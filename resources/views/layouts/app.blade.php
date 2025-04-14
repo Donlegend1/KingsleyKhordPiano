@@ -20,16 +20,28 @@
                 <a href="/" class="text-2xl font-bold"><img src="/logo/logo.png" alt="KingsleyKhord logo"></a>
 
                 <nav class="hidden lg:flex flex-grow active:text-white items-center text-white justify-center space-x-6">
-                    @foreach (['Home', 'Plans', 'About Us', 'Contact Us'] as $link)
-                        <a href="#"
+                 
+                        <a href="/"
                            class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
-                            {{ strtoupper($link) }}
+                           Home
                         </a>
-                    @endforeach
+                        <a href="/plans"
+                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
+                           Plans
+                        </a>
+                        <a href="/about"
+                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
+                           About Us
+                        </a>
+                        <a href="/contact"
+                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
+                           Contact Us
+                        </a>
+                   
                 </nav>
 
                 <div class="hidden lg:flex space-x-4">
-                    <a href="#"
+                    <a href="/login"
                        class="text-sm font-semibold px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-[#FFD736] hover:text-white transition">
                         Login here
                     </a>
@@ -47,15 +59,28 @@
             <!-- Mobile Nav -->
             <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4 space-y-4">
                 <div class="flex flex-col space-y-2">
-                    @foreach (['Home', 'Plans', 'About Us', 'Contact Us'] as $link)
-                        <a href="#"
+                  
+                       
+                    <a href="/"
                            class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
-                            {{ strtoupper($link) }}
+                           Home
                         </a>
-                    @endforeach
+                        <a href="/plans"
+                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
+                           Plans
+                        </a>
+                        <a href="/about"
+                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
+                           About Us
+                        </a>
+                        <a href="/contact"
+                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
+                           Contact Us
+                        </a>
+                    
                 </div>
                 <div class="flex flex-col space-y-2 mt-4">
-                    <a href="#"
+                    <a href="/login"
                        class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
                         LOGIN Here
                     </a>
