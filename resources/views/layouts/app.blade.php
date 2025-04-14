@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name', 'Laravel') }}</title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+    <div id="app">
+        <!-- Navbar -->
+        <header class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+                <a href="/" class="text-2xl font-bold"><img src="/logo/logo.png" alt="KingsleyKhord logo"></a>
+
+                <nav class="hidden lg:flex flex-grow active:text-white items-center text-white justify-center space-x-6">
+                    @foreach (['Home', 'Plans', 'About Us', 'Contact Us'] as $link)
+                        <a href="#"
+                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
+                            {{ strtoupper($link) }}
+                        </a>
+                    @endforeach
+                </nav>
+
+                <div class="hidden lg:flex space-x-4">
+                    <a href="#"
+                       class="text-sm font-semibold px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-[#FFD736] hover:text-white transition">
+                        Login here
+                    </a>
+                
+                </div>
+
+                <button class="lg:hidden navbar-burger" aria-label="Open Menu">
+                    <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Nav -->
+            <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4 space-y-4">
+                <div class="flex flex-col space-y-2">
+                    @foreach (['Home', 'Plans', 'About Us', 'Contact Us'] as $link)
+                        <a href="#"
+                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
+                            {{ strtoupper($link) }}
+                        </a>
+                    @endforeach
+                </div>
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="#"
+                       class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
+                        LOGIN Here
+                    </a>
+                    
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main >
+            @yield('content')
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+  <div class="max-w-7xl mx-auto py-6 px-4 flex flex-col md:flex-row items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+    <div class="flex items-center">
+      <div>&copy; {{ date('Y') }} {{ config('app.name') }}</div>
+      <div class="h-4 border-l border-gray-400 mx-2"></div>
+      <div>All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+    </div>
+
+    <script>
+        // Toggle mobile nav
+        document.addEventListener('DOMContentLoaded', () => {
+            const burger = document.querySelector('.navbar-burger');
+            const nav = document.getElementById('mobile-nav');
+
+            burger?.addEventListener('click', () => {
+                nav.classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
