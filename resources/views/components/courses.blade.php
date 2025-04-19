@@ -1,6 +1,6 @@
-<section class=" container mx-auto py-10">
-  <div class="text-center mb-6">
-    <p class="font-bold text-2xl"> Featured Courses </p>
+<section class=" py-24 relative bg-cover bg-center h-[75vh]" style="background-image: url('/images/Background.jpg')">
+  <div class="text-center mb-12">
+    <p class="font-bold text-4xl"> Featured Courses </p>
   </div>
   <div class="flex flex-wrap justify-center gap-6">
     <div class="max-w-sm rounded overflow-hidden shadow-lg">
