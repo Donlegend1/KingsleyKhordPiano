@@ -25,7 +25,8 @@
   </ul>
 
   <div class="flex justify-center">
-    <button class="w-full bg-white border border-[#C2D3DD73] text-black px-4 py-2 rounded hover:bg-gray-100 transition">
+    <button class="w-full bg-white border border-[#C2D3DD73] text-black px-4 py-2 rounded hover:bg-gray-100 transition"
+    onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: { plan: 'Monthly Membership', amount: '$25 / ₦37,000' } }))">
       Choose Plan
     </button>
   </div>
@@ -46,11 +47,61 @@
   </ul>
 
   <div class="flex justify-center">
-    <button class="w-full bg-[#1B223C] border border-[#C2D3DD73] text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+    <button class="w-full bg-[#1B223C] border border-[#C2D3DD73] text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+     onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: { plan: 'Yearly Membership', amount: '$200 / ₦300,000' } }))">
       Choose Plan
     </button>
   </div>
 </div>
+
+
+
+<div 
+  x-data="{ open: false, plan: '', amount: '' }" 
+  x-show="open"
+  @open-modal.window="open = true; plan = $event.detail.plan; amount = $event.detail.amount"
+  @keydown.escape.window="open = false"
+  @click.away="open = false"  
+  class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 py-9"
+  x-cloak
+  x-transition:enter="transition ease-out duration-300"
+  x-transition:enter-start="opacity-0 transform scale-95"
+>
+  <div class="bg-[#2D2D2D] rounded-xl shadow-xl p-12 w-full max-w-lg mx-auto">
+    <!-- Modal Header -->
+    <h2 class="text-2xl font-bold text-center text-white mb-2">
+      Choose your Preferred Payment Option
+    </h2>
+    <p class="text-center text-white mb-4" x-text="plan + ' - ' + amount"></p>
+    
+    <!-- Payment Options -->
+    <div class="flex flex-col gap-6">
+      <!-- Paystack Option -->
+      <a :href="'/paystack-route?plan=' + plan" class="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold flex items-center justify-center">
+        <img src="/icons/paystack.png" alt="Paystack" />
+      </a>
+
+      <!-- Stripe Option -->
+      <a :href="'/stripe-route?plan=' + plan" class="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold flex items-center justify-center">
+        <img src="/icons/stripe.png" alt="Stripe" />
+      </a>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="mt-4 flex items-center justify-center text-sm text-gray-400">
+      <p>Powered by 
+        <span class="inline-block  bg-gray-300 rounded-md">
+          <img src="/icons/stripe2.png" alt="Stripe" /> 
+        </span>
+        <span class="inline-block  bg-gray-300 rounded-md">
+          <img src="/icons/paystack2.png" alt="Paystack"  /> 
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+
 
 
   </div>

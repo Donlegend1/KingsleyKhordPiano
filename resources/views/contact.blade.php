@@ -1,8 +1,6 @@
 @extends("layouts.app")
 
 @section("content")
-<div>
- plans
-</div>
 
+@include("components.contact")
 @endsection

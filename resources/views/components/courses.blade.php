@@ -1,4 +1,4 @@
-<section class=" py-24 relative bg-cover bg-center h-[75vh]" style="background-image: url('/images/Background.jpg')">
+<section class=" py-24 bg-cover bg-center " style="background-image: url('/images/Background.jpg')">
   <div class="text-center mb-12">
     <p class="font-bold text-4xl"> Featured Courses </p>
   </div>
