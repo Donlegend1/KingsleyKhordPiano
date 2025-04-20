@@ -1,7 +1,9 @@
-<section class="container mx-auto bg-white">
-  <div class="text-center my-7">
-    <p class="font-bold text-2xl md:text-3xl"> A Glimpse Into Student's Journey </p>
+<section class=" bg-[#F7F8F8] ">
+  <div class="text-center my-10">
+    <p class="font-bold text-2xl md:text-3xl pt-10"> A Glimpse Into Student's Journey </p>
   </div>
+  <div class="container mx-auto px-4 py-5">
+ 
   <div class="flex flex-wrap justify-center">
     <div class="w-full md:w-1/2 lg:w-1/2 xl:w-1/2 p-4">
       <div class="bg-white  p-6 rounded-lg shadow-lg h-full">
@@ -76,5 +78,6 @@
       </div>
      
     </div>
+  </div>
   </div>
 </section>

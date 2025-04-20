@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
@@ -19,72 +22,68 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                 <a href="/" class="text-2xl font-bold"><img src="/logo/logo.png" alt="KingsleyKhord logo"></a>
 
-                <nav class="hidden lg:flex flex-grow active:text-white items-center text-white justify-center space-x-6">
-                 
-                        <a href="/"
-                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
-                           Home
-                        </a>
-                        <a href="/plans"
-                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
-                           Plans
-                        </a>
-                        <a href="/about"
-                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
-                           About Us
-                        </a>
-                        <a href="/contact"
-                           class="text-sm font-semibold hover:text-[#FFD736] transition duration-200">
-                           Contact Us
-                        </a>
-                   
+                <!-- Desktop Nav -->
+                <nav class="hidden lg:flex flex-grow items-center justify-center space-x-6">
+                <a href="/"
+                    class="text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Home
+                </a>
+                <a href="/plans"
+                    class="text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Plans
+                </a>
+                <a href="/about"
+                    class="text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    About Us
+                </a>
+                <a href="/contact"
+                    class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Contact Us
+                </a>
                 </nav>
 
+                <!-- Login -->
                 <div class="hidden lg:flex space-x-4">
-                    <a href="/login"
-                       class="text-sm font-semibold px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-[#FFD736] hover:text-white transition">
-                        Login here
-                    </a>
-                
+                <a href="/login"
+                    class="text-sm font-semibold px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-[#FFD736] hover:text-white transition">
+                    Login here
+                </a>
                 </div>
 
+                <!-- Mobile Toggle -->
                 <button class="lg:hidden navbar-burger" aria-label="Open Menu">
-                    <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
+                <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
                 </button>
             </div>
 
             <!-- Mobile Nav -->
             <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4 space-y-4">
                 <div class="flex flex-col space-y-2">
-                  
-                       
-                    <a href="/"
-                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
-                           Home
-                        </a>
-                        <a href="/plans"
-                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
-                           Plans
-                        </a>
-                        <a href="/about"
-                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
-                           About Us
-                        </a>
-                        <a href="/contact"
-                           class="block text-sm font-semibold text-white hover:text-[#FFD736] transition duration-200">
-                           Contact Us
-                        </a>
-                    
+                <a href="/"
+                    class="block text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Home
+                </a>
+                <a href="/plans"
+                    class="block text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Plans
+                </a>
+                <a href="/about"
+                    class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    About Us
+                </a>
+                <a href="/contact"
+                    class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Contact Us
+                </a>
                 </div>
                 <div class="flex flex-col space-y-2 mt-4">
-                    <a href="/login"
-                       class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
-                        LOGIN Here
-                    </a>
-                    
+                <a href="/login"
+                    class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
+                    LOGIN Here
+                </a>
                 </div>
             </div>
         </header>
@@ -95,15 +94,15 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-  <div class="max-w-7xl mx-auto py-6 px-4 flex flex-col md:flex-row items-center justify-center text-sm text-gray-500 dark:text-gray-400">
-    <div class="flex items-center">
-      <div>&copy; {{ date('Y') }} {{ config('app.name') }}</div>
-      <div class="h-4 border-l border-gray-400 mx-2"></div>
-      <div>All rights reserved.</div>
-    </div>
-  </div>
-</footer>
+        <footer class="bg-gray-100 shadow sticky bottom-0 z-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-5">
+        <div class="max-w-7xl mx-auto  px-4 flex flex-col md:flex-row items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+            <div class="flex items-center">
+            <div>&copy; {{ date('Y') }} {{ config('app.name') }}</div>
+            <div class="h-4 border-l border-gray-400 mx-2"></div>
+            <div>All rights reserved.</div>
+            </div>
+        </div>
+        </footer>
     </div>
 
     <script>
@@ -117,5 +116,25 @@
             });
         });
     </script>
+ <script>
+    const slider = document.getElementById('slider');
+    const slides = slider.children;
+    const totalSlides = slides.length;
+    let currentIndex = 0;
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentIndex < totalSlides - 1) currentIndex++;
+      updateSlider();
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentIndex > 0) currentIndex--;
+      updateSlider();
+    });
+
+    function updateSlider() {
+      slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+  </script>
 </body>
 </html>

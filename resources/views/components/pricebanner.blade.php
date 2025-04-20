@@ -7,7 +7,7 @@
         <h1 class="text-5xl  md:text-6xl font-bold leading-tight mb-6">
         I will teach you to play
         </h1>
-        <p class="text-4xl md:text-6xl mb-8 italic text-[#FFD736] ">
+        <p class="text-4xl md:text-6xl mb-8 italic text-[#FFD736] font-playfair">
         Gospel Piano like the Pros
         </p>
         <p class="mb-2 font-thin text-gray">

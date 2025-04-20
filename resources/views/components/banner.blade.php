@@ -7,7 +7,7 @@
         <h1 class="text-5xl  md:text-6xl font-bold leading-tight mb-6">
         Master Gospel Piano
         </h1>
-        <p class="text-4xl md:text-6xl mb-8 italic text-[#FFD736] ">
+        <p class="text-4xl md:text-6xl mb-8 text-[#FFD736] italic font-playfair">
         and Play Like the Pros
         </p>
         <p class="mb-2 font-thin text-gray">

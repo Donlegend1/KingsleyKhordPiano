@@ -1,6 +1,7 @@
 @extends("layouts.app")
 
 @section("content")
+@include("components.about")
 
-<div>about</div>
+@include("components.stats")
 @endsection
