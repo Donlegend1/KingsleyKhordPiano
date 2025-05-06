@@ -24,6 +24,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://js.paystack.co/v2/inline.js">
 
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -149,5 +150,53 @@
       slider.style.transform = `translateX(-${currentIndex * 100}%)`;
     }
   </script>
+
+<script>
+function registerForm() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+        plan: '',
+        showPaymentModal: false,
+        registerUser() {
+            fetch('{{ route('register') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: JSON.stringify({
+                    name: this.name,
+                    email: this.email,
+                    password: this.password,
+                    password_confirmation: this.password_confirmation,
+                    plan: params.get('plan') ,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || data.user) {
+                    this.showPaymentModal = true;
+                } else if (data.errors) {
+                    alert("Error: " + JSON.stringify(data.errors));
+                } else {
+                    alert("Something went wrong.");
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert("Something went wrong.");
+            });
+        }
+    }
+}
+</script>
+
+
+
 </body>
 </html>

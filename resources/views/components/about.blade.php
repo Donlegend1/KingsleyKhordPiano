@@ -3,8 +3,8 @@
 
     <!-- Intro Text -->
     <div class="flex">
-      <div class="md:w-3/5 text-left max-w-4xl">
-        <p class="font-bold text-2xl mb-4">
+      <div class="md:w-3/5 text-left max-w-5xl">
+        <p class="font-bold text-[24px] mb-4">
           Welcome to KingsleyKhord Music Academy, where piano playing meets mastery.
         </p>
         <p class="mb-4 text-sm text-gray-500">

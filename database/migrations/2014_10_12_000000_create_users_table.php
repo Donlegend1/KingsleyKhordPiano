@@ -19,6 +19,17 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+
+            // Subscription-related fields
+            $table->string('plan')->nullable(); // Add plan column
+            $table->string('amount')->nullable(); // Add amount column
+
+            // Payment details
+            $table->string('payment_status')->default('pending'); // e.g., 'pending', 'completed'
+            $table->string('payment_method')->nullable(); // e.g., 'card', 'crypto', 'bank'
+            $table->string('last_payment_reference')->nullable(); // e.g., Stripe or Paystack reference
+            $table->decimal('last_payment_amount', 10, 2)->nullable();
+            $table->timestamp('last_payment_at')->nullable();
         });
     }
 

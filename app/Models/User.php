@@ -21,6 +21,20 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+
+        // Custom subscription/payment fields
+        'plan',
+        'amount',
+        'payment_status',
+        'subscription_type',
+        'subscription_payload',
+        'subscription_status',
+        'subscription_started_at',
+        'subscription_expires_at',
+        'payment_method',
+        'last_payment_reference',
+        'last_payment_amount',
+        'last_payment_at',
     ];
 
     /**
@@ -40,5 +54,10 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'subscription_payload' => 'array',
+        'subscription_started_at' => 'datetime',
+        'subscription_expires_at' => 'datetime',
+        'last_payment_at' => 'datetime',
+        'last_payment_amount' => 'decimal:2',
     ];
 }

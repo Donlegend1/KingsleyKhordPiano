@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SubscriptionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,10 +24,18 @@ Route::get('/about', function () {
 Route::get('/contact', function () {
     return view('contact');
 });
-Route::get('/plans', function () {
-    return view('plans');
-});
+
+Route::get('/plans', [App\Http\Controllers\SubscriptionController::class, 'index']);
 
 Auth::routes();
 
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
+Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('paystack.callback');
+
+Route::get('/stripe-route', [PaymentController::class, 'redirectToStripe'])->name('stripe.redirect');
+Route::get('/stripe/success', [PaymentController::class, 'stripeSuccess'])->name('stripe.success');
+Route::get('/stripe/cancel', [PaymentController::class, 'stripeCancel'])->name('stripe.cancel');
+

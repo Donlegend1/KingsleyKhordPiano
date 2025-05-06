@@ -1,4 +1,4 @@
-<section class="container mx-auto px-5 md:px-28 h-[85vh] bg-white">
+<section class="container mx-auto px-5 md:px-28 h-[95vh] bg-white" id="plans">
   <div class="text-center my-12 mx-auto">
     <p class="font-bold text-4xl">Gain Immediate Entry to </p>
     <p class="font-bold text-4xl my-3 text-[#BC1414]">Kingsley Khord Piano Academy</p>
@@ -12,8 +12,8 @@
  <div class="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full md:w-1/3">
   <img src="/icons/price1.png" alt="" class=" mb-4">
   
-  <h3 class="text-xl font-semibold text-black mb-4 ">Monthly Membership</h3>
-  <p class="text-2xl font-bold mb-2 ">$25 / ₦37,000</p>
+  <h3 class="text-xl font-semibold text-black mb-4 ">{{$monthlyPlan->name}}</h3>
+  <p class="text-2xl font-bold mb-2 ">${{number_format($monthlyPlan->amount_dollar)}} / ₦{{number_format($monthlyPlan->amount_naria)}}</p>
   <p class="text-sm border border-gray-100 my-4"></p>
 
   <ul class="text-sm text-gray-700 mb-6 list-disc list-inside">
@@ -25,17 +25,20 @@
   </ul>
 
   <div class="flex justify-center">
-    <button class="w-full bg-white border border-[#C2D3DD73] text-black px-4 py-2 rounded hover:bg-gray-100 transition"
-    onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: { plan: 'Monthly Membership', amount: '$25 / ₦37,000' } }))">
-      Choose Plan
-    </button>
+  <button
+  class="w-full bg-white border border-[#C2D3DD73] text-black px-4 py-2 rounded hover:bg-gray-100 transition"
+  onclick="window.location.href = `/register?plan={{$monthlyPlan->id}}`"
+>
+  Choose Plan
+</button>
+
   </div>
 </div>
 <div class="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full md:w-1/3"  style="background-image: url('/images/Background.jpg')">
   <img src="/icons/price2.png" alt="" class=" mb-4 p-3 border bg-[#C2D3DD73] rounded-3xl">
   
-  <h3 class="text-xl font-semibold text-black mb-4 ">Yearly Membership <span class="mx-5 p-1 rounded-md text-sm bg-gray-200">save $100</span></h3>
-  <p class="text-2xl font-bold mb-2 ">$200 / ₦300,000</p>
+  <h3 class="text-xl font-semibold text-black mb-4 ">{{$yearlyPlan->name}} <span class="mx-5 p-1 rounded-md text-sm bg-gray-200">save $100</span></h3>
+  <p class="text-2xl font-bold mb-2 ">${{number_format($yearlyPlan->amount_dollar)}} / ₦{{number_format($yearlyPlan->amount_naria)}} </p>
   <p class="text-sm border border-gray-100 my-4"></p>
 
   <ul class="text-sm text-gray-700 mb-6 list-disc list-inside">
@@ -47,10 +50,13 @@
   </ul>
 
   <div class="flex justify-center">
-    <button class="w-full bg-[#1B223C] border border-[#C2D3DD73] text-white px-4 py-2 rounded hover:bg-gray-700 transition"
-     onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: { plan: 'Yearly Membership', amount: '$200 / ₦300,000' } }))">
-      Choose Plan
-    </button>
+  <button
+  class="w-full bg-[#1B223C] border border-[#C2D3DD73] text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+  onclick="window.location.href = `/register?plan={{$yearlyPlan->id}}`"
+>
+  Choose Plan
+</button>
+
   </div>
 </div>
 
@@ -100,9 +106,6 @@
     </div>
   </div>
 </div>
-
-
-
 
   </div>
 </section>

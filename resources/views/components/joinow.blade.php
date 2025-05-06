@@ -8,7 +8,7 @@
     </div>
     <p class="mb-2 font-thin text-gray max-w-3xl mx-auto"> Remember, being the best involves understanding the fundamentals. It’s a completely different approach from following the latest tricks. </p>
     <div class="flex flex-wrap justify-center my-7">
-      <a href="#plans" class="flex bg-[#FFD736] uppercase px-3 py-2 hover:bg-[#c2ab39] text-black rounded-md font-medium transition">
+      <a href="/register" class="flex bg-[#FFD736] uppercase px-3 py-2 hover:bg-[#c2ab39] text-black rounded-md font-medium transition">
         <img src="/icons/forward.png" alt="forward" class="ml-2 order-last mt-1 h-4 ">
         Join Now
       </a>
