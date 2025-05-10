@@ -35,4 +35,16 @@ return [
     'secret_key' => env('PAYSTACK_SECRET_KEY'),
     ],
 
+    'stripe' => [
+    'key' => env('STRIPE_KEY'),
+    'secret' => env('STRIPE_SECRET'),
+],
+
+'paypal' => [
+    'client_id' => env('PAYPAL_LIVE_CLIENT_ID'),
+    'secret' => env('PAYPAL_LIVE_CLIENT_SECRET'),
+    'currency' => env('PAYPAL_CURRENCY'),
+    'test_mode' => env('PAYPAL_TEST_MODE', true),
+],
+
 ];

@@ -59,5 +59,7 @@ class User extends Authenticatable
         'subscription_expires_at' => 'datetime',
         'last_payment_at' => 'datetime',
         'last_payment_amount' => 'decimal:2',
+        'metadata' => 'array',
     ];
+
 }

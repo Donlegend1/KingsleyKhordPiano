@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->timestamps();
+          
 
             // Subscription-related fields
             $table->string('plan')->nullable(); // Add plan column
@@ -30,6 +30,9 @@ return new class extends Migration
             $table->string('last_payment_reference')->nullable(); // e.g., Stripe or Paystack reference
             $table->decimal('last_payment_amount', 10, 2)->nullable();
             $table->timestamp('last_payment_at')->nullable();
+            $table->json('metadata')->nullable();
+
+            $table->timestamps();
         });
     }
 

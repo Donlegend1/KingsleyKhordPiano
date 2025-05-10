@@ -35,9 +35,8 @@
      <header class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between space-x-6">
         
-        <!-- Left: Logo + Member Area -->
         <div class="flex items-center space-x-4 flex-shrink-0">
-            <a href="/" class="text-2xl font-bold">
+            <a href="/home" class="text-2xl font-bold">
                 <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8">
             </a>
             <span class="text-[#FFD736] flex items-center space-x-1">
@@ -64,19 +63,19 @@
         <!-- Right: Navigation & Mobile Menu Button -->
         <div class="flex items-center space-x-4">
             <nav class="hidden lg:flex items-center space-x-6">
-                <a href="/"
+                <a href="/member/getstarted"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Get Started
                 </a>
-                <a href="/plans"
+                <a href="#"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Community
                 </a>
-                <a href="/about"
+                <a href="/member/profile"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     My Account
                 </a>
-                <a href="/contact"
+                <a href="#"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Support
                 </a>
@@ -101,19 +100,19 @@
     <!-- Mobile Nav -->
     <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4 space-y-4">
         <div class="flex flex-col space-y-2">
-            <a href="/"
+            <a href="/member/getstarted"
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 Get Started
             </a>
-            <a href="/plans"
+            <a href="#"
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 Community
             </a>
-            <a href="/about"
+            <a href="/member/profile"
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 My Account
             </a>
-            <a href="/contact"
+            <a href="#"
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 Support
             </a>
@@ -129,53 +128,65 @@
         
         </div>
     </div>
+   
 </header>
 <section class="bg-gray-900 text-white py-7 shadow">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center space-x-4 overflow-x-auto">
 
-        <a href="/member/dashboard" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-th-large" aria-hidden="true"></i>
+        <a href="/home" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
+           <img src="/icons/dashboard.svg">
             <span>Dashboard</span>
         </a>
 
         <a href="/member/roadmap" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-map text-[#FAFAFA]"></i>
+            <img src="/icons/roadmap2.png">
             <span>Roadmap</span>
         </a>
 
         <a href="/member/piano-exercise" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-music text-[#FAFAFA]"></i>
+            <img src="/icons/piano2.png">
             <span>Piano Exercise</span>
         </a>
 
         <a href="/member/ear-training" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-headphones text-[#FAFAFA]"></i>
+            <img src="/icons/eartraning.svg">
             <span>Ear Training</span>
         </a>
 
         <a href="/member/extra-courses" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-book text-[#FAFAFA]"></i>
+            <img src="/icons/extracourse.svg">
             <span>Extra Courses</span>
         </a>
 
-        <a href="/member/quick-lesson" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-bolt text-[#FAFAFA]"></i>
+        <a href="/member/quick-lessons" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
+            <img src="/icons/quick lession.svg">
             <span>Quick Lesson</span>
         </a>
 
         <a href="/member/learn-songs" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-music text-[#FAFAFA]"></i>
+            <img src="/icons/songs.svg">
             <span>Learn Songs</span>
         </a>
 
         <a href="/member/live-session" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
-            <i class="fa fa-video-camera text-[#FAFAFA]"></i>
+            <img src="/icons/livesession.svg">
             <span>Live Session</span>
         </a>
 
     </div>
 </section>
 
+@if(session()->has('success'))
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        {{ session()->get('success') }}
+    </div>
+@endif
+
+@if(session()->has('error'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ session()->get('error') }}
+    </div>
+@endif
 
 
 

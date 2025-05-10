@@ -2,7 +2,9 @@
 
 @section('content')
 
-@include("components.memberarea.getstarted")
+@if(auth()->user()->created_at->diffInDays(now()) <= 7)
+    @include("components.memberarea.getstarted")
+@endif
 @include("components.memberarea.details")
 @include("components.memberarea.guide")
 @include("components.memberarea.stats")

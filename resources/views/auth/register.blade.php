@@ -6,12 +6,13 @@
   <div class="flex flex-col md:flex-row items-stretch gap-8">
     <div class="w-full md:w-3/5 bg-white p-6 rounded-lg shadow-lg">
 
-    <form action="/paystack"> 
-  <input type="hidden" name="user_email" value="shedrackogwuche5@gmail.com"> 
-  <input type="hidden" name="amount" value="10000"> 
-  <input type="hidden" name="cartid" value="1"> 
-  <button type="submit" name="pay_now" id="pay-now" title="Pay now">Pay now</button>
-</form>
+      <form action="/stripe/create" method="post">
+        @csrf
+        <input type="hidden" name="plan" value="{{ request()->query('plan') }}">
+        <button type="submit">
+          sucmite
+        </button>
+      </form>
       <h2 class="text-3xl font-bold text-gray-800 mb-6">{{ __('Register') }}</h2>
       <form @submit.prevent="registerUser" class="space-y-4 h-full">
         @csrf
@@ -25,6 +26,7 @@
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
           @enderror
         </div>
+
 
         <!-- Email -->
         <div>
@@ -69,7 +71,6 @@
         </button>
       </form>
     </div>
-
     <!-- Image (Right Side) -->
     <div class="w-full md:w-2/5 hidden md:block">
       <img src="/images/banner.png" alt="Register" class="w-full h-full object-cover rounded-lg shadow-lg">
@@ -89,8 +90,9 @@
     <!-- Buttons Section -->
     <div class="flex flex-col space-y-4">
       <!-- Paystack Button -->
-      <form action="/paystack" method="GET">
-        <input type="hidden" name="plan" value="1">
+      <form action="/paystack" method="POST">
+       @csrf
+       <input type="hidden" name="plan" value="{{ request()->query('plan') }}">
         <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 transition-all duration-200 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-3 shadow">
           <img src="/icons/paystack.png" alt="Paystack" class="w-6 h-6" />
           Pay with Paystack
@@ -98,11 +100,20 @@
       </form>
 
       <!-- Stripe Button -->
-      <form action="{{ route('stripe.redirect') }}" method="GET">
-        <input type="hidden" name="plan" :value="plan">
+      <form action="/stripe/create" method="POST" >
+          @csrf
+          <input type="hidden" name="plan" value="{{ request()->query('plan') }}">
         <button type="submit" class="w-full bg-[#FFD736] text-black hover:bg-yellow-400 transition-all duration-200 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-3 shadow">
           <img src="/icons/stripe.png" alt="Stripe" class="w-6 h-6" />
           Pay with Stripe
+        </button>
+      </form>
+       <form action="paypal/create-order" method="POST" >
+          @csrf
+          <input type="hidden" name="plan" value="{{ request()->query('plan') }}">
+        <button type="submit" class="w-full bg-[#FFD736] text-black hover:bg-yellow-400 transition-all duration-200 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-3 shadow">
+          <img src="/icons/paypal.png" alt="Stripe" class="w-6 h-6" />
+          Pay with Paypal
         </button>
       </form>
     </div>
