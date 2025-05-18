@@ -22,21 +22,35 @@
         @enderror
       </div>
 
-      <div>
+      <div x-data="{ showPassword: false }" class="relative">
         <label for="password" class="block text-gray-700 mb-1">{{ __('Password') }}</label>
+        
         <input
-          type="password"
-          id="password"
-          name="password" required autocomplete="current-password"
-          placeholder="••••••••"
-          class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            placeholder="••••••••"
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+    
+        <!-- Toggle Visibility Button -->
+        <button 
+        type="button" 
+        @click="showPassword = !showPassword" 
+        class="absolute right-3 top-12 transform -translate-y-1/2 focus:outline-none"
+    >
+        <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-gray-500"></i>
+    </button>
+    
         @error('password')
-            <span class="invalid-feedback" role="alert">
+            <span class="invalid-feedback text-red-600" role="alert">
                 <strong>{{ $message }}</strong>
             </span>
         @enderror
-      </div>
+       </div>
+     
 
       <div class="flex items-center justify-between text-sm text-gray-600">
         <label class="flex items-center gap-2">

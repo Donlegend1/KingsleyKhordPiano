@@ -28,7 +28,7 @@
       <span>Zoom Video</span>
     </p>
     <p class="font-semibold flex items-center space-x-2">
-      <i class="fa fa-usd" aria-hidden="true"></i>
+      <i class="fa fa-money" aria-hidden="true"></i>
       <span>$60</span>
     </p>
   </div>

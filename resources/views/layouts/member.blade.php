@@ -22,12 +22,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://js.paystack.co/v2/inline.js">
+    <script src="https://js.paystack.co/v2/inline.js" ></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 
-
+    @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
     <div id="app">
@@ -204,7 +205,7 @@
         </div>
         </footer>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const burger = document.querySelector('.navbar-burger');
@@ -216,7 +217,36 @@
         });
     </script>
 
+    <script>
+  function changeTab(tab) {
+    // Hide all tab contents
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => {
+      content.classList.add('hidden');
+    });
 
+    // Remove active state from all buttons
+    const buttons = document.querySelectorAll('[data-tab]');
+    buttons.forEach(button => {
+      button.classList.remove('bg-gray-300');
+      button.classList.add('bg-transparent');
+    });
+
+    // Show content of the selected tab
+    const activeContent = document.querySelector(`[data-content="${tab}"]`);
+    activeContent.classList.remove('hidden');
+
+    // Add active state to the selected button
+    const activeButton = document.querySelector(`[data-tab="${tab}"]`);
+    activeButton.classList.remove('bg-transparent');
+    activeButton.classList.add('bg-gray-300');
+  }
+
+  // Initially set the first tab as active
+  document.addEventListener("DOMContentLoaded", function() {
+    changeTab('beginners');
+  });
+</script>
 
 </body>
 </html>

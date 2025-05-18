@@ -10,12 +10,14 @@
     
     <!-- Progress Bar -->
     <div class="mt-4">
+      
       <label for="progress" class="text-sm text-gray-600">Progress</label>
       <p class="font-semibold text-[#145CCF]">Introduction to Pentatonic Scales</p>
       <p class="font-semibold text-[#145CCF]">5/12 <span class="text-gray-400">modules in this course</span></p>
-      <progress id="progress" value="5" max="12" class="w-full h-2 bg-gray-200 rounded-md mt-1 text-[#145CCF]"></progress>
-      
-    </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
+      </div>
+  </div>
 
     <!-- Button (Link) -->
     <div class="mt-6 text-left">
@@ -28,7 +30,9 @@
       <label for="progress" class="text-sm text-gray-600">The Harmonic Techniques</label>
       <p class="font-semibold text-[#145CCF]">Introduction to Pentatonic Scales</p>
       <p class="font-semibold text-[#145CCF]">18/24 <span class="text-gray-400">modules in this course</span></p>
-      <progress id="progress" value="18" max="24" class="w-full h-2 rounded-md mt-1 bg-[#145CCF] text-[#145CCF]" ></progress>
+      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 75%"></div>
+      </div>
       
     </div>
 

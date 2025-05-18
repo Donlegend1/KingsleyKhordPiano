@@ -24,11 +24,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://js.paystack.co/v2/inline.js">
+    <script src="https://js.paystack.co/v2/inline.js"></script>
      <script src="https://js.stripe.com/v3/"></script>
 
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+     @viteReactRefresh
+    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
     <div id="app">
@@ -198,6 +199,7 @@ function registerForm() {
 
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 
 </body>
 </html>

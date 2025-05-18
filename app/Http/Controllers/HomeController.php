@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles\UserRoles;
+use App\Models\User;
+
 
 class HomeController extends Controller
 {
@@ -24,7 +27,14 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+
+        if (Auth::user()->role == UserRoles::ADMIN->value) {
+            return view('admin.home');
+        }
+        if (Auth::user()->role == UserRoles::MEMBER->value) {
+            return view('home');
+        }
+        
     }
 
     function profile() {

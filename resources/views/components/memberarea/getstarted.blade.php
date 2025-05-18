@@ -13,9 +13,12 @@
       <a href="/member/getstarted" class="px-4 py-1.5 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 transition inline-flex items-center">
         Get Started <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
       </a>
-      <button class="px-4 py-1.5 bg-transparent border border-[#404348] text-[#404348] text-sm rounded-full hover:bg-yellow-50 transition inline-flex items-center">
-        Close <i class="fa fa-times ml-2" aria-hidden="true"></i>
-      </button>
+      <form action="/member/getstarted/updated" method="post">
+        @csrf
+        <button type="submit" class="px-4 py-1.5 bg-transparent border border-[#404348] text-[#404348] text-sm rounded-full hover:bg-yellow-50 transition inline-flex items-center">
+          Close <i class="fa fa-times ml-2" aria-hidden="true"></i>
+        </button>
+      </form>
     </div>
     
   </div>

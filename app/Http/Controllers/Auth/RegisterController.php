@@ -47,6 +47,7 @@ class RegisterController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'plan' => $request->plan,
+                'role' => UserRole::MEMBER->value,
                 'payment_status' => 'pending',
             ]);
 
