@@ -11,7 +11,7 @@ class UpdateCourseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class UpdateCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category' => 'required|string|max:255',
+            'level' => 'required|in:beginner,intermediate,advanced',
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        
+            'status' => 'nullable|in:active,inactive,draft',
+            'video_url' => 'nullable|string',
+            'prerequisites' => 'nullable|string',
+            'what_you_will_learn' => 'nullable|string',
+            'published_at' => 'nullable|date',
         ];
     }
 }

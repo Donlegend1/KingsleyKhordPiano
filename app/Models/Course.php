@@ -14,15 +14,20 @@ class Course extends Model
         'category',
         'description',
         'video_url',
-        'image_path',
+        // 'image_path',
         'price',
         'duration',
         'level',
         'status',
-        'prerequisites',
-        'what_you_will_learn',
-        'resources',
+        // 'prerequisites',
+        // 'what_you_will_learn',
+        // 'resources',
         'requirements',
 
     ];
+
+    public function completedByUsers()
+{
+    return $this->belongsToMany(User::class, 'user_video_completions')->withTimestamps();
+}
 }

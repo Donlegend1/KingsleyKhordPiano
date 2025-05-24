@@ -9,8 +9,13 @@
 @include("components.approach")
 @include("components.membership")
 @include("components.practise")
-@include("components.price")
+{{-- @include("components.price") --}}
+<div id="plan-switch" >
+   
+</div>
 @include("components.journey")
+{{-- @include("components.memberarea.schedule") --}}
+<div id="zoomMeetingBooking"></div>
 @include("components.faq")
 
 

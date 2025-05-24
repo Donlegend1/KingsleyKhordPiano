@@ -45,10 +45,13 @@
         <i class="fa fa-cog"></i>
         <span>Settings</span>
       </a>
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200">
-        <i class="fa fa-sign-out-alt"></i>
-        <span>Logout</span>
-      </a>
+       <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button class="flex items-center gap-3 p-2 rounded-lg hover:bg-yellow-400 hover:text-black" type="submit" >
+           <i class="fa fa-sign-out-alt"></i> {{ __('Logout') }}
+        </button>
+    </form>
+     
     </nav>
   </aside>
 

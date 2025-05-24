@@ -28,7 +28,7 @@
      <script src="https://js.stripe.com/v3/"></script>
 
      @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
@@ -44,25 +44,33 @@
                     class="text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Home
                 </a>
-                <a href="/plans"
+                {{-- <a href="/plans"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Plans
-                </a>
+                </a> --}}
                 <a href="/about"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    About Us
+                    About
                 </a>
                 <a href="/contact"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Contact Us
+                    Contact
+                </a>
+                <a href="/member/shop"
+                    class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Shop
                 </a>
                 </nav>
 
                 <!-- Login -->
-                <div class="hidden lg:flex space-x-4">
+                <div class="hidden lg:flex space-x-2">
+                    <a href="/register"
+                    class="text-sm font-semibold px-4 py-2 rounded-md bg-transparent border border-gray-300 text-white hover:bg-[#FFD736] hover:text-black transition">
+                    Sign Up 
+                </a>
                 <a href="/login"
-                    class="text-sm font-semibold px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-[#FFD736] hover:text-white transition">
-                    Login here
+                    class="text-sm font-semibold px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-[#FFD736] hover:text-black transition">
+                    Login 
                 </a>
                 </div>
 
@@ -82,23 +90,31 @@
                     class="block text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Home
                 </a>
-                <a href="/plans"
+                {{-- <a href="/plans"
                     class="block text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Plans
-                </a>
+                </a> --}}
                 <a href="/about"
                     class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    About Us
+                    About
                 </a>
                 <a href="/contact"
                     class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Contact Us
+                    Contact
+                </a>
+                 <a href="/member/shop"
+                    class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Shop
                 </a>
                 </div>
                 <div class="flex flex-col space-y-2 mt-4">
+                    <a href="/register"
+                    class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
+                    Sign Up
+                </a>
                 <a href="/login"
                     class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
-                    LOGIN Here
+                    Login
                 </a>
                 </div>
             </div>

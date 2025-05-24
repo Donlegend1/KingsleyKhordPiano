@@ -9,7 +9,8 @@
 @include("components.memberarea.guide")
 @include("components.memberarea.stats")
 @include("components.memberarea.liveshow")
-@include("components.memberarea.schedule")
+<div id="zoomMeetingBooking"></div>
+{{-- @include("components.memberarea.schedule") --}}
 
 
 @endsection

@@ -25,17 +25,16 @@ class StoreCourseRequest extends FormRequest
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'description' => 'required|string',
-            'video_url' => 'nullable|url',
-            'image_path' => 'nullable|string',
+            'video_url' => 'nullable|string',
             'level' => 'nullable|in:beginner,intermediate,advanced',
             'status' => 'nullable|in:active,inactive,draft',
-            'prerequisites' => 'nullable|string',
-            'what_you_will_learn' => 'nullable|string',
-            'published_at' => 'nullable|date',
+            // 'prerequisites' => 'nullable|string',
+            // 'what_you_will_learn' => 'nullable|string',
+            // 'published_at' => 'nullable|date',
             'rating_count' => 'nullable|integer',
             'average_rating' => 'nullable|numeric',
             // 'resources' => 'nullable|json',
-            'requirements' => 'nullable|string',
+            // 'requirements' => 'nullable|string',
            
         ];
     }

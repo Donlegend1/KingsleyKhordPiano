@@ -58,7 +58,8 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course)
     {
-        
+        $course->update($request->validated());
+        return response()->json($course, 200);
     }
 
     /**
@@ -91,13 +92,26 @@ class CourseController extends Controller
         return view('memberpages.course.details', compact('level'));
     }
 
-     public function membershowAPI($level)
-    {
-        $courses = Course::where('level', $level)->get();
-        if ($courses->isEmpty()) {
-            return response()->json(['message' => 'No courses found for this level'], 404);
-        }
-        return response()->json($courses);
+    public function membershowAPI($level)
+{
+    $courses = Course::where('level', $level)->get();
+
+    if ($courses->isEmpty()) {
+        return response()->json(['message' => 'No courses found for this level'], 404);
     }
+
+    // Group courses by `group_name` (adjust field name as necessary)
+    $groupedCourses = $courses->groupBy('category');
+    
+
+    return response()->json($groupedCourses);
+}
+
+public function deleteCourse(Course $course)
+{
+    $course->delete();
+    return response()->json(['message' => 'Course deleted successfully']);
+}
+
     
 }

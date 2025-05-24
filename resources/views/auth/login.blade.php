@@ -22,35 +22,30 @@
         @enderror
       </div>
 
-      <div x-data="{ showPassword: false }" class="relative">
-        <label for="password" class="block text-gray-700 mb-1">{{ __('Password') }}</label>
+     <div x-data="{ show: false, password: '' }" class="relative">
+        <label class="block text-gray-700 mb-1" for="password">Password</label>
+        <input 
+          x-model="password" 
+          :type="show ? 'text' : 'password'" 
+          name="password" 
+          id="password"
+          class="w-full border border-gray-300 p-3 rounded-lg focus:ring focus:ring-blue-200 pr-10 @error('password') border-red-500 @enderror"
+          placeholder="........" 
+          autocomplete="new-password"
+        >
         
-        <input
-            :type="showPassword ? 'text' : 'password'"
-            id="password"
-            name="password"
-            required
-            autocomplete="current-password"
-            placeholder="••••••••"
-            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-    
-        <!-- Toggle Visibility Button -->
         <button 
-        type="button" 
-        @click="showPassword = !showPassword" 
-        class="absolute right-3 top-12 transform -translate-y-1/2 focus:outline-none"
-    >
-        <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-gray-500"></i>
-    </button>
-    
+          type="button" 
+          class="absolute right-3 top-[2.5rem] text-gray-500 focus:outline-none"
+          @click="show = !show"
+        >
+          <i :class="show ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+        </button>
+
         @error('password')
-            <span class="invalid-feedback text-red-600" role="alert">
-                <strong>{{ $message }}</strong>
-            </span>
+          <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
         @enderror
-       </div>
-     
+      </div>
 
       <div class="flex items-center justify-between text-sm text-gray-600">
         <label class="flex items-center gap-2">

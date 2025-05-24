@@ -24,26 +24,37 @@ class PaymentController extends Controller
         }
     
         $reference = Str::uuid()->toString(); 
-        $subscription = Subscription::find($request->input('plan'));
+       
 
-        $amount = $subscription->amount_naria * 100;
+        $amount = $request->amount * 100;
     
         // Optional: Store transaction record
         DB::table('payments')->insert([
             'user_id' => $user->id,
             'reference' => $reference,
             'amount' => $amount,
+            'metadata' => json_encode($request->all()),
             'payment_method' =>'paystack',
             'status' => 'pending',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        $user = Auth::user();
+        $user->metadata = $request->all();
+        $user->payment_status = 'pending';
+        $user->payment_method ='paystack';
+        $user->last_payment_reference = $reference;
+        $user->last_payment_amount = $request->amount;
+        $user->last_payment_at = now();
+        $user->save();
     
         $fields = [
             'email' => $user->email,
             'amount' => $amount,
             'reference' => $reference,
-            'metadata' => json_encode(['user_id' => $user->id])
+            'metadata' => json_encode(['user_id' => $user->id, 'payload' => $request->all()]),
+            'callback_url' => route('payment.verify'), 
         ];
     
         $fields_string = http_build_query($fields);
@@ -63,7 +74,8 @@ class PaymentController extends Controller
         curl_close($ch);
     
         $response = json_decode($result, true);
-    
+
+        // dd($response);
         if ($response['status'] && isset($response['data']['authorization_url'])) {
             return redirect()->away($response['data']['authorization_url']);
         }
@@ -72,7 +84,7 @@ class PaymentController extends Controller
     }
     
 
-    public function verify(Request $request)
+    public function handlePaystackCallback(Request $request)
     {
         $reference = $request->query('reference');
     
@@ -91,20 +103,14 @@ class PaymentController extends Controller
             if ($data['data']['status'] === 'success') {
                 // ✅ Update payment record
                 DB::table('payments')->where('reference', $reference)->update([
-                    'status' => 'success',
-                    'paid_at' => now(),
+                    'status' => 'successful',
                     'updated_at' => now(),
                 ]);
-
-                DB::table('payments')->where('reference', $reference)->update([
-                    'status' => 'success',
-                    'paid_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                $user = Auth::user();
+                $user->payment_status = 'successful';
+                $user->save();
     
-                // Optionally perform post-payment actions (grant access, notify, etc.)
-    
-                return response()->json(['message' => 'Payment verified successfully']);
+                return redirect()->route('home')->with('success', 'Payment verified successfully');
             } else {
                 // ❌ Update as failed
                 DB::table('payments')->where('reference', $reference)->update([
@@ -112,7 +118,7 @@ class PaymentController extends Controller
                     'updated_at' => now(),
                 ]);
     
-                return response()->json(['message' => 'Payment was not successful'], 400);
+                return redirect()->route('home')->with('success', 'Payment not successfully');
             }
         }
     

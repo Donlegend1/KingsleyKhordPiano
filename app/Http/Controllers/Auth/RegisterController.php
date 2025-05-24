@@ -32,7 +32,7 @@ class RegisterController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                 'password' => ['required', 'string', 'min:8', 'confirmed'],
-                'plan' => ['required'],
+                // 'plan' => ['required'],
             ]);
 
             if ($validator->fails()) {
@@ -46,7 +46,7 @@ class RegisterController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'plan' => $request->plan,
+                // 'plan' => $request->plan,
                 'role' => UserRole::MEMBER->value,
                 'payment_status' => 'pending',
             ]);
@@ -77,7 +77,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'plan' => ['required', 'string'],
+            // 'plan' => ['required', 'string'],
         ]);
     }
 
@@ -90,7 +90,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'plan' => $data['plan'],
+            // 'plan' => $data['plan'],
             'payment_status' => 'pending',
         ]);
     }

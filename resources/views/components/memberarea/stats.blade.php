@@ -1,49 +1,31 @@
 <section class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-6">
   <!-- Card 1 -->
- <div class="p-8 bg-[#F3F5F6] rounded-lg shadow-md border hover:shadow-lg transition h-full flex flex-col justify-between">
-    <div class="mx-12">
-      <h2 class="text-2xl font-bold text-gray-800">Student Progress</h2>
-      <p class="mt-3 text-gray-600 text-sm">Pick up from where you left off!</p>
-    </div>
-    <div class="font-semibold border-t-2 border-gray-300 my-4"></div>
+<div class="p-8 bg-[#F3F5F6] rounded-lg shadow-md border hover:shadow-lg transition h-full flex flex-col justify-between">
+  <div class="mx-12">
+    <h2 class="text-2xl font-bold text-gray-800">Student Progress</h2>
+    <p class="mt-3 text-gray-600 text-sm">Pick up from where you left off!</p>
+  </div>
 
-    
-    <!-- Progress Bar -->
+  <div class="font-semibold border-t-2 border-gray-300 my-4"></div>
+
+  @foreach ($categoryProgress as $category)
     <div class="mt-4">
-      
-      <label for="progress" class="text-sm text-gray-600">Progress</label>
-      <p class="font-semibold text-[#145CCF]">Introduction to Pentatonic Scales</p>
-      <p class="font-semibold text-[#145CCF]">5/12 <span class="text-gray-400">modules in this course</span></p>
+      <label for="progress" class="text-sm text-gray-600">{{ $category['course_category'] }}</label>
+      <p class="font-semibold text-[#145CCF]">{{ $category['completed_courses'] }}/{{ $category['total_courses'] }} <span class="text-gray-400">modules in this course</span></p>
       <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
+        <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $category['completion_percentage'] }}%"></div>
       </div>
-  </div>
-
-    <!-- Button (Link) -->
-    <div class="mt-6 text-left">
-      <a href="/member/academy" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
-        Continue Learning
-          <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
-      </a>
-    </div>
-     <div class="mt-4">
-      <label for="progress" class="text-sm text-gray-600">The Harmonic Techniques</label>
-      <p class="font-semibold text-[#145CCF]">Introduction to Pentatonic Scales</p>
-      <p class="font-semibold text-[#145CCF]">18/24 <span class="text-gray-400">modules in this course</span></p>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 75%"></div>
-      </div>
-      
     </div>
 
-    <!-- Button (Link) -->
     <div class="mt-6 text-left">
-      <a href="/member/academy" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
+      <a href="/member/course/{{ urlencode($category['level']) }}" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
         Continue Learning
-          <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
+        <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
       </a>
     </div>
-  </div>
+  @endforeach
+</div>
+
 
  <!-- Card 2 -->
 <div class="p-8 bg-[#F3F5F6] rounded-lg shadow-md border hover:shadow-lg transition h-full flex flex-col justify-between mb-6">

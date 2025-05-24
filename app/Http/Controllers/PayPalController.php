@@ -25,6 +25,7 @@ private $gateway;
 
     function pay(Request $request)
     {
+        // dd($request->all());
         try {
             $response = $this->gateway->purchase(array(
                 'amount' => 200,

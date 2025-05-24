@@ -15,6 +15,7 @@ use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseProgressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,15 +40,17 @@ Route::get('/contact', function () {
 
 
 Route::get('/plans', [SubscriptionController::class, 'index']);
-Route::get('/member/plan', [SubscriptionController::class, 'memberplans']);
+Route::get('/member/plan', [SubscriptionController::class, 'memberplans'])->middleware('auth');
 
-Auth::routes();
+Auth::routes(
+    ['verify' => true]
+);
 
 
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('check.payment');
 
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
-Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('paystack.callback');
+Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
 
 Route::post('/stripe/create', [StripeController::class, 'createPaymentIntent'])->name('stripe.create');
 Route::get('/stripe/success', [StripeController::class, 'retrievePaymentIntent'])->name('stripe.verify');
@@ -70,6 +73,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment'])->group(function (
     Route::get('learn-songs', [LessonController::class, 'learnSongs']);
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
+    Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
 });
 
 

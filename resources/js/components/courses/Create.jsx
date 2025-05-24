@@ -8,18 +8,17 @@ const CourseForm = () => {
     category: '',
     description: '',
     video_url: '',
-    image_path: '',
+    // image_path: '',
     level: 'beginner',
     enrollment_count: 0,
     status: 'active',
     prerequisites: '',
-    what_you_will_learn: '',
-    instructor_id: '',
-    published_at: '',
+    // what_you_will_learn: '',
+
     rating_count: 0,
     average_rating: 0,
     // resources: [],
-    requirements: '',
+    // requirements: '',
     likes: 0,
     dislikes: 0
   });
@@ -49,7 +48,7 @@ const CourseForm = () => {
           <input name="title" placeholder="Title" value={course.title} onChange={handleChange} className="w-full p-3 border rounded-lg" />
           <input name="category" placeholder="Category" value={course.category} onChange={handleChange} className="w-full p-3 border rounded-lg" />
           <input name="video_url" placeholder="Video URL" value={course.video_url} onChange={handleChange} className="w-full p-3 border rounded-lg" />
-          <input name="image_path" placeholder="Image Path" value={course.image_path} onChange={handleChange} className="w-full p-3 border rounded-lg" />
+          {/* <input name="image_path" placeholder="Image Path" value={course.image_path} onChange={handleChange} className="w-full p-3 border rounded-lg" /> */}
        <select name="status" value={course.status} onChange={handleChange} className="w-full p-3 border rounded-lg">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -67,7 +66,7 @@ const CourseForm = () => {
         </div>
 
         <textarea name="description" placeholder="Description" value={course.description} onChange={handleChange} className="w-full p-3 border rounded-lg" rows="4"></textarea>
-        <textarea name="what_you_will_learn" placeholder="What You Will Learn" value={course.what_you_will_learn} onChange={handleChange} className="w-full p-3 border rounded-lg" rows="4"></textarea>
+        {/* <textarea name="what_you_will_learn" placeholder="What You Will Learn" value={course.what_you_will_learn} onChange={handleChange} className="w-full p-3 border rounded-lg" rows="4"></textarea> */}
 
        
 

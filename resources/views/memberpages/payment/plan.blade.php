@@ -13,6 +13,8 @@
      </div>
      </div>
  </div>
- @include("components.price")
+<div id="plan-switch">
+
+</div>
 
 @endsection

@@ -26,35 +26,46 @@ class StripeController extends Controller
      */
     public function createPaymentIntent(Request $request)
     {
-        $subDetails = Subscription::find($request->plan);
+
+        // dd($request->all());
         $user = Auth::user();
         $reference = Str::uuid()->toString(); 
 
         DB::table('payments')->insert([
             'user_id' => $user->id,
             'reference' => $reference,
-            'amount' => $subDetails->amount_dollar,
+            'amount' => $request->amount,
+            'metadata' => json_encode($request->all()),
             'payment_method' =>'stripe',
             'status' => 'pending',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
+        $user = Auth::user();
+        $user->metadata = $request->all();
+        $user->payment_status = 'pending';
+        $user->payment_method ='stripe';
+        $user->last_payment_reference = $reference;
+        $user->last_payment_amount = $request->amount;
+        $user->last_payment_at = now();
+        $user->save();
+
         $stripe = new \Stripe\StripeClient($this->stripeKey);
 
         $checkout_session = $stripe->checkout->sessions->create([
           'line_items' => [[
             'price_data' => [
-              'currency' => 'usd',
+              'currency' => $request->currency,
               'product_data' => [
-                'name' => $subDetails->name,
+                'name' => $request->tier,
               ],
-              'unit_amount' => $subDetails->amount_dollar * 100,
+              'unit_amount' => $request->amount * 100,
             ],
             'quantity' => 1,
           ]],
           'mode' => 'payment',
-          'success_url' => 'http://kingsleykhordpaino.test/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+          'success_url' => 'http://kingsleykhordpaino.test/stripe/success?session_id={CHECKOUT_SESSION_ID}&reference=' . $reference,
           'cancel_url' => 'http://kingsleykhordpaino.test/stripe/cancel',
         ]);
         
@@ -68,30 +79,33 @@ class StripeController extends Controller
      */
     public function retrievePaymentIntent(Request $request)
     {
-        // dd("here");
         try {
             $stripe = new \Stripe\StripeClient($this->stripeKey);
             $checkout_session = $stripe->checkout->sessions->retrieve(
                 $request->input('session_id')
             );
-
-            // dd($checkout_session);
     
             if ($checkout_session->status === 'complete') {
-                // dd("here");
-                DB::table('payments')->where('status', 'pending')->update([
-                    'status' => 'completed',
+                 DB::table('payments')->where('reference', $request->reference)->update([
+                    'status' => 'successful',
                     'updated_at' => now(),
                 ]);
+                 $user = Auth::user();
+                $user->payment_status = 'successful';
+                $user->save();
 
-                return redirect()->back()->with('success', 'Payment Successful!');
+                return redirect()->route('home')->with('success', 'Payment Successful!');
             } else {
-                return redirect()->back()->with('error', 'Payment not verified.');
+                 DB::table('payments')->where('reference', $reference)->update([
+                    'status' => 'failed',
+                    'updated_at' => now(),
+                ]);
+                return redirect()->route('home')->with('error', 'Payment not verified.');
             }
         } catch (\Exception $e) {
             // Log the exception
             \Log::error($e->getMessage());
-            return redirect()->back()->with('error', 'An error occurred while processing your payment.');
+            return redirect()->route('home')->with('error', 'An error occurred while processing your payment.');
         }
     }
 

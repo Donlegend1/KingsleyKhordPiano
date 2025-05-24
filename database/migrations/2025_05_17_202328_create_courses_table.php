@@ -16,9 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('category');
             $table->text('description');
-            $table->string('video_url');
-            $table->string('image_path');
-            $table->integer('duration')->comment('Duration in minutes')->nullable();
+            $table->text('video_url');
             $table->enum('level', ['beginner', 'intermediate', 'advanced'])->default('beginner');
             $table->enum('status', ['active', 'inactive', 'draft'])->default('active');
             $table->text('prerequisites')->nullable();

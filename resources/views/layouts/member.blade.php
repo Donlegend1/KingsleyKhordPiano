@@ -72,6 +72,10 @@
                     class="text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Community
                 </a>
+                  <a href="/member/shop"
+                        class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        Shop
+                    </a>
                 <a href="/member/profile"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     My Account
@@ -113,6 +117,10 @@
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 My Account
             </a>
+             <a href="/member/shop"
+                class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+               Shop
+            </a>
             <a href="#"
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 Support
@@ -122,7 +130,7 @@
           
                  <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center" type="submit" >
+                            <button class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-black transition text-center" type="submit" >
                                 {{ __('Logout') }}
                             </button>
                         </form>
@@ -131,7 +139,7 @@
     </div>
    
 </header>
-<section class="bg-gray-900 text-white py-7 shadow">
+<section class="bg-gray-900 text-white py-7 shadow sticky top-0 ">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center space-x-4 overflow-x-auto">
 
         <a href="/home" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
@@ -188,9 +196,6 @@
         {{ session()->get('error') }}
     </div>
 @endif
-
-
-
         <main >
             @yield('content')
         </main>

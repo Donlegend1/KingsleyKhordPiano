@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('course_progress', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
-            $table->string('reference');
-            $table->string('amount');
-            $table->string('payment_method')->nullable();
-             $table->json('metadata')->nullable();
-            $table->string('status')->default("pending");
+            $table->foreignId('user_id');
+            $table->foreignId('course_id');
+            $table->string('course_category');
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('course_progress');
     }
 };

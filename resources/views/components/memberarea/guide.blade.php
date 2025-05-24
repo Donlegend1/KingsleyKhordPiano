@@ -1,6 +1,6 @@
 <section class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
   <!-- Card 1 -->
-  <a href="/member/roadmaps" class="block">
+  <a href="/member/roadmap" class="block">
     <div class="min-h-[100px] h-full flex justify-between items-start p-6 bg-[#F3F5F6] rounded-md shadow-sm border hover:shadow-md transition">
       <div>
         <h4 class="font-bold text-gray-800">Course Roadmaps</h4>

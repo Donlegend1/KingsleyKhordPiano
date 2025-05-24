@@ -17,3 +17,5 @@ import './components/UsersList';
 import './components/courses/Courses';
 import './components/courses/Create';
 import './components/courses/Details';
+import './components/plans/PlanSwitchAndCurrencySelect';
+import './components/ZoomMeetingBooking';

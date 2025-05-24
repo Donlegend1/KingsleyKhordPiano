@@ -6,8 +6,15 @@
   <div class="flex flex-col md:flex-row items-stretch gap-8">
     <div class="w-full md:w-3/5 bg-white p-6 rounded-lg shadow-lg">
 
+      <form action="/stripe/create" method="post">
+        @csrf
+        <input type="hidden" name="plan" value="{{ request()->query('plan') }}">
+        <button type="submit">
+          submit
+        </button>
+      </form>
       <h2 class="text-3xl font-bold text-gray-800 mb-6">{{ __('Register') }}</h2>
-      <form method="POST" action="{{route('register')}}" class="space-y-4 h-full">
+      <form @submit.prevent="registerUser" class="space-y-4 h-full">
         @csrf
 
         <!-- Name -->
