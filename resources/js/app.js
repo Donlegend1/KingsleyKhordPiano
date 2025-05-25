@@ -19,3 +19,5 @@ import './components/courses/Create';
 import './components/courses/Details';
 import './components/plans/PlanSwitchAndCurrencySelect';
 import './components/ZoomMeetingBooking';
+import './components/uploads/Uploads';
+import './components/uploads/Create';

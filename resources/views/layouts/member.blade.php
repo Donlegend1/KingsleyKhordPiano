@@ -137,9 +137,7 @@
         
         </div>
     </div>
-   
-</header>
-<section class="bg-gray-900 text-white py-7 shadow sticky top-0 ">
+   <section class="bg-gray-900 text-white py-7 shadow sticky ">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center space-x-4 overflow-x-auto">
 
         <a href="/home" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
@@ -184,6 +182,8 @@
 
     </div>
 </section>
+</header>
+
 
 @if(session()->has('success'))
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">

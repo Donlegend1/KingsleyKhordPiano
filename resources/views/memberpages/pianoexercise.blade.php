@@ -1,3 +1,4 @@
+
 @extends('layouts.member')
 
 @section('content')
@@ -9,7 +10,7 @@
      <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
        <a href="/home" class="hover:text-blue-600">Dashboard</a>
        <span>/</span>
-       <a href="/member/piano-exercise" class="hover:text-blue-600 font-semibold">Piano Exercise</a>
+       <a href="/member/piano-exercise" class="hover:text-blue-600 font-semibold">Piano Exercises</a>
      </div>
      <div class="flex items-center space-x-2">
        <i class="fa fa-user-circle text-xl"></i>
@@ -18,82 +19,172 @@
 
    <!-- Second Row -->
    <div>
-     <h1 class="text-xl font-bold">Piano Exercise</h1>
+     <h1 class="text-xl font-bold">Piano Exercises</h1>
    </div>
 
  </div>
 </section>
+<section class="flex items-center justify-center bg-gray-100 p-6 min-h-screen">
+  <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg " x-data="{ activeTab: 'all' }">
 
-<section class="flex justify-center items-center my-5">
- <div class="w-full max-w-3xl  bg-[#F3F5F6] p-8 rounded-lg shadow-lg text-center space-y-4">
-   <p class="text-gray-700 ">
-     Hands-on daily exercises to strengthen your fingers. What’s learning to play the piano without consistent, hands-on practice? 
-     Your fingers need a lot of practical training to produce flawless rhythms. These exercises are designed to help you develop 
-     strong, flexible fingers.
-   </p>
-   <div class="flex justify-center mt-4">
-     <i class="fa fa-angle-down text-gray-400 text-lg"></i>
-   </div>
- </div>
+    <!-- Tabs -->
+    <div class="mb-6">
+      <div class="flex flex-wrap gap-2 border-b">
+        <button 
+          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
+          :class="{ 'border-blue-500 text-blue-500': activeTab === 'all' }"
+          @click="activeTab = 'all'">All</button>
+
+        <button 
+          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
+          :class="{ 'border-blue-500 text-blue-500': activeTab === 'independence' }"
+          @click="activeTab = 'independence'">Independence</button>
+
+        <button 
+          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
+          :class="{ 'border-blue-500 text-blue-500': activeTab === 'coordination' }"
+          @click="activeTab = 'coordination'">Coordination</button>
+
+        <button 
+          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
+          :class="{ 'border-blue-500 text-blue-500': activeTab === 'flexibility' }"
+          @click="activeTab = 'flexibility'">Flexibility</button>
+
+        <button 
+          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
+          :class="{ 'border-blue-500 text-blue-500': activeTab === 'strength' }"
+          @click="activeTab = 'strength'">Strength</button>
+
+        <button 
+          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
+          :class="{ 'border-blue-500 text-blue-500': activeTab === 'dexterity' }"
+          @click="activeTab = 'dexterity'">Dexterity</button>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="space-y-6">
+
+      <!-- All Content -->
+      <div x-show="activeTab === 'all'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        @foreach ($all as $exercise) 
+          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
+          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
+          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
+          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
+          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
+        </div>
+        @endforeach
+      
+      </div>
+
+      <!-- Beginner Content -->
+      <div x-show="activeTab === 'independence'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+         @foreach ($independence as $exercise) 
+          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
+          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
+          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
+          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
+          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
+        </div>
+        @endforeach
+      </div>
+
+      <!-- Intermediate Content -->
+      <div x-show="activeTab === 'coordination'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach ($coordination as $exercise) 
+          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
+          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
+          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
+          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
+          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
+        </div>
+        @endforeach
+      </div>
+
+      <!-- Advanced Content -->
+      <div x-show="activeTab === 'flexibility'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+         @foreach ($flexibility as $exercise) 
+          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
+          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
+          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
+          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
+          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
+        </div>
+        @endforeach
+      </div>
+
+      <div x-show="activeTab === 'strength'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach ($strength as $exercise) 
+          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
+          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
+          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
+          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
+          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
+        </div>
+        @endforeach
+      </div>
+      <div x-show="activeTab === 'dexterity'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach ($dexterity as $exercise) 
+          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
+          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
+          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
+          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
+          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
+        </div>
+        @endforeach
+      </div>
+
+    </div>
+  </div>
 </section>
 
 
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-6 rounded-lg shadow-lg max-w-3xl mx-auto" x-data="{ openTab: null }">
- <h2 class="text-2xl font-bold mb-4">Video Tutorials</h2>
 
- <!-- Video 1 -->
- <div class="mb-4">
+<section class="flex items-center justify-center py-6 bg-gray-100">
+ <div class="flex items-center space-x-2">
+   <!-- Previous Button -->
    <button 
-     @click="openTab = openTab === 1 ? null : 1"
-     class="w-full text-left py-3 px-4 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex justify-between items-center rounded-lg"
+     class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200"
+     :disabled="currentPage === 1"
+     @click="currentPage--"
    >
-     <span>Introduction to the Platform</span>
-     <span x-show="openTab !== 1">+</span>
-     <span x-show="openTab === 1">-</span>
+     Previous
    </button>
-   <div x-show="openTab === 1" class="mt-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-     <video controls class="w-full rounded-lg">
-       <source src="video1.mp4" type="video/mp4">
-       Your browser does not support the video tag.
-     </video>
-   </div>
- </div>
 
- <!-- Video 2 -->
- <div class="mb-4">
+   <!-- Numbered Pagination Links -->
+   <template x-for="page in totalPages" :key="page">
+     <button 
+       class="px-4 py-2 border rounded-lg"
+       :class="{
+         'bg-blue-500 text-white': page === currentPage,
+         'bg-white text-gray-700 border-gray-300': page !== currentPage
+       }"
+       @click="currentPage = page"
+     >
+       <span x-text="page"></span>
+     </button>
+   </template>
+
+   <!-- Next Button -->
    <button 
-     @click="openTab = openTab === 2 ? null : 2"
-     class="w-full text-left py-3 px-4 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex justify-between items-center rounded-lg"
+     class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200"
+     :disabled="currentPage === totalPages"
+     @click="currentPage++"
    >
-     <span>Getting Started with Features</span>
-     <span x-show="openTab !== 2">+</span>
-     <span x-show="openTab === 2">-</span>
+     Next
    </button>
-   <div x-show="openTab === 2" class="mt-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-     <video controls class="w-full rounded-lg">
-       <source src="video2.mp4" type="video/mp4">
-       Your browser does not support the video tag.
-     </video>
-   </div>
  </div>
-
- <!-- Video 3 -->
- <div>
-   <button 
-     @click="openTab = openTab === 3 ? null : 3"
-     class="w-full text-left py-3 px-4 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex justify-between items-center rounded-lg"
-   >
-     <span>Advanced Techniques</span>
-     <span x-show="openTab !== 3">+</span>
-     <span x-show="openTab === 3">-</span>
-   </button>
-   <div x-show="openTab === 3" class="mt-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-     <video controls class="w-full rounded-lg">
-       <source src="video3.mp4" type="video/mp4">
-       Your browser does not support the video tag.
-     </video>
-   </div>
- </div>
-
 </section>
+
+<script>
+ document.addEventListener('alpine:init', () => {
+   Alpine.data('pagination', () => ({
+     currentPage: 1,
+     totalPages: 5,
+   }));
+ });
+</script>
+
 @endsection

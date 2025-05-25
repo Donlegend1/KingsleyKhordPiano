@@ -16,6 +16,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseProgressController;
+use App\Http\Controllers\ZoomMeetingController;
+use App\Http\Controllers\UploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +61,9 @@ Route::get('/stripe/cancel', [StripeController::class, 'paymentCanceled'])->name
 Route::post('paypal/create-order', [PayPalController::class, 'pay']);
 Route::get('paypal/success', [PayPalController::class, 'success']);
 Route::get('paypal/cancel', [PayPalController::class, 'error']);
+Route::post('/zoom-meeting-booking', [ZoomMeetingController::class, 'createZoomMeeting']);
+Route::get('/zoom/authorize', [ZoomMeetingController::class, 'redirectToZoom']);
+Route::get('/zoom/callback', [ZoomMeetingController::class, 'handleZoomCallback']);
 
 Route::prefix('member')->middleware(['auth', 'check.payment'])->group(function () {
     Route::get('roadmap', [GetstartedController::class, 'roadmap']);
@@ -74,6 +79,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment'])->group(function (
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
+    
 });
 
 
@@ -82,7 +88,10 @@ Route::prefix('admin')->group(function () {
     Route::get('courses', [CourseController::class, 'index']);
     Route::get('course/create', [CourseController::class, 'create']);
     Route::post('course', [CourseController::class, 'store']);
-
-    
+    Route::get('uploads/list', [UploadController::class, 'index']);
+    Route::get('uploads/create', [UploadController::class, 'create']);
+    Route::post('upload/store', [UploadController::class, 'store']);
+    Route::get('uploads/{id}/edit', [UploadController::class, 'edit']); 
+    Route::get('upload-list', [UploadController::class, 'uploadList'])->name('upload.list');
 
 });

@@ -38,8 +38,16 @@
         <span>Users</span>
       </a>
       <a href="/admin/courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
-        <i class="fa fa-user"></i>
+        <i class="fa fa-file"></i>
         <span>Courses</span>
+      </a>
+      <a href="/admin/courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+        <i class="fa fa-leanpub" aria-hidden="true"></i>
+        <span>Ear Training</span>
+      </a>
+      <a href="/admin/uploads/list" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+        <i class="fa fa-upload"></i>
+        <span>Others</span>
       </a>
       <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200">
         <i class="fa fa-cog"></i>
