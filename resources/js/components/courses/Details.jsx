@@ -1,18 +1,21 @@
 import ReactDOM from "react-dom/client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
 
 const CourseDetails = ({ course }) => {
+    const [loading, setLoading] = useState(false);
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
+    const { showMessage } = useFlashMessage();
 
-  const [loading, setLoading] = useState(false);
-  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
-
-  const handleMarkAsCompleted = async () => {
-    
-    setLoading(true);
-    console.log("Marking course as completed:", course);
-    console.log("CSRF Token:", csrfToken);
-    try {
+    const handleMarkAsCompleted = async () => {
+        setLoading(true);
+        try {
             const response = await axios.post(
                 `/member/course/${course?.id}/complete`,
                 course,
@@ -23,24 +26,23 @@ const CourseDetails = ({ course }) => {
                     withCredentials: true,
                 }
             );
+            showMessage("Mark as completed.", "success");
+
             console.log(response.data);
-            
         } catch (error) {
             console.error("Error creating course:", error);
+            showMessage(" Failed to mark as completed.", "error");
         } finally {
             setLoading(false);
         }
-  }
+    };
 
     return (
         <div className="p-6 bg-white rounded shadow-lg">
             <h2 className="text-xl font-bold mb-4">{course.title}</h2>
-            {/* <p className="mb-2">Category: {course.category}</p>
-      <p className="mb-4">{course.description}</p> */}
-
             {course.video_url ? (
                 <div
-                    className="mb-4"
+                    className="mb-4 w-full"
                     dangerouslySetInnerHTML={{ __html: course.video_url }}
                 />
             ) : (
@@ -49,16 +51,15 @@ const CourseDetails = ({ course }) => {
                 </div>
             )}
 
-            {/* <div className="mb-4">
-        <h3 className="font-semibold">What You Will Learn:</h3>
-        <p>{course.what_you_will_learn}</p>
-      </div> */}
-
-            <div className="text-center">
-                <button className="bg-black p-3 text-white hover:text-gray-800 hover:bg-yellow-500 rounded-full" onClick={handleMarkAsCompleted}>
-                    Completed
-                </button>
+           <div className="text-center mt-6">
+            <button
+                onClick={handleMarkAsCompleted}
+                className="px-6 py-2 bg-gradient-to-r from-black to-gray-900 text-white text-sm font-semibold rounded-full shadow-md hover:from-yellow-500 hover:to-yellow-400 hover:text-black transition duration-300"
+            >
+                <span className="fa fa-check"></span> Mark as Completed
+            </button>
             </div>
+
         </div>
     );
 };
@@ -183,7 +184,9 @@ if (document.getElementById("course-details")) {
     const root = ReactDOM.createRoot(document.getElementById("course-details"));
     root.render(
         <React.StrictMode>
-            <CoursesPage />
+            <FlashMessageProvider>
+                <CoursesPage />
+            </FlashMessageProvider>
         </React.StrictMode>
     );
 }

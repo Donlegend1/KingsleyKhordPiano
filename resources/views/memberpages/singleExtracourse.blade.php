@@ -8,9 +8,9 @@
      <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
        <a href="/home" class="hover:text-blue-600">Dashboard</a>
        <span>/</span>
-       <a href="/member/extra-courses" class="hover:text-blue-600 font-semibold">Extra Courses</a>
+       <a href="/member/extra-courses" class="hover:text-blue-600 font-semibold">Lession</a>
        <span>/</span>
-       <a href="/member/extra-courses/1" class="hover:text-blue-600 font-semibold">1</a>
+       <a href="/member/lesson/{{$lesson->id}}" class="hover:text-blue-600 font-semibold">{{$lesson->id}}</a>
      </div>
      <div class="flex items-center space-x-2">
        <i class="fa fa-user-circle text-xl"></i>
@@ -18,9 +18,9 @@
    </div>
 
    <!-- Second Row -->
-   <div>
-     <h1 class="text-xl font-bold">Extra Courses</h1>
-   </div>
+  <div>
+  <h1 class="text-xl font-bold">{{ strtoupper($lesson->category) }} / {{ $lesson->title }}</h1>
+</div>
 
  </div>
 </section>
@@ -28,12 +28,9 @@
  <!-- Blog Main Content -->
  <div class="bg-white max-w-3xl w-full rounded-lg shadow-lg p-6 mr-6 space-y-6">
   <!-- Video Section -->
-  <div class="w-full">
-    <video controls class="w-full h-64 object-cover rounded-lg mb-6">
-      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-  </div>
+ <div class="w-full">
+    {!! $lesson->video_url !!}
+</div>
 
   
 
@@ -60,18 +57,12 @@
   <div class="space-y-4">
     <h3 class="text-xl font-semibold text-gray-800 mb-2">Related Products</h3>
     <ul class="space-y-2">
-      <li>
-        <a href="#" class="text-blue-600 hover:underline">Piano Learning Kit</a>
+      @foreach ($relatedUploads as $item)
+        <li>
+        <a href="/member/lesson/{{$item->id}}" class="text-blue-600 hover:underline">{{$item->title}}</a>
       </li>
-      <li>
-        <a href="#" class="text-blue-600 hover:underline">Sheet Music Collection</a>
-      </li>
-      <li>
-        <a href="#" class="text-blue-600 hover:underline">Finger Exercise Tools</a>
-      </li>
-      <li>
-        <a href="#" class="text-blue-600 hover:underline">Advanced Piano Techniques</a>
-      </li>
+      @endforeach
+     
     </ul>
   </div>
 

@@ -24,167 +24,198 @@
 
  </div>
 </section>
-<section class="flex items-center justify-center bg-gray-100 p-6 min-h-screen">
-  <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg " x-data="{ activeTab: 'all' }">
+<section class="bg-gray-100 p-6 min-h-screen">
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6" x-data="{ activeTab: 'all' }">
 
-    <!-- Tabs -->
-    <div class="mb-6">
-      <div class="flex flex-wrap gap-2 border-b">
-        <button 
-          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-          :class="{ 'border-blue-500 text-blue-500': activeTab === 'all' }"
-          @click="activeTab = 'all'">All</button>
-
-        <button 
-          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-          :class="{ 'border-blue-500 text-blue-500': activeTab === 'independence' }"
-          @click="activeTab = 'independence'">Independence</button>
-
-        <button 
-          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-          :class="{ 'border-blue-500 text-blue-500': activeTab === 'coordination' }"
-          @click="activeTab = 'coordination'">Coordination</button>
-
-        <button 
-          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-          :class="{ 'border-blue-500 text-blue-500': activeTab === 'flexibility' }"
-          @click="activeTab = 'flexibility'">Flexibility</button>
-
-        <button 
-          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-          :class="{ 'border-blue-500 text-blue-500': activeTab === 'strength' }"
-          @click="activeTab = 'strength'">Strength</button>
-
-        <button 
-          class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-          :class="{ 'border-blue-500 text-blue-500': activeTab === 'dexterity' }"
-          @click="activeTab = 'dexterity'">Dexterity</button>
-      </div>
-    </div>
-
-    <!-- Content Area -->
-    <div class="space-y-6">
-
-      <!-- All Content -->
-      <div x-show="activeTab === 'all'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        @foreach ($all as $exercise) 
-          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
-          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
-          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
-          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
-          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
-        </div>
-        @endforeach
+    <!-- Main Content Area -->
+    <div class="flex-1">
       
+      <!-- Tabs -->
+      <div class="mb-6">
+        <div class="flex flex-wrap gap-2 border-b">
+          <template x-for="tab in ['all', 'independence', 'coordination', 'flexibility', 'strength', 'dexterity']" :key="tab">
+            <button
+              class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
+              :class="{ 'border-blue-500 text-blue-500': activeTab === tab }"
+              @click="activeTab = tab"
+              x-text="tab.charAt(0).toUpperCase() + tab.slice(1)">
+            </button>
+          </template>
+        </div>
       </div>
 
-      <!-- Beginner Content -->
-      <div x-show="activeTab === 'independence'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-         @foreach ($independence as $exercise) 
-          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
-          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
-          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
-          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
-          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
-        </div>
-        @endforeach
-      </div>
+   <!-- Tab Panels -->
+<div class="space-y-6">
 
-      <!-- Intermediate Content -->
-      <div x-show="activeTab === 'coordination'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach ($coordination as $exercise) 
-          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
-          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
-          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
-          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
-          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
-        </div>
-        @endforeach
+  <!-- All Tab -->
+  <div x-show="activeTab === 'all'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @forelse ($all as $exercise)
+      <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+        <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+        <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+        <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">
+          Watch Now
+        </a>
       </div>
+    @empty
+      <div class="col-span-full text-center text-gray-500 py-12">
+        No exercises found for this category.
+      </div>
+    @endforelse
+    @if ($all->total() > 9)
+  <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
+    {{ $all->links() }}
+  </div>
+@endif
+  </div>
 
-      <!-- Advanced Content -->
-      <div x-show="activeTab === 'flexibility'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-         @foreach ($flexibility as $exercise) 
-          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
-          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
-          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
-          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
-          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
-        </div>
-        @endforeach
+  <!-- Independence Tab -->
+  <div x-show="activeTab === 'independence'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @forelse ($independence as $exercise)
+      <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+        <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+        <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+        <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">
+          Watch Now
+        </a>
       </div>
+    @empty
+      <div class="col-span-full text-center text-gray-500 py-12">
+        No exercises found for this category.
+      </div>
+    @endforelse
+     @if ($independence->total() > 9)
+  <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
+    {{ $independence->links() }}
+  </div>
+@endif
+  </div>
 
-      <div x-show="activeTab === 'strength'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach ($strength as $exercise) 
-          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
-          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
-          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
-          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
-          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
-        </div>
-        @endforeach
+  <!-- Coordination Tab -->
+  <div x-show="activeTab === 'coordination'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @forelse ($coordination as $exercise)
+      <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+        <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+        <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+        <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">
+          Watch Now
+        </a>
       </div>
-      <div x-show="activeTab === 'dexterity'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach ($dexterity as $exercise) 
-          <div class="bg-gray-100 p-6  rounded-lg shadow-lg flex flex-col items-center space-y-4" >
-          <img src="{{$exercise->thumbnail_url }}" alt="{{$exercise->title}}" class="w-full h-56 object-cover rounded-md">
-          <h3 class="font-bold text-gray-800">{{$exercise->title}}</h3>
-          {{-- <p class="text-gray-600 text-center">{{$exercise->description}}</p> --}}
-          <a href="/member/extra-courses/{{$exercise->id}}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">Watch Now</a>
-        </div>
-        @endforeach
+    @empty
+      <div class="col-span-full text-center text-gray-500 py-12">
+        No exercises found for this category.
       </div>
+    @endforelse
+
+     @if ($coordination->total() > 9)
+  <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
+    {{ $coordination->links() }}
+  </div>
+@endif
+  </div>
+
+  <!-- Flexibility Tab -->
+  <div x-show="activeTab === 'flexibility'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @forelse ($flexibility as $exercise)
+      <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+        <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+        <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+        <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">
+          Watch Now
+        </a>
+      </div>
+    @empty
+      <div class="col-span-full text-center text-gray-500 py-12">
+        No exercises found for this category.
+      </div>
+    @endforelse
+     @if ($flexibility->total() > 9)
+  <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
+    {{ $flexibility->links() }}
+  </div>
+@endif
+  </div>
+
+  <!-- Strength Tab -->
+  <div x-show="activeTab === 'strength'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @forelse ($strength as $exercise)
+      <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+        <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+        <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+        <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">
+          Watch Now
+        </a>
+      </div>
+    @empty
+      <div class="col-span-full text-center text-gray-500 py-12">
+        No exercises found for this category.
+      </div>
+    @endforelse
+      @if ($strength->total() > 9)
+  <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
+    {{ $strength->links() }}
+  </div>
+@endif
+  </div>
+
+  <!-- Dexterity Tab -->
+  <div x-show="activeTab === 'dexterity'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @forelse ($dexterity as $exercise)
+      <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+        <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+        <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+        <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center">
+          Watch Now
+        </a>
+      </div>
+    @empty
+      <div class="col-span-full text-center text-gray-500 py-12">
+        No exercises found for this category.
+      </div>
+    @endforelse
+     @if ($dexterity->total() > 9)
+  <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
+    {{ $dexterity->links() }}
+  </div>
+@endif
+  </div>
+
+</div>
 
     </div>
-  </div>
+
+    <!-- Sidebar -->
+    =<aside class="w-full lg:w-64 bg-white p-6 rounded-lg shadow-lg h-fit">
+  <h3 class="text-lg font-semibold mb-4">Filter by Category</h3>
+  <ul class="space-y-3 text-sm" x-data="{ categories: ['all', 'independence', 'coordination', 'flexibility', 'strength', 'dexterity'] }">
+    <template x-for="category in categories" :key="category">
+      <li>
+        <label class="flex items-center space-x-3 cursor-pointer">
+          <input 
+            type="radio" 
+            class="hidden" 
+            name="category" 
+            :value="category" 
+            x-model="activeTab"
+          >
+          <div 
+            class="w-4 h-4 rounded border border-gray-400 flex items-center justify-center" 
+            :class="{ 'bg-blue-600 border-blue-600': activeTab === category }"
+          >
+            <svg x-show="activeTab === category" class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span x-text="category.charAt(0).toUpperCase() + category.slice(1)" :class="{ 'font-semibold text-blue-600': activeTab === category }"></span>
+        </label>
+      </li>
+    </template>
+  </ul>
+</aside>
+
+</div>
 </section>
 
 
-
-<section class="flex items-center justify-center py-6 bg-gray-100">
- <div class="flex items-center space-x-2">
-   <!-- Previous Button -->
-   <button 
-     class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200"
-     :disabled="currentPage === 1"
-     @click="currentPage--"
-   >
-     Previous
-   </button>
-
-   <!-- Numbered Pagination Links -->
-   <template x-for="page in totalPages" :key="page">
-     <button 
-       class="px-4 py-2 border rounded-lg"
-       :class="{
-         'bg-blue-500 text-white': page === currentPage,
-         'bg-white text-gray-700 border-gray-300': page !== currentPage
-       }"
-       @click="currentPage = page"
-     >
-       <span x-text="page"></span>
-     </button>
-   </template>
-
-   <!-- Next Button -->
-   <button 
-     class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200"
-     :disabled="currentPage === totalPages"
-     @click="currentPage++"
-   >
-     Next
-   </button>
- </div>
-</section>
-
-<script>
- document.addEventListener('alpine:init', () => {
-   Alpine.data('pagination', () => ({
-     currentPage: 1,
-     totalPages: 5,
-   }));
- });
-</script>
 
 @endsection

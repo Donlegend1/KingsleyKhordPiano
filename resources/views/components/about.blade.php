@@ -26,7 +26,7 @@
       
       <!-- Image -->
       <div class="md:w-1/2">
-        <img src="/images/kingsley.png" alt="Kingsley Akunwa" class="w-full rounded-lg shadow-md">
+        <img src="/images/kingsley.jpg" alt="Kingsley Akunwa" class="w-full rounded-lg shadow-md">
       </div>
 
       <!-- Text -->

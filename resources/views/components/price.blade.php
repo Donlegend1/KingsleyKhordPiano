@@ -91,6 +91,10 @@
       <a :href="'/stripe-route?plan=' + plan" class="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold flex items-center justify-center">
         <img src="/icons/stripe.png" alt="Stripe" />
       </a>
+
+      <a :href="'/stripe-route?plan=' + plan" class="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold flex items-center justify-center">
+        <img src="/icons/paypal.png" alt="Paypal" />
+      </a>
     </div>
 
     <!-- Footer Section -->

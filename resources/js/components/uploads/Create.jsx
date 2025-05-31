@@ -1,9 +1,14 @@
 import ReactDOM from "react-dom/client";
 import React, { useState } from "react";
 import axios from "axios";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
 
 const UploadForm = () => {
-  const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [thumbnailFile, setThumbnailFile] = useState(null);
+    const { showMessage } = useFlashMessage();
     const [upload, setUpload] = useState({
         // tumbnail: null,
         title: "",
@@ -13,6 +18,7 @@ const UploadForm = () => {
         level: "",
         status: "active",
     });
+    const [saving, setSaving] = useState(false);
 
     const categories = [
         "piano exercise",
@@ -35,12 +41,13 @@ const UploadForm = () => {
         setUpload({ ...upload, [name]: value });
     };
 
-  const handleFileChange = (e) => {
+    const handleFileChange = (e) => {
         setThumbnailFile(e.target.files[0]);
-  };
-  
+    };
+
     const handleSubmit = async (e) => {
-       e.preventDefault();
+        e.preventDefault();
+        setSaving(true);
 
         const formData = new FormData();
         formData.append("thumbnail", thumbnailFile);
@@ -54,9 +61,13 @@ const UploadForm = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            console.log("Upload successful:", response.data);
+            showMessage("Record Saved successfully.", "success");
+            setUpload({})
         } catch (error) {
+            showMessage("Error creating upload.", "error");
             console.error("Error creating upload:", error);
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -152,10 +163,37 @@ const UploadForm = () => {
                 {/* <textarea name="what_you_will_learn" placeholder="What You Will Learn" value={upload.what_you_will_learn} onChange={handleChange} className="w-full p-3 border rounded-lg" rows="4"></textarea> */}
 
                 <button
+                    disabled={saving}
                     type="submit"
-                    className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300"
+                    className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300 flex items-center justify-center gap-2"
                 >
-                    Save upload
+                    {saving ? (
+                        <>
+                            <svg
+                                className="animate-spin h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+                                ></path>
+                            </svg>
+                            <span>Saving...</span>
+                        </>
+                    ) : (
+                        <span>Save upload</span>
+                    )}
                 </button>
             </form>
         </div>
@@ -169,7 +207,9 @@ if (document.getElementById("upload-form")) {
 
     Index.render(
         <React.StrictMode>
-            <UploadForm />
+            <FlashMessageProvider>
+                <UploadForm />
+            </FlashMessageProvider>
         </React.StrictMode>
     );
 }

@@ -72,7 +72,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment'])->group(function (
     Route::get('profile', [HomeController::class, 'profile']);
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise']);
     Route::get('extra-courses', [CoursesController::class, 'extraCourses']);
-    Route::get('extra-courses/{id}', [CoursesController::class, 'singleCourse']);
+    Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
     Route::get('ear-training', [EarTrainingController::class, 'earTraining']);
     Route::get('quick-lessons', [LessonController::class, 'quicklession']);
     Route::get('learn-songs', [LessonController::class, 'learnSongs']);

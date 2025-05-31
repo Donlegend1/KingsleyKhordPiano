@@ -1,6 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { useState } from "react";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "./Alert/FlashMessageContext";
 
 const questions = [
     {
@@ -74,7 +78,10 @@ function Modal({ onClose, children }) {
                         onClick={onClose}
                         className="text-gray-500 hover:text-black"
                     >
-                        <i className="fa fa-times text-2xl" aria-hidden="true"></i>
+                        <i
+                            className="fa fa-times text-2xl"
+                            aria-hidden="true"
+                        ></i>
                     </button>
                 </div>
                 {children}
@@ -87,6 +94,7 @@ export default function QuizCardWithModal() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const { showMessage } = useFlashMessage();
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -97,7 +105,7 @@ export default function QuizCardWithModal() {
 
         // If the current question is not answered yet, do nothing or alert
         if (!updatedAnswers[currentQuestionIndex]) {
-            alert("Please select an answer before proceeding.");
+            showMessage('Please select an answer before proceeding.',"error");
             return;
         }
 
@@ -119,50 +127,52 @@ export default function QuizCardWithModal() {
     };
 
     const checkProgressAndRedirect = (newAnswers) => {
-  // 1. If any of the first 4 answers is "No." => redirect immediately
-  for (let i = 0; i < 4; i++) {
-    if (newAnswers[i] === "No.") {
-      window.location = "/member/course/beginner";
-      return true;  // redirect happened
-    }
-  }
+        // 1. If any of the first 4 answers is "No." => redirect immediately
+        for (let i = 0; i < 4; i++) {
+            if (newAnswers[i] === "No.") {
+                showMessage('You are in beginner level',"success");
+                window.location = "/member/course/beginner";
+                return true; // redirect happened
+            }
+        }
 
-  // 2. Only continue if first 4 questions are answered
-  const firstFourAnswered = [0, 1, 2, 3].every(i => newAnswers[i]);
+        // 2. Only continue if first 4 questions are answered
+        const firstFourAnswered = [0, 1, 2, 3].every((i) => newAnswers[i]);
 
-  // 3. Only check intermediate/advanced if first 4 answered
-  if (!firstFourAnswered) return false;
+        // 3. Only check intermediate/advanced if first 4 answered
+        if (!firstFourAnswered) return false;
 
-  // 4. Check if questions 5-9 have all been answered
-  const nextFourAnswered = [4, 5, 6, 7,8].every(i => newAnswers[i]);
+        // 4. Check if questions 5-9 have all been answered
+        const nextFourAnswered = [4, 5, 6, 7, 8].every((i) => newAnswers[i]);
 
-  // 5. If any of questions 5-8 NOT answered yet, don't redirect yet
-  if (!nextFourAnswered) return false;
+        // 5. If any of questions 5-8 NOT answered yet, don't redirect yet
+        if (!nextFourAnswered) return false;
 
-  // 6. Now check answers for intermediate/advanced
+        // 6. Now check answers for intermediate/advanced
 
-  // Expected answers to be considered "advanced"
-  const advancedAnswers = {
-    4: "Yes I can.",
-    5: "I am good at it.",
-    6: "I am confident in passing chords.",
-    7: "Yes I can.",
-  9: "I focus on the emotional impact of my playing and the sound I want to convey.",
-  };
+        // Expected answers to be considered "advanced"
+        const advancedAnswers = {
+            4: "Yes I can.",
+            5: "I am good at it.",
+            6: "I am confident in passing chords.",
+            7: "Yes I can.",
+            9: "I focus on the emotional impact of my playing and the sound I want to convey.",
+        };
 
-  // If any of questions 5-9 is NOT the advanced answer, redirect to intermediate
-  for (let i = 4; i <= 8; i++) {
-    if (newAnswers[i] !== advancedAnswers[i]) {
-      window.location = "/member/course/intermediate";
-      return true;
-    }
-  }
+        // If any of questions 5-9 is NOT the advanced answer, redirect to intermediate
+        for (let i = 4; i <= 8; i++) {
+            if (newAnswers[i] !== advancedAnswers[i]) {
+                showMessage('You are in intermediate level',"success");
+                window.location = "/member/course/intermediate";
+                return true;
+            }
+        }
 
-  // All 5-9 questions answered with advanced answers -> redirect advanced
-  window.location = "/member/course/advanced";
-  return true;
-};
-
+        // All 5-9 questions answered with advanced answers -> redirect advanced
+        window.location = "/member/course/advanced";
+        showMessage('You are in advanced level ',"success");
+        return true;
+    };
 
     return (
         <div className="flex flex-col items-center justify-center p-4 bg-white border border-gray-300 rounded-lg w-full min-h-[200px]">
@@ -313,7 +323,9 @@ if (document.getElementById("getStartedQuiz")) {
 
     Index.render(
         <React.StrictMode>
-            <QuizCardWithModal />
+            <FlashMessageProvider>
+                <QuizCardWithModal />
+            </FlashMessageProvider>
         </React.StrictMode>
     );
 }

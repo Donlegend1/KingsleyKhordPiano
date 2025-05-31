@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Omnipay\Omnipay;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PayPalController extends Controller
 {
@@ -25,11 +26,35 @@ private $gateway;
 
     function pay(Request $request)
     {
-        // dd($request->all());
+         $user = Auth::user();
+         if (!$user) {
+            return redirect('register');
+        }
         try {
+             $reference = Str::uuid()->toString(); 
+
+        DB::table('payments')->insert([
+            'user_id' => $user->id,
+            'reference' => $reference,
+            'amount' => $request->amount,
+            'metadata' => json_encode($request->all()),
+            'payment_method' =>'paypal',
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+            $user->metadata = $request->all();
+            $user->payment_status = 'pending';
+            $user->payment_method ='stripe';
+            $user->last_payment_reference = $reference;
+            $user->last_payment_amount = $request->amount;
+            $user->last_payment_at = now();
+            $user->save();
+
             $response = $this->gateway->purchase(array(
-                'amount' => 200,
-                'currency' => config('services.paypal.currency'),
+                'amount' => $request->amount,
+                'currency' => $request->currency,
                 'returnUrl' => url('paypal/success'),
                 'cancelUrl' => url('paypal/cancel'),
             ))->send();
@@ -55,7 +80,7 @@ private $gateway;
             $arr = $transaction->getData();
 
             DB::table('payments')->insert([
-                'user_id' => Auth::user()->id,
+                'user_id' => $user->id,
                 'reference' => $arr['id'],
                 'amount' => $arr['transactions'][0]['amount']['total'],
                 'payment_method' =>'paypal',
@@ -64,16 +89,16 @@ private $gateway;
                 'updated_at' => now(),
             ]);
 
-            return reduirect()->back()->with('success', 'payment successful');
+            return redirect()->back()->with('success', 'payment successful');
         }
-        return reduirect()->back()->with('error', 'payment not successful');
+        return redirect()->back()->with('error', 'payment not successful');
        }
 
-       return reduirect()->back()->with('error', 'payment is declined');
+       return redirect()->back()->with('error', 'payment is declined');
     }
 
     function error()  {
-        return reduirect()->back()->with('error', 'payment is declined');
+        return redirect()->back()->with('error', 'payment is declined');
     }
     
 }

@@ -29,6 +29,9 @@ class StripeController extends Controller
 
         // dd($request->all());
         $user = Auth::user();
+         if (!$user) {
+            return redirect('register');
+        }
         $reference = Str::uuid()->toString(); 
 
         DB::table('payments')->insert([

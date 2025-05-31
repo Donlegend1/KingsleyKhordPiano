@@ -20,7 +20,7 @@ class PaymentController extends Controller
         $user = Auth::user(); // or pass user explicitly from request
     
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return redirect('register');
         }
     
         $reference = Str::uuid()->toString(); 
