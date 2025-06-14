@@ -75,7 +75,7 @@
 
  <!-- Card 2 -->
  <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
-  {{-- <img src="/icons/quicklink1.svg" alt="quick link"> --}}
+  <img src="/icons/trophy.png" alt="quick link">
   <div class="text-center my-5 font-sf">
    <p class="text-gray-800 font-semibold mb-2">How To Gain Quality Experience</p>
    <p>Get exposed to the right opportunities, stay consistent in your learning, and transform your knowledge into life-changing results</p>

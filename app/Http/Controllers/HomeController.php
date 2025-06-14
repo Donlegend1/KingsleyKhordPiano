@@ -7,8 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles\UserRoles;
 use App\Models\User;
 use App\Models\Payment;
+use App\Models\Subscription;
+use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 
 class HomeController extends Controller
@@ -33,21 +36,21 @@ class HomeController extends Controller
 
         if (Auth::user()->role == UserRoles::ADMIN->value) {
             $users = User::all();
-            $usdRevenue = Payment::where('status', 'completed')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'usd'")
+            $usdRevenue = Payment::where('status', 'successful')
+            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'USD'")
             ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
 
-        $eurRevenue = Payment::where('status', 'completed')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'eur'")
+        $eurRevenue = Payment::where('status', 'successful')
+            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'EUR'")
             ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
 
-        $nairaRevenue = Payment::where('status', 'completed')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'naira'")
+        $nairaRevenue = Payment::where('status', 'successful')
+            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'NGN'")
             ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
-
             
+            $courses =Course::count();
 
-            return view('admin.home', compact('users', 'usdRevenue', 'eurRevenue', 'nairaRevenue'));
+            return view('admin.home', compact('users', 'usdRevenue', 'eurRevenue', 'nairaRevenue', 'courses'));
         }
         if (Auth::user()->role == UserRoles::MEMBER->value) {
             $completedCourses = DB::table('course_progress')
@@ -115,12 +118,45 @@ class HomeController extends Controller
     }
 
     function profile() {
-        return view('memberpages.profile');
+        $subscriptions = Subscription::all();
+
+        $transactions = Payment::where('user_id', auth()->user()->id)->get();
+        return view('memberpages.profile', compact('subscriptions', 'transactions'));
     }
 
-    function update() {
-        
-        
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password); 
+        }
+
+        $user->save();
+
+        return redirect('/home')->with('success', 'Profile updated.');
+    }
+
+    public function destroy()
+    {
+        $user = Auth::user();
+        $user->delete();
+
+        return redirect('/')->with('success', 'Account deleted.');
+    }
+
+     public function support()
+    {
+       return view('memberpages.support');
     }
 
     function handleGetStarted() : Returntype {

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseProgressController;
+use App\Http\Controllers\LiveShowController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,8 @@ use App\Http\Controllers\CourseProgressController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('/live-shows', [LiveShowController::class, 'list']);
+
 
 Route::prefix('admin')->group(function () {
     Route::get('users', [AdminController::class, 'usersList']);
@@ -27,6 +30,8 @@ Route::prefix('admin')->group(function () {
     Route::patch('courses/{course}', [CourseController::class, 'update']);
     Route::delete('courses/{course}', [CourseController::class, 'deleteCourse']);
     Route::post('course/store', [CourseController::class, 'store']);
+    Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
+    Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
 
 });
 
@@ -49,4 +54,4 @@ Route::prefix('admin')->group(function () {
     Route::get('ear-training/{level}', [EarTrainingController::class, 'show']);
     Route::get('live-sessions', [LiveSessionController::class, 'index']);
     Route::get('live-sessions/{session}', [LiveSessionController::class, 'show']);
-Route::get('course/{level}', [CourseController::class, 'membershow']);
+    Route::get('course/{level}', [CourseController::class, 'membershow']);

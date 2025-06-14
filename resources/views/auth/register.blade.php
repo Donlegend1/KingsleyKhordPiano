@@ -2,7 +2,7 @@
 
 @section('content')
 
-<section x-data="registerForm()" class="container mx-auto px-4 py-12">
+<section x-data="registerForm()" class="container mx-auto px-4 py-12 h-screen">
   <div class="flex flex-col md:flex-row items-stretch gap-8">
     <div class="w-full md:w-3/5 bg-white p-6 rounded-lg shadow-lg">
 

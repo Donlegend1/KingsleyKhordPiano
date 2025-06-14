@@ -26,15 +26,16 @@ class CoursesController extends Controller
     }
 
     function singleCourse($id) {
-    $lesson = Upload::where('id', $id)->first();
 
-    if (!$lesson) {
-        abort(404); 
-    }
+        $lesson = Upload::where('id', $id)->first();
 
-    $relatedUploads = Upload::where('category', $lesson->category)
-                            ->where('id', '!=', $id)
-                            ->get();
+        if (!$lesson) {
+            abort(404); 
+        }
+
+        $relatedUploads = Upload::where('category', $lesson->category)
+                                ->where('id', '!=', $id)
+                                ->get();
 
     return view('memberpages.singleExtracourse', compact('lesson', 'relatedUploads'));
 }

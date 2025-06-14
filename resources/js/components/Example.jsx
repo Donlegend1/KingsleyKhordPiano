@@ -19,7 +19,7 @@ function Example() {
 
 export default Example;
 
-if (document.getElementById('getStartedQuiz')) {
+if (document.getElementById('example')) {
     const Index = ReactDOM.createRoot(document.getElementById("example"));
 
     Index.render(

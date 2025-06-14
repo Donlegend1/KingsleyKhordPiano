@@ -29,63 +29,17 @@
 
    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
      
-     <!-- Card 1 -->
+    @foreach ($data as  $quiz)
+    
      <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-       <img src="/icons/eartraining1.webp" alt="Finger Strengthening" class="w-full  object-cover">
+       <img src="{{ $quiz->thumbnail_url }}" alt="Finger Strengthening" class="w-full  object-cover">
        <div class="p-6 text-center">
-         <h3 class="text-lg font-bold mb-2 text-gray-800">Relative Pitch (Part One)</h3>
-         <p class="text-gray-600 mb-4">Ear Training Quize</p>
-         <a href="#" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
+         <h3 class="text-lg font-bold mb-2 text-gray-800">{{$quiz->title}}</h3>
+         <p class="text-gray-600 mb-4">{{$quiz->description}}</p>
+         <a href="/member/ear-training/{{$quiz->id}}" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
        </div>
      </div>
-
-     <!-- Card 1 -->
-     <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-      <img src="/icons/eartraining2.webp" alt="Finger Strengthening" class="w-full  object-cover">
-      <div class="p-6 text-center">
-        <h3 class="text-lg font-bold mb-2 text-gray-800">Relative Pitch (Part One)</h3>
-        <p class="text-gray-600 mb-4">Ear Training Quize</p>
-        <a href="#" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
-      </div>
-    </div>
-    <!-- Card 1 -->
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-     <img src="/icons/eartraining3.webp" alt="Finger Strengthening" class="w-full  object-cover">
-     <div class="p-6 text-center">
-       <h3 class="text-lg font-bold mb-2 text-gray-800">Relative Pitch (Part One)</h3>
-       <p class="text-gray-600 mb-4">Ear Training Quize</p>
-       <a href="#" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
-     </div>
-   </div>
-   <!-- Card 1 -->
-   <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-    <img src="/icons/eartraining4.webp" alt="Finger Strengthening" class="w-full  object-cover">
-    <div class="p-6 text-center">
-      <h3 class="text-lg font-bold mb-2 text-gray-800">Relative Pitch (Part One)</h3>
-      <p class="text-gray-600 mb-4">Ear Training Quize</p>
-      <a href="#" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
-    </div>
-  </div>
-  <!-- Card 1 -->
-  <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-   <img src="/icons/eartraining5.webp" alt="Finger Strengthening" class="w-full  object-cover">
-   <div class="p-6 text-center">
-     <h3 class="text-lg font-bold mb-2 text-gray-800">Relative Pitch (Part One)</h3>
-     <p class="text-gray-600 mb-4">Ear Training Quize</p>
-     <a href="#" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
-   </div>
- </div>
- <!-- Card 1 -->
- <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-  <img src="/icons/eartraining6.webp" alt="Finger Strengthening" class="w-full  object-cover">
-  <div class="p-6 text-center">
-    <h3 class="text-lg font-bold mb-2 text-gray-800">Relative Pitch (Part One)</h3>
-    <p class="text-gray-600 mb-4">Ear Training Quize</p>
-    <a href="#" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
-  </div>
-</div>
-
-
+     @endforeach
    </div>
  </div>
 </section>

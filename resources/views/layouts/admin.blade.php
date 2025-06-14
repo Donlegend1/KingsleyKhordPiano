@@ -41,9 +41,13 @@
         <i class="fa fa-file"></i>
         <span>Courses</span>
       </a>
-      <a href="/admin/courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+      <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
         <i class="fa fa-leanpub" aria-hidden="true"></i>
         <span>Ear Training</span>
+      </a>
+      <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+        <i class="fa fa-television" aria-hidden="true"></i>
+        <span>Live Show</span>
       </a>
       <a href="/admin/uploads/list" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
         <i class="fa fa-upload"></i>

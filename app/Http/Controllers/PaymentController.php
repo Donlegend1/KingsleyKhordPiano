@@ -25,14 +25,11 @@ class PaymentController extends Controller
     
         $reference = Str::uuid()->toString(); 
        
-
-        $amount = $request->amount * 100;
-    
         // Optional: Store transaction record
         DB::table('payments')->insert([
             'user_id' => $user->id,
             'reference' => $reference,
-            'amount' => $amount,
+            'amount' => $request->amount,
             'metadata' => json_encode($request->all()),
             'payment_method' =>'paystack',
             'status' => 'pending',
@@ -43,6 +40,7 @@ class PaymentController extends Controller
         $user = Auth::user();
         $user->metadata = $request->all();
         $user->payment_status = 'pending';
+        $user->premium = $request->tier === 'premium';
         $user->payment_method ='paystack';
         $user->last_payment_reference = $reference;
         $user->last_payment_amount = $request->amount;
@@ -51,7 +49,7 @@ class PaymentController extends Controller
     
         $fields = [
             'email' => $user->email,
-            'amount' => $amount,
+            'amount' => $request->amount * 100,
             'reference' => $reference,
             'metadata' => json_encode(['user_id' => $user->id, 'payload' => $request->all()]),
             'callback_url' => route('payment.verify'), 

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 const currencySigns = {
-    eur: "€",
-    usd: "$",
-    naira: "₦",
+    NGN: "₦",
+    USD: "$",
+    EUR: "€",
 };
 
 const plans = [
@@ -11,7 +11,7 @@ const plans = [
         id: 1,
         type: "monthly",
         tier: "standard",
-        amount: { eur: 23, usd: 26, naira: 38000 },
+        amount: { EUR: 23, USD: 26, NGN: 38000 },
         img: "/icons/icon.png",
         bg: "",
     },
@@ -19,7 +19,7 @@ const plans = [
         id: 2,
         type: "monthly",
         tier: "premium",
-        amount: { eur: 40, usd: 45, naira: 70000 },
+        amount: { EUR: 40, USD: 45, NGN: 70000 },
         img: "/icons/price2.png",
         bg: "/images/Background.jpg",
     },
@@ -27,7 +27,7 @@ const plans = [
         id: 3,
         type: "yearly",
         tier: "standard",
-        amount: { eur: 189, usd: 215, naira: 320000 },
+        amount: { EUR: 189, USD: 215, NGN: 320000 },
         img: "/icons/icon.png",
         bg: "",
     },
@@ -35,7 +35,7 @@ const plans = [
         id: 4,
         type: "yearly",
         tier: "premium",
-        amount: { eur: 369, usd: 420, naira: 650000 },
+        amount: { EUR: 369, USD: 420, NGN: 650000 },
         img: "/icons/price2.png",
         bg: "/images/Background.jpg",
     },
@@ -43,7 +43,7 @@ const plans = [
 
 const PlanSwitchAndCurrencySelect = () => {
     const [selectedPlan, setSelectedPlan] = useState("monthly");
-    const [currency, setCurrency] = useState("eur");
+    const [currency, setCurrency] = useState("EUR");
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedPlanDetails, setSelectedPlanDetails] = useState(null);
     const csrfToken = document
@@ -111,74 +111,69 @@ const PlanSwitchAndCurrencySelect = () => {
                         onChange={(e) => setCurrency(e.target.value)}
                         className="appearance-none px-4 py-2 border rounded-full focus:ring focus:ring-blue-300 transition text-xs"
                     >
-                        <option value="eur">Euro €</option>
-                        <option value="usd">USD $ </option>
-                        <option value="naira">Naira ₦ </option>
+                        <option value="EUR">Euro €</option>
+                        <option value="USD">USD $</option>
+                        <option value="NGN">Naira ₦</option>
                     </select>
                 </div>
             </div>
 
             <div className="flex flex-col md:flex-row justify-center gap-6">
-                {filteredPlans.map((plan) => (
-                    <div
-                        key={plan.id}
-                        className="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full md:w-1/3"
-                        style={{ backgroundImage: `url(${plan.bg})` }}
-                    >
-                        <div className="flex justify-center mb-4 relative">
+                {filteredPlans &&
+                    filteredPlans.map((plan) => (
+                        <div
+                            key={plan.id}
+                            className="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full md:w-1/3"
+                            style={{ backgroundImage: `url(${plan.bg})` }}
+                        >
+                           
                             <img
-                                src={plan.bg}
+                                src={plan.img}
                                 alt=""
-                                className="absolute top-0 left-0 w-full h-full object-cover opacity-50 rounded-xl"
+                                className="mb-4 p-3 border h-16  rounded-3xl"
                             />
+                            <h3 className="text-xl font-semibold text-black mb-4">
+                                {plan.tier} Plan
+                            </h3>
+                            <p className="text-2xl font-bold mb-2">
+                                {currencySigns[currency]}
+                                {plan.amount[currency].toLocaleString()}
+                            </p>
+                            <p className="text-sm border border-gray-100 my-4"></p>
+                            {plan.tier == "standard" && (
+                                <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
+                                    <li>Roadmap for all skill levels</li>
+                                    <li>Premium midi files</li>
+                                    <li>Ear Training Quiz</li>
+                                    <li>Practice Routine</li>
+                                    <li>Supportive Community</li>
+                                </ul>
+                            )}
+                            {plan.tier == "premium" && (
+                                <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
+                                    <li className="text-red-500 font-sf font-semibold">
+                                        Everything in the standard plan
+                                    </li>
+                                    <li>Personalized roadmap course</li>
+                                    <li>Weekly live sessions</li>
+                                    <li>Structured Accoountability plan</li>
+                                    <li>In-Depth Master classes</li>
+                                </ul>
+                            )}
+                            <div className="flex justify-center">
+                                <button
+                                    className={`w-full px-4 py-2 rounded-lg transition ${
+                                        plan.tier === "premium"
+                                            ? "bg-black text-white hover:bg-gray-700"
+                                            : "bg-white text-black border border-[#C2D3DD73] hover:bg-gray-100"
+                                    }`}
+                                    onClick={() => handleModalOpen(plan)}
+                                >
+                                    Join Today
+                                </button>
+                            </div>
                         </div>
-                        <img
-                            src={plan.img}
-                            alt=""
-                            className="mb-4 p-3 border h-16  rounded-3xl"
-                        />
-                        <h3 className="text-xl font-semibold text-black mb-4">
-                            {plan.tier} Plan
-                        </h3>
-                        <p className="text-2xl font-bold mb-2">
-                            {currencySigns[currency]}
-                            {plan.amount[currency].toLocaleString()}
-                        </p>
-                        <p className="text-sm border border-gray-100 my-4"></p>
-                        {plan.tier == "standard" && (
-                            <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
-                                <li>Roadmap for all skill levels</li>
-                                <li>Premium midi files</li>
-                                <li>Ear Training Quiz</li>
-                                <li>Practice Routine</li>
-                                <li>Supportive Community</li>
-                            </ul>
-                        )}
-                        {plan.tier == "premium" && (
-                            <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
-                                <li className="text-red-500 font-sf font-semibold">
-                                    Everyting in the standard plan
-                                </li>
-                                <li>Personalized roadmap course</li>
-                                <li>Weekly live sessions</li>
-                                <li>Structured Accoountability plan</li>
-                                <li>In-Depth Master classes</li>
-                            </ul>
-                        )}
-                        <div className="flex justify-center">
-                            <button
-                                className={`w-full px-4 py-2 rounded-lg transition ${
-                                    plan.tier === "premium"
-                                        ? "bg-black text-white hover:bg-gray-700"
-                                        : "bg-white text-black border border-[#C2D3DD73] hover:bg-gray-100"
-                                }`}
-                                onClick={() => handleModalOpen(plan)}
-                            >
-                                Join Today
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                    ))}
             </div>
 
             {modalOpen && selectedPlanDetails && (

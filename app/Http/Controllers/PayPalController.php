@@ -47,6 +47,7 @@ private $gateway;
             $user->metadata = $request->all();
             $user->payment_status = 'pending';
             $user->payment_method ='stripe';
+            $user->premium = $request->tier === 'premium';
             $user->last_payment_reference = $reference;
             $user->last_payment_amount = $request->amount;
             $user->last_payment_at = now();

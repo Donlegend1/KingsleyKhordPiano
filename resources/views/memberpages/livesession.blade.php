@@ -1,8 +1,8 @@
 @extends('layouts.member')
 
 @section('content')
-<p>
 
- Live lessons
-</p>
+<div id="live-show-page">
+
+</div>
 @endsection

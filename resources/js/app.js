@@ -21,3 +21,11 @@ import './components/plans/PlanSwitchAndCurrencySelect';
 import './components/ZoomMeetingBooking';
 import './components/uploads/Uploads';
 import './components/uploads/Create';
+import './components/EarTraining/Index';
+import './components/EarTraining/Create'
+import './components/EarTraining/Show'
+import './components/LiveShow/LiveShowCard'
+import './components/LiveShow/List'
+import './components/LiveShow/Create'
+import './components/LiveShow/LiveShowCardPage'
+

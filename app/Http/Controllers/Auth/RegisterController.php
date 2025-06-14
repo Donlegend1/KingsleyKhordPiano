@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
@@ -23,50 +24,55 @@ class RegisterController extends Controller
     /**
      * Handle the registration request (supports both AJAX and traditional).
      */
-    public function register(Request $request)
-    {
-        // If request is AJAX (from Alpine/JS)
-        \Log::info($request->all());
-        if ($request->expectsJson()) {
-            $validator = Validator::make($request->all(), [
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
-                // 'plan' => ['required'],
-            ]);
+ public function register(Request $request)
+{
+    \Log::info($request->all());
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+    if ($request->expectsJson()) {
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
 
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                // 'plan' => $request->plan,
-                'role' => UserRole::MEMBER->value,
-                'payment_status' => 'pending',
-            ]);
-
-            auth()->login($user);
-
+        if ($validator->fails()) {
             return response()->json([
-                'success' => true,
-                'user' => $user
-            ]);
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        // Fallback: standard Laravel flow
-        $this->validator($request->all())->validate();
-        $user = $this->create($request->all());
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => UserRole::MEMBER->value,
+            'payment_status' => 'pending',
+        ]);
 
-        $this->guard()->login($user);
+        // 🔥 This sends the verification email
+        event(new Registered($user));
 
-        return redirect($this->redirectPath());
+        auth()->login($user);
+
+        return response()->json([
+            'success' => true,
+            'user' => $user
+        ]);
     }
+
+    // Fallback (non-AJAX)
+    $this->validator($request->all())->validate();
+    $user = $this->create($request->all());
+
+    // 🔥 Again, ensure the event is triggered here too
+    event(new Registered($user));
+
+    $this->guard()->login($user);
+
+    return redirect($this->redirectPath());
+}
+
 
     /**
      * For traditional form validation.
@@ -84,14 +90,17 @@ class RegisterController extends Controller
     /**
      * Create a new user instance (for fallback form).
      */
-    protected function create(array $data)
-    {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            // 'plan' => $data['plan'],
-            'payment_status' => 'pending',
-        ]);
-    }
+ protected function create(array $data)
+{
+    $user = User::create([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'password' => Hash::make($data['password']),
+        'payment_status' => 'pending',
+    ]);
+
+    event(new Registered($user)); // ✅ Don't forget this too
+
+    return $user;
+}
 }

@@ -80,7 +80,7 @@
                     class="text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     My Account
                 </a>
-                <a href="#"
+                <a href="/member/support"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Support
                 </a>
