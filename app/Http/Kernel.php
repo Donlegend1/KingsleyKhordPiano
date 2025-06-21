@@ -67,5 +67,9 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
     'check.payment' => \App\Http\Middleware\CheckPaymentStatus::class,
-];
+    ];
+
+    protected $commands = [
+    \App\Console\Commands\CheckExpiredSubscriptions::class,
+    ];
 }

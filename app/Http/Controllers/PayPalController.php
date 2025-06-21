@@ -40,6 +40,9 @@ private $gateway;
             'metadata' => json_encode($request->all()),
             'payment_method' =>'paypal',
             'status' => 'pending',
+            'notify_at' => null,
+            'starts_at' => now(),
+            'ends_at' =>  $request->duration ==="monthly" ? now()->addMonth(3) : now()->addYear(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

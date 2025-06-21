@@ -12,6 +12,4 @@
 </div>
 
  <div id="live-show"></div>
- <script>
-    window.authUser = @json(auth()->user());
-</script>
+

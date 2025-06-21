@@ -2,13 +2,19 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from 'react-dom/client';
 import axios from "axios";
 import dayjs from "dayjs";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
+
 
 const LiveShowCard = () => {
   const [shows, setShows] = useState([]);
   const [alert, setAlert] = useState(null);
+   const { showMessage } = useFlashMessage();
 
   const authUser = window.authUser || {};
-  const isPremium = authUser?.is_premium;
+  const isPremium = authUser?.premium;
 
   useEffect(() => {
     axios.get('/api/live-shows').then((res) => setShows(res.data));
@@ -16,17 +22,13 @@ const LiveShowCard = () => {
 
   const handleRestrictedClick = (e) => {
     e.preventDefault();
-    setAlert("This content is available for premium users only.");
-    setTimeout(() => setAlert(null), 4000);
+    showMessage("This content is available for premium users only.", "error");
+   
   };
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-10">
-      {alert && (
-        <div className="mb-6 p-4 bg-yellow-100 text-yellow-800 rounded-md text-center font-medium">
-          {alert}
-        </div>
-      )}
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {shows.map((show) => {
           const date = dayjs(show.start_time);
@@ -91,7 +93,9 @@ if (document.getElementById("live-show")) {
   const Index = ReactDOM.createRoot(document.getElementById("live-show"));
   Index.render(
     <React.StrictMode>
-      <LiveShowCard />
+      <FlashMessageProvider>
+        <LiveShowCard />
+        </FlashMessageProvider>
     </React.StrictMode>
   );
 }

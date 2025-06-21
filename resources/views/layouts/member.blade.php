@@ -23,6 +23,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     <script src="https://js.paystack.co/v2/inline.js" ></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 
@@ -60,8 +61,6 @@
     </div>
 </div>
 
-
-        <!-- Right: Navigation & Mobile Menu Button -->
         <div class="flex items-center space-x-4">
             <nav class="hidden lg:flex items-center space-x-6">
                 <a href="/member/getstarted"
@@ -84,12 +83,54 @@
                     class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Support
                 </a>
-               <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button class="text-sm font-semibold px-4 py-2 rounded-md   hover:bg-[#FFD736] text-gray-400 transition text-center" type="submit" >
-                                {{ __('Logout') }}
+
+            <div x-data="{ showLogoutModal: false }">
+                <!-- Logout Button -->
+                <button
+                    @click="showLogoutModal = true"
+                    class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition"
+                >
+                    {{ __('Logout') }}
+                </button>
+
+                <!-- Hidden Logout Form -->
+                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
+                    @csrf
+                </form>
+
+                <!-- Logout Modal -->
+                            <div
+                                x-show="showLogoutModal"
+                                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                            >
+                                <div
+                                    @click.away="showLogoutModal = false"
+                                    class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6"
+                                >
+                            <div class="mx-auto mb-4 text-center">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-2">Confirm Logout</h2>
+                            <p class="text-gray-600">Are you sure you want to log out?</p>
+                        </div>
+                                    
+
+                        <div class="flex justify-between space-x-3">
+                            <button
+                                @click="showLogoutModal = false"
+                                class="px-4 py-2 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300"
+                            >
+                                Cancel
                             </button>
-                        </form>
+
+                            <button
+                                @click="document.getElementById('logout-form').submit()"
+                                class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700"
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </nav>
 
             <!-- Mobile menu button -->
@@ -128,12 +169,53 @@
         </div>
         <div class="flex flex-col space-y-2 mt-4">
           
-                 <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-black transition text-center" type="submit" >
-                                {{ __('Logout') }}
-                            </button>
-                        </form>
+                <div x-data="{ showLogoutModal: false }">
+    <!-- Logout Button -->
+    <button
+        @click="showLogoutModal = true"
+        class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition"
+    >
+        {{ __('Logout') }}
+    </button>
+
+    <!-- Hidden Logout Form -->
+    <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
+        @csrf
+    </form>
+
+    <!-- Logout Modal -->
+                <div
+                    x-show="showLogoutModal"
+                    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                >
+                    <div
+                        @click.away="showLogoutModal = false"
+                        class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6"
+                    >
+                <div class="mx-auto mb-4 text-center">
+                <h2 class="text-lg font-semibold text-gray-800 mb-2">Confirm Logout</h2>
+                <p class="text-gray-600">Are you sure you want to log out?</p>
+            </div>
+                        
+
+            <div class="flex justify-between space-x-3">
+                <button
+                    @click="showLogoutModal = false"
+                    class="px-4 py-2 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    @click="document.getElementById('logout-form').submit()"
+                    class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700"
+                >
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
         
         </div>
     </div>
@@ -183,7 +265,6 @@
     </div>
 </section>
 </header>
-
 
 @if(session()->has('success'))
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -253,5 +334,8 @@
   });
 </script>
 
+ <script>
+    window.authUser = @json(auth()->user());
+</script>
 </body>
 </html>

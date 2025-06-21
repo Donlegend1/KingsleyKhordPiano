@@ -107,17 +107,8 @@
   </div>
 
   <!-- Card 2 -->
-  <div class="flex flex-col items-center justify-center p-4 bg-white border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
-    <div class="text-center my-5 mx-10">
-      <p class="text-gray-800 font-semibold mb-2">Get on a 10 mins Discovery Call with Kingsley Khod</p>
-      <p class="text-gray-500 text-sm">
-        This call will help you find clarity in your piano journey so you know where to commence your learning from.
-      </p>
-    </div>
-    <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-      View Details <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
-    </a>
-  </div>
+<div id="free-call"></div>
+<!-- Calendly inline widget end -->
 </div>
 </section>
 

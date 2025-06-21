@@ -28,4 +28,6 @@ import './components/LiveShow/LiveShowCard'
 import './components/LiveShow/List'
 import './components/LiveShow/Create'
 import './components/LiveShow/LiveShowCardPage'
+import './components/Calls/FreeCall'
+import './components/Calls/PaidCall'
 

@@ -209,6 +209,11 @@ const PlanSwitchAndCurrencySelect = () => {
                                     name="tier"
                                     value={selectedPlanDetails.tier}
                                 />
+                                <input
+                                    type="hidden"
+                                    name="duration"
+                                    value={selectedPlanDetails.type}
+                                />
                                 {/* <input type="hidden" name="currency" value={currency} /> */}
                                 <input
                                     type="hidden"
@@ -239,7 +244,11 @@ const PlanSwitchAndCurrencySelect = () => {
                                     name="tier"
                                     value={selectedPlanDetails.tier}
                                 />
-
+                                <input
+                                    type="hidden"
+                                    name="duration"
+                                    value={selectedPlanDetails.type}
+                                />
                                 <input
                                     type="hidden"
                                     name="amount"
@@ -272,6 +281,11 @@ const PlanSwitchAndCurrencySelect = () => {
                                     type="hidden"
                                     name="tier"
                                     value={selectedPlanDetails.tier}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="duration"
+                                    value={selectedPlanDetails.type}
                                 />
 
                                 <input

@@ -10,11 +10,10 @@ import {
 const PremiumVideoSection = () => {
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [alert, setAlert] = useState(null);
   const { showMessage } = useFlashMessage();
 
   const authUser = window.authUser || {};
-  const isPremium = authUser?.is_premium;
+  const isPremium = authUser?.premium;
 
   useEffect(() => {
     axios.get('/api/live-shows').then(res => setVideos(res.data));
@@ -22,9 +21,7 @@ const PremiumVideoSection = () => {
 
   const handleVideoClick = (video) => {
     if (video.access_type === 'premium' && !isPremium) {
-      setAlert("This video is only available to premium users.");
       showMessage("This video is only available to premium users!", "error");
-      setTimeout(() => setAlert(null), 4000);
       return;
     }
     setSelectedVideo(video);
@@ -34,11 +31,7 @@ const PremiumVideoSection = () => {
     <section className="max-w-6xl mx-auto px-4 py-12">
       <h2 className="text-2xl font-bold mb-6 text-center">Live Session</h2>
 
-      {alert && (
-        <div className="mb-6 p-4 bg-yellow-100 text-yellow-800 rounded-md text-center font-medium">
-          {alert}
-        </div>
-      )}
+    
 
       {selectedVideo && (
         <div className="mb-8">

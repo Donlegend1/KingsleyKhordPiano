@@ -1,12 +1,9 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 
 class CheckPaymentStatus
 {
@@ -19,8 +16,17 @@ class CheckPaymentStatus
     {
         $user = Auth::user();
 
-        if ($user->role ==="member" && $user->payment_status ==="pending") {
-            return redirect('/member/plan');
+        if ($user->role === 'member') {
+            if (in_array($user->payment_status, ['pending', 'expired'])) {
+                return redirect('/member/plan');
+            }
+
+            $latestPayment = $user->payments()->latest('ends_at')->first();
+
+            if (!$latestPayment || $latestPayment->ends_at->isPast()) {
+                $user->update(['payment_status' => 'expired']);
+                return redirect('/member/plan');
+            }
         }
 
         return $next($request);

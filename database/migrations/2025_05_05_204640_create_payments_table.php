@@ -16,8 +16,11 @@ return new class extends Migration
             $table->string('user_id');
             $table->string('reference');
             $table->string('amount');
+            $table->date('starts_at');
+            $table->date('ends_at');
+            $table->date('notified_at')->nullable();
             $table->string('payment_method')->nullable();
-             $table->json('metadata')->nullable();
+            $table->json('metadata')->nullable();
             $table->string('status')->default("pending");
             $table->timestamps();
         });

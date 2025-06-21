@@ -3,6 +3,11 @@ import ReactDOM from "react-dom/client";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import axios from "axios";
+import PaidCall from "./Calls/PaidCall";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "./Alert/FlashMessageContext";
 
 const ZoomMeetingBooking = () => {
     const [loading, setLoading] = useState(false);
@@ -34,21 +39,6 @@ const ZoomMeetingBooking = () => {
         localStorage.setItem("meetingDetails", JSON.stringify(meetingDetails));
     }, [meetingDetails]);
 
-    // const handlePayment = async (method) => {
-    //     setLoading(true);
-    //     try {
-    //         // Simulate payment processing (Replace with actual Paystack/Stripe integration)
-    //         await new Promise((resolve) => setTimeout(resolve, 2000));
-    //         setPaymentSuccess(true);
-
-    //         // If payment is successful, create Zoom meeting
-    //         await createZoomMeeting();
-    //     } catch (error) {
-    //         console.error("Payment error:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     const createZoomMeeting = async () => {
         try {
@@ -147,20 +137,7 @@ const ZoomMeetingBooking = () => {
                                 Zoom 5 minutes earlier to prepare your video,
                                 audio, and keyboard.
                             </p>
-                            {zoomLink && (
-                                <div className="mt-4 p-4 bg-green-100 rounded">
-                                    <p className="text-green-800">
-                                        Meeting created! Join via:{" "}
-                                        <a
-                                            href={zoomLink}
-                                            className="underline text-blue-600"
-                                            target="_blank"
-                                        >
-                                            Zoom Link
-                                        </a>
-                                    </p>
-                                </div>
-                            )}
+                            
                         </div>
                     </div>
 
@@ -263,10 +240,9 @@ const ZoomMeetingBooking = () => {
                                 </div>
                             </div>
                         ) : (
-                            <Calendar
-                                onChange={handleDateChange}
-                                value={selectedDate}
-                            />
+                                <>
+                                    <PaidCall />
+                                </>
                         )}
                     </div>
                 </div>
@@ -284,7 +260,9 @@ if (document.getElementById("zoomMeetingBooking")) {
 
     Index.render(
         <React.StrictMode>
-            <ZoomMeetingBooking />
+            <FlashMessageProvider>
+                <ZoomMeetingBooking />
+                </FlashMessageProvider>
         </React.StrictMode>
     );
 }

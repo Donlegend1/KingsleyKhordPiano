@@ -20,6 +20,7 @@ use App\Http\Controllers\ZoomMeetingController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LiveShowController;
+use App\Http\Controllers\DocumentMailController;
 
 
 /*
@@ -43,6 +44,7 @@ Route::get('/contact', function () {
     return view('contact');
 });
 
+Route::post('/send-document', [DocumentMailController::class, 'send'])->name('subscribe');
 
 Route::get('/plans', [SubscriptionController::class, 'index']);
 Route::get('/member/plan', [SubscriptionController::class, 'memberplans'])->middleware(['auth', 'verified']);
