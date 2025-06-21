@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,8 +31,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
-<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
-    <div id="app">
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+    <div id="app" class="flex flex-col flex-grow">
      
      <header class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between space-x-6">
@@ -67,7 +67,7 @@
                     class="text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Get Started
                 </a>
-                <a href="#"
+                <a href="/member/community"
                     class="text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Community
                 </a>
@@ -150,7 +150,7 @@
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 Get Started
             </a>
-            <a href="#"
+            <a href="/member/community"
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 Community
             </a>
@@ -162,7 +162,7 @@
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                Shop
             </a>
-            <a href="#"
+            <a href="/member/support"
                 class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                 Support
             </a>
@@ -171,17 +171,17 @@
           
                 <div x-data="{ showLogoutModal: false }">
     <!-- Logout Button -->
-    <button
-        @click="showLogoutModal = true"
-        class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition"
-    >
-        {{ __('Logout') }}
-    </button>
+                <button
+                    @click="showLogoutModal = true"
+                    class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition"
+                >
+                    {{ __('Logout') }}
+                </button>
 
-    <!-- Hidden Logout Form -->
-    <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
-        @csrf
-    </form>
+                <!-- Hidden Logout Form -->
+                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
+                    @csrf
+                </form>
 
     <!-- Logout Modal -->
                 <div
@@ -219,7 +219,7 @@
         
         </div>
     </div>
-   <section class="bg-gray-900 text-white py-7 shadow sticky ">
+   <section class="bg-gray-900 text-white py-7 shadow sticky hidden lg:flex">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center space-x-4 overflow-x-auto">
 
         <a href="/home" class="flex items-center space-x-2 text-sm hover:text-[#FFD736] transition">
@@ -277,18 +277,18 @@
         {{ session()->get('error') }}
     </div>
 @endif
-        <main >
+        <main  class="flex-grow">
             @yield('content')
         </main>
 
-        <footer class="bg-gray-100 shadow sticky bottom-0 z-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-5">
-        <div class="max-w-7xl mx-auto  px-4 flex flex-col md:flex-row items-center justify-center text-sm text-gray-500 dark:text-gray-400">
-            <div class="flex items-center">
-            <div>&copy; {{ date('Y') }} {{ config('app.name') }}</div>
-            <div class="h-4 border-l border-gray-400 mx-2"></div>
-            <div>All rights reserved.</div>
+         <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-5">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+                <div class="flex items-center">
+                    <div>&copy; {{ date('Y') }} {{ config('app.name') }}</div>
+                    <div class="h-4 border-l border-gray-400 mx-2"></div>
+                    <div>All rights reserved.</div>
+                </div>
             </div>
-        </div>
         </footer>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>

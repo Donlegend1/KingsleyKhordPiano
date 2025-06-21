@@ -4,12 +4,10 @@
 <div class="max-w-5xl mx-auto py-10 px-6">
     <h2 class="text-3xl font-semibold text-gray-800 mb-8">My Profile</h2>
 
-    {{-- Profile Info Form --}}
-<form action="/profile/update" method="POST" class="bg-white p-6 rounded-2xl shadow-md space-y-6">
+<form action="/profile/update" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl shadow-md space-y-6">
     @csrf
     @method('PUT')
 
-    {{-- Display all validation errors at the top --}}
     @if ($errors->any())
         <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md p-4">
             <ul class="list-disc list-inside space-y-1">
@@ -22,42 +20,63 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <label for="passport" class="block text-sm font-medium text-gray-700 mb-1">Passport</label>
+            <input id="passport" name="passport" type="file"
+                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+            @error('passport')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
             <input id="name" name="name" type="text" value="{{ old('name', Auth::user()->name) }}" required
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
             @error('name')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
         <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
             <input id="email" name="email" type="email" value="{{ old('email', Auth::user()->email) }}" required
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
             @error('email')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
+        <!-- Address -->
         <div>
-            <label for="password" class="block text-sm font-medium">New Password</label>
-            <input type="password" name="password" id="password"
-                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <input id="address" name="address" type="text" value="{{ old('address', Auth::user()->address) }}"
+                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+            @error('address')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <!-- Password -->
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+            <input id="password" name="password" type="password"
+                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
             @error('password')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
+        <!-- Confirm Password -->
         <div>
-            <label for="password_confirmation" class="block text-sm font-medium">Confirm Password</label>
-            <input type="password" name="password_confirmation" id="password_confirmation"
-                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+            <input id="password_confirmation" name="password_confirmation" type="password"
+                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         </div>
     </div>
 
     <div class="flex justify-end">
         <button type="submit"
-                class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 font-medium text-sm">
+                class="inline-flex items-center px-6 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             Save Changes
         </button>
     </div>
@@ -149,18 +168,56 @@
 
 
     {{-- Delete Account --}}
-    <div class="mt-10 bg-red-50 p-6 rounded-2xl shadow-md border border-red-200">
-        <h3 class="text-xl font-semibold text-red-600 mb-2">Danger Zone</h3>
-        <p class="text-sm text-red-500 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+   <div x-data="{ showModal: false }" class="mt-10 bg-red-50 p-6 rounded-2xl shadow-md border border-red-200">
+    <h3 class="text-xl font-semibold text-red-600 mb-2">Danger Zone</h3>
+    <p class="text-sm text-red-500 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
 
-        <form action="/profile/delete" method="POST">
-            @csrf
-            @method('DELETE')
-            <button type="submit"
-                class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-medium text-sm">
-                Delete My Account
-            </button>
-        </form>
+    <!-- Trigger Button -->
+    <button
+        @click="showModal = true"
+        type="button"
+        class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-medium text-sm"
+    >
+        Delete My Account
+    </button>
+
+    <div
+        x-show="showModal"
+        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        x-cloak
+    >
+        <div
+            @click.away="showModal = false"
+            class="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg text-gray-900"
+        >
+            <h2 class="text-lg font-semibold mb-2">Confirm Deletion</h2>
+            <p class="text-sm text-gray-600 mb-4">
+                Are you sure you want to permanently delete your account? This action cannot be undone.
+            </p>
+
+            <div class="flex justify-end space-x-3">
+                <button
+                    @click="showModal = false"
+                    type="button"
+                    class="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-md"
+                >
+                    Cancel
+                </button>
+
+                <form action="/profile/delete" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button
+                        type="submit"
+                        class="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+                    >
+                        Yes, Delete
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
+</div>
+
 </div>
 @endsection

@@ -28,7 +28,6 @@ const PaidCall = () => {
 
 export default PaidCall;
 
-// Attach Calendly script globally ONCE (in index.html or via script loader)
 if (!document.querySelector("script[src*='calendly.com']")) {
     const script = document.createElement("script");
     script.src = "https://assets.calendly.com/assets/external/widget.js";

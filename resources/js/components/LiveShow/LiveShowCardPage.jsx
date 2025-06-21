@@ -31,8 +31,6 @@ const PremiumVideoSection = () => {
     <section className="max-w-6xl mx-auto px-4 py-12">
       <h2 className="text-2xl font-bold mb-6 text-center">Live Session</h2>
 
-    
-
       {selectedVideo && (
         <div className="mb-8">
           <video

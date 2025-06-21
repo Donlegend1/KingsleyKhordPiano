@@ -55,11 +55,14 @@
           <span class="w-px h-5 bg-gray-300"></span>
           <p class="text-[18px] text-gray-500">Lead Instructor</p>
           <span class="w-px h-5 bg-gray-300"></span>
-          <a href="https://youtube.com" target="_blank">
+          <a href="https://youtube.com/@kingsleykhord?si=UY3WhgSjD4o6PeAu" target="_blank">
             <img src="/icons/youtube.png" alt="YouTube" >
           </a>
-          <a href="https://instagram.com" target="_blank">
+          <a href="https://www.instagram.com/kingsleykhord?igsh=N2p3eHZianZxOWo5" target="_blank">
             <img src="/icons/insta.png" alt="Instagram" >
+          </a>
+          <a href="https://www.tiktok.com/@kingsleykhord?_t=ZN-8xOl4rI6j2M&_r=1" target="_blank">
+            <img src="/icons/tictok.png" alt="Instagram"  class="w-10 h-6">
           </a>
         </div>
       </div>

@@ -26,7 +26,7 @@
 </section>
 
 <!-- Mobile Section -->
-<section class="block md:hidden container mx-auto bg-cover bg-center min-h-[50vh] px-4">
+<section class="block md:hidden container mx-auto bg-cover bg-center  px-4 my-5 py-auto">
   <div class="max-w-5xl mx-auto bg-[#0068DF] py-12 px-6 rounded-3xl flex flex-col items-center justify-between gap-6">
     <div class="text-center">
       <h2 class="text-3xl font-bold text-white">Download Free Roadmap</h2>

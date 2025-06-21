@@ -21,6 +21,8 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\DocumentMailController;
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\ShopController;
 
 
 /*
@@ -89,6 +91,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
+    Route::get('/shop', [ShopController::class, 'index']);
+    Route::get('/community', [CommunityController::class, 'index']);
 });
 
 Route::prefix('admin')->group(function () {

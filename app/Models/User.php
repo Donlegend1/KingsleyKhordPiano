@@ -21,8 +21,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-
-        // Custom subscription/payment fields
         'plan',
         'amount',
         'payment_status',
@@ -35,6 +33,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_payment_reference',
         'last_payment_amount',
         'last_payment_at',
+        'address',
+        'passport',
+        'metadata',
     ];
 
     /**

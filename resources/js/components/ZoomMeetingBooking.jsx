@@ -23,11 +23,6 @@ const ZoomMeetingBooking = () => {
         skillLevel: "Beginner",
     });
 
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
-        setShowForm(true);
-    };
-
     useEffect(() => {
         const savedDetails = JSON.parse(localStorage.getItem("meetingDetails"));
         if (savedDetails) {
@@ -50,7 +45,6 @@ const ZoomMeetingBooking = () => {
                 date: selectedDate,
                 time: selectedTime,
             });
-            console.log("Zoom Meeting Created:", response.data);
         } catch (error) {
             console.error("Error creating Zoom meeting:", error);
         }

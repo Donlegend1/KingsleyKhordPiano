@@ -12,6 +12,7 @@ use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 
 class HomeController extends Controller
@@ -123,7 +124,6 @@ class HomeController extends Controller
         $transactions = Payment::where('user_id', auth()->user()->id)->get();
         return view('memberpages.profile', compact('subscriptions', 'transactions'));
     }
-
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -132,13 +132,28 @@ class HomeController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
+            'passport' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'address' => 'nullable|string|max:500',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->address = $request->address;
 
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password); 
+            $user->password = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('passport')) {
+            if ($user->passport) {
+                Storage::disk('public')->delete('passports/' . $user->passport);
+            }
+
+            $file = $request->file('passport');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('public/passports', $filename);
+
+            $user->passport = $filename;
         }
 
         $user->save();

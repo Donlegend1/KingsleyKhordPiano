@@ -40,7 +40,7 @@ class StripeController extends Controller
             'amount' => $request->amount,
             'metadata' => json_encode($request->all()),
             'payment_method' =>'stripe',
-            'notify_at' => null,
+            'notified_at' => null,
             'starts_at' => now(),
             'ends_at' =>  $request->duration ==="monthly" ? now()->addMonth(3) : now()->addYear(),
             'status' => 'pending',

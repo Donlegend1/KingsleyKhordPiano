@@ -33,7 +33,7 @@ class PaymentController extends Controller
             'metadata' => json_encode($request->all()),
             'payment_method' =>'paystack',
             'starts_at' => now(),
-            'notify_at' => null,
+            'notified_at' => null,
             'ends_at' =>  $request->duration ==="monthly" ? now()->addMonth(3) : now()->addYear(),
             'status' => 'pending',
             'created_at' => now(),
