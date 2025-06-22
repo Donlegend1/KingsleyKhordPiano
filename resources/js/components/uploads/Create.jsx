@@ -16,6 +16,7 @@ const UploadForm = () => {
         description: "",
         video_url: "",
         level: "",
+        skill_level: "",
         status: "active",
     });
     const [saving, setSaving] = useState(false);
@@ -62,7 +63,15 @@ const UploadForm = () => {
                 },
             });
             showMessage("Record Saved successfully.", "success");
-            setUpload({})
+            setUpload({
+                title: "",
+                category: "",
+                description: "",
+                video_url: "",
+                level: "",
+                skill_level: "",
+                status: "active",
+            });
         } catch (error) {
             showMessage("Error creating upload.", "error");
             console.error("Error creating upload:", error);
@@ -78,90 +87,182 @@ const UploadForm = () => {
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
-                        type="file"
-                        name="thumbnail"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="w-full p-3 border rounded-lg"
-                    />
-                    <input
-                        name="title"
-                        placeholder="Title"
-                        value={upload.title}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                    />
-                    <select
-                        name="category"
-                        value={upload.category}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                    >
-                        <option value="">Select</option>
-                        {categories.map((category) => (
-                            <option key={category} value={category}>
-                                {category.charAt(0).toUpperCase() +
-                                    category.slice(1)}
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        name="video_url"
-                        placeholder="Video URL"
-                        value={upload.video_url}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                    />
-                    <select
-                        name="level"
-                        value={upload.level}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                    >
-                        <option value="">select</option>
-                        {upload.category === "piano exercise" ? (
-                            <>
-                                {pianoLevels.map((level) => (
-                                    <option key={level} value={level}>
-                                        {level.charAt(0).toUpperCase() +
-                                            level.slice(1)}
-                                    </option>
-                                ))}
-                            </>
-                        ) : (
-                            <>
+                    {/* Thumbnail Upload */}
+                    <div>
+                        <label
+                            htmlFor="thumbnail"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Thumbnail
+                        </label>
+                        <input
+                            type="file"
+                            id="thumbnail"
+                            name="thumbnail"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="w-full p-3 border rounded-lg"
+                        />
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                        <label
+                            htmlFor="title"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Title
+                        </label>
+                        <input
+                            id="title"
+                            name="title"
+                            placeholder="Title"
+                            value={upload.title}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        />
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                        <label
+                            htmlFor="category"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Category
+                        </label>
+                        <select
+                            id="category"
+                            name="category"
+                            value={upload.category}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        >
+                            <option value="">Select</option>
+                            {categories.map((category) => (
+                                <option key={category} value={category}>
+                                    {category.charAt(0).toUpperCase() +
+                                        category.slice(1)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Video URL */}
+                    <div>
+                        <label
+                            htmlFor="video_url"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Video URL
+                        </label>
+                        <input
+                            id="video_url"
+                            name="video_url"
+                            placeholder="Video URL"
+                            value={upload.video_url}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        />
+                    </div>
+
+                    {/* Level */}
+                    <div>
+                        <label
+                            htmlFor="level"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Level
+                        </label>
+                        <select
+                            id="level"
+                            name="level"
+                            value={upload.level}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        >
+                            <option value="">Select</option>
+                            {upload.category === "piano exercise"
+                                ? pianoLevels.map((level) => (
+                                      <option key={level} value={level}>
+                                          {level.charAt(0).toUpperCase() +
+                                              level.slice(1)}
+                                      </option>
+                                  ))
+                                : levels.map((level) => (
+                                      <option key={level} value={level}>
+                                          {level.charAt(0).toUpperCase() +
+                                              level.slice(1)}
+                                      </option>
+                                  ))}
+                        </select>
+                    </div>
+                    {upload.category === "piano exercise" && (
+                        <div>
+                            <label
+                                htmlFor="skill_level"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Skil Level
+                            </label>
+                            <select
+                                id="skill_level"
+                                name="skill_level"
+                                value={upload.skill_level}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                            >
+                                <option value="">Select</option>
                                 {levels.map((level) => (
                                     <option key={level} value={level}>
                                         {level.charAt(0).toUpperCase() +
                                             level.slice(1)}
                                     </option>
                                 ))}
-                            </>
-                        )}
-                    </select>
-
-                    <select
-                        name="status"
-                        value={upload.status}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                    >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                            </select>
+                        </div>
+                    )}
+                    {/* Status */}
+                    <div>
+                        <label
+                            htmlFor="status"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Status
+                        </label>
+                        <select
+                            id="status"
+                            name="status"
+                            value={upload.status}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
                 </div>
 
-                <textarea
-                    name="description"
-                    placeholder="Description"
-                    value={upload.description}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded-lg"
-                    rows="4"
-                ></textarea>
-                {/* <textarea name="what_you_will_learn" placeholder="What You Will Learn" value={upload.what_you_will_learn} onChange={handleChange} className="w-full p-3 border rounded-lg" rows="4"></textarea> */}
+                {/* Description */}
+                <div>
+                    <label
+                        htmlFor="description"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Description
+                    </label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Description"
+                        value={upload.description}
+                        onChange={handleChange}
+                        className="w-full p-3 border rounded-lg"
+                        rows="4"
+                    ></textarea>
+                </div>
 
+                {/* Submit Button */}
                 <button
                     disabled={saving}
                     type="submit"
@@ -192,7 +293,7 @@ const UploadForm = () => {
                             <span>Saving...</span>
                         </>
                     ) : (
-                        <span>Save upload</span>
+                        <span>Save Upload</span>
                     )}
                 </button>
             </form>

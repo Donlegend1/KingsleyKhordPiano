@@ -23,6 +23,7 @@ use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
+use Illuminate\Support\Facades\Artisan;
 
 
 /*
@@ -44,6 +45,11 @@ Route::get('/about', function () {
 });
 Route::get('/contact', function () {
     return view('contact');
+});
+
+Route::get('/clear', function () {
+    Artisan::call('optimize');
+    return 'Application optimized!';
 });
 
 Route::post('/send-document', [DocumentMailController::class, 'send'])->name('subscribe');
@@ -81,7 +87,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
     Route::get('profile', [HomeController::class, 'profile']);
-    Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise']);
+    Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
     Route::get('extra-courses', [CoursesController::class, 'extraCourses']);
     Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
     Route::get('ear-training', [EarTrainingController::class, 'earTraining']);

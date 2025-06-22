@@ -23,7 +23,30 @@ class AdminController extends Controller
     }
 
     function usersList() {
-        $users = User:: with('plan')->where('role', UserRoles::MEMBER->value)->paginate(10);
+        $users = User:: with('plan')->paginate(10);
         return response()->json($users);
-}
+    }
+
+
+    public function editUser(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'payment_status' => 'nullable|in:successful,pending',
+            'premium' => 'nullable|boolean',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json($user);
+    }
+
+    public function destroy(Request $request, User $user)
+    {
+        $user->delete();
+
+        return response()->json(['message' => "Record deleted"]);
+    }
+
 }

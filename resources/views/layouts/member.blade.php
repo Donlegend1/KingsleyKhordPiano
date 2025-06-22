@@ -26,9 +26,13 @@
     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     <script src="https://js.paystack.co/v2/inline.js" ></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+    <script src="/build/manifest.json"></script>
+    <link rel="stylesheet" href="/build/assets/app-DDKpoaqD.css">
+    <link rel="stylesheet" href="/build/assets/app-B_jciIra.css">
+    <script src="/assets/app-tHA-qcZZ.js"></script>
 
-    @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- @viteReactRefresh --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js']) 
 
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col">

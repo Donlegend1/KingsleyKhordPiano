@@ -10,12 +10,9 @@ import {
 } from "./Alert/FlashMessageContext";
 
 const ZoomMeetingBooking = () => {
-    const [loading, setLoading] = useState(false);
-    const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState("");
     const [showForm, setShowForm] = useState(false);
-    const [zoomLink, setZoomLink] = useState(null);
     const [meetingDetails, setMeetingDetails] = useState({
         name: "",
         email: "",

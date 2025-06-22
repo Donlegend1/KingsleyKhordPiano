@@ -37,6 +37,7 @@ class UploadController extends Controller
         'description',
         'video_url',
         'level',
+        'skill_level',
         'status',
     ]);
 

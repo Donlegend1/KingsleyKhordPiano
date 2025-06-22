@@ -26,6 +26,8 @@ Route::get('/live-shows', [LiveShowController::class, 'list']);
 
 Route::prefix('admin')->group(function () {
     Route::get('users', [AdminController::class, 'usersList']);
+    Route::put('users/{user}', [AdminController::class, 'editUser']);
+    Route::delete('user/{user}', [AdminController::class, 'destroy']);
     Route::get('courses', [CourseController::class, 'coursesList']);
     Route::patch('courses/{course}', [CourseController::class, 'update']);
     Route::delete('courses/{course}', [CourseController::class, 'deleteCourse']);

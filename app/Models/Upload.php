@@ -15,6 +15,7 @@ class Upload extends Model
         'video_url',
         'level',
         'status',
+        'skill_level',
         'thumbnail',
     ];
 

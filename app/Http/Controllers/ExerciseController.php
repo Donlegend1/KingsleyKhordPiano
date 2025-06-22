@@ -13,15 +13,27 @@ class ExerciseController extends Controller
     }
     
 
-    function pianoExercise() {
-        $all = Upload::where('category', 'piano exercise')->paginate(5);
-        $independence = Upload::where('category', 'piano exercise')->where('level', 'Independence')->paginate(9);
-        $coordination = Upload::where('category', 'piano exercise')->where('level', 'Coordination')->paginate(9);
-        $flexibility = Upload::where('category', 'piano exercise')->where('level', 'Flexibility')->paginate(9);
-        $strength = Upload::where('category', 'piano exercise')->where('level', 'Strength')->paginate(9);
-        $dexterity = Upload::where('category', 'piano exercise')->where('level', 'Dextrity')->paginate(9);
+public function pianoExercise(Request $request)
+{
+    $level = $request->query('level');
+    $skillLevel = $request->query('skill_level');
 
-        // dd($all);
-        return view('memberpages.pianoexercise', compact('all', 'independence', 'coordination', 'flexibility', 'strength', 'dexterity'));
+    $query = Upload::query()->where('category', 'piano exercise');
+
+    if ($level) {
+        $query->where('level', ucfirst($level));
     }
+
+    if ($skillLevel) {
+        $query->where('skill_level', ucfirst($skillLevel));
+    }
+
+    $exercises = $query->latest()->paginate(12);
+
+    $levels = ['independence', 'coordination', 'flexibility', 'strength', 'dexterity'];
+    $skillLevels = ['beginner', 'intermediate', 'advanced'];
+
+    return view('memberpages.pianoexercise', compact('exercises', 'level', 'skillLevel', 'levels', 'skillLevels'));
+}
+
 }
