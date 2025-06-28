@@ -26,89 +26,92 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://js.paystack.co/v2/inline.js"></script>
      <script src="https://js.stripe.com/v3/"></script>
+       <script src="/build/manifest.json"></script>
+    <link rel="stylesheet" href="/build/assets/app-DDKpoaqD.css">
+    <link rel="stylesheet" href="/build/assets/app-B_jciIra.css">
+    <script src="/assets/app-tHA-qcZZ.js"></script>
 
-     {{-- @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+    @viteReactRefresh
+    @vite(['resources/css/app.css', 'resources/js/app.js']) 
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
     <div id="app">
-        <!-- Navbar -->
-        <header class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-                <a href="/" class="text-2xl font-bold"><img src="/logo/logo.png" alt="KingsleyKhord logo"></a>
+    <header class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <!-- Left: Logo -->
+            <div class="flex items-center flex-shrink-0">
+                <a href="/" class="text-2xl font-bold">
+                    <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8 w-auto">
+                </a>
+            </div>
 
-                <!-- Desktop Nav -->
-                <nav class="hidden lg:flex flex-grow items-center justify-center space-x-6">
+            <!-- Center: Desktop Nav -->
+            <nav class="hidden lg:grid grid-flow-col auto-cols-max gap-x-10 items-center justify-center flex-1">
                 <a href="/"
-                    class="text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-lg font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Home
                 </a>
-                {{-- <a href="/plans"
-                    class="text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Plans
-                </a> --}}
                 <a href="/about"
-                    class="text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-lg font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     About
                 </a>
                 <a href="/contact"
-                    class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-lg font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Contact
                 </a>
                 <a href="/member/shop"
-                    class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-lg font-semibold transition duration-200 {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Shop
                 </a>
-                </nav>
+            </nav>
 
-                <!-- Login -->
-                <div class="hidden lg:flex space-x-2">
-                    <a href="/register"
-                    class="text-sm font-semibold px-4 py-2 rounded-md bg-transparent border border-gray-300 text-white hover:bg-[#FFD736] hover:text-black transition">
-                    Sign Up 
-                </a>
-                <a href="/login"
-                    class="text-sm font-semibold px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-[#FFD736] hover:text-black transition">
-                    Login 
-                </a>
-                </div>
+            <div class="hidden lg:flex items-center space-x-4">
+            <a href="/register"
+                class="text-lg font-semibold px-4 py-2 rounded-lg bg-transparent border border-gray-300 text-white hover:bg-[#FFD736] hover:text-black shadow transition duration-200">
+                Sign Up
+            </a>
+            <a href="/login"
+                class="text-lg font-semibold px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-[#FFD736] hover:text-black shadow transition duration-200">
+                Login
+            </a>
+        </div>
 
-                <!-- Mobile Toggle -->
-                <button class="lg:hidden navbar-burger" aria-label="Open Menu">
-                <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
+
+
+            <!-- Mobile Toggle -->
+            <div class="lg:hidden">
+                <button class="navbar-burger" aria-label="Open Menu">
+                    <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                 </button>
             </div>
+        </div>
 
-            <!-- Mobile Nav -->
-            <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4 space-y-4">
-                <div class="flex flex-col space-y-2">
+        <!-- Mobile Nav -->
+        <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4 space-y-4">
+            <div class="flex flex-col space-y-1">
                 <a href="/"
                     class="block text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Home
                 </a>
-                {{-- <a href="/plans"
-                    class="block text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Plans
-                </a> --}}
                 <a href="/about"
-                    class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="block text-sm font-semibold transition duration-200 my-2 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     About
                 </a>
                 <a href="/contact"
                     class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Contact
                 </a>
-                 <a href="/member/shop"
-                    class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <a href="/member/shop"
+                    class="block text-sm font-semibold transition duration-200 {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Shop
                 </a>
-                </div>
-                <div class="flex flex-col space-y-2 mt-4">
-                    <a href="/register"
+            </div>
+            <div class="flex flex-col space-y-2 mt-4">
+                <a href="/register"
                     class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
                     Sign Up
                 </a>
@@ -116,20 +119,21 @@
                     class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
                     Login
                 </a>
-                </div>
             </div>
-        </header>
-        @if(session()->has('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-        {{ session()->get('success') }}
-    </div>
-@endif
+        </div>
+    </header>
 
-@if(session()->has('error'))
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        {{ session()->get('error') }}
-    </div>
-@endif
+        @if(session()->has('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session()->get('success') }}
+        </div>
+    @endif
+
+    @if(session()->has('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {{ session()->get('error') }}
+        </div>
+    @endif
 
         <!-- Main Content -->
         <main >

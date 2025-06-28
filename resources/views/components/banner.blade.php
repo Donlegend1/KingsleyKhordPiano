@@ -14,9 +14,9 @@
         Achieve Pro-Level Gospel Piano Skills—Even If You’re Starting from Scratch!
         </p>
         <div class="flex flex-wrap justify-center my-7">
-        <a href="/plans" class="flex bg-[#FAFAFA] uppercase px-3 py-2 hover:bg-[#c2ab39] text-black rounded-md font-medium transition">
-            <img src="/icons/forward.png" alt="forward" class="ml-2 order-last mt-1 h-4 ">
-            Join Now 
+       <a href="/plans#pricing" class="flex items-center bg-[#FAFAFA] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-lg font-semibold text-lg transition duration-200">
+            Join Now
+            <img src="/icons/forward.png" alt="forward" class="ml-3 h-5 w-5 order-last mt-0.5">
         </a>
         </div>
 

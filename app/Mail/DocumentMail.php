@@ -19,7 +19,7 @@ class DocumentMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Here is your document')
+        return $this->subject('Your Piano Roadmap Is Ready ')
                     ->markdown('emails.document')
                     ->attach($this->filePath, [
                         'as' => 'kingsleyKhordRoadmap.pdf',

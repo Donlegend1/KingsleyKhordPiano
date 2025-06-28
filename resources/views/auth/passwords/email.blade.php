@@ -5,6 +5,11 @@
 <section class="py-5 h-[78vh] flex items-center justify-center bg-gray-100 px-4" style="background-image: url('/images/banner.png')">
   <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-md">
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">{{ __('Reset Password') }}</h2>
+    @if (session('status'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+            {{ session('status') }}
+        </div>
+    @endif
     
    <form method="POST" action="{{ route('password.email') }}">
                         @csrf

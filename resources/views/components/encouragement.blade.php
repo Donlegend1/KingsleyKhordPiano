@@ -1,4 +1,4 @@
-<section class="relative bg-cover bg-center h-[85vh]" style="background-image: url('/images/Background.jpg')">
+<section class="relative bg-cover bg-center my-10" style="background-image: url('/images/Background.jpg')">
     <!-- Overlay -->
     <!-- <div class="absolute inset-0 bg-black/60"></div> -->
 
@@ -22,7 +22,7 @@
         </p>
        
         <div class="flex flex-wrap justify-center my-7">
-        <a href="/plans" class="flex bg-[#FFD736] uppercase px-3 py-2 hover:bg-[#c2ab00] text-black rounded-md font-medium transition">
+        <a href="/plans#pricing" class="flex bg-[#FFD736] uppercase px-3 py-2 hover:bg-[#c2ab00] text-black rounded-md font-medium transition">
             <img src="/icons/forward.png" alt="forward" class="ml-2 order-last mt-1 h-4 ">
             Let's do this
         </a>

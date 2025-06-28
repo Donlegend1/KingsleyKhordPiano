@@ -16,7 +16,7 @@ class DocumentMailController extends Controller
         ]);
 
         $email = $request->input('email');
-        $filePath = public_path('sample.pdf');
+        $filePath = public_path('piano.pdf');
 
         if (!file_exists($filePath)) {
             return redirect()->back()->with('error', 'Document not found.');
@@ -24,7 +24,7 @@ class DocumentMailController extends Controller
 
         try {
             Mail::to($email)->send(new DocumentMail($filePath));
-            return redirect()->back()->with('success', 'Document sent successfully!');
+            return redirect()->back()->with('success', 'Roadmap sent successfully!');
         } catch (\Throwable $e) {
             Log::error('Failed to send document email: ' . $e->getMessage(), [
                 'file' => $filePath,

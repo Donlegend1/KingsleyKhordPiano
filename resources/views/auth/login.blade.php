@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-<section class="py-5 flex items-center justify-center bg-gray-100 px-4" style="background-image: url('/images/banner.png')">
+<section class="min-h-screen flex items-center justify-center bg-gray-100 bg-cover bg-center px-4 py-10 sm:py-16" style="background-image: url('/images/banner.png')">
   <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-md">
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">{{ __('Welcome Back') }}</h2>
     
@@ -74,3 +74,6 @@
 </section>
 
 @endsection
+
+
+

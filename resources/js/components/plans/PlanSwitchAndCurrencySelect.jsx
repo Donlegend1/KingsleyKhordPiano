@@ -63,7 +63,7 @@ const PlanSwitchAndCurrencySelect = () => {
 
     return (
         <section
-            className="container mx-auto px-5 md:px-28 h-[100vh] bg-white mb-20"
+            className="container mx-auto px-5 md:px-28 bg-cover bg-white mb-20"
             id="plans"
         >
             <div className="text-center my-12 mx-auto">
@@ -169,7 +169,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                     }`}
                                     onClick={() => handleModalOpen(plan)}
                                 >
-                                    Join Today
+                                    Begin Membership
                                 </button>
                             </div>
                         </div>
@@ -197,119 +197,125 @@ const PlanSwitchAndCurrencySelect = () => {
                         </p>
 
                         <div className="flex flex-col gap-6">
-                            <form action="/paystack" method="POST">
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value={csrfToken}
-                                />
+                            {currency === "NGN" && (
+                                <form action="/paystack" method="POST">
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value={csrfToken}
+                                    />
 
-                                <input
-                                    type="hidden"
-                                    name="tier"
-                                    value={selectedPlanDetails.tier}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="duration"
-                                    value={selectedPlanDetails.type}
-                                />
-                                {/* <input type="hidden" name="currency" value={currency} /> */}
-                                <input
-                                    type="hidden"
-                                    name="amount"
-                                    value={selectedPlanDetails.amount[currency]}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="currency"
-                                    value={currency}
-                                />
-                                <button
-                                    type="submit"
-                                    className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full"
-                                >
-                                    Pay with Paystack
-                                </button>
-                            </form>
+                                    <input
+                                        type="hidden"
+                                        name="tier"
+                                        value={selectedPlanDetails.tier}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="duration"
+                                        value={selectedPlanDetails.type}
+                                    />
+                                    {/* <input type="hidden" name="currency" value={currency} /> */}
+                                    <input
+                                        type="hidden"
+                                        name="amount"
+                                        value={selectedPlanDetails.amount[currency]}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="currency"
+                                        value={currency}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full"
+                                    >
+                                        Pay with Paystack
+                                    </button>
+                                </form>
+                            )}
 
-                            <form action="/stripe/create" method="POST">
-                                <input
-                                    type="hidden"
-                                    name="plan_id"
-                                    value={selectedPlanDetails.id}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="tier"
-                                    value={selectedPlanDetails.tier}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="duration"
-                                    value={selectedPlanDetails.type}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="amount"
-                                    value={selectedPlanDetails.amount[currency]}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value={csrfToken}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="currency"
-                                    value={currency}
-                                />
-                                <button
-                                    type="submit"
-                                    className="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold w-full"
-                                >
-                                    Pay with Stripe
-                                </button>
-                            </form>
-                            <form action="/paypal/create-order" method="POST">
-                                <input
-                                    type="hidden"
-                                    name="plan_id"
-                                    value={selectedPlanDetails.id}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="tier"
-                                    value={selectedPlanDetails.tier}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="duration"
-                                    value={selectedPlanDetails.type}
-                                />
+                            {["USD", "EUR"].includes(currency) && (
+                                <form action="/stripe/create" method="POST">
+                                    <input
+                                        type="hidden"
+                                        name="plan_id"
+                                        value={selectedPlanDetails.id}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="tier"
+                                        value={selectedPlanDetails.tier}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="duration"
+                                        value={selectedPlanDetails.type}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="amount"
+                                        value={selectedPlanDetails.amount[currency]}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value={csrfToken}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="currency"
+                                        value={currency}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold w-full"
+                                    >
+                                        Pay with Stripe
+                                    </button>
+                                </form>
+                            )}
+                            {["USD", "EUR"].includes(currency) && (
+                                <form action="/paypal/create-order" method="POST">
+                                    <input
+                                        type="hidden"
+                                        name="plan_id"
+                                        value={selectedPlanDetails.id}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="tier"
+                                        value={selectedPlanDetails.tier}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="duration"
+                                        value={selectedPlanDetails.type}
+                                    />
 
-                                <input
-                                    type="hidden"
-                                    name="amount"
-                                    value={selectedPlanDetails.amount[currency]}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value={csrfToken}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="currency"
-                                    value={currency}
-                                />
-                                <button
-                                    type="submit"
-                                    className="bg-cyan-500 hover:bg-cyan-800 py-3 rounded text-center font-semibold w-full"
-                                >
-                                    Pay with Paypal
-                                </button>
-                            </form>
+                                    <input
+                                        type="hidden"
+                                        name="amount"
+                                        value={selectedPlanDetails.amount[currency]}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value={csrfToken}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="currency"
+                                        value={currency}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="bg-cyan-500 hover:bg-cyan-800 py-3 rounded text-center font-semibold w-full"
+                                    >
+                                        Pay with Paypal
+                                    </button>
+                                </form>
+                            )}
                         </div>
 
                         <div className="mt-4 flex items-center justify-center text-sm text-gray-400">

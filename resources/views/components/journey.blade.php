@@ -1,6 +1,6 @@
 <section class=" bg-[#F7F8F8] ">
   <div class="text-center my-10">
-    <p class="font-bold text-2xl md:text-3xl pt-10"> A Glimpse Into Student's Journey </p>
+    <p class="font-bold text-[#2C2C2C] text-[28px] md:text-3xl pt-10"> A Glimpse Into Student's Journey </p>
   </div>
   <div class="container mx-auto px-4 py-5">
  

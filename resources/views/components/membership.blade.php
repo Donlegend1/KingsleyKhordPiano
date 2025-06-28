@@ -49,7 +49,7 @@
 
     <!-- Call to Action Button -->
     <div class="flex justify-center my-7">
-      <a href="#plans" class="flex items-center bg-[#FFD736] uppercase px-4 py-2 hover:bg-[#c2ab39] text-black rounded-md font-medium transition">
+      <a href="/plans#pricing" class="flex items-center bg-[#FFD736] uppercase px-4 py-2 hover:bg-[#c2ab39] text-black rounded-md font-medium transition">
         <span>Let's do this</span>
         <img src="/icons/forward.png" alt="forward" class="ml-2 h-4">
       </a>
