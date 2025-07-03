@@ -7,7 +7,7 @@
 @include("components.journey")
 @include("components.joinow2")
 @include("components.stats")
-@include("components.courses")
+{{-- @include("components.courses") --}}
 @include("components.subscribe")
 
 @endsection

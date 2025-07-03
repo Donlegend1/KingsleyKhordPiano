@@ -11,11 +11,11 @@
         You are not alone in your learning journey! Even the best feel confused and stuck at times.
       </h1>
 
-      <p class="mb-4 font-light text-[#FF364A] text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
+      <p class="mb-4 font-semibold text-[#FF364A] text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
         Committing to this carefully restructured learning process will make you unstoppable!
       </p>
 
-      <p class="mb-6 font-light text-[#E1E1E1] text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
+      <p class="mb-6 font-semibold text-[#E1E1E1] text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
         That's why you need a thriving learning community where you can learn alongside other music enthusiasts.
       </p>
 
@@ -23,7 +23,7 @@
         <a href="/plans#pricing"
            class="inline-flex items-center bg-[#FFD736] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-md font-semibold text-base transition">
           Join Now
-          <img src="/icons/forward.png" alt="forward" class="ml-3 h-5 w-5">
+          <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
         </a>
       </div>
     </div>
@@ -36,7 +36,7 @@
         <a href="/plans#pricing"
            class="inline-flex items-center bg-[#FFD736] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-md font-semibold text-base transition">
           Join Now
-          <img src="/icons/forward.png" alt="forward" class="ml-3 h-5 w-5">
+          <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
         </a>
       </div>
   </div>

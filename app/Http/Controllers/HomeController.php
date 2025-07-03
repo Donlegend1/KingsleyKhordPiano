@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -36,7 +36,7 @@ class HomeController extends Controller
     {
 
         if (Auth::user()->role == UserRoles::ADMIN->value) {
-            $users = User::all();
+            $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->get();
             $usdRevenue = Payment::where('status', 'successful')
             ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'USD'")
             ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
@@ -122,38 +122,58 @@ class HomeController extends Controller
         $subscriptions = Subscription::all();
 
         $transactions = Payment::where('user_id', auth()->user()->id)->get();
-        return view('memberpages.profile', compact('subscriptions', 'transactions'));
+
+        $countries = DB::table('countries')
+            ->orderBy('country_name')
+            ->pluck('country_name', 'country_code');
+
+        return view('memberpages.profile', compact('subscriptions', 'transactions', 'countries'));
     }
+
     public function update(Request $request)
     {
         $user = Auth::user();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'passport' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'address' => 'nullable|string|max:500',
+            'country' => 'nullable|string|max:500',
         ]);
 
-        $user->name = $request->name;
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
         $user->email = $request->email;
-        $user->address = $request->address;
+        $user->country = $request->country;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 
         if ($request->hasFile('passport')) {
+            // Delete old file if exists
             if ($user->passport) {
-                Storage::disk('public')->delete('passports/' . $user->passport);
+                $oldPath = public_path($user->passport);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
             }
 
             $file = $request->file('passport');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/passports', $filename);
+            $destinationPath = public_path('passports');
 
-            $user->passport = $filename;
+            // Ensure the directory exists
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+
+            // Save full relative path
+            $user->passport = '/passports/' . $filename;
         }
 
         $user->save();

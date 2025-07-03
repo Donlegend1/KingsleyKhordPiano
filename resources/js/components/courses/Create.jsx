@@ -1,6 +1,10 @@
 import ReactDOM from "react-dom/client";
 import React, { useState } from "react";
 import axios from "axios";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
 
 const CourseForm = () => {
     const [course, setCourse] = useState({
@@ -23,6 +27,10 @@ const CourseForm = () => {
         dislikes: 0,
     });
 
+    const [loading, setLoading] = useState(false);
+
+    const { showMessage } = useFlashMessage();
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCourse({ ...course, [name]: value });
@@ -31,14 +39,35 @@ const CourseForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log("Course data:", course);
+            setLoading(true);
             const response = await axios.post(
                 "/api/admin/course/store",
                 course
             );
-            console.log("Course created:", response.data);
+            showMessage("Course saved", "success");
+            setCourse({
+                title: "",
+                category: "",
+                description: "",
+                video_url: "",
+                // image_path: '',
+                level: "beginner",
+                enrollment_count: 0,
+                status: "active",
+                prerequisites: "",
+                // what_you_will_learn: '',
+
+                rating_count: 0,
+                average_rating: 0,
+                // resources: [],
+                // requirements: '',
+                likes: 0,
+                dislikes: 0,
+            });
         } catch (error) {
-            console.error("Error creating course:", error);
+            showMessage("Error creating course", "error");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -157,9 +186,14 @@ const CourseForm = () => {
 
                 <button
                     type="submit"
-                    className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300"
+                    disabled={loading}
+                    className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Save Course
+                    {loading ? (
+                        <span className="fa fa-spinner fa-spin"></span>
+                    ) : (
+                        "Save Course"
+                    )}
                 </button>
             </form>
         </div>
@@ -175,7 +209,9 @@ if (document.getElementById("courses-create")) {
 
     Index.render(
         <React.StrictMode>
-            <CourseForm />
+            <FlashMessageProvider>
+                <CourseForm />
+            </FlashMessageProvider>
         </React.StrictMode>
     );
 }

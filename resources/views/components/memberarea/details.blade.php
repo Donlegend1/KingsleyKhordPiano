@@ -1,11 +1,14 @@
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4 ">
     <div class="max-w-7xl mx-auto space-y-3">
         
-        <div class="flex justify-between items-center">
+       <div class="flex justify-between items-center">
             <h1 class="text-xl font-bold">Dashboard</h1>
             <a href="/member/profile" class="flex items-center space-x-2 hover:text-[#FFD736] transition">
-                {{-- <i class="fa fa-user-circle text-xl"></i> --}}
-                <img src="/storage/passports/{{auth()->user()->passport}}" alt="passport" class="w-10 h-10 rounded-full">
+                @if(auth()->user()->passport)
+                    <img src="{{ auth()->user()->passport }}" alt="passport" class="w-10 h-10 rounded-full object-cover">
+                @else
+                    <i class="fa fa-user-circle text-2xl text-gray-500"></i>
+                @endif
                 <span class="text-sm font-medium">{{ auth()->user()->name }}</span>
             </a>
         </div>

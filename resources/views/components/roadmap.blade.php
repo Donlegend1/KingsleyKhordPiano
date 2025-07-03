@@ -10,23 +10,34 @@
   </div>
 
   <!-- Feature Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    @foreach (['component2', 'component1', 'component3', 'component4'] as $image)
-    <div class="h-80 sm:h-96 bg-cover bg-center rounded-lg relative"
-         style="background-image: url('/images/{{ $image }}.png')">
-      <div class="absolute bottom-0 left-0 w-full p-3 bg-black bg-opacity-50 text-white opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-b-lg">
-        <p class="text-sm sm:text-base">
-          @switch($image)
-            @case('component2') Replace your nervousness with still-like confidence. @break
-            @case('component1') Gain a clear, structured plan of the curriculum, designed to guide you through every skill level. @break
-            @case('component3') Learn to expand your musical vocabulary and repertoire. @break
-            @case('component4') Hands-on daily piano exercises to strengthen your fingers. @break
-          @endswitch
-        </p>
-      </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  @foreach (['musictheory', 'roadmap', 'eartraining', 'pianoexercise'] as $image)
+  <div class="h-80 sm:h-96 bg-cover bg-center rounded-lg relative overflow-hidden"
+       style="background-image: url('/images/{{ $image }}.png')">
+
+    <!-- Full overlay covering the card -->
+    <div class="absolute inset-0 bg-black bg-opacity-60 flex items-end p-4 text-white">
+      <p class="text-sm sm:text-base leading-snug">
+        @switch($image)
+          @case('musictheory')
+            Replace your nervousness with steel-like confidence. A solid understanding of the fundamentals of music theory will expose you to the structures and systems of music. Also, you'll learn to communicate your musical ideas eloquently.
+            @break
+          @case('roadmap')
+            Gain a clear, structured plan of the curriculum, designed to guide you through every skill level—beginner, intermediate, and advanced. Get a hands-on understanding of the essential steps needed to progress with confidence.
+            @break
+          @case('eartraining')
+            Learn to expand your musical vocabulary and repertoire. You'll soon be able to recognise and identify chord progressions just by listening to their melodies. This will, in turn, help you develop a flawless and incredible playing style.
+            @break
+          @case('pianoexercise')
+            Hands-on daily piano exercises to strengthen your fingers. What's learning to play the piano without consistent, hands-on practice? Your fingers need a lot of practical training and drilling to produce flawless rhythms.
+            @break
+        @endswitch
+      </p>
     </div>
-    @endforeach
   </div>
+  @endforeach
+</div>
+
 
   <!-- Academy Welcome Section -->
   <div class="flex flex-col lg:flex-row justify-center items-center gap-8 mt-16 px-4">
@@ -57,7 +68,7 @@
   <div class="flex justify-center mt-12">
     <a href="/plans" class="flex items-center bg-[#FFD736] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-md font-semibold text-base sm:text-lg transition">
       All Membership Features
-      <img src="/icons/forward.png" alt="forward" class="ml-3 h-5 w-5 order-last">
+      <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
     </a>
   </div>
 </div>

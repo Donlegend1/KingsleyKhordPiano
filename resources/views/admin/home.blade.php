@@ -17,8 +17,12 @@
         <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
       </button>
       <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden">
-        <img src="/images/admin-avatar.png" alt="Admin" class="object-cover w-full h-full">
-      </div>
+        @if(auth()->user()->passport)
+            <img src="{{ auth()->user()->passport }}" alt="Admin" class="object-cover w-full h-full">
+        @else
+             <img src="/avatar1.jpg" alt="Admin" class="object-cover w-full h-full">
+        @endif
+    </div>
     </div>
   </header>
 
@@ -66,6 +70,39 @@
     </div>
 
   </div>
+
+  <!-- Recent Users Table -->
+<div class="mt-10 bg-white p-6 rounded-xl shadow-md border border-gray-100">
+  <h3 class="text-lg font-bold text-gray-800 mb-4">Recently Joined Users (Last 2 Weeks)</h3>
+  
+  @if($users->isEmpty())
+    <p class="text-sm text-gray-600">No new users registered in the last 2 weeks.</p>
+  @else
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto">
+        <thead class="bg-gray-100 text-gray-600 text-sm uppercase">
+          <tr>
+            <th class="px-4 py-2 text-left">#</th>
+            <th class="px-4 py-2 text-left">Name</th>
+            <th class="px-4 py-2 text-left">Email</th>
+            <th class="px-4 py-2 text-left">Date Joined</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm text-gray-700 divide-y divide-gray-100">
+          @foreach ($users as $index => $user)
+            <tr>
+              <td class="px-4 py-2">{{ $index + 1 }}</td>
+              <td class="px-4 py-2">{{ $user->first_name." ". $user->last_name}}</td>
+              <td class="px-4 py-2">{{ $user->email }}</td>
+              <td class="px-4 py-2">{{ $user->created_at->format('M d, Y') }}</td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  @endif
+</div>
+
 </main>
 
 @endsection

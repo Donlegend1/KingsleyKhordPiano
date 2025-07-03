@@ -16,22 +16,42 @@
 
   <div class="font-semibold border-t-2 border-gray-300 my-4"></div>
 
-  @foreach ($categoryProgress as $category)
-    <div class="mt-4">
-      <label for="progress" class="text-sm text-gray-600">{{ $category['course_category'] }}</label>
-      <p class="font-semibold text-[#145CCF]">{{ $category['completed_courses'] }}/{{ $category['total_courses'] }} <span class="text-gray-400">modules in this course</span></p>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-        <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $category['completion_percentage'] }}%"></div>
-      </div>
-    </div>
+ @if (!empty($categoryProgress) && count($categoryProgress))
+    @foreach ($categoryProgress as $category)
+        <div class="mt-4">
+            <label for="progress" class="text-sm text-gray-600">{{ $category['course_category'] }}</label>
+            <p class="font-semibold text-[#145CCF]">{{ $category['completed_courses'] }}/{{ $category['total_courses'] }} <span class="text-gray-400">modules in this course</span></p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $category['completion_percentage'] }}%"></div>
+            </div>
+        </div>
 
-    <div class="mt-6 text-left">
-      <a href="/member/course/{{ urlencode($category['level']) }}" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
-        Continue Learning
-        <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
-      </a>
-    </div>
-  @endforeach
+        <div class="mt-6 text-left">
+            <a href="/member/course/{{ urlencode($category['level']) }}" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
+                Continue Learning
+                <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
+            </a>
+        </div>
+    @endforeach
+@else
+    @foreach (['Beginner', 'Intermediate', 'Advanced'] as $defaultLevel)
+        <div class="mt-4">
+            <label for="progress" class="text-sm text-gray-600">{{ $defaultLevel }}</label>
+            <p class="font-semibold text-[#145CCF]">0/0 <span class="text-gray-400">modules in this course</span></p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div class="bg-blue-300 h-2.5 rounded-full w-0"></div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-left">
+            <a href="/member/course/{{ strtolower($defaultLevel) }}" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
+                Start Learning
+                <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
+            </a>
+        </div>
+    @endforeach
+@endif
+
 </div>
 
 

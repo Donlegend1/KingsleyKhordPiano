@@ -1,6 +1,10 @@
 import ReactDOM from "react-dom/client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
 
 const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
@@ -32,22 +36,22 @@ const Courses = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     // const [selectedCourse, setSelectedCourse] = useState(null);
-  const perPage = 10;
-   const [selectedCourse, setSelectedCourse] = useState({
-      title: '',
-      category: '',
-      description: '',
-      video_url: '',
-      level: 'beginner',
-      enrollment_count: 0,
-      status: 'active',
-      prerequisites: '',
-      published_at: '',
-      rating_count: 0,
-      average_rating: 0,
-      // resources: [],
-      requirements: '',
-
+    const { showMessage } = useFlashMessage();
+    const perPage = 10;
+    const [selectedCourse, setSelectedCourse] = useState({
+        title: "",
+        category: "",
+        description: "",
+        video_url: "",
+        level: "beginner",
+        enrollment_count: 0,
+        status: "active",
+        prerequisites: "",
+        published_at: "",
+        rating_count: 0,
+        average_rating: 0,
+        // resources: [],
+        requirements: "",
     });
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
@@ -89,19 +93,19 @@ const Courses = () => {
                 }
             );
             closeDeleteModal();
-            console.log(response.data);
+            showMessage("course deleted", "success");
             fetchCourses();
         } catch (error) {
-            console.error("Error fetching users:", error);
+            showMessage("Error deleting course", "error");
         } finally {
             setLoading(false);
         }
-  };
-  
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSelectedCourse({ ...selectedCourse, [name]: value });
-  };
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedCourse({ ...selectedCourse, [name]: value });
+    };
 
     useEffect(() => {
         fetchCourses();
@@ -129,11 +133,11 @@ const Courses = () => {
     const closeDeleteModal = () => {
         setIsDeleteModalOpen(false);
         setSelectedCourse(null);
-  };
-  
-  const handleSubmit = async (e) => {
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-    setLoading(true);
+        setLoading(true);
         try {
             const response = await axios.patch(
                 `/api/admin/courses/${selectedCourse.id}`,
@@ -145,15 +149,15 @@ const Courses = () => {
                     withCredentials: true,
                 }
             );
-            console.log(response.data);
+            showMessage("course updated", "success");
             closeEditModal();
             fetchCourses();
         } catch (error) {
-            console.error("Error creating course:", error);
+            showMessage("Error creating course", "error");
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
@@ -294,7 +298,7 @@ const Courses = () => {
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         />
-                       
+
                         <select
                             name="status"
                             defaultValue={selectedCourse?.status}
@@ -326,13 +330,17 @@ const Courses = () => {
                         className="w-full p-3 border rounded-lg"
                         rows="4"
                     ></textarea>
-                    
 
                     <button
                         type="submit"
-                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300"
+                        disabled={loading}
+                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Save Course
+                        {loading ? (
+                            <span className="fa fa-spinner fa-spin"></span>
+                        ) : (
+                            "Update Course"
+                        )}
                     </button>
                 </form>
             </Modal>
@@ -381,7 +389,9 @@ if (document.getElementById("courses")) {
 
     Index.render(
         <React.StrictMode>
-            <Courses />
+            <FlashMessageProvider>
+                <Courses />
+            </FlashMessageProvider>
         </React.StrictMode>
     );
 }

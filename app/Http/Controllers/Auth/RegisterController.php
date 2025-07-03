@@ -21,58 +21,55 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
-    /**
-     * Handle the registration request (supports both AJAX and traditional).
-     */
- public function register(Request $request)
-{
-    \Log::info($request->all());
+    public function register(Request $request)
+    {
 
-    if ($request->expectsJson()) {
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        if ($request->expectsJson()) {
+            $validator = Validator::make($request->all(), [
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:4', 'confirmed'],
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => UserRole::MEMBER->value,
+                'payment_status' => 'pending',
+            ]);
+
+            // 🔥 This sends the verification email
+            event(new Registered($user));
+
+            auth()->login($user);
+
             return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+                'success' => true,
+                'user' => $user
+            ]);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => UserRole::MEMBER->value,
-            'payment_status' => 'pending',
-        ]);
+        // Fallback (non-AJAX)
+        $this->validator($request->all())->validate();
+        $user = $this->create($request->all());
 
-        // 🔥 This sends the verification email
+        // 🔥 Again, ensure the event is triggered here too
         event(new Registered($user));
 
-        auth()->login($user);
+        $this->guard()->login($user);
 
-        return response()->json([
-            'success' => true,
-            'user' => $user
-        ]);
+        return redirect($this->redirectPath());
     }
-
-    // Fallback (non-AJAX)
-    $this->validator($request->all())->validate();
-    $user = $this->create($request->all());
-
-    // 🔥 Again, ensure the event is triggered here too
-    event(new Registered($user));
-
-    $this->guard()->login($user);
-
-    return redirect($this->redirectPath());
-}
-
 
     /**
      * For traditional form validation.
@@ -80,9 +77,10 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:4', 'confirmed'],
             // 'plan' => ['required', 'string'],
         ]);
     }
@@ -90,17 +88,18 @@ class RegisterController extends Controller
     /**
      * Create a new user instance (for fallback form).
      */
- protected function create(array $data)
-{
-    $user = User::create([
-        'name' => $data['name'],
-        'email' => $data['email'],
-        'password' => Hash::make($data['password']),
-        'payment_status' => 'pending',
-    ]);
+    protected function create(array $data)
+    {
+        $user = User::create([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'payment_status' => 'pending',
+        ]);
 
-    event(new Registered($user)); // ✅ Don't forget this too
+        event(new Registered($user)); 
 
-    return $user;
-}
+        return $user;
+    }
 }

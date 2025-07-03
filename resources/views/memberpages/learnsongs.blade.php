@@ -24,8 +24,9 @@
 
  </div>
 </section>
-<section class="flex items-center justify-center bg-gray-100 p-6 min-h-screen">
- <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg p-6" x-data="{ activeTab: 'all' }">
+<section class="flex items-start justify-center bg-gray-100 py-10 px-4 min-h-[70vh]">
+  <div class="w-full max-w-6xl bg-white rounded-xl shadow-lg p-6 md:p-10" x-data="{ activeTab: 'all' }">
+    
    <!-- Tabs -->
    <div class="mb-6">
      <div class="flex justify-between border-b">

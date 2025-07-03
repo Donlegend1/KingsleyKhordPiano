@@ -60,8 +60,8 @@
                     class="text-lg font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Contact
                 </a>
-                <a href="/member/shop"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <a href="/shop"
+                    class="text-lg font-semibold transition duration-200 {{ Request::is('/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Shop
                 </a>
             </nav>
@@ -105,8 +105,8 @@
                     class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Contact
                 </a>
-                <a href="/member/shop"
-                    class="block text-sm font-semibold transition duration-200 {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <a href="/shop"
+                    class="block text-sm font-semibold transition duration-200 {{ Request::is('/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Shop
                 </a>
             </div>
@@ -123,7 +123,7 @@
         </div>
     </header>
 
-        @if(session()->has('success'))
+    @if(session()->has('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
             {{ session()->get('success') }}
         </div>

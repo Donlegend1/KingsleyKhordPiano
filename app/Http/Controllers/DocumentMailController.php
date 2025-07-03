@@ -23,7 +23,7 @@ class DocumentMailController extends Controller
         }
 
         try {
-            Mail::to($email)->send(new DocumentMail($filePath));
+            Mail::to($email)->send(new DocumentMail($filePath))->from('info@kingsleykhordpiano.com');
             return redirect()->back()->with('success', 'Roadmap sent successfully!');
         } catch (\Throwable $e) {
             Log::error('Failed to send document email: ' . $e->getMessage(), [

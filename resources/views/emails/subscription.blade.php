@@ -1,5 +1,5 @@
 <x-mail::message>
-# Hello {{ $user->name }},
+# Hello {{ $user->first_name }},
 
 Your subscription expired on **{{ $payment->ends_at->format('F j, Y') }}**.
 

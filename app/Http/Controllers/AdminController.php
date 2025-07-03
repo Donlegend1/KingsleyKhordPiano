@@ -23,7 +23,7 @@ class AdminController extends Controller
     }
 
     function usersList() {
-        $users = User:: with('plan')->paginate(10);
+        $users = User::with('plan')->paginate(10);
         return response()->json($users);
     }
 
@@ -31,7 +31,8 @@ class AdminController extends Controller
     public function editUser(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email',
             'payment_status' => 'nullable|in:successful,pending',
             'premium' => 'nullable|boolean',

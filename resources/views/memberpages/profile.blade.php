@@ -1,123 +1,158 @@
 @extends('layouts.member')
 
 @section('content')
-<div class="max-w-5xl mx-auto py-10 px-6">
-    <h2 class="text-3xl font-semibold text-gray-800 mb-8">My Profile</h2>
+    <div class="max-w-5xl mx-auto py-10 px-6">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-8">My Profile</h2>
 
-<form action="/profile/update" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl shadow-md space-y-6">
-    @csrf
-    @method('PUT')
+    <div x-data="{ open: false }" class="space-y-6">
 
-    @if ($errors->any())
-        <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md p-4">
-            <ul class="list-disc list-inside space-y-1">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <label for="passport" class="block text-sm font-medium text-gray-700 mb-1">Passport</label>
-            <input id="passport" name="passport" type="file"
-                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-            @error('passport')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input id="name" name="name" type="text" value="{{ old('name', Auth::user()->name) }}" required
-                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-            @error('name')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-            <input id="email" name="email" type="email" value="{{ old('email', Auth::user()->email) }}" required
-                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-            @error('email')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- Address -->
-        <div>
-            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <input id="address" name="address" type="text" value="{{ old('address', Auth::user()->address) }}"
-                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-            @error('address')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- Password -->
-        <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-            <input id="password" name="password" type="password"
-                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-            @error('password')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- Confirm Password -->
-        <div>
-            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-            <input id="password_confirmation" name="password_confirmation" type="password"
-                   class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        </div>
-    </div>
-
+    <!-- Toggle Button -->
     <div class="flex justify-end">
-        <button type="submit"
-                class="inline-flex items-center px-6 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            Save Changes
+        <button 
+            @click="open = !open"
+            class="px-4 py-2 bg-black text-white hover:text-black rounded-md text-sm font-medium hover:bg-[#FFD736] transition"
+        >
+            <span class="fa fa-edit"></span> Profile
         </button>
     </div>
-</form>
+    
+    <!-- Form Section -->
+    <div x-show="open" x-transition class="bg-white p-6 rounded-2xl shadow-md space-y-6">
 
+        <form action="/profile/update" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+
+            @if ($errors->any())
+                <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md p-4">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- First Name -->
+                <div>
+                    <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <input id="first_name" name="first_name" type="text" value="{{ old('first_name', Auth::user()->first_name) }}" required
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                    @error('first_name')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <input id="last_name" name="last_name" type="text" value="{{ old('last_name', Auth::user()->last_name) }}" required
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                    @error('last_name')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input id="email" name="email" type="email" value="{{ old('email', Auth::user()->email) }}" required
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                    @error('email')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Country -->
+               <div>
+                <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                    <select id="country" name="country"
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        @foreach ($countries as $code => $name)
+                            <option value="{{ $code }}" {{ old('country', Auth::user()->country) == $code ? 'selected' : '' }}>
+                                {{ $name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('country')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                    <input id="password" name="password" type="password"
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                    @error('password')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <input id="password_confirmation" name="password_confirmation" type="password"
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                </div>
+
+                <!-- Passport -->
+                <div>
+                    <label for="passport" class="block text-sm font-medium text-gray-700 mb-1">Passport</label>
+                    <input id="passport" name="passport" type="file"
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                    @error('passport')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button type="submit"
+                    class="inline-flex items-center px-6 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
     {{-- Subscriptions --}}
-<div class="mt-10 bg-white p-6 rounded-2xl shadow-md">
-    <h3 class="text-xl font-semibold text-gray-800 mb-4">Subscriptions</h3>
+    <div class="mt-10 bg-white p-6 rounded-2xl shadow-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Subscriptions</h3>
 
-@php
-    $metadata = Auth::user()->metadata ?? [];
-    $currency = $metadata['currency'] ?? 'USD';
+    @php
+        $metadata = Auth::user()->metadata ?? [];
+        $currency = $metadata['currency'] ?? 'USD';
 
-    $symbols = [
-        'NGN' => '₦',
-        'USD' => '$',
-        'GBP' => '£',
-        'EUR' => '€',
-    ];
+        $symbols = [
+            'NGN' => '₦',
+            'USD' => '$',
+            'GBP' => '£',
+            'EUR' => '€',
+        ];
 
-    $symbol = $symbols[$currency] ?? '';
-@endphp
+        $symbol = $symbols[$currency] ?? '';
+    @endphp
 
-<ul class="divide-y divide-gray-200">
-    <li class="py-3">
-        <div class="flex justify-between items-center">
-            <div>
-                <p class="text-sm font-medium">
-                    Plan: {{ $metadata['tier'] ?? 'Free' }}
-                </p>
-                <p class="text-xs text-gray-500">
-                    Amount: {{ $symbol }}{{ number_format(Auth::user()->last_payment_amount, 2) }} ({{ $currency }})
-                </p>
+    <ul class="divide-y divide-gray-200">
+        <li class="py-3">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-medium">
+                        Plan: {{ $metadata['tier'] ?? 'Free' }}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                        Amount: {{ $symbol }}{{ number_format(Auth::user()->last_payment_amount, 2) }} ({{ $currency }})
+                    </p>
+                </div>
+                <a href="#" class="text-indigo-600 hover:underline text-sm">Manage</a>
             </div>
-            <a href="#" class="text-indigo-600 hover:underline text-sm">Manage</a>
-        </div>
-    </li>
-</ul>
+        </li>
+    </ul>
 
-</div>
+    </div>
 
     {{-- Transactions --}}
     <div class="mt-10 bg-white p-6 rounded-2xl shadow-md">

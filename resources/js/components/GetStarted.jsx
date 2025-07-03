@@ -105,7 +105,7 @@ export default function QuizCardWithModal() {
 
         // If the current question is not answered yet, do nothing or alert
         if (!updatedAnswers[currentQuestionIndex]) {
-            showMessage('Please select an answer before proceeding.',"error");
+            showMessage("Please select an answer before proceeding.", "error");
             return;
         }
 
@@ -113,10 +113,8 @@ export default function QuizCardWithModal() {
         // If redirect occurs, do NOT advance question
         const redirected = checkProgressAndRedirect(updatedAnswers);
         if (redirected) {
-            return; // stop here, redirect happened
+            return; 
         }
-
-        // Otherwise, advance the question normally
         setCurrentQuestionIndex((prev) =>
             prev < questions.length - 1 ? prev + 1 : prev
         );
@@ -127,50 +125,52 @@ export default function QuizCardWithModal() {
     };
 
     const checkProgressAndRedirect = (newAnswers) => {
-        // 1. If any of the first 4 answers is "No." => redirect immediately
-        for (let i = 0; i < 4; i++) {
-            if (newAnswers[i] === "No.") {
-                showMessage('You are in beginner level',"success");
-                window.location = "/member/course/beginner";
-                return true; // redirect happened
-            }
+        const firstFourComplete = [0, 1, 2, 3].every((i) => newAnswers[i]);
+        if (!firstFourComplete) return false;
+
+        const firstFourFailed = [0, 1, 2, 3].some(
+            (i) => newAnswers[i] === "No."
+        );
+        if (firstFourFailed) {
+            showMessage("You are in beginner level", "success");
+            window.location = "/member/course/beginner";
+            return true;
         }
 
-        // 2. Only continue if first 4 questions are answered
-        const firstFourAnswered = [0, 1, 2, 3].every((i) => newAnswers[i]);
+        const midThreeComplete = [4, 5, 6].every((i) => newAnswers[i]);
+        if (!midThreeComplete) return false;
 
-        // 3. Only check intermediate/advanced if first 4 answered
-        if (!firstFourAnswered) return false;
-
-        // 4. Check if questions 5-9 have all been answered
-        const nextFourAnswered = [4, 5, 6, 7, 8].every((i) => newAnswers[i]);
-
-        // 5. If any of questions 5-8 NOT answered yet, don't redirect yet
-        if (!nextFourAnswered) return false;
-
-        // 6. Now check answers for intermediate/advanced
-
-        // Expected answers to be considered "advanced"
-        const advancedAnswers = {
+        const midThreeAnswers = {
             4: "Yes I can.",
             5: "I am good at it.",
             6: "I am confident in passing chords.",
-            7: "Yes I can.",
-            9: "I focus on the emotional impact of my playing and the sound I want to convey.",
         };
 
-        // If any of questions 5-9 is NOT the advanced answer, redirect to intermediate
-        for (let i = 4; i <= 8; i++) {
-            if (newAnswers[i] !== advancedAnswers[i]) {
-                showMessage('You are in intermediate level',"success");
-                window.location = "/member/course/intermediate";
-                return true;
-            }
+        const isIntermediate = [4, 5, 6].some(
+            (i) => newAnswers[i] !== midThreeAnswers[i]
+        );
+        if (isIntermediate) {
+            showMessage("You are in intermediate level", "success");
+            window.location = "/member/course/intermediate";
+            return true;
         }
 
-        // All 5-9 questions answered with advanced answers -> redirect advanced
-        window.location = "/member/course/advanced";
-        showMessage('You are in advanced level ',"success");
+        const finalTwoComplete = [7, 8].every((i) => newAnswers[i]);
+        if (!finalTwoComplete) return false;
+
+        const isAdvanced =
+            newAnswers[7] === "Yes I can." &&
+            newAnswers[8] ===
+                "I focus on the emotional impact of my playing and the sound I want to convey.";
+
+        if (isAdvanced) {
+            showMessage("You are in advanced level", "success");
+            window.location = "/member/course/advanced";
+        } else {
+            showMessage("You are in intermediate level", "success");
+            window.location = "/member/course/intermediate";
+        }
+
         return true;
     };
 
@@ -297,16 +297,9 @@ export default function QuizCardWithModal() {
 
                         <button
                             onClick={nextQuestion}
-                            // disabled={
-                            //     currentQuestionIndex === questions.length - 1
-                            // }
-                            className={`px-6 py-2 rounded-full flex items-center gap-2 transition ${
-                                currentQuestionIndex === questions.length - 1
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-black text-white hover:bg-gray-800"
-                            }`}
+                            className={`px-6 py-2 rounded-full flex items-center gap-2 transition bg-black text-white hover:bg-gray-800`}
                         >
-                            Next
+                            {currentQuestionIndex === questions.length - 1 ? "Finish" : "Next"}
                             <i className="fa fa-angle-right"></i>
                         </button>
                     </div>

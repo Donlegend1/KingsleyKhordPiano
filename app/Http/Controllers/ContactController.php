@@ -6,6 +6,8 @@ use App\Models\Contact;
 use App\Http\Requests\StoreContactRequest;
 use App\Http\Requests\UpdateContactRequest;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
+use App\Mail\ContactMessage;
 
 class ContactController extends Controller
 {
@@ -14,78 +16,48 @@ class ContactController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(Request $request)
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-   public function store(StoreContactRequest $request)
-{
-    try {
-        $user = auth()->user();
-
-        // Store contact message in DB
-        Contact::create([
-            'name' => $user->name,
-            'email' => $user->email,
-            'subject' => $request->subject,
-            'message' => $request->message,
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'email'      => 'required|email',
+            'subject'    => 'required|string|max:255',
+            'message'    => 'required|string',
         ]);
 
-        // Send raw email (consider using a Mailable)
-        Mail::raw($request->message, function ($msg) use ($request, $user) {
-            $msg->to('shedrackogwuche5@gmail.com')
-                ->subject($request->subject)
-                ->from('contact@kingsleykhordpiano.com');
-        });
+        Mail::to('contact@kingsleykhordpiano.com')->send(new ContactMessage($validated));
 
-        return redirect()->back()->with('success', 'Your message has been sent.');
-    } catch (\Throwable $th) {
-        // Optionally log the error
-        \Log::error('Contact form error: ' . $th->getMessage());
-
-        return redirect()->back()->with('error', 'Something went wrong. Please try again.');
-    }
-}
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Contact $contact)
-    {
-        //
+        return redirect()->back()->with('success', 'Your message has been recieved, we will get back to you.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Contact $contact)
+    public function store(StoreContactRequest $request)
     {
-        //
-    }
+        try {
+            $user = auth()->user();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateContactRequest $request, Contact $contact)
-    {
-        //
-    }
+            // Store contact message in DB
+            Contact::create([
+                'name' => $user->fist_name. " ".$user->last_name,
+                'email' => $user->email,
+                'subject' => $request->subject,
+                'message' => $request->message,
+            ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Contact $contact)
-    {
-        //
+            // Send raw email (consider using a Mailable)
+            Mail::raw($request->message, function ($msg) use ($request, $user) {
+                $msg->to('contact@kingsleykhordpiano.com')
+                    ->subject($request->subject);
+            });
+
+            return redirect()->back()->with('success', 'Your message has been sent.');
+        } catch (\Throwable $th) {
+            \Log::error('Contact form error: ' . $th->getMessage());
+
+            return redirect()->back()->with('error', 'Something went wrong. Please try again.');
+        }
     }
 }

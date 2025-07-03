@@ -2,7 +2,7 @@
 @extends('layouts.member')
 
 @section('content')
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4">
+<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-3 px-4">
  <div class="max-w-7xl mx-auto space-y-3">
    
    <!-- Top Row -->
@@ -24,8 +24,8 @@
 
  </div>
 </section>
-<section class="flex items-center justify-center bg-gray-100 p-6 min-h-screen">
- <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg p-6" x-data="{ activeTab: 'all' }">
+<section class="bg-gray-100 py-10">
+ <div class="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-6" x-data="{ activeTab: 'all' }">
    <!-- Tabs -->
    <div class="mb-6">
      <div class="flex justify-between border-b">
@@ -69,10 +69,10 @@
       </div>
     @endforelse
     @if ($all->total() > 9)
-  <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
-    {{ $all->links() }}
-  </div>
-@endif
+      <div class="flex justify-center py-6 bg-gray-100 rounded-md mt-4">
+        {{ $all->links() }}
+      </div>
+    @endif
      </div>
 
      <!-- Beginner Content -->
@@ -142,6 +142,7 @@
      </div>
    </div>
  </div>
+
 </section>
 
 

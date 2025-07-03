@@ -4,7 +4,7 @@
 
     <!-- Content -->
     <div class="relative z-10 flex flex-col items-center justify-center text-center  h-full px-4">
-        <h1 class="text-xl  md:text-4xl font-bold leading-tight mb-6">
+        <h1 class="text-xl  md:text-4xl font-bold leading-tight mb-3">
         Don’t let fear keep you from
        
         </h1>

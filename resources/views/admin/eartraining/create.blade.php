@@ -21,7 +21,7 @@
       </div>
     </header>
 
-     <div id="ear-training-form">
+     <div id="ear-training-quiz">
 
      </div>
    </main>

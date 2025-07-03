@@ -18,7 +18,8 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'plan',
@@ -33,7 +34,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_payment_reference',
         'last_payment_amount',
         'last_payment_at',
-        'address',
+        'country',
         'passport',
         'metadata',
     ];
@@ -77,5 +78,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
     }
 }

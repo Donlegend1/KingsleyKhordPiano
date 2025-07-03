@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://js.paystack.co/v2/inline.js"></script>
      <script src="https://js.stripe.com/v3/"></script>
-
+    @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>

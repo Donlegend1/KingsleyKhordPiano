@@ -27,7 +27,8 @@ const UsersList = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [editForm, setEditForm] = useState({
-        name: "",
+        first_name: "",
+        last_name:"",
         email: "",
         premium: 0,
         payment_status: null,
@@ -69,7 +70,8 @@ const UsersList = () => {
     const openEditModal = (user) => {
         setSelectedUser(user);
         setEditForm({
-            name: user.name,
+            first_name: user.first_name,
+            last_name: user.last_name,
             email: user.email,
             premium: user.premium,
             payment_status: user.payment_status,
@@ -150,7 +152,7 @@ const UsersList = () => {
                                                 1}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.name}
+                                            {user.first_name+ " "+ user.last_name}
                                         </td>
                                         <td className="py-2 px-4">
                                             {user.email}
@@ -159,8 +161,8 @@ const UsersList = () => {
                                             {user.payment_status}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.plan?.name ?? "—"}
-                                        </td>
+                                            {user.metadata?.duration} ({user.metadata?.tier})
+                                            </td>
                                         <td className="py-2 px-4">
                                             <div className="flex gap-2">
                                                 <button
@@ -222,12 +224,23 @@ const UsersList = () => {
             <Modal isOpen={isEditModalOpen} onClose={() => closeEditModal()}>
                 <h2 className="text-lg font-bold mb-4">Edit User</h2>
                 <label className="block mb-2">
-                    Name:
+                   First Name:
                     <input
                         type="text"
-                        defaultValue={editForm.name}
+                        defaultValue={editForm.first_name}
                         onChange={(e) =>
-                            setEditForm({ ...editForm, name: e.target.value })
+                            setEditForm({ ...editForm, first_name: e.target.value })
+                        }
+                        className="w-full border rounded px-3 py-2 mt-1"
+                    />
+                </label>
+                <label className="block mb-2">
+                   Last Name:
+                    <input
+                        type="text"
+                        defaultValue={editForm.last_name}
+                        onChange={(e) =>
+                            setEditForm({ ...editForm, last_name: e.target.value })
                         }
                         className="w-full border rounded px-3 py-2 mt-1"
                     />

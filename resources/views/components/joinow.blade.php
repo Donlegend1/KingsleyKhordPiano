@@ -18,7 +18,7 @@
       <a href="/plans#pricing"
          class="inline-flex items-center bg-[#FFD736] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-md font-semibold text-base sm:text-lg transition">
         Join Now
-        <img src="/icons/forward.png" alt="forward" class="ml-3 h-5 w-5 order-last">
+        <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
       </a>
     </div>
   </div>

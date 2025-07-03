@@ -38,7 +38,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between space-x-6">
             
             <div class="flex items-center space-x-4 flex-shrink-0">
-                <a href="/home" class="text-2xl font-bold">
+                <a href="/" class="text-2xl font-bold">
                     <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8">
                 </a>
                 <span class="text-[#FFD736] flex items-center space-x-1">
@@ -62,77 +62,38 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <nav class="hidden lg:flex items-center space-x-6">
-                    <a href="/member/getstarted"
-                        class="text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                        Get Started
-                    </a>
-                    <a href="/member/community"
-                        class="text-sm font-semibold transition duration-200 {{ Request::is('plans') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                        Community
-                    </a>
-                    <a href="/member/shop"
-                            class="block text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                            Shop
-                        </a>
-                    <a href="/member/profile"
-                        class="text-sm font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                        My Account
-                    </a>
-                    <a href="/member/support"
-                        class="text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                        Support
-                    </a>
+              <nav class="hidden lg:flex items-center space-x-3">
+                  <a href="/member/getstarted" class="text-sm font-semibold transition duration-200 {{ Request::is('member/getstarted') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Get Started</a>
+                  <a href="/member/community" class="text-sm font-semibold transition duration-200 {{ Request::is('member/community') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Community</a>
+                  <a href="/member/shop" class="text-sm font-semibold transition duration-200 {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Shop</a>
+                  <a href="/member/profile" class="text-sm font-semibold transition duration-200 {{ Request::is('member/profile') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">My Account</a>
+                  <a href="/member/support" class="text-sm font-semibold transition duration-200 {{ Request::is('member/support') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Support</a>
 
-                    <div x-data="{ showLogoutModal: false }">
-                        <!-- Logout Button -->
-                        <button
-                            @click="showLogoutModal = true"
-                            class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition"
-                        >
-                            {{ __('Logout') }}
-                        </button>
+                  <!-- Logout button (same flex level) -->
+                  <div x-data="{ showLogoutModal: false }">
+                      <button @click="showLogoutModal = true"
+                          class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition">
+                          {{ __('Logout') }}
+                      </button>
 
-                        <!-- Hidden Logout Form -->
-                        <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
-                            @csrf
-                        </form>
+                      <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
 
-                        <!-- Logout Modal -->
-                                    <div
-                                        x-show="showLogoutModal"
-                                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-                                    >
-                                        <div
-                                            @click.away="showLogoutModal = false"
-                                            class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6"
-                                        >
-                                    <div class="mx-auto mb-4 text-center">
-                                    <h2 class="text-lg font-semibold text-gray-800 mb-2">Confirm Logout</h2>
-                                    <p class="text-gray-600">Are you sure you want to log out?</p>
-                                </div>
-                                            
-
-                                <div class="flex justify-between space-x-3">
-                                    <button
-                                        @click="showLogoutModal = false"
-                                        class="px-4 py-2 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300"
-                                    >
-                                        Cancel
-                                    </button>
-
-                                    <button
-                                        @click="document.getElementById('logout-form').submit()"
-                                        class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700"
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-
+                      <div x-show="showLogoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                          <div @click.away="showLogoutModal = false" class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
+                              <div class="text-center mb-4">
+                                  <h2 class="text-lg font-semibold text-gray-800 mb-2">Confirm Logout</h2>
+                                  <p class="text-gray-600">Are you sure you want to log out?</p>
+                              </div>
+                              <div class="flex justify-between space-x-3">
+                                  <button @click="showLogoutModal = false"
+                                      class="px-4 py-2 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                                  <button @click="document.getElementById('logout-form').submit()"
+                                      class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">Logout</button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </nav>
                 <!-- Mobile menu button -->
                 <button class="lg:hidden navbar-burger" aria-label="Open Menu">
                     <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

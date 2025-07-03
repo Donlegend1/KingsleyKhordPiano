@@ -105,7 +105,7 @@ const PlanSwitchAndCurrencySelect = () => {
                     </button>
                 </div>
 
-                <div className="relative">
+                <div className="relative mt-3">
                     <select
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value)}
@@ -169,7 +169,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                     }`}
                                     onClick={() => handleModalOpen(plan)}
                                 >
-                                    Begin Membership
+                                    Join Today
                                 </button>
                             </div>
                         </div>
@@ -235,7 +235,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </form>
                             )}
 
-                            {["USD", "EUR"].includes(currency) && (
+                            {currency === "EUR" && (
                                 <form action="/stripe/create" method="POST">
                                     <input
                                         type="hidden"
@@ -275,7 +275,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                     </button>
                                 </form>
                             )}
-                            {["USD", "EUR"].includes(currency) && (
+                            {currency === "USD" && (
                                 <form action="/paypal/create-order" method="POST">
                                     <input
                                         type="hidden"

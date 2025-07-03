@@ -41,10 +41,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/about', function () {
-    return view('about');
+    return view('about', ['pageTitle' => 'About Us']);
 });
+
+Route::get('/shop', function () {
+    return view('shop', ['pageTitle' => 'About Us']);
+});
+
 Route::get('/contact', function () {
-    return view('contact');
+    return view('contact', ['pageTitle' => 'Contact']);
 });
 
 Route::get('/clear', function () {
@@ -67,8 +72,11 @@ Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paysta
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
 
 Route::post('/stripe/create', [StripeController::class, 'createPaymentIntent'])->name('stripe.create');
-Route::get('/stripe/success', [StripeController::class, 'retrievePaymentIntent'])->name('stripe.verify');
-Route::get('/stripe/cancel', [StripeController::class, 'paymentCanceled'])->name('stripe.cancel');
+Route::get('/stripe/success', [StripeController::class, 'retrievePaymentIntent'])->name('stripe.success');
+Route::get('/stripe/cancel', function () {
+    return redirect()->route('home')->with('error', 'Payment was cancelled.');
+})->name('stripe.cancel');
+
 
 Route::post('paypal/create-order', [PayPalController::class, 'pay']);
 Route::get('paypal/success', [PayPalController::class, 'success']);
@@ -80,6 +88,7 @@ Route::get('/zoom/callback', [ZoomMeetingController::class, 'handleZoomCallback'
 Route::put('profile/update', [HomeController::class, 'update']);
 Route::delete('profile/delete', [HomeController::class, 'destroy']);
 Route::post('/support/send', [ContactController::class, 'store'])->name('support.send');
+Route::post('/contact/send', [ContactController::class, 'create']);
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('roadmap', [GetstartedController::class, 'roadmap']);
