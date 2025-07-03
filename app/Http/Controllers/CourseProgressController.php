@@ -31,22 +31,26 @@ class CourseProgressController extends Controller
      */
     public function store(StoreCourseProgressRequest $request, Course $course)
     {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-    $user = Auth::user();
-    if (!$user) {
-        return response()->json(['error' => 'Unauthorized'], 401);
+        // Mark the user's progress
+        CourseProgress::firstOrCreate([
+            'user_id' => $user->id,
+            'course_id' => $course->id,
+        ], [
+            'course_category' => $course->category,
+        ]);
+
+        // Mark the course itself as completed globally (optional — if that's the design)
+        $course->completed = true;
+        $course->save();
+
+        return response()->json(['message' => 'Course marked as completed']);
     }
 
-    CourseProgress::firstOrCreate([
-        'user_id' => $user->id,
-        'course_id' => $course->id,
-    ], [
-        'course_category' => $course->category,
-    ]);
-
-    return response()->json(['message' => 'Course marked as completed']);
-
-    }
 
     /**
      * Display the specified resource.

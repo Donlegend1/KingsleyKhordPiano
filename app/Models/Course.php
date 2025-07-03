@@ -27,7 +27,11 @@ class Course extends Model
     ];
 
     public function completedByUsers()
-{
-    return $this->belongsToMany(User::class, 'user_video_completions')->withTimestamps();
-}
+    {
+        return $this->belongsToMany(User::class, 'user_video_completions')->withTimestamps();
+    }
+
+    public function progress(){
+        return $this->hasOne(CourseProgress::class);
+    }
 }

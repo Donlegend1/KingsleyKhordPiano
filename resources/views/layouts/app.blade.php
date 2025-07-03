@@ -91,36 +91,37 @@
         </div>
 
         <!-- Mobile Nav -->
-        <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4 space-y-4">
-            <div class="flex flex-col space-y-1">
-                <a href="/"
-                    class="block text-sm font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Home
-                </a>
-                <a href="/about"
-                    class="block text-sm font-semibold transition duration-200 my-2 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    About
-                </a>
-                <a href="/contact"
-                    class="block text-sm font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Contact
-                </a>
-                <a href="/shop"
-                    class="block text-sm font-semibold transition duration-200 {{ Request::is('/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Shop
-                </a>
+            <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4">
+                <div class="flex flex-col divide-y divide-gray-600 border border-gray-700 rounded-md overflow-hidden">
+                    <a href="/"
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        Home
+                    </a>
+                    <a href="/about"
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        About
+                    </a>
+                    <a href="/contact"
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        Contact
+                    </a>
+                    <a href="/shop"
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        Shop
+                    </a>
+                </div>
+
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="/register"
+                        class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
+                        Sign Up
+                    </a>
+                    <a href="/login"
+                        class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
+                        Login
+                    </a>
+                </div>
             </div>
-            <div class="flex flex-col space-y-2 mt-4">
-                <a href="/register"
-                    class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
-                    Sign Up
-                </a>
-                <a href="/login"
-                    class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
-                    Login
-                </a>
-            </div>
-        </div>
     </header>
 
     @if(session()->has('success'))

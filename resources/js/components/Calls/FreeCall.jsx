@@ -34,12 +34,12 @@ const FreeCall = () => {
     return (
         <>
             {/* Call to Action Card */}
-            <div className="flex flex-col items-center justify-center p-4 bg-white border border-gray-300 rounded-lg w-full min-h-[200px]">
-                <div className="text-center my-5 mx-10">
-                    <p className="text-gray-800 font-semibold mb-2">
+            <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white border border-gray-300 rounded-lg w-full min-h-[200px]">
+                <div className="text-center my-4 sm:my-6 mx-4 sm:mx-10">
+                    <p className="text-gray-800  mb-2 text-base sm:text-lg font-bold">
                         Get on a 10 mins Discovery Call with Kingsley Khod
                     </p>
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-gray-500 text-sm sm:text-base leading-relaxed">
                         This call will help you find clarity in your piano journey so you know where to commence your learning from.
                     </p>
                 </div>
@@ -47,14 +47,14 @@ const FreeCall = () => {
                     onClick={handleOpenModal}
                     className="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
                 >
-                    Book Now <i className="fa fa-angle-right ml-2" aria-hidden="true"></i>
+                    Schedule Call <i className="fa fa-angle-right ml-2" aria-hidden="true"></i>
                 </button>
             </div>
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-                    <div className="bg-white rounded-lg w-full max-w-3xl p-6 relative">
+                <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center px-2">
+                    <div className="bg-white rounded-lg w-full max-w-3xl p-4 sm:p-6 relative shadow-lg">
                         <button
                             className="absolute top-3 right-3 text-gray-600 hover:text-red-500"
                             onClick={() => setShowModal(false)}
@@ -63,7 +63,7 @@ const FreeCall = () => {
                         </button>
 
                         {/* Calendly Widget Container */}
-                        <div ref={calendlyRef} style={{ minWidth: "320px", height: "500px" }}></div>
+                        <div ref={calendlyRef} style={{ minWidth: "100%", height: "500px" }}></div>
                     </div>
                 </div>
             )}
@@ -73,7 +73,7 @@ const FreeCall = () => {
 
 export default FreeCall;
 
-// Attach Calendly script globally ONCE (in index.html or via script loader)
+// Load Calendly script once
 if (!document.querySelector("script[src*='calendly.com']")) {
     const script = document.createElement("script");
     script.src = "https://assets.calendly.com/assets/external/widget.js";

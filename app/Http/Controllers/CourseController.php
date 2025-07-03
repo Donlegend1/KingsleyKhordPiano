@@ -93,19 +93,19 @@ class CourseController extends Controller
     }
 
     public function membershowAPI($level)
-{
-    $courses = Course::where('level', $level)->get();
+    {
+        $courses = Course::with('progress')->where('level', $level)->get();
 
-    if ($courses->isEmpty()) {
-        return response()->json(['message' => 'No courses found for this level'], 404);
+        if ($courses->isEmpty()) {
+            return response()->json(['message' => 'No courses found for this level'], 404);
+        }
+
+        // Group courses by `group_name` (adjust field name as necessary)
+        $groupedCourses = $courses->groupBy('category');
+        
+
+        return response()->json($groupedCourses);
     }
-
-    // Group courses by `group_name` (adjust field name as necessary)
-    $groupedCourses = $courses->groupBy('category');
-    
-
-    return response()->json($groupedCourses);
-}
 
 public function deleteCourse(Course $course)
 {

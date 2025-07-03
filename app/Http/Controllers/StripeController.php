@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\Plan;
 
 class StripeController extends Controller
 {
@@ -27,7 +28,6 @@ class StripeController extends Controller
     {
         // Validate incoming data
         $request->validate([
-            'amount' => 'required|numeric|min:1',
             'currency' => 'required|string',
             'tier' => 'required|string',
             'duration' => 'required|in:monthly,yearly',
@@ -40,11 +40,13 @@ class StripeController extends Controller
 
         $reference = Str::uuid()->toString();
 
+         $plan = Plan::where('type', $request->duration)->where('tier', $request->tier)->first();
+       
         // Store payment record
         DB::table('payments')->insert([
             'user_id'       => $user->id,
             'reference'     => $reference,
-            'amount'        => $request->amount,
+            'amount'        => $plan->price_eur,
             'metadata'      => json_encode($request->only(['currency', 'tier', 'duration'])),
             'payment_method'=> 'stripe',
             'notified_at'   => null,
@@ -57,11 +59,10 @@ class StripeController extends Controller
 
         // Update user payment info
         $user->metadata = $request->only(['currency', 'tier', 'duration']);
-        $user->payment_status = 'pending';
         $user->payment_method = 'stripe';
         $user->premium = $request->tier === 'premium';
         $user->last_payment_reference = $reference;
-        $user->last_payment_amount = $request->amount;
+        $user->last_payment_amount = $plan->price_eur;
         $user->last_payment_at = now();
         $user->save();
 
@@ -73,7 +74,7 @@ class StripeController extends Controller
                 'price_data' => [
                     'currency'     => $request->currency,
                     'product_data' => ['name' => $request->tier],
-                    'unit_amount'  => $request->amount * 100,
+                    'unit_amount'  => $plan->price_eur * 100,
                 ],
                 'quantity' => 1,
             ]],

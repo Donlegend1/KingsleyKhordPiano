@@ -68,10 +68,10 @@ const questions = [
 
 function Modal({ onClose, children }) {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-5 rounded-lg shadow-lg w-full max-w-5xl">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-[25px] font-bold text-gray-700">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+            <div className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-lg w-full max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl transition-all">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-700">
                         Customize your learning experience
                     </h2>
                     <button
@@ -79,11 +79,12 @@ function Modal({ onClose, children }) {
                         className="text-gray-500 hover:text-black"
                     >
                         <i
-                            className="fa fa-times text-2xl"
+                            className="fa fa-times text-xl sm:text-2xl"
                             aria-hidden="true"
                         ></i>
                     </button>
                 </div>
+
                 {children}
             </div>
         </div>
@@ -100,20 +101,16 @@ export default function QuizCardWithModal() {
     const closeModal = () => setIsModalOpen(false);
 
     const nextQuestion = () => {
-        // Include the current answer in the check (answers[currentQuestionIndex])
         const updatedAnswers = { ...answers };
 
-        // If the current question is not answered yet, do nothing or alert
         if (!updatedAnswers[currentQuestionIndex]) {
             showMessage("Please select an answer before proceeding.", "error");
             return;
         }
 
-        // Run redirect check BEFORE advancing
-        // If redirect occurs, do NOT advance question
         const redirected = checkProgressAndRedirect(updatedAnswers);
         if (redirected) {
-            return; 
+            return;
         }
         setCurrentQuestionIndex((prev) =>
             prev < questions.length - 1 ? prev + 1 : prev
@@ -176,27 +173,27 @@ export default function QuizCardWithModal() {
 
     return (
         <div className="flex flex-col items-center justify-center p-4 bg-white border border-gray-300 rounded-lg w-full min-h-[200px]">
-            <div className="text-center my-5 mx-10">
-                <p className="text-gray-800 font-semibold mb-2">
+            <div className="text-center my-5 mx-4 sm:mx-10">
+                <p className="text-gray-800 font-bold mb-2 text-base sm:text-lg">
                     Take a Quick Quiz
                 </p>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 text-sm sm:text-base">
                     This quick quiz will help us customize your learning
                     experience and determine your skill level.
                 </p>
             </div>
             <button
                 onClick={openModal}
-                className="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
+                className="px-4 sm:px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
             >
-                View Details{" "}
+                Start Quiz
                 <i className="fa fa-angle-right ml-2" aria-hidden="true"></i>
             </button>
 
             {isModalOpen && (
                 <Modal onClose={closeModal}>
-                    <div className=" mb-4">
-                        <div className="flex justify-between items-center my-4 gap-7">
+                    <div className="mb-4 px-2 sm:px-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-center my-4 gap-4 sm:gap-7">
                             <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                                 <div
                                     className="bg-blue-600 h-2.5 rounded-full"
@@ -209,16 +206,16 @@ export default function QuizCardWithModal() {
                                     }}
                                 ></div>
                             </div>
-                            <div className="text-gray-500 text-sm text-center whitespace-nowrap">
+                            <div className="text-gray-500 text-sm mt-2 sm:mt-0 whitespace-nowrap">
                                 {currentQuestionIndex + 1} / {questions.length}
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-center justify-center my-12 max-w-lg mx-auto text-center">
-                            <p className="mb-4 text-2xl font-bold">
+                        <div className="flex flex-col items-center justify-center my-8 sm:my-12 max-w-xs sm:max-w-lg mx-auto text-center px-2">
+                            <p className="mb-3 text-lg sm:text-2xl font-bold">
                                 {questions[currentQuestionIndex].text}
                             </p>
-                            <p className="text-gray-500 ">
+                            <p className="text-gray-500 text-sm sm:text-base">
                                 Knowing your scale is fundamental for piano
                                 learning. A major scale is a set of 7 notes
                                 following a specific pattern (e.g.,
@@ -226,7 +223,7 @@ export default function QuizCardWithModal() {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 max-w-3xl mx-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-md sm:max-w-3xl mx-auto">
                             {questions[currentQuestionIndex].answers.map(
                                 (answer, idx) => (
                                     <label
@@ -234,7 +231,7 @@ export default function QuizCardWithModal() {
                                         className={`flex items-center gap-2 cursor-pointer p-3 rounded-lg border ${
                                             answers[currentQuestionIndex] ===
                                             answer
-                                                ? "bg-blue-600 "
+                                                ? "bg-blue-600 text-white"
                                                 : "bg-gray-100 border-gray-300"
                                         } hover:bg-blue-400 transition`}
                                     >
@@ -243,7 +240,7 @@ export default function QuizCardWithModal() {
                                                 answers[
                                                     currentQuestionIndex
                                                 ] === answer
-                                                    ? "bg-blue-600 "
+                                                    ? "bg-blue-600"
                                                     : "bg-white border border-gray-300"
                                             }`}
                                         >
@@ -273,7 +270,7 @@ export default function QuizCardWithModal() {
                                             className="hidden"
                                         />
 
-                                        <span className="text-sm">
+                                        <span className="text-sm sm:text-base">
                                             {answer}
                                         </span>
                                     </label>
@@ -281,25 +278,28 @@ export default function QuizCardWithModal() {
                             )}
                         </div>
                     </div>
-                    <div className="flex justify-end items-center gap-6 mt-6">
+
+                    <div className="flex flex-col sm:flex-row justify-center sm:justify-end items-center gap-4 sm:gap-6 mt-6 px-2">
                         <button
                             onClick={prevQuestion}
                             disabled={currentQuestionIndex === 0}
-                            className={`px-6 py-2 rounded-full flex items-center gap-2 transition ${
+                            className={`px-4 sm:px-6 py-2 rounded-full flex items-center gap-2 transition ${
                                 currentQuestionIndex === 0
                                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     : "bg-gray-200 hover:bg-gray-300 text-gray-600"
                             }`}
                         >
                             <i className="fa fa-angle-left"></i>
-                            Previous
+                            <span className="hidden sm:inline">Previous</span>
                         </button>
 
                         <button
                             onClick={nextQuestion}
-                            className={`px-6 py-2 rounded-full flex items-center gap-2 transition bg-black text-white hover:bg-gray-800`}
+                            className="px-4 sm:px-6 py-2 rounded-full flex items-center gap-2 transition bg-black text-white hover:bg-gray-800"
                         >
-                            {currentQuestionIndex === questions.length - 1 ? "Finish" : "Next"}
+                            {currentQuestionIndex === questions.length - 1
+                                ? "Finish"
+                                : "Next"}
                             <i className="fa fa-angle-right"></i>
                         </button>
                     </div>

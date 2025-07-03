@@ -10,7 +10,7 @@
 @include("components.membership")
 @include("components.practise")
 {{-- @include("components.price") --}}
-<div id="pricing">
+<div>
 <div id="plan-switch" >
    
 </div>

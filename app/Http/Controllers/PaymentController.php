@@ -10,26 +10,28 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use App\Models\Subscription;
+use App\Models\Plan;
 
 class PaymentController extends Controller
 {
     
     public function initialize(Request $request)
     {
-        $user = Auth::user(); // or pass user explicitly from request
+        $user = Auth::user(); 
     
         if (!$user) {
             return redirect('register');
         }
     
         $reference = Str::uuid()->toString(); 
+
+        $plan = Plan::where('type', $request->duration)->where('tier', $request->tier)->first();
+        // dd($plan);
        
-        // Optional: Store transaction record
         DB::table('payments')->insert([
             'user_id' => $user->id,
             'reference' => $reference,
-            'amount' => $request->amount,
+            'amount' => $plan->price_ngn,
             'metadata' => json_encode($request->all()),
             'payment_method' =>'paystack',
             'starts_at' => now(),
@@ -42,17 +44,16 @@ class PaymentController extends Controller
 
         $user = Auth::user();
         $user->metadata = $request->all();
-        $user->payment_status = 'pending';
         $user->premium = $request->tier === 'premium';
         $user->payment_method ='paystack';
         $user->last_payment_reference = $reference;
-        $user->last_payment_amount = $request->amount;
+        $user->last_payment_amount = $plan->price_ngn;
         $user->last_payment_at = now();
         $user->save();
     
         $fields = [
             'email' => $user->email,
-            'amount' => $request->amount * 100,
+            'amount' => $plan->price_ngn * 100,
             'reference' => $reference,
             'metadata' => json_encode(['user_id' => $user->id, 'payload' => $request->all()]),
             'callback_url' => route('payment.verify'), 
@@ -83,7 +84,6 @@ class PaymentController extends Controller
     
         return response()->json(['error' => 'Unable to initialize payment'], 500);
     }
-    
 
     public function handlePaystackCallback(Request $request)
     {

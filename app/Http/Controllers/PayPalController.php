@@ -8,6 +8,7 @@ use Omnipay\Omnipay;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\Plan;
 
 class PayPalController extends Controller
 {
@@ -33,10 +34,13 @@ private $gateway;
         try {
              $reference = Str::uuid()->toString(); 
 
+             $plan = Plan::where('type', $request->duration)->where('tier', $request->tier)->first();
+       
+
         DB::table('payments')->insert([
             'user_id' => $user->id,
             'reference' => $reference,
-            'amount' => $request->amount,
+            'amount' => $plan->price_usd,
             'metadata' => json_encode($request->all()),
             'payment_method' =>'paypal',
             'status' => 'pending',
@@ -48,16 +52,15 @@ private $gateway;
         ]);
 
             $user->metadata = $request->all();
-            $user->payment_status = 'pending';
-            $user->payment_method ='stripe';
+            $user->payment_method ='paypal';
             $user->premium = $request->tier === 'premium';
             $user->last_payment_reference = $reference;
-            $user->last_payment_amount = $request->amount;
+            $user->last_payment_amount = $plan->price_usd;
             $user->last_payment_at = now();
             $user->save();
 
             $response = $this->gateway->purchase(array(
-                'amount' => $request->amount,
+                'amount' => $plan->price_usd,
                 'currency' => $request->currency,
                 'returnUrl' => url('paypal/success'),
                 'cancelUrl' => url('paypal/cancel'),

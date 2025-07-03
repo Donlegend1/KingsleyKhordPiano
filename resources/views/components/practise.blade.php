@@ -49,12 +49,13 @@
 
       </div>
     </div>
-
+ <div id="pricing"></div>
     <!-- Next Button -->
     <button id="nextBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 px-3 py-2 z-20">
       <img src="/icons/next.png" alt="next" class="w-6 h-6">
     </button>
   </div>
+ 
 </section>
 
 <script>

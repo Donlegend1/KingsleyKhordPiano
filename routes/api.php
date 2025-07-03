@@ -18,38 +18,36 @@ use App\Http\Controllers\LiveShowController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-Route::get('/live-shows', [LiveShowController::class, 'list']);
+    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::get('/live-shows', [LiveShowController::class, 'list']);
 
 
-Route::prefix('admin')->group(function () {
-    Route::get('users', [AdminController::class, 'usersList']);
-    Route::put('users/{user}', [AdminController::class, 'editUser']);
-    Route::delete('user/{user}', [AdminController::class, 'destroy']);
-    Route::get('courses', [CourseController::class, 'coursesList']);
-    Route::patch('courses/{course}', [CourseController::class, 'update']);
-    Route::delete('courses/{course}', [CourseController::class, 'deleteCourse']);
-    Route::post('course/store', [CourseController::class, 'store']);
-    Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
-    Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
+    Route::prefix('admin')->group(function () {
+        Route::get('users', [AdminController::class, 'usersList']);
+        Route::put('users/{user}', [AdminController::class, 'editUser']);
+        Route::delete('user/{user}', [AdminController::class, 'destroy']);
+        Route::get('courses', [CourseController::class, 'coursesList']);
+        Route::patch('courses/{course}', [CourseController::class, 'update']);
+        Route::delete('courses/{course}', [CourseController::class, 'deleteCourse']);
+        Route::post('course/store', [CourseController::class, 'store']);
+        Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
+        Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
 
-});
+    });
 
     Route::prefix('member')->group(function () {
         Route::get('courses', [CourseController::class, 'index']);
 
-        Route::get('courses/{level}', [CourseController::class, 'membershowAPI']);
-        
+        Route::get('courses/{level}', [CourseController::class, 'membershowAPI']);  
         Route::get('course/{course}', [CourseController::class, 'show']);
         Route::get('course/{course}/lessons', [CourseController::class, 'lessons']);
         Route::get('course/{course}/lesson/{lesson}', [CourseController::class, 'lesson']);
         Route::get('course/{course}/exercise', [CourseController::class, 'exercise']);
         Route::post('course/{course}/exercise/submit', [CourseController::class, 'submitExercise']);
-
-        // Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
     });
+
     Route::get('exercise/{exercise}', [ExerciseController::class, 'show']);
     Route::post('exercise/{exercise}/submit', [ExerciseController::class, 'submit']);
     Route::get('ear-training', [EarTrainingController::class, 'index']);

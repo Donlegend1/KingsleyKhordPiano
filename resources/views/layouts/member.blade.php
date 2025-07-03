@@ -34,233 +34,197 @@
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
     <div id="app" class="flex flex-col flex-grow">
      
-     <header class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between space-x-6">
-            
-            <div class="flex items-center space-x-4 flex-shrink-0">
-                <a href="/" class="text-2xl font-bold">
-                    <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8">
-                </a>
-                <span class="text-[#FFD736] flex items-center space-x-1">
-                    <i class="fa fa-user" aria-hidden="true"></i>
-                    <span>Member Area</span>
+    <header x-data="{ openMobileNav: false, showLogoutModal: false }" class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between space-x-6">
+
+        <!-- Logo & Member Area -->
+        <div class="flex items-center space-x-4 flex-shrink-0">
+            <a href="/" class="text-2xl font-bold">
+                <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8">
+            </a>
+            <span class="text-[#FFD736] flex items-center space-x-1">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <span>Member Area</span>
+            </span>
+        </div>
+
+        <!-- Search Bar (desktop only) -->
+        <div class="hidden lg:flex flex-grow justify-center">
+            <div class="relative w-full max-w-sm">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa fa-search text-gray-400"></i>
                 </span>
+                <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-1.5 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD736] focus:border-transparent text-sm">
             </div>
+        </div>
 
-            <!-- Center: Search Bar -->
-            <div class="hidden lg:flex flex-grow justify-center">
-                <div class="relative w-full max-w-sm">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-search text-gray-400"></i>
-                    </span>
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        class="w-full pl-10 pr-4 py-1.5 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD736] focus:border-transparent text-sm"
-                    />
-                </div>
-            </div>
+        <!-- Right-side nav & mobile button -->
+        <div class="flex items-center space-x-4">
 
-            <div class="flex items-center space-x-4">
-              <nav class="hidden lg:flex items-center space-x-3">
-                  <a href="/member/getstarted" class="text-sm font-semibold transition duration-200 {{ Request::is('member/getstarted') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Get Started</a>
-                  <a href="/member/community" class="text-sm font-semibold transition duration-200 {{ Request::is('member/community') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Community</a>
-                  <a href="/member/shop" class="text-sm font-semibold transition duration-200 {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Shop</a>
-                  <a href="/member/profile" class="text-sm font-semibold transition duration-200 {{ Request::is('member/profile') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">My Account</a>
-                  <a href="/member/support" class="text-sm font-semibold transition duration-200 {{ Request::is('member/support') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Support</a>
+            <nav class="hidden lg:flex items-center space-x-3">
+                <a href="/member/getstarted" class="text-sm font-semibold {{ Request::is('member/getstarted') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Get Started</a>
+                <a href="/member/community" class="text-sm font-semibold {{ Request::is('member/community') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Community</a>
+                <a href="/member/shop" class="text-sm font-semibold {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Shop</a>
+                <a href="/member/profile" class="text-sm font-semibold {{ Request::is('member/profile') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">My Account</a>
+                <a href="/member/support" class="text-sm font-semibold {{ Request::is('member/support') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Support</a>
 
-                  <!-- Logout button (same flex level) -->
-                  <div x-data="{ showLogoutModal: false }">
-                      <button @click="showLogoutModal = true"
-                          class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition">
-                          {{ __('Logout') }}
-                      </button>
+                <button @click="showLogoutModal = true" class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition">
+                    {{ __('Logout') }}
+                </button>
+            </nav>
 
-                      <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
+            <!-- Mobile Menu Button -->
+            <button @click="openMobileNav = true" class="lg:hidden navbar-burger" aria-label="Open Menu">
+                <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
 
-                      <div x-show="showLogoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                          <div @click.away="showLogoutModal = false" class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
-                              <div class="text-center mb-4">
-                                  <h2 class="text-lg font-semibold text-gray-800 mb-2">Confirm Logout</h2>
-                                  <p class="text-gray-600">Are you sure you want to log out?</p>
-                              </div>
-                              <div class="flex justify-between space-x-3">
-                                  <button @click="showLogoutModal = false"
-                                      class="px-4 py-2 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-                                  <button @click="document.getElementById('logout-form').submit()"
-                                      class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">Logout</button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </nav>
-                <!-- Mobile menu button -->
-                <button class="lg:hidden navbar-burger" aria-label="Open Menu">
-                    <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
+        </div>
+
+    </div>
+
+    <!-- Mobile Nav Sliding Sidebar -->
+    <div x-show="openMobileNav" class="fixed inset-0 z-50 flex" x-transition>
+        <div class="fixed inset-0 bg-black bg-opacity-60" @click="openMobileNav = false"></div>
+
+        <div class="relative bg-black text-white w-72 max-w-full h-full overflow-y-auto p-4 transform transition-transform duration-300" :class="openMobileNav ? 'translate-x-0' : '-translate-x-full'">
+
+            <div class="flex justify-end mb-4">
+                <button @click="openMobileNav = false">
+                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
+
+            <div class="space-y-6">
+                <div class="flex flex-col divide-y divide-gray-700 border border-gray-700 rounded-md overflow-hidden">
+                   @php
+                      $navItems = [
+                        ['url' => 'home', 'label' => 'Dashboard', 'icon' => 'dashboard.svg'],
+                        ['url' => 'member/roadmap', 'label' => 'Roadmap', 'icon' => 'roadmap2.png'],
+                        ['url' => 'member/piano-exercise', 'label' => 'Piano Exercise', 'icon' => 'piano2.png'],
+                        ['url' => 'member/ear-training', 'label' => 'Ear Training', 'icon' => 'eartraning.svg'],
+                        ['url' => 'member/extra-courses', 'label' => 'Extra Courses', 'icon' => 'extracourse.svg'],
+                        ['url' => 'member/quick-lessons', 'label' => 'Quick Lesson', 'icon' => 'quick lession.svg'],
+                        ['url' => 'member/learn-songs', 'label' => 'Learn Songs', 'icon' => 'songs.svg'],
+                        ['url' => 'member/live-session', 'label' => 'Live Session', 'icon' => 'livesession.svg'],
+                      ];
+                  @endphp
+                    @foreach ($navItems as $item)
+                        <a href="/{{ $item['url'] }}" class="flex items-center gap-3 text-sm px-3 py-3 transition {{ Request::is($item['url']) ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                            <img src="/icons/{{ $item['icon'] }}" class="h-5 w-auto" alt="{{ $item['label'] }}" />
+                            <span>{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="flex flex-col gap-2">
+                <a href="/member/getstarted" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Get Started</a>
+                <a href="/member/community" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Community</a>
+                <a href="/member/profile" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">My Account</a>
+                <a href="/member/shop" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Shop</a>
+                <a href="/member/support" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Support</a>
+                </div>
+                <button @click="showLogoutModal = true" class="mt-4 text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-white bg-red-500">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></button>
+
+            </div>
         </div>
-
-  <!-- Mobile Nav -->
-<div id="mobile-nav" class="lg:hidden hidden px-4 pb-6 pt-4 space-y-6 bg-black text-white">
-  <!-- Main Navigation Links -->
-  <div class="flex flex-col space-y-3">
-    @php
-      $navItems = [
-        ['url' => 'home', 'label' => 'Dashboard', 'icon' => 'dashboard.svg'],
-        ['url' => 'member/roadmap', 'label' => 'Roadmap', 'icon' => 'roadmap2.png'],
-        ['url' => 'member/piano-exercise', 'label' => 'Piano Exercise', 'icon' => 'piano2.png'],
-        ['url' => 'member/ear-training', 'label' => 'Ear Training', 'icon' => 'eartraning.svg'],
-        ['url' => 'member/extra-courses', 'label' => 'Extra Courses', 'icon' => 'extracourse.svg'],
-        ['url' => 'member/quick-lessons', 'label' => 'Quick Lesson', 'icon' => 'quick lession.svg'],
-        ['url' => 'member/learn-songs', 'label' => 'Learn Songs', 'icon' => 'songs.svg'],
-        ['url' => 'member/live-session', 'label' => 'Live Session', 'icon' => 'livesession.svg'],
-      ];
-    @endphp
-
-    @foreach ($navItems as $item)
-      <a href="/{{ $item['url'] }}"
-        class="flex items-center gap-3 text-sm px-3 py-2 rounded transition
-          {{ Request::is($item['url']) ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-        <img src="/icons/{{ $item['icon'] }}" class="h-5 w-auto" alt="{{ $item['label'] }}" />
-        <span>{{ $item['label'] }}</span>
-      </a>
-    @endforeach
-  </div>
-
-  <!-- Secondary Links -->
-  <div class="flex flex-col space-y-2 border-t border-gray-700 pt-4">
-    <a href="/member/getstarted"
-      class="text-sm font-semibold px-3 py-2 rounded transition {{ Request::is('/') ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-      Get Started
-    </a>
-    <a href="/member/community"
-      class="text-sm font-semibold px-3 py-2 rounded transition {{ Request::is('plans') ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-      Community
-    </a>
-    <a href="/member/profile"
-      class="text-sm font-semibold px-3 py-2 rounded transition {{ Request::is('about') ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-      My Account
-    </a>
-    <a href="/member/shop"
-      class="text-sm font-semibold px-3 py-2 rounded transition {{ Request::is('about') ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-      Shop
-    </a>
-    <a href="/member/support"
-      class="text-sm font-semibold px-3 py-2 rounded transition {{ Request::is('contact') ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-      Support
-    </a>
-  </div>
-
-  <!-- Logout -->
-  <div x-data="{ showLogoutModal: false }" class="pt-4 border-t border-gray-700">
-    <button @click="showLogoutModal = true"
-      class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition w-full text-left">
-      {{ __('Logout') }}
-    </button>
-
-    <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
+    </div>
 
     <!-- Logout Modal -->
-    <div x-show="showLogoutModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div @click.away="showLogoutModal = false"
-        class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
-        <div class="text-center mb-4">
-          <h2 class="text-lg font-semibold text-gray-800">Confirm Logout</h2>
-          <p class="text-gray-600">Are you sure you want to log out?</p>
+    <div x-show="showLogoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div @click.away="showLogoutModal = false" class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
+            <div class="text-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800 mb-2">Confirm Logout</h2>
+                <p class="text-gray-600">Are you sure you want to log out?</p>
+            </div>
+            <div class="flex justify-between space-x-3">
+                <button @click="showLogoutModal = false" class="px-4 py-2 text-sm text-gray-600 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
+                <button @click="document.getElementById('logout-form').submit()" class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700">Logout</button>
+            </div>
         </div>
-        <div class="flex justify-between gap-3">
-          <button @click="showLogoutModal = false"
-            class="px-4 py-2 text-sm bg-gray-200 text-gray-600 rounded hover:bg-gray-300">Cancel</button>
-          <button @click="document.getElementById('logout-form').submit()"
-            class="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700">Logout</button>
+    </div>
+    <div class="hidden md:flex bg-black dark:bg-gray-800 shadow sticky top-0 z-50 text-white overflow-x-auto">
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-x-4 flex-nowrap">
+
+                <a href="/home"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('home') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/dashboard.svg" class="h-5 w-auto">
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="/member/roadmap"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('member/roadmap') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/roadmap2.png" class="h-5 w-auto">
+                    <span>Roadmap</span>
+                </a>
+
+                <a href="/member/piano-exercise"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('member/piano-exercise') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/piano2.png" class="h-5 w-auto">
+                    <span>Piano Exercise</span>
+                </a>
+
+                <a href="/member/ear-training"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('member/ear-training') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/eartraning.svg" class="h-5 w-auto">
+                    <span>Ear Training</span>
+                </a>
+
+                <a href="/member/extra-courses"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('member/extra-courses') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/extracourse.svg" class="h-5 w-auto">
+                    <span>Extra Courses</span>
+                </a>
+
+                <a href="/member/quick-lessons"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('member/quick-lessons') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/quick lession.svg" class="h-5 w-auto">
+                    <span>Quick Lesson</span>
+                </a>
+
+                <a href="/member/learn-songs"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('member/learn-songs') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/songs.svg" class="h-5 w-auto">
+                    <span>Learn Songs</span>
+                </a>
+
+                <a href="/member/live-session"
+                  class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
+                  {{ Request::is('member/live-session') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
+                    <img src="/icons/livesession.svg" class="h-5 w-auto">
+                    <span>Live Session</span>
+                </a>
+
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="hidden md:flex bg-black dark:bg-gray-800 shadow sticky top-0 z-50 text-white overflow-x-auto">
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-x-4 flex-nowrap">
-
-        <a href="/home"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('home') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/dashboard.svg" class="h-5 w-auto">
-            <span>Dashboard</span>
-        </a>
-
-        <a href="/member/roadmap"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('member/roadmap') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/roadmap2.png" class="h-5 w-auto">
-            <span>Roadmap</span>
-        </a>
-
-        <a href="/member/piano-exercise"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('member/piano-exercise') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/piano2.png" class="h-5 w-auto">
-            <span>Piano Exercise</span>
-        </a>
-
-        <a href="/member/ear-training"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('member/ear-training') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/eartraning.svg" class="h-5 w-auto">
-            <span>Ear Training</span>
-        </a>
-
-        <a href="/member/extra-courses"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('member/extra-courses') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/extracourse.svg" class="h-5 w-auto">
-            <span>Extra Courses</span>
-        </a>
-
-        <a href="/member/quick-lessons"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('member/quick-lessons') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/quick lession.svg" class="h-5 w-auto">
-            <span>Quick Lesson</span>
-        </a>
-
-        <a href="/member/learn-songs"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('member/learn-songs') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/songs.svg" class="h-5 w-auto">
-            <span>Learn Songs</span>
-        </a>
-
-        <a href="/member/live-session"
-           class="flex items-center gap-x-2 text-sm px-3 py-2 rounded transition whitespace-nowrap
-           {{ Request::is('member/live-session') ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
-            <img src="/icons/livesession.svg" class="h-5 w-auto">
-            <span>Live Session</span>
-        </a>
-
-    </div>
-</div>
-
 
 </header>
 
-@if(session()->has('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-        {{ session()->get('success') }}
-    </div>
-@endif
 
-@if(session()->has('error'))
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        {{ session()->get('error') }}
-    </div>
-@endif
+    @if(session()->has('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session()->get('success') }}
+        </div>
+    @endif
+
+  @if(session()->has('error'))
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {{ session()->get('error') }}
+      </div>
+  @endif
         <main  class="flex-grow">
             @yield('content')
         </main>
