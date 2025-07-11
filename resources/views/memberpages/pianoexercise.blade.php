@@ -32,7 +32,7 @@
       <select onchange="window.location.href = this.value" class="w-full border-gray-300 rounded p-2 text-sm">
         <option value="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}" {{ is_null($level) ? 'selected' : '' }}>All Categories</option>
         @foreach ($levels as $tab)
-          <option value="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" {{ strtolower($level) === $tab ? 'selected' : '' }}>
+          <option value="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" {{ strtolower($level) === strtolower($tab) ? 'selected' : '' }}>
             {{ ucfirst($tab) }}
           </option>
         @endforeach
@@ -42,7 +42,7 @@
       <select onchange="window.location.href = this.value" class="w-full border-gray-300 rounded p-2 text-sm">
         <option value="{{ route('piano.exercise', array_filter(['level' => $level])) }}" {{ is_null($skillLevel) ? 'selected' : '' }}>All Skill Levels</option>
         @foreach ($skillLevels as $sl)
-          <option value="{{ route('piano.exercise', array_filter(['level' => $level, 'skill_level' => $sl])) }}" {{ strtolower($skillLevel) === $sl ? 'selected' : '' }}>
+          <option value="{{ route('piano.exercise', array_filter(['level' => $level, 'skill_level' => $sl])) }}" {{ strtolower($skillLevel) === strtolower($sl) ? 'selected' : '' }}>
             {{ ucfirst($sl) }}
           </option>
         @endforeach
@@ -59,7 +59,7 @@
         <div class="hidden sm:flex flex-wrap gap-3 border-b pb-2 mb-8">
           <a href="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}" class="py-2 px-4 border-b-2 {{ is_null($level) ? 'border-blue-500 text-blue-500 font-semibold' : 'text-gray-600 hover:text-blue-500' }}">All</a>
           @foreach ($levels as $tab)
-            <a href="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" class="py-2 px-4 border-b-2 {{ strtolower($level) === $tab ? 'border-blue-500 text-blue-500 font-semibold' : 'text-gray-600 hover:text-blue-500' }}">{{ ucfirst($tab) }}</a>
+            <a href="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" class="py-2 px-4 border-b-2 {{ strtolower($level) === strtolower($tab) ? 'border-blue-500 text-blue-500 font-semibold' : 'text-gray-600 hover:text-blue-500' }}">{{ ucfirst($tab) }}</a>
           @endforeach
         </div>
 
@@ -69,7 +69,7 @@
             <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
               <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
               <h3 class="font-bold text-gray-800 text-center">{{ $exercise->title }}</h3>
-              <p class="text-sm text-gray-500">{{ $exercise->level }} | {{ $exercise->skill_level }}</p>
+              <p class="text-sm text-gray-500 capitalize">{{ $exercise->level }} | {{ $exercise->skill_level }}</p>
               <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
                 Watch Now
               </a>
@@ -80,7 +80,7 @@
             </div>
           @endforelse
 
-          @if ($exercises->total() > 9)
+          @if ($exercises->hasPages())
             <div class="col-span-full flex justify-center py-8">
               {{ $exercises->withQueryString()->links() }}
             </div>
@@ -100,14 +100,14 @@
           @foreach ($skillLevels as $sl)
             @php
               $url = route('piano.exercise', array_filter(['level' => $level, 'skill_level' => $sl]));
-              $icon = match($sl) {
-                'beginner' => 'fa-star',
-                'intermediate' => 'fa-chart-line',
-                'advanced' => 'fa-mountain',
+              $icon = match(strtolower($sl)) {
+                'basic' => 'fa-star',
+                'competent' => 'fa-chart-line',
+                'challenging' => 'fa-mountain',
                 default => 'fa-circle',
               };
             @endphp
-            <a href="{{ $url }}" class="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm transition hover:bg-blue-50 {{ strtolower($skillLevel) === $sl ? 'bg-blue-50 border-blue-300 text-blue-600 font-medium' : 'text-gray-700' }}">
+            <a href="{{ $url }}" class="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm transition hover:bg-blue-50 {{ strtolower($skillLevel) === strtolower($sl) ? 'bg-blue-50 border-blue-300 text-blue-600 font-medium' : 'text-gray-700' }}">
               <i class="fas {{ $icon }} text-gray-400"></i>
               {{ ucfirst($sl) }}
             </a>

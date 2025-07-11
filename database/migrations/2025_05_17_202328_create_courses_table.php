@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('category');
             $table->text('description');
             $table->text('video_url');
-            $table->enum('level', ['beginner', 'intermediate', 'advanced'])->default('beginner');
+            $table->string('level')->default('beginner');
             $table->enum('status', ['active', 'inactive', 'draft'])->default('active');
             $table->text('prerequisites')->nullable();
             $table->text('what_you_will_learn')->nullable();

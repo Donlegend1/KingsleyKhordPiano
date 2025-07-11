@@ -122,54 +122,39 @@ export default function QuizCardWithModal() {
     };
 
     const checkProgressAndRedirect = (newAnswers) => {
-        const firstFourComplete = [0, 1, 2, 3].every((i) => newAnswers[i]);
-        if (!firstFourComplete) return false;
+    // Check if first 4 answers are provided
+    const firstFourComplete = [0, 1, 2, 3].every((i) => newAnswers[i]);
+    if (!firstFourComplete) return false;
 
-        const firstFourFailed = [0, 1, 2, 3].some(
-            (i) => newAnswers[i] === "No."
-        );
-        if (firstFourFailed) {
-            showMessage("You are in beginner level", "success");
-            window.location = "/member/course/beginner";
-            return true;
-        }
-
-        const midThreeComplete = [4, 5, 6].every((i) => newAnswers[i]);
-        if (!midThreeComplete) return false;
-
-        const midThreeAnswers = {
-            4: "Yes I can.",
-            5: "I am good at it.",
-            6: "I am confident in passing chords.",
-        };
-
-        const isIntermediate = [4, 5, 6].some(
-            (i) => newAnswers[i] !== midThreeAnswers[i]
-        );
-        if (isIntermediate) {
-            showMessage("You are in intermediate level", "success");
-            window.location = "/member/course/intermediate";
-            return true;
-        }
-
-        const finalTwoComplete = [7, 8].every((i) => newAnswers[i]);
-        if (!finalTwoComplete) return false;
-
-        const isAdvanced =
-            newAnswers[7] === "Yes I can." &&
-            newAnswers[8] ===
-                "I focus on the emotional impact of my playing and the sound I want to convey.";
-
-        if (isAdvanced) {
-            showMessage("You are in advanced level", "success");
-            window.location = "/member/course/advanced";
-        } else {
-            showMessage("You are in intermediate level", "success");
-            window.location = "/member/course/intermediate";
-        }
-
+    // If 4th question (index 3) is "No.", redirect to Beginner
+    if (newAnswers[3] === "No.") {
+        showMessage("You are in beginner level", "success");
+        window.location = "/member/course/beginner";
         return true;
-    };
+    }
+
+    // Check if first 7 answers are provided
+    const firstSevenComplete = [0, 1, 2, 3, 4, 5, 6].every((i) => newAnswers[i]);
+    if (!firstSevenComplete) return false;
+
+    // If 7th question (index 6) is "No.", redirect to Intermediate
+    if (newAnswers[6] === "No I dont.") {
+        showMessage("You are in intermediate level", "success");
+        window.location = "/member/course/intermediate";
+        return true;
+    }
+
+    // Check if all answers up to question 9 (index 8) are provided
+    const allQuestionsComplete = [0, 1, 2, 3, 4, 5, 6, 7, 8].every((i) => newAnswers[i]);
+    if (!allQuestionsComplete) return false;
+
+    // If none of the above conditions matched, redirect to Advanced
+    showMessage("You are in advanced level", "success");
+    window.location = "/member/course/advanced";
+
+    return true;
+};
+
 
     return (
         <div className="flex flex-col items-center justify-center p-4 bg-white border border-gray-300 rounded-lg w-full min-h-[200px]">

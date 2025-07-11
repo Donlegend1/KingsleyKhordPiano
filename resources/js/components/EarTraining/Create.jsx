@@ -1,206 +1,205 @@
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom/client";
+import React, { useState } from "react";
 import axios from "axios";
+import ReactDOM from "react-dom/client";
 
-const ShowEartraining = () => {
-    const [quiz, setQuiz] = useState(null);
-    const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [selectedOption, setSelectedOption] = useState(null);
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const [showResult, setShowResult] = useState(false);
-    const [score, setScore] = useState(0);
+const CreateEarTrainingQuiz = () => {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [videoUrl, setVideoUrl] = useState("");
+    const [thumbnail, setThumbnail] = useState(null);
+    const [mainAudio, setMainAudio] = useState(null);
+    const [questions, setQuestions] = useState([
+        { audio: null, correct_option: "" },
+    ]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     const STANDARD_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
 
-    const lastSegment = window.location.pathname
-        .split("/")
-        .filter(Boolean)
-        .pop();
+    const handleQuestionChange = (index, field, value) => {
+        const updated = [...questions];
+        updated[index][field] = value;
+        setQuestions(updated);
+    };
 
-    useEffect(() => {
-        const fetchQuiz = async () => {
-            try {
-                const response = await axios.get(
-                    `/admin/ear-training/${lastSegment}`
-                );
-                setQuiz(response.data);
-            } catch (error) {
-                console.error("Error fetching quiz:", error);
-            }
-        };
-        fetchQuiz();
-    }, [lastSegment]);
+    const addQuestion = () => {
+        setQuestions([...questions, { audio: null, correct_option: "" }]);
+    };
 
-    if (!quiz || !quiz.questions?.length) {
-        return (
-            <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg mt-6">
-                <div className="animate-pulse space-y-4">
-                    <div className="h-6 bg-gray-300 rounded w-1/2"></div>
-                    <div className="h-48 bg-gray-200 rounded"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                    <div className="space-y-2">
-                        {STANDARD_OPTIONS.map((_, i) => (
-                            <div
-                                key={i}
-                                className="h-10 bg-gray-100 rounded"
-                            ></div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    const removeQuestion = (index) => {
+        const updated = questions.filter((_, i) => i !== index);
+        setQuestions(updated);
+    };
 
-    const question = quiz.questions[currentQuestion];
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setSuccessMessage("");
 
-    const handleOptionSelect = (index) => {
-        if (!isSubmitted) {
-            setSelectedOption(index);
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("video_url", videoUrl);
+        formData.append("thumbnail", thumbnail);
+        formData.append("main_audio", mainAudio);
+
+        questions.forEach((q, index) => {
+            formData.append(`questions[${index}][audio]`, q.audio);
+            formData.append(`questions[${index}][correct_option]`, q.correct_option);
+        });
+
+        try {
+            const response = await axios.post("/admin/ear-training", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            setSuccessMessage("Quiz created successfully!");
+            setTitle("");
+            setDescription("");
+            setVideoUrl("");
+            setThumbnail(null);
+            setMainAudio(null);
+            setQuestions([{ audio: null, correct_option: "" }]);
+        } catch (error) {
+            console.error("Error uploading quiz:", error);
+            alert("Failed to create quiz.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const handleSubmit = () => {
-        if (selectedOption === null) return;
-
-        setIsSubmitted(true);
-        if (selectedOption === question.correct_option) {
-            setScore((prev) => prev + 1);
-        }
-    };
-
-    const handleNext = () => {
-        if (currentQuestion < quiz.questions.length - 1) {
-            setCurrentQuestion((prev) => prev + 1);
-            setSelectedOption(null);
-            setIsSubmitted(false);
-        } else {
-            setShowResult(true);
-        }
-    };
-
-    console.log(STANDARD_OPTIONS, "standatd");
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg mt-6">
-            <h2 className="text-2xl font-bold mb-4">{quiz.title}</h2>
+        <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow mt-8">
+            <h2 className="text-2xl font-bold mb-6">Create New Ear Training Quiz</h2>
 
-            {STANDARD_OPTIONS.map((idex) => (
-                <p>hehehreh</p>
-            ))}
+            {successMessage && (
+                <div className="mb-4 p-4 bg-green-100 border border-green-500 rounded">
+                    {successMessage}
+                </div>
+            )}
 
-            {/* Main video */}
-            <div
-                className="mb-6"
-                dangerouslySetInnerHTML={{ __html: quiz.video_url }}
-            />
-
-            {/* Main audio */}
-            {quiz.main_audio_path && (
-                <div className="mb-6">
-                    <p className="font-semibold mb-2">Main Audio:</p>
-                    <audio
-                        controls
-                        src={`/storage/${quiz.main_audio_path}`}
-                        className="w-full max-w-2xl"
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="block mb-1 font-medium">Title</label>
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded"
                     />
                 </div>
-            )}
 
-            {!showResult ? (
-                <>
-                    {/* Question audio */}
-                    <div className="mb-4">
-                        <p className="text-lg font-medium mb-2">
-                            Question {currentQuestion + 1} of{" "}
-                            {quiz.questions.length}
-                        </p>
-                        <audio
-                            controls
-                            src={`/storage/${question.audio_path}`}
-                            className="mb-4"
-                        />
-                    </div>
-
-                    {/* Options list */}
-                    <div className="space-y-3">
-                        {STANDARD_OPTIONS.map((opt, i) => (
-                            <button
-                                key={i}
-                                onClick={() => handleOptionSelect(i)}
-                                disabled={isSubmitted}
-                                className={`w-full p-3 border rounded-lg text-left 
-                ${
-                    selectedOption === i
-                        ? "bg-blue-100 border-blue-500"
-                        : "bg-gray-50"
-                }
-                ${
-                    isSubmitted && i === question.correct_option
-                        ? "border-green-500 bg-green-100"
-                        : ""
-                }
-                ${
-                    isSubmitted &&
-                    selectedOption === i &&
-                    selectedOption !== question.correct_option
-                        ? "border-red-500 bg-red-100"
-                        : ""
-                }
-            `}
-                            >
-                                {opt}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Correct Answer */}
-                    {isSubmitted && (
-                        <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700">
-                            Correct Answer:{" "}
-                            <strong>
-                                {STANDARD_OPTIONS[question.correct_option]}
-                            </strong>
-                        </div>
-                    )}
-
-                    {/* Submit / Next Button */}
-                    <div className="mt-6 flex justify-end space-x-3">
-                        {!isSubmitted ? (
-                            <button
-                                onClick={handleSubmit}
-                                className="bg-black text-white px-6 py-2 rounded hover:bg-blue-600 hover:text-black transition"
-                                disabled={selectedOption === null}
-                            >
-                                Submit Answer
-                            </button>
-                        ) : (
-                            <button
-                                onClick={handleNext}
-                                className="bg-gray-800 text-white px-6 py-2 rounded hover:bg-green-500 hover:text-black transition"
-                            >
-                                {currentQuestion === quiz.questions.length - 1
-                                    ? "Finish"
-                                    : "Next Question"}
-                            </button>
-                        )}
-                    </div>
-                </>
-            ) : (
-                <div className="text-center">
-                    <h3 className="text-xl font-semibold mb-2">
-                        Quiz Complete!
-                    </h3>
-                    <p className="text-lg">
-                        Your Score: {score} / {quiz.questions.length}
-                    </p>
+                <div>
+                    <label className="block mb-1 font-medium">Description</label>
+                    <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    />
                 </div>
-            )}
+
+                <div>
+                    <label className="block mb-1 font-medium">Video Embed Code (iframe)</label>
+                    <textarea
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    />
+                </div>
+
+                <div>
+                    <label className="block mb-1 font-medium">Thumbnail Image</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setThumbnail(e.target.files[0])}
+                        required
+                        className="w-full"
+                    />
+                </div>
+
+                <div>
+                    <label className="block mb-1 font-medium">Main Audio</label>
+                    <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={(e) => setMainAudio(e.target.files[0])}
+                        required
+                        className="w-full"
+                    />
+                </div>
+
+                <div>
+                    <h3 className="text-lg font-semibold mb-2">Questions</h3>
+                    {questions.map((q, index) => (
+                        <div key={index} className="border p-4 rounded mb-4">
+                            <div className="mb-2">
+                                <label className="block mb-1 font-medium">Question Audio</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => handleQuestionChange(index, "audio", e.target.files[0])}
+                                    required
+                                    className="w-full"
+                                />
+                            </div>
+
+                            <div className="mb-2">
+                                <label className="block mb-1 font-medium">Correct Option</label>
+                                <select
+                                    value={q.correct_option}
+                                    onChange={(e) => handleQuestionChange(index, "correct_option", e.target.value)}
+                                    required
+                                    className="w-full p-2 border rounded"
+                                >
+                                    <option value="">-- Select Correct Option --</option>
+                                    {STANDARD_OPTIONS.map((opt, i) => (
+                                        <option key={i} value={i}>
+                                            {opt}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {questions.length > 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() => removeQuestion(index)}
+                                    className="text-red-600 mt-2"
+                                >
+                                    Remove Question
+                                </button>
+                            )}
+                        </div>
+                    ))}
+
+                    <button
+                        type="button"
+                        onClick={addQuestion}
+                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Add Another Question
+                    </button>
+                </div>
+
+                <div className="pt-4">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="bg-black text-white px-6 py-3 rounded hover:bg-green-600"
+                    >
+                        {isSubmitting ? "Submitting..." : "Create Quiz"}
+                    </button>
+                </div>
+            </form>
         </div>
     );
 };
 
+export default CreateEarTrainingQuiz;
+
 if (document.getElementById("ear-training-quiz")) {
-    const root = ReactDOM.createRoot(
-        document.getElementById("ear-training-quiz")
-    );
-    root.render(<ShowEartraining />);
+    const root = ReactDOM.createRoot(document.getElementById("ear-training-quiz"));
+    root.render(<CreateEarTrainingQuiz />);
 }

@@ -37,6 +37,12 @@ const UploadForm = () => {
         "Dexterity",
     ];
 
+    const pianoGroup = [
+        "Basic",
+        "Competent",
+        "Challenging",
+    ];
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUpload({ ...upload, [name]: value });
@@ -213,12 +219,20 @@ const UploadForm = () => {
                                 className="w-full p-3 border rounded-lg"
                             >
                                 <option value="">Select</option>
-                                {levels.map((level) => (
-                                    <option key={level} value={level}>
-                                        {level.charAt(0).toUpperCase() +
-                                            level.slice(1)}
-                                    </option>
-                                ))}
+
+                                 {upload.category === "piano exercise"
+                                ? pianoGroup.map((level) => (
+                                      <option key={level} value={level}>
+                                          {level.charAt(0).toUpperCase() +
+                                              level.slice(1)}
+                                      </option>
+                                  ))
+                                : levels.map((level) => (
+                                      <option key={level} value={level}>
+                                          {level.charAt(0).toUpperCase() +
+                                              level.slice(1)}
+                                      </option>
+                                  ))}
                             </select>
                         </div>
                     )}

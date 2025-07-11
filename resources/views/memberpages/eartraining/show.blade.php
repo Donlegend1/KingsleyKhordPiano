@@ -23,7 +23,7 @@
 
  </div>
 </section>
-<div id="ear-training-quiz">
+<div id="ear-training-quiz-show">
 
 </div>
 

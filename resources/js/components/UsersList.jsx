@@ -28,7 +28,7 @@ const UsersList = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [editForm, setEditForm] = useState({
         first_name: "",
-        last_name:"",
+        last_name: "",
         email: "",
         premium: 0,
         payment_status: null,
@@ -152,7 +152,9 @@ const UsersList = () => {
                                                 1}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.first_name+ " "+ user.last_name}
+                                            {user.first_name +
+                                                " " +
+                                                user.last_name}
                                         </td>
                                         <td className="py-2 px-4">
                                             {user.email}
@@ -161,9 +163,10 @@ const UsersList = () => {
                                             {user.payment_status}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.metadata?.duration} ({user.metadata?.tier})
-                                            </td>
-                                        <td className="py-2 px-4">
+                                            {user.metadata?.duration} (
+                                            {user.metadata?.tier})
+                                        </td>
+                                        <td className="py-2 px-4 flex justify-center text-center items-center">
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() =>
@@ -171,7 +174,7 @@ const UsersList = () => {
                                                     }
                                                     className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition"
                                                 >
-                                                    Edit
+                                                    <span className="fa fa-edit"></span>
                                                 </button>
                                                 <button
                                                     onClick={() =>
@@ -179,7 +182,7 @@ const UsersList = () => {
                                                     }
                                                     className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition"
                                                 >
-                                                    Delete
+                                                    <span className="fa fa-trash"></span>
                                                 </button>
                                             </div>
                                         </td>
@@ -198,23 +201,25 @@ const UsersList = () => {
                         </tbody>
                     </table>
 
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-center gap-6 mt-6">
                         <button
                             disabled={currentPage === 1}
                             onClick={() => handlePageChange(currentPage - 1)}
-                            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
                         >
-                            Previous
+                            <i className="fas fa-chevron-left"></i>
                         </button>
-                        <span>
+
+                        <span className="text-gray-700 text-sm font-medium">
                             Page {currentPage} of {totalPages}
                         </span>
+
                         <button
                             disabled={currentPage === totalPages}
                             onClick={() => handlePageChange(currentPage + 1)}
-                            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
                         >
-                            Next
+                            <i className="fas fa-chevron-right"></i>
                         </button>
                     </div>
                 </>
@@ -224,23 +229,29 @@ const UsersList = () => {
             <Modal isOpen={isEditModalOpen} onClose={() => closeEditModal()}>
                 <h2 className="text-lg font-bold mb-4">Edit User</h2>
                 <label className="block mb-2">
-                   First Name:
+                    First Name:
                     <input
                         type="text"
                         defaultValue={editForm.first_name}
                         onChange={(e) =>
-                            setEditForm({ ...editForm, first_name: e.target.value })
+                            setEditForm({
+                                ...editForm,
+                                first_name: e.target.value,
+                            })
                         }
                         className="w-full border rounded px-3 py-2 mt-1"
                     />
                 </label>
                 <label className="block mb-2">
-                   Last Name:
+                    Last Name:
                     <input
                         type="text"
                         defaultValue={editForm.last_name}
                         onChange={(e) =>
-                            setEditForm({ ...editForm, last_name: e.target.value })
+                            setEditForm({
+                                ...editForm,
+                                last_name: e.target.value,
+                            })
                         }
                         className="w-full border rounded px-3 py-2 mt-1"
                     />

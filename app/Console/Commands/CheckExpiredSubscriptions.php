@@ -19,6 +19,7 @@ class CheckExpiredSubscriptions extends Command
 
         $expiredSubs = Payment::where('ends_at', '<', now())
             ->whereNull('notified_at')
+            ->where('status', 'successful')
             ->with('user') 
             ->get();
 

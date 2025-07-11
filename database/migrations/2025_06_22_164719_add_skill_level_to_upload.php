@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('uploads', function (Blueprint $table) {
-            $table->enum('skill_level', ['beginner', 'intermediate', 'advanced'])->nullable();
+            $table->string('skill_level')->default('Basic');
         });
     }
 

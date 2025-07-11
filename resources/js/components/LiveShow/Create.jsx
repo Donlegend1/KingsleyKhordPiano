@@ -38,6 +38,7 @@ const LiveShowForm = () => {
                 access_type: "all",
                 start_time: "", 
             })
+            window.location ="/admin/live-shows"
            
         } catch (error) {
             console.error("Error creating live show:", error);

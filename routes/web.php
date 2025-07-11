@@ -92,7 +92,7 @@ Route::post('/contact/send', [ContactController::class, 'create']);
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('roadmap', [GetstartedController::class, 'roadmap']);
-     Route::get('support', [HomeController::class, 'support']);
+    Route::get('support', [HomeController::class, 'support']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
     Route::get('profile', [HomeController::class, 'profile']);
@@ -119,6 +119,8 @@ Route::prefix('admin')->group(function () {
     Route::get('ear-training/{id}', [EarTrainingController::class, 'show']);
     Route::post('/ear-training', [EarTrainingController::class, 'store']);
     Route::get('ear-training/show', [EarTrainingController::class, 'showadmin']);
+    Route::post('ear-training/update/{quiz}', [EarTrainingController::class, 'update']);
+    Route::delete('ear-training/delete/{quiz}', [EarTrainingController::class, 'destroy']);
     Route::get('course/create', [CourseController::class, 'create']);
     Route::post('course', [CourseController::class, 'store']);
     Route::get('uploads/list', [UploadController::class, 'index']);

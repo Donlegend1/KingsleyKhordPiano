@@ -31,6 +31,8 @@ class CourseController extends Controller
     public function store(StoreCourseRequest $request)
     {
         $validated = $request->validated();
+
+        return $validated;
         $course = Course::create($validated);
 
         return response()->json($course, 201);

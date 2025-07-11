@@ -6,7 +6,7 @@ use App\Models\Liveshow;
 use App\Http\Requests\StoreLiveshowRequest;
 use App\Http\Requests\UpdateLiveshowRequest;
 
-class LiveshowController extends Controller
+class LiveShowController extends Controller
 {
     /**
      * Display a listing of the resource.

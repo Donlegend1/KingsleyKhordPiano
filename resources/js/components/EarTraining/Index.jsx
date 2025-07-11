@@ -53,7 +53,6 @@ const EarTraining = () => {
                     withCredentials: true,
                 }
             );
-            console.log(response.data);
             setquizzes(response.data.data);
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
@@ -68,7 +67,7 @@ const EarTraining = () => {
         setLoading(true);
         try {
             const response = await axios.delete(
-                `/api/admin/quizzes/${selectedQuiz.id}`,
+                `/admin/ear-training/delete/${selectedQuiz.id}`,
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
@@ -76,9 +75,9 @@ const EarTraining = () => {
                     withCredentials: true,
                 }
             );
+            fetchQuizzes();
             closeDeleteModal();
-            console.log(response.data);
-            fetchquizzes();
+
         } catch (error) {
             console.error("Error fetching users:", error);
         } finally {
@@ -121,25 +120,48 @@ const EarTraining = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+
+        const formData = new FormData();
+
+        formData.append("title", selectedQuiz.title || "");
+        formData.append("video_url", selectedQuiz.video_url || "");
+        formData.append("description", selectedQuiz.description || "");
+
+        // Files
+        if (selectedQuiz.thumbnail instanceof File) {
+            formData.append("thumbnail", selectedQuiz.thumbnail);
+        }
+
+        if (selectedQuiz.main_audio instanceof File) {
+            formData.append("main_audio", selectedQuiz.main_audio);
+        }
+
+        // Questions (nested)
+        selectedQuiz.questions.forEach((q, index) => {
+            formData.append(`questions[${index}][audio]`, q.audio);
+            formData.append(
+                `questions[${index}][correct_option]`,
+                q.correct_option
+            );
+        });
+
         try {
-            const response = await axios.patch(
-                `/api/admin/quizzes/${selectedQuiz.id}`,
-                selectedQuiz,
+            const response = await axios.post(
+                `/admin/ear-training/update/${selectedQuiz.id}`,
+                formData,
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
+                        "Content-Type": "multipart/form-data",
                     },
                     withCredentials: true,
                 }
             );
-            console.log(response.data);
+
             closeEditModal();
             fetchQuizzes();
         } catch (error) {
-            console.error("Error creating course:", error);
-        } finally {
-            setLoading(false);
+            console.error("Error submitting quiz:", error);
         }
     };
 
@@ -188,16 +210,23 @@ const EarTraining = () => {
                                             {user.title}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.thumbnail}
+                                            <img
+                                                className="object-cover h-10 w-10"
+                                                src={
+                                                    "/storage/" +
+                                                    user.thumbnail_path
+                                                }
+                                                alt=""
+                                            />
                                         </td>
-                                        <td className="py-2 px-4">
+                                        <td className="py-2 px-4 flex">
                                             <button
                                                 onClick={() =>
                                                     openEditModal(user)
                                                 }
                                                 className="bg-blue-500 text-white px-2 py-1 rounded"
                                             >
-                                                Edit
+                                                <span className="fa fa-edit"></span>
                                             </button>
                                             <button
                                                 onClick={() =>
@@ -205,7 +234,7 @@ const EarTraining = () => {
                                                 }
                                                 className="bg-red-500 text-white px-2 py-1 rounded ml-2"
                                             >
-                                                Delete
+                                                <span className="fa fa-trash"></span>
                                             </button>
                                         </td>
                                     </tr>
@@ -223,97 +252,219 @@ const EarTraining = () => {
                         </tbody>
                     </table>
 
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-center gap-6 mt-6">
                         <button
                             disabled={currentPage === 1}
                             onClick={() => handlePageChange(currentPage - 1)}
-                            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
                         >
-                            Previous
+                            <i className="fas fa-chevron-left"></i>
                         </button>
-                        <span>
+
+                        <span className="text-gray-700 text-sm font-medium">
                             Page {currentPage} of {totalPages}
                         </span>
+
                         <button
                             disabled={currentPage === totalPages}
                             onClick={() => handlePageChange(currentPage + 1)}
-                            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
                         >
-                            Next
+                            <i className="fas fa-chevron-right"></i>
                         </button>
                     </div>
                 </>
             )}
 
-            <Modal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-            >
-                <h2 className="text-lg font-bold mb-2">Edit Course</h2>
-                <p>Editing Course: {selectedQuiz?.title}</p>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input
-                            name="title"
-                            placeholder="Title"
-                            defaultValue={selectedQuiz?.title}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
-                        <input
-                            name="category"
-                            placeholder="Category"
-                            defaultValue={selectedQuiz?.category}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
-                        <input
-                            name="video_url"
-                            placeholder="Video URL"
-                            defaultValue={selectedQuiz?.video_url}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
+            <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
+                <div className="max-h-[80vh] overflow-y-auto p-6">
+                    <h2 className="text-lg font-bold mb-4">
+                        Edit Quiz: {selectedQuiz?.title}
+                    </h2>
 
-                        <select
-                            name="status"
-                            defaultValue={selectedQuiz?.status}
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input
+                                name="title"
+                                placeholder="Title"
+                                value={selectedQuiz?.title || ""}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                            />
+
+                            <input
+                                name="video_url"
+                                placeholder="Video URL"
+                                value={selectedQuiz?.video_url || ""}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                            />
+                        </div>
+
+                        <textarea
+                            name="description"
+                            placeholder="Description"
+                            value={selectedQuiz?.description || ""}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
-                        >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="draft">Draft</option>
-                        </select>
+                            rows="4"
+                        ></textarea>
 
-                        <select
-                            name="level"
-                            defaultValue={selectedQuiz?.level}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        >
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </div>
+                        {/* File Uploads */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block mb-1 font-medium">
+                                    Thumbnail
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) =>
+                                        setSelectedQuiz({
+                                            ...selectedQuiz,
+                                            thumbnail: e.target.files[0],
+                                        })
+                                    }
+                                    className="w-full"
+                                />
+                            </div>
 
-                    <textarea
-                        name="description"
-                        placeholder="Description"
-                        defaultValue={selectedQuiz?.description}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                        rows="4"
-                    ></textarea>
+                            <div>
+                                <label className="block mb-1 font-medium">
+                                    Main Audio
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) =>
+                                        setSelectedQuiz({
+                                            ...selectedQuiz,
+                                            main_audio: e.target.files[0],
+                                        })
+                                    }
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
 
-                    <button
-                        type="submit"
-                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300"
-                    >
-                        Save Course
-                    </button>
-                </form>
+                        {/* Questions Section */}
+                        <div>
+                            <h3 className="text-md font-semibold mb-2">
+                                Quiz Questions
+                            </h3>
+
+                            {selectedQuiz?.questions?.map((q, index) => (
+                                <div
+                                    key={index}
+                                    className="border rounded p-4 mb-3"
+                                >
+                                    <div className="mb-2">
+                                        <label className="block mb-1 text-sm">
+                                            Question Audio
+                                        </label>
+                                        <input
+                                            type="file"
+                                            accept="audio/*"
+                                            onChange={(e) => {
+                                                const updatedQuestions = [
+                                                    ...selectedQuiz.questions,
+                                                ];
+                                                updatedQuestions[index].audio =
+                                                    e.target.files[0];
+                                                setSelectedQuiz({
+                                                    ...selectedQuiz,
+                                                    questions: updatedQuestions,
+                                                });
+                                            }}
+                                            className="w-full"
+                                        />
+                                    </div>
+
+                                    <div className="mb-2">
+                                        <label className="block mb-1 text-sm">
+                                            Correct Option
+                                        </label>
+                                        <select
+                                            value={q.correct_option ?? ""}
+                                            onChange={(e) => {
+                                                const updatedQuestions = [
+                                                    ...selectedQuiz.questions,
+                                                ];
+                                                updatedQuestions[
+                                                    index
+                                                ].correct_option =
+                                                    e.target.value;
+                                                setSelectedQuiz({
+                                                    ...selectedQuiz,
+                                                    questions: updatedQuestions,
+                                                });
+                                            }}
+                                            className="w-full p-2 border rounded"
+                                        >
+                                            <option value="">
+                                                Select Option
+                                            </option>
+                                            <option value="0">DOH</option>
+                                            <option value="1">REH</option>
+                                            <option value="2">MI</option>
+                                            <option value="3">FAH</option>
+                                            <option value="4">SOH</option>
+                                            <option value="5">LAH</option>
+                                            <option value="6">TI</option>
+                                        </select>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const updatedQuestions =
+                                                selectedQuiz.questions.filter(
+                                                    (_, i) => i !== index
+                                                );
+                                            setSelectedQuiz({
+                                                ...selectedQuiz,
+                                                questions: updatedQuestions,
+                                            });
+                                        }}
+                                        className="text-red-600 text-sm"
+                                    >
+                                        Remove Question
+                                    </button>
+                                </div>
+                            ))}
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const updatedQuestions =
+                                        selectedQuiz.questions
+                                            ? [...selectedQuiz.questions]
+                                            : [];
+                                    updatedQuestions.push({
+                                        audio: null,
+                                        correct_option: "",
+                                    });
+                                    setSelectedQuiz({
+                                        ...selectedQuiz,
+                                        questions: updatedQuestions,
+                                    });
+                                }}
+                                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                                Add Question
+                            </button>
+                        </div>
+
+                        <div className="flex justify-end mt-6">
+                            <button
+                                type="submit"
+                                className="px-6 py-3 bg-black text-white rounded-lg hover:bg-green-600"
+                            >
+                                Save Quiz
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </Modal>
 
             <Modal

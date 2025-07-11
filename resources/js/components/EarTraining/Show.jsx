@@ -11,12 +11,17 @@ const ShowEartraining = () => {
     const [score, setScore] = useState(0);
     const STANDARD_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
 
-    const lastSegment = window.location.pathname.split("/").filter(Boolean).pop();
+    const lastSegment = window.location.pathname
+        .split("/")
+        .filter(Boolean)
+        .pop();
 
     useEffect(() => {
         const fetchQuiz = async () => {
             try {
-                const response = await axios.get(`/admin/ear-training/${lastSegment}`);
+                const response = await axios.get(
+                    `/admin/ear-training/${lastSegment}`
+                );
                 setQuiz(response.data);
             } catch (error) {
                 console.error("Error fetching quiz:", error);
@@ -69,7 +74,8 @@ const ShowEartraining = () => {
     };
 
     const percentageCompleted = Math.round(
-        ((currentQuestion + (isSubmitted ? 1 : 0)) / quiz.questions.length) * 100
+        ((currentQuestion + (isSubmitted ? 1 : 0)) / quiz.questions.length) *
+            100
     );
 
     return (
@@ -90,16 +96,21 @@ const ShowEartraining = () => {
             </div>
 
             {/* Main Video */}
-            <div className="mb-6" dangerouslySetInnerHTML={{ __html: quiz.video_url }} />
+            <div
+                className="mb-6"
+                dangerouslySetInnerHTML={{ __html: quiz.video_url }}
+            />
 
             {/* Main Audio */}
             {quiz.main_audio_path && (
-                <div className="mb-6 border bg-red-100 rounded-full">
-                    <p className="font-semibold mb-2">Main Audio:</p>
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm">
+                    <p className="font-semibold text-red-700 mb-3 text-lg">
+                        Main Audio
+                    </p>
                     <audio
                         controls
                         src={`/storage/${quiz.main_audio_path}`}
-                        className="w-full max-w-2xl"
+                        className="w-full max-w-2xl rounded-lg"
                     />
                 </div>
             )}
@@ -107,14 +118,16 @@ const ShowEartraining = () => {
             {!showResult ? (
                 <>
                     {/* Question Audio */}
-                    <div className="mb-4">
-                        <p className="text-lg font-medium mb-2">
-                            Question {currentQuestion + 1} of {quiz.questions.length}
+                    <div className="mb-6 text-center">
+                        <p className="text-lg font-semibold mb-4">
+                            Question {currentQuestion + 1} of{" "}
+                            {quiz.questions.length}
                         </p>
                         <audio
                             controls
+                            autoPlay
                             src={`/storage/${question.audio_path}`}
-                            className="mb-4 w-full"
+                            className="w-full max-w-md mx-auto rounded"
                         />
                     </div>
 
@@ -125,31 +138,43 @@ const ShowEartraining = () => {
                                 key={i}
                                 onClick={() => handleOptionSelect(i)}
                                 disabled={isSubmitted}
-                                className={`w-full p-3 border rounded-lg text-left 
-                                    ${selectedOption === i ? "bg-blue-100 border-blue-500" : "bg-gray-50"} 
-                                    ${isSubmitted && i === question.correct_option ? "border-green-500 bg-green-100" : ""}
-                                    ${
-                                        isSubmitted &&
-                                        selectedOption === i &&
-                                        selectedOption !== question.correct_option
-                                            ? "border-red-500 bg-red-100"
-                                            : ""
-                                    }`}
+                                className={`w-full p-3 border rounded-lg text-left transition
+                        ${
+                            selectedOption === i
+                                ? "bg-blue-100 border-blue-500"
+                                : "bg-gray-50"
+                        }
+                        ${
+                            isSubmitted && i === question.correct_option
+                                ? "border-green-500 bg-green-100"
+                                : ""
+                        }
+                        ${
+                            isSubmitted &&
+                            selectedOption === i &&
+                            selectedOption !== question.correct_option
+                                ? "border-red-500 bg-red-100"
+                                : ""
+                        }
+                    `}
                             >
                                 {opt}
                             </button>
                         ))}
                     </div>
 
-                    {/* Correct Answer Feedback */}
+                    {/* Correct Answer */}
                     {isSubmitted && (
-                        <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700">
-                            Correct Answer: <strong>{STANDARD_OPTIONS[question.correct_option]}</strong>
+                        <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded">
+                            Correct Answer:{" "}
+                            <strong>
+                                {STANDARD_OPTIONS[question.correct_option]}
+                            </strong>
                         </div>
                     )}
 
                     {/* Navigation Buttons */}
-                    <div className="mt-6 flex justify-between">
+                    <div className="mt-6 flex flex-wrap gap-4 justify-between">
                         {currentQuestion > 0 && (
                             <button
                                 onClick={handlePrevious}
@@ -158,11 +183,16 @@ const ShowEartraining = () => {
                                 Previous
                             </button>
                         )}
+
                         {!isSubmitted ? (
                             <button
                                 onClick={handleSubmit}
                                 disabled={selectedOption === null}
-                                className="bg-black text-white px-6 py-2 rounded hover:bg-blue-600 hover:text-black transition"
+                                className={`px-6 py-2 rounded transition ${
+                                    selectedOption === null
+                                        ? "bg-gray-300 text-black cursor-not-allowed"
+                                        : "bg-black text-white hover:bg-blue-600 hover:text-black"
+                                }`}
                             >
                                 Submit Answer
                             </button>
@@ -171,14 +201,18 @@ const ShowEartraining = () => {
                                 onClick={handleNext}
                                 className="bg-gray-800 text-white px-6 py-2 rounded hover:bg-green-500 hover:text-black transition"
                             >
-                                {currentQuestion === quiz.questions.length - 1 ? "Finish" : "Next Question"}
+                                {currentQuestion === quiz.questions.length - 1
+                                    ? "Finish"
+                                    : "Next Question"}
                             </button>
                         )}
                     </div>
                 </>
             ) : (
                 <div className="text-center">
-                    <h3 className="text-xl font-semibold mb-2">Quiz Complete!</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                        Quiz Complete!
+                    </h3>
                     <p className="text-lg">
                         Your Score: {score} / {quiz.questions.length}
                     </p>
@@ -189,7 +223,9 @@ const ShowEartraining = () => {
 };
 
 // Mount the component
-if (document.getElementById("ear-training-quiz")) {
-    const root = ReactDOM.createRoot(document.getElementById("ear-training-quiz"));
+if (document.getElementById("ear-training-quiz-show")) {
+    const root = ReactDOM.createRoot(
+        document.getElementById("ear-training-quiz-show")
+    );
     root.render(<ShowEartraining />);
 }

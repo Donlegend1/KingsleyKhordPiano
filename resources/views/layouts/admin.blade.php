@@ -21,14 +21,22 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-<div class="min-h-screen flex">
+<div class="min-h-screen flex flex-col md:flex-row">
+  <!-- Mobile Header -->
+  <header class="flex items-center justify-between bg-black text-white p-4 md:hidden">
+    <a href="/home" class="text-xl font-bold"><img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8"></a>
+    <button id="menu-toggle" class="text-white focus:outline-none">
+      <i class="fa fa-bars text-2xl"></i>
+    </button>
+  </header>
+
   <!-- Sidebar -->
-  <aside class="w-64 bg-black shadow-lg p-6 text-white">
+  <aside id="sidebar" class="w-64 bg-black shadow-lg p-6 text-white fixed md:static top-0 left-0  transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 md:z-auto">
     <div class="mb-10">
       <a href="/home" class="text-2xl font-bold"><img src="/logo/logo.png" alt="KingsleyKhord logo"></a>
     </div>
     <nav class="space-y-4">
-      <a href="/home" class="flex items-center border border-gray-600 gap-3 p-2 rounded-lg hover:bg-gray-200">
+      <a href="/home" class="flex items-center border border-gray-600 gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
         <i class="fa fa-home"></i>
         <span>Dashboard</span>
       </a>
@@ -36,10 +44,10 @@
         <i class="fa fa-user"></i>
         <span>Users</span>
       </a>
-      <a href="/admin/courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+      {{-- <a href="/admin/courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
         <i class="fa fa-file"></i>
         <span>Courses</span>
-      </a>
+      </a> --}}
       <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
         <i class="fa fa-leanpub" aria-hidden="true"></i>
         <span>Ear Training</span>
@@ -52,23 +60,33 @@
         <i class="fa fa-upload"></i>
         <span>Others</span>
       </a>
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200">
+      <a href="/member/profile" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
         <i class="fa fa-cog"></i>
         <span>Settings</span>
       </a>
-       <form method="POST" action="{{ route('logout') }}">
+      <form method="POST" action="{{ route('logout') }}">
         @csrf
-        <button class="flex items-center gap-3 p-2 rounded-lg hover:bg-yellow-400 hover:text-black" type="submit" >
-           <i class="fa fa-sign-out-alt"></i> {{ __('Logout') }}
+        <button class="flex items-center gap-3 p-2 rounded-lg hover:bg-yellow-400 hover:text-black" type="submit">
+          <i class="fa fa-sign-out-alt"></i> {{ __('Logout') }}
         </button>
-    </form>
-     
+      </form>
     </nav>
   </aside>
 
-   @yield('content')
-       
+  <!-- Page Content -->
+  <main class="flex-1 ml-0">
+    @yield('content')
+  </main>
 </div>
 
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const sidebar = document.getElementById('sidebar');
+
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+</script>
 </body>
+
 </html>

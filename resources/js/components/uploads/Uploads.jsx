@@ -210,14 +210,14 @@ const UploadList = () => {
                                         <td className="py-2 px-4">
                                             {user.status}
                                         </td>
-                                        <td className="py-2 px-4">
+                                        <td className="py-2 px-4 flex justify-center text-center items-center">
                                             <button
                                                 onClick={() =>
                                                     openEditModal(user)
                                                 }
                                                 className="bg-blue-500 text-white px-2 py-1 rounded"
                                             >
-                                                Edit
+                                                <span className="fa fa-edit"></span>
                                             </button>
                                             <button
                                                 onClick={() =>
@@ -225,7 +225,7 @@ const UploadList = () => {
                                                 }
                                                 className="bg-red-500 text-white px-2 py-1 rounded ml-2"
                                             >
-                                                Delete
+                                                <span className="fa fa-trash"></span>
                                             </button>
                                         </td>
                                     </tr>
@@ -243,23 +243,25 @@ const UploadList = () => {
                         </tbody>
                     </table>
 
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-center gap-6 mt-6">
                         <button
                             disabled={currentPage === 1}
                             onClick={() => handlePageChange(currentPage - 1)}
-                            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
                         >
-                            Previous
+                            <i className="fas fa-chevron-left"></i>
                         </button>
-                        <span>
+
+                        <span className="text-gray-700 text-sm font-medium">
                             Page {currentPage} of {totalPages}
                         </span>
+
                         <button
                             disabled={currentPage === totalPages}
                             onClick={() => handlePageChange(currentPage + 1)}
-                            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
                         >
-                            Next
+                            <i className="fas fa-chevron-right"></i>
                         </button>
                     </div>
                 </>
