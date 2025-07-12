@@ -5,6 +5,7 @@ import ReactDOM from "react-dom/client";
 const CreateEarTrainingQuiz = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [category, setCategory] = useState("");
     const [videoUrl, setVideoUrl] = useState("");
     const [thumbnail, setThumbnail] = useState(null);
     const [mainAudio, setMainAudio] = useState(null);
@@ -13,8 +14,82 @@ const CreateEarTrainingQuiz = () => {
     ]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
+    const categories = [
+        "Relative Pitch",
+        "Di-tone Pitch",
+        "Diatonic Intervals",
+        "Non-diatonic Intervals",
+        "Intervals",
+        "Basic Triad",
+        "7 Degree Chords",
+        "7 Degree Chords (secondary)",
+        "7 Degree Chords (general)",
+    ];
 
-    const STANDARD_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
+    const RELATIVE_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
+    const DITONE_OPTIONS = [
+        "DOH MI",
+        "REH FAH",
+        "MI SOH",
+        "FAH LAH",
+        "SOH TI",
+        "LAH DOH",
+        "TI REH",
+    ];
+    const DIATOMIC_OPTIONS = [
+        "Major 2nd",
+        "Major 3rd",
+        "Perfect 4th",
+        "Perfect 5th",
+        "Major 6th",
+        "Major 7th",
+        "Octave",
+    ];
+    const NONDIATOMIC_OPTIONS = [
+        "Minor 2nd",
+        "Minor 3rd",
+        "tri tone",
+        "Minor 6th",
+        "Minor 7th",
+    ];
+    const INTERVALS = [
+        "Minor 2nd",
+        "Major 2nd",
+        "Minor 3rd",
+        "Major 3rd",
+        "Perfect 4th",
+        "Tri tone",
+        "Perfect 5th",
+        "Minor 6th",
+        "Major 6th",
+        "Minor 7th",
+        "Major 7th",
+        "Octave",
+    ];
+    const BASICTRIADS = ["Augmented", "Diminished", "Major", "Minor", "Sus"];
+    const DEGREECHORD = [
+        "Diminished 7th",
+        "Dominant 7th",
+        "Half Diminished",
+        "Major 7th",
+        "Minor 7th",
+    ];
+    const DEGREECHORDs = [
+        "Diminished 7 (b5)",
+        "Minor Major 7",
+        "Major 7 (b5)",
+        "Dominant 7 (b13)",
+        "Diminished Major 7th",
+        "Major 7 (b13)",
+    ];
+    const DEGREECHORDg = [
+        "Dominant 7 (b5)",
+        "Minor Major 7",
+        "Major 7 (b5)",
+        "Dominant 7 (b13)",
+        "Diminished Major 7th",
+        "Major 7 (b13)",
+    ];
 
     const handleQuestionChange = (index, field, value) => {
         const updated = [...questions];
@@ -39,13 +114,17 @@ const CreateEarTrainingQuiz = () => {
         const formData = new FormData();
         formData.append("title", title);
         formData.append("description", description);
+        formData.append("category", category);
         formData.append("video_url", videoUrl);
         formData.append("thumbnail", thumbnail);
         formData.append("main_audio", mainAudio);
 
         questions.forEach((q, index) => {
             formData.append(`questions[${index}][audio]`, q.audio);
-            formData.append(`questions[${index}][correct_option]`, q.correct_option);
+            formData.append(
+                `questions[${index}][correct_option]`,
+                q.correct_option
+            );
         });
 
         try {
@@ -57,6 +136,7 @@ const CreateEarTrainingQuiz = () => {
             setTitle("");
             setDescription("");
             setVideoUrl("");
+            setCategory("")
             setThumbnail(null);
             setMainAudio(null);
             setQuestions([{ audio: null, correct_option: "" }]);
@@ -70,7 +150,9 @@ const CreateEarTrainingQuiz = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow mt-8">
-            <h2 className="text-2xl font-bold mb-6">Create New Ear Training Quiz</h2>
+            <h2 className="text-2xl font-bold mb-6">
+                Create New Ear Training Quiz
+            </h2>
 
             {successMessage && (
                 <div className="mb-4 p-4 bg-green-100 border border-green-500 rounded">
@@ -79,6 +161,22 @@ const CreateEarTrainingQuiz = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="block mb-1 font-medium">Categories</label>
+                    <select
+                        name=""
+                        id=""
+                        className="w-full p-2 border rounded"
+                        onChange={(e) => setCategory(e.target.value)}
+                    >
+                        <option value="">--select-</option>
+                        {categories.map((catgory, index) => (
+                            <option value={catgory} key={index}>
+                                {catgory}
+                            </option>
+                        ))}
+                    </select>
+                </div>
                 <div>
                     <label className="block mb-1 font-medium">Title</label>
                     <input
@@ -91,7 +189,9 @@ const CreateEarTrainingQuiz = () => {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium">Description</label>
+                    <label className="block mb-1 font-medium">
+                        Description
+                    </label>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
@@ -100,7 +200,9 @@ const CreateEarTrainingQuiz = () => {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium">Video Embed Code (iframe)</label>
+                    <label className="block mb-1 font-medium">
+                        Video Embed Code (iframe)
+                    </label>
                     <textarea
                         value={videoUrl}
                         onChange={(e) => setVideoUrl(e.target.value)}
@@ -109,7 +211,9 @@ const CreateEarTrainingQuiz = () => {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium">Thumbnail Image</label>
+                    <label className="block mb-1 font-medium">
+                        Thumbnail Image
+                    </label>
                     <input
                         type="file"
                         accept="image/*"
@@ -135,30 +239,99 @@ const CreateEarTrainingQuiz = () => {
                     {questions.map((q, index) => (
                         <div key={index} className="border p-4 rounded mb-4">
                             <div className="mb-2">
-                                <label className="block mb-1 font-medium">Question Audio</label>
+                                <label className="block mb-1 font-medium">
+                                    Question Audio
+                                </label>
                                 <input
                                     type="file"
                                     accept="audio/*"
-                                    onChange={(e) => handleQuestionChange(index, "audio", e.target.files[0])}
+                                    onChange={(e) =>
+                                        handleQuestionChange(
+                                            index,
+                                            "audio",
+                                            e.target.files[0]
+                                        )
+                                    }
                                     required
                                     className="w-full"
                                 />
                             </div>
 
                             <div className="mb-2">
-                                <label className="block mb-1 font-medium">Correct Option</label>
+                                <label className="block mb-1 font-medium">
+                                    Correct Option
+                                </label>
                                 <select
                                     value={q.correct_option}
-                                    onChange={(e) => handleQuestionChange(index, "correct_option", e.target.value)}
+                                    onChange={(e) =>
+                                        handleQuestionChange(
+                                            index,
+                                            "correct_option",
+                                            e.target.value
+                                        )
+                                    }
                                     required
                                     className="w-full p-2 border rounded"
                                 >
-                                    <option value="">-- Select Correct Option --</option>
-                                    {STANDARD_OPTIONS.map((opt, i) => (
-                                        <option key={i} value={i}>
-                                            {opt}
-                                        </option>
-                                    ))}
+                                    <option value="">
+                                        -- Select Correct Option --
+                                    </option>
+
+                                    {category === "Relative Pitch" &&
+                                        RELATIVE_OPTIONS.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category === "Di-tone Pitch" &&
+                                        DITONE_OPTIONS.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category === "Diatonic Intervals" &&
+                                        DIATOMIC_OPTIONS.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category === "Non-diatonic Intervals" &&
+                                        NONDIATOMIC_OPTIONS.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category === "Intervals" &&
+                                        INTERVALS.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category === "Basic Triad" &&
+                                        BASICTRIADS.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category === "7 Degree Chords" &&
+                                        DEGREECHORD.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category ===
+                                        "7 Degree Chords (secondary)" &&
+                                        DEGREECHORDs.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category === "7 Degree Chords (general)" &&
+                                        DEGREECHORDg.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
                                 </select>
                             </div>
 
@@ -200,6 +373,8 @@ const CreateEarTrainingQuiz = () => {
 export default CreateEarTrainingQuiz;
 
 if (document.getElementById("ear-training-quiz")) {
-    const root = ReactDOM.createRoot(document.getElementById("ear-training-quiz"));
+    const root = ReactDOM.createRoot(
+        document.getElementById("ear-training-quiz")
+    );
     root.render(<CreateEarTrainingQuiz />);
 }

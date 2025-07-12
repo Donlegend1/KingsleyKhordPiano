@@ -23,14 +23,28 @@ const LiveShowCard = () => {
     dayjs.extend(isoWeek);
 
     useEffect(() => {
-        axios.get("/api/live-shows").then((res) => {
-            setShows(res.data);
-            const countdownsObj = {};
-            res.data.forEach((show) => {
-                countdownsObj[show.id] = calculateCountdown(show.start_time);
-            });
-            setCountdowns(countdownsObj);
-        });
+        const fetchShows = async () => {
+            try {
+                const res = await axios.get("/api/live-shows", {
+                    params: { filter: "future" }, // or "previous"
+                });
+
+                setShows(res.data);
+
+                const countdownsObj = {};
+                res.data.forEach((show) => {
+                    countdownsObj[show.id] = calculateCountdown(
+                        show.start_time
+                    );
+                });
+
+                setCountdowns(countdownsObj);
+            } catch (error) {
+                console.error("Error fetching live shows:", error);
+            }
+        };
+
+        fetchShows();
     }, []);
 
     useEffect(() => {
@@ -94,7 +108,15 @@ const LiveShowCard = () => {
                                 {/* Premium badge */}
                                 {show.access_type === "premium" && (
                                     <div className="absolute top-2 right-2 bg-black text-white text-xs font-semibold px-2 py-1 rounded shadow-md z-20">
-                                        Premium
+                                        <div className="flex gap-2">
+                                            <p>Premium</p>
+
+                                            <img
+                                                src="/icons/diamondred.png"
+                                                alt="Premium Icon"
+                                                class="w-4 h-4"
+                                            ></img>
+                                        </div>
                                     </div>
                                 )}
 

@@ -9,7 +9,71 @@ const ShowEartraining = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [showResult, setShowResult] = useState(false);
     const [score, setScore] = useState(0);
-    const STANDARD_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
+
+    const RELATIVE_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
+    const DITONE_OPTIONS = [
+        "DOH MI",
+        "REH FAH",
+        "MI SOH",
+        "FAH LAH",
+        "SOH TI",
+        "LAH DOH",
+        "TI REH",
+    ];
+    const DIATOMIC_OPTIONS = [
+        "Major 2nd",
+        "Major 3rd",
+        "Perfect 4th",
+        "Perfect 5th",
+        "Major 6th",
+        "Major 7th",
+        "Octave",
+    ];
+    const NONDIATOMIC_OPTIONS = [
+        "Minor 2nd",
+        "Minor 3rd",
+        "tri tone",
+        "Minor 6th",
+        "Minor 7th",
+    ];
+    const INTERVALS = [
+        "Minor 2nd",
+        "Major 2nd",
+        "Minor 3rd",
+        "Major 3rd",
+        "Perfect 4th",
+        "Tri tone",
+        "Perfect 5th",
+        "Minor 6th",
+        "Major 6th",
+        "Minor 7th",
+        "Major 7th",
+        "Octave",
+    ];
+    const BASICTRIADS = ["Augmented", "Diminished", "Major", "Minor", "Sus"];
+    const DEGREECHORD = [
+        "Diminished 7th",
+        "Dominant 7th",
+        "Half Diminished",
+        "Major 7th",
+        "Minor 7th",
+    ];
+    const DEGREECHORDs = [
+        "Diminished 7 (b5)",
+        "Minor Major 7",
+        "Major 7 (b5)",
+        "Dominant 7 (b13)",
+        "Diminished Major 7th",
+        "Major 7 (b13)",
+    ];
+    const DEGREECHORDg = [
+        "Dominant 7 (b5)",
+        "Minor Major 7",
+        "Major 7 (b5)",
+        "Dominant 7 (b13)",
+        "Diminished Major 7th",
+        "Major 7 (b13)",
+    ];
 
     const lastSegment = window.location.pathname
         .split("/")
@@ -50,9 +114,11 @@ const ShowEartraining = () => {
         if (selectedOption === null) return;
 
         setIsSubmitted(true);
-        if (selectedOption === question.correct_option) {
-            setScore((prev) => prev + 1);
-        }
+        setScore((prevScore) =>
+            parseInt(selectedOption) === parseInt(question.correct_option)
+                ? prevScore + 1
+                : prevScore
+        );
     };
 
     const handleNext = () => {
@@ -77,6 +143,31 @@ const ShowEartraining = () => {
         ((currentQuestion + (isSubmitted ? 1 : 0)) / quiz.questions.length) *
             100
     );
+
+    const getOptionsByCategory = (category) => {
+        switch (category) {
+            case "Relative Pitch":
+                return RELATIVE_OPTIONS;
+            case "Di-tone Pitch":
+                return DITONE_OPTIONS;
+            case "Diatomic":
+                return DIATOMIC_OPTIONS;
+            case "Non-Diatomic":
+                return NONDIATOMIC_OPTIONS;
+            case "Intervals":
+                return INTERVALS;
+            case "Basic Triads":
+                return BASICTRIADS;
+            case "Degree Chords":
+                return DEGREECHORD;
+            case "Degree Chords S":
+                return DEGREECHORDs;
+            case "Degree Chords G":
+                return DEGREECHORDg;
+            default:
+                return [];
+        }
+    };
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg mt-6">
@@ -133,30 +224,21 @@ const ShowEartraining = () => {
 
                     {/* Options */}
                     <div className="space-y-3 mb-6">
-                        {STANDARD_OPTIONS.map((opt, i) => (
+                        {getOptionsByCategory(quiz.category).map((opt, i) => (
                             <button
                                 key={i}
                                 onClick={() => handleOptionSelect(i)}
                                 disabled={isSubmitted}
-                                className={`w-full p-3 border rounded-lg text-left transition
-                        ${
-                            selectedOption === i
-                                ? "bg-blue-100 border-blue-500"
-                                : "bg-gray-50"
-                        }
-                        ${
-                            isSubmitted && i === question.correct_option
-                                ? "border-green-500 bg-green-100"
-                                : ""
-                        }
-                        ${
-                            isSubmitted &&
-                            selectedOption === i &&
-                            selectedOption !== question.correct_option
-                                ? "border-red-500 bg-red-100"
-                                : ""
-                        }
-                    `}
+                                className={`w-full p-3 border rounded-lg text-left transition ${
+                                    isSubmitted &&
+                                    i === parseInt(question.correct_option)
+                                        ? "bg-green-100 border-green-500"
+                                        : isSubmitted && selectedOption === i
+                                        ? "bg-red-100 border-red-500"
+                                        : selectedOption === i
+                                        ? "bg-blue-100 border-blue-500"
+                                        : "bg-gray-50"
+                                }`}
                             >
                                 {opt}
                             </button>
@@ -168,7 +250,11 @@ const ShowEartraining = () => {
                         <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded">
                             Correct Answer:{" "}
                             <strong>
-                                {STANDARD_OPTIONS[question.correct_option]}
+                                {
+                                    getOptionsByCategory(quiz.category)[
+                                        question.correct_option
+                                    ]
+                                }
                             </strong>
                         </div>
                     )}
