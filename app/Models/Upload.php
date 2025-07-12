@@ -17,11 +17,13 @@ class Upload extends Model
         'status',
         'skill_level',
         'thumbnail',
+        'tags'
     ];
 
     protected $casts = [
         'category' => 'string',
         'status' => 'string',
+        'tags' => 'array',
     ];
 
     protected $appends = ['thumbnail_url'];

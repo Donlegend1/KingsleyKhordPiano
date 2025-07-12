@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Select from "react-select";
 import axios from "axios";
 import {
     useFlashMessage,
@@ -9,6 +10,18 @@ import {
 const UploadForm = () => {
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const { showMessage } = useFlashMessage();
+    const [tagOptions, setUploadList] = useState([]);
+
+    const [selectedTags, setSelectedTags] = useState([]);
+
+    const handleTagsChange = (selectedOptions) => {
+        setSelectedTags(selectedOptions);
+    };
+
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
+
     const [upload, setUpload] = useState({
         // tumbnail: null,
         title: "",
@@ -37,11 +50,7 @@ const UploadForm = () => {
         "Dexterity",
     ];
 
-    const pianoGroup = [
-        "Basic",
-        "Competent",
-        "Challenging",
-    ];
+    const pianoGroup = ["Basic", "Competent", "Challenging"];
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -52,39 +61,73 @@ const UploadForm = () => {
         setThumbnailFile(e.target.files[0]);
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setSaving(true);
+    const fetchCourses = async () => {
+    try {
+        const response = await axios.get(`/admin/upload-list`, {
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+            },
+            withCredentials: true,
+        });
+        const formatted = response?.data.map((item) => ({
+            value: item.id,
+            label: item.title, 
+        }));
 
-        const formData = new FormData();
-        formData.append("thumbnail", thumbnailFile);
-        Object.entries(upload).forEach(([key, value]) =>
-            formData.append(key, value)
-        );
-
-        try {
-            const response = await axios.post("/admin/upload/store", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            showMessage("Record Saved successfully.", "success");
-            setUpload({
-                title: "",
-                category: "",
-                description: "",
-                video_url: "",
-                level: "",
-                skill_level: "",
-                status: "active",
-            });
-        } catch (error) {
-            showMessage("Error creating upload.", "error");
-            console.error("Error creating upload:", error);
-        } finally {
-            setSaving(false);
-        }
+        setUploadList(formatted);
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+    }
     };
+
+
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+
+    const formData = new FormData();
+    formData.append("thumbnail", thumbnailFile);
+
+    // Upload fields
+    Object.entries(upload).forEach(([key, value]) =>
+        formData.append(key, value)
+    );
+
+    // Append selected tag IDs as an array
+    selectedTags.forEach((tag, index) => {
+        formData.append(`tags[${index}]`, tag.value);
+    });
+
+    try {
+        const response = await axios.post("/admin/upload/store", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+
+        showMessage("Record Saved successfully.", "success");
+        setUpload({
+            title: "",
+            category: "",
+            description: "",
+            video_url: "",
+            level: "",
+            skill_level: "",
+            status: "active",
+        });
+        setSelectedTags([]);
+    } catch (error) {
+        showMessage("Error creating upload.", "error");
+        console.error("Error creating upload:", error);
+    } finally {
+        setSaving(false);
+    }
+};
+
+
+    useEffect(() => {
+        fetchCourses();
+    }, []);
 
     return (
         <div className="p-8 bg-white rounded-lg shadow-lg max-w-2xl mx-auto">
@@ -220,22 +263,41 @@ const UploadForm = () => {
                             >
                                 <option value="">Select</option>
 
-                                 {upload.category === "piano exercise"
-                                ? pianoGroup.map((level) => (
-                                      <option key={level} value={level}>
-                                          {level.charAt(0).toUpperCase() +
-                                              level.slice(1)}
-                                      </option>
-                                  ))
-                                : levels.map((level) => (
-                                      <option key={level} value={level}>
-                                          {level.charAt(0).toUpperCase() +
-                                              level.slice(1)}
-                                      </option>
-                                  ))}
+                                {upload.category === "piano exercise"
+                                    ? pianoGroup.map((level) => (
+                                          <option key={level} value={level}>
+                                              {level.charAt(0).toUpperCase() +
+                                                  level.slice(1)}
+                                          </option>
+                                      ))
+                                    : levels.map((level) => (
+                                          <option key={level} value={level}>
+                                              {level.charAt(0).toUpperCase() +
+                                                  level.slice(1)}
+                                          </option>
+                                      ))}
                             </select>
                         </div>
                     )}
+                    <div>
+                        <label
+                            htmlFor="tags"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Related Courses
+                        </label>
+                        <Select
+                            id="tags"
+                            isMulti
+                            name="tags"
+                            options={tagOptions}
+                            value={selectedTags}
+                            onChange={handleTagsChange}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                        />
+                    </div>
+
                     {/* Status */}
                     <div>
                         <label

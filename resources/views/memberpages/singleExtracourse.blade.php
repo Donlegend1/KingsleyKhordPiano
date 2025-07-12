@@ -53,17 +53,22 @@
 
  <!-- Sidebar -->
  <aside class="w-64 bg-white rounded-lg shadow-lg p-4 space-y-8">
-  <!-- Product List -->
+  <!-- Related Products -->
   <div class="space-y-4">
-    <h3 class="text-xl font-semibold text-gray-800 mb-2">Related Products</h3>
-    <ul class="space-y-2">
-      @foreach ($relatedUploads as $item)
-        <li>
-        <a href="/member/lesson/{{$item->id}}" class="text-blue-600 hover:underline">{{$item->title}}</a>
-      </li>
-      @endforeach
-     
-    </ul>
+    <h3 class="text-xl font-semibold text-gray-800 mb-2">Related Courses</h3>
+    @if ($relatedUploads->isNotEmpty())
+      <ul class="space-y-2">
+        @foreach ($relatedUploads as $item)
+          <li>
+            <a href="/member/lesson/{{$item->id}}" class="text-blue-600 hover:underline">
+              {{ $item->title }}
+            </a>
+          </li>
+        @endforeach
+      </ul>
+    @else
+      <p class="text-gray-500 text-sm">No related course available.</p>
+    @endif
   </div>
 
   <!-- Latest Comments -->
@@ -100,6 +105,7 @@
     </ul>
   </div>
 </aside>
+
 
 </section>
 

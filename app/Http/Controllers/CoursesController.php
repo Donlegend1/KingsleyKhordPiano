@@ -26,17 +26,15 @@ class CoursesController extends Controller
     }
 
     function singleCourse($id) {
+        $lesson = Upload::findOrFail($id);
 
-        $lesson = Upload::where('id', $id)->first();
+        $relatedUploads = collect();
 
-        if (!$lesson) {
-            abort(404); 
+        if (is_array($lesson->tags) && count($lesson->tags)) {
+            $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
         }
 
-        $relatedUploads = Upload::where('category', $lesson->category)
-                                ->where('id', '!=', $id)
-                                ->get();
+        return view('memberpages.singleExtracourse', compact('lesson', 'relatedUploads'));
+    }
 
-    return view('memberpages.singleExtracourse', compact('lesson', 'relatedUploads'));
-}
 }

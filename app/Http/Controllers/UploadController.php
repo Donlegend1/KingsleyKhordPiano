@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Upload;
 use App\Http\Requests\StoreUploadRequest;
 use App\Http\Requests\UpdateUploadRequest;
+use Illuminate\Http\Request;
 
 class UploadController extends Controller
 {
@@ -39,6 +40,7 @@ class UploadController extends Controller
         'level',
         'skill_level',
         'status',
+        'tags'
     ]);
 
     // Handle file upload
@@ -85,8 +87,14 @@ class UploadController extends Controller
         //
     }
 
-    public function uploadList(){
-        $uploads = Upload::paginate(10);
-        return  response()->json($uploads, 200);
+    public function uploadList(Request $request)
+    {
+        if ($request->has('page')) {
+            $uploads = Upload::paginate(10);
+        } else {
+            $uploads = Upload::all();
+        }
+
+        return response()->json($uploads, 200);
     }
 }
