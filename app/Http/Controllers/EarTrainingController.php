@@ -56,6 +56,7 @@ class EarTrainingController extends Controller
 
    public function store(StoreQuizRequest $request)
     {
+        
        $thumbnailPath = $request->file('thumbnail')->store('ear_training/thumbnails', 'public');
         $mainAudioPath = $request->file('main_audio')->store('ear_training/main_audios', 'public');
 
@@ -65,6 +66,7 @@ class EarTrainingController extends Controller
             'video_url' => $request->video_url,
             'thumbnail_path' => $thumbnailPath,
             'main_audio_path' => $mainAudioPath,
+            'category' => $request->category,
         ]);
 
         foreach ($request->questions as $q) {
@@ -91,6 +93,10 @@ class EarTrainingController extends Controller
 
         if ($request->has('description')) {
             $quiz->description = $request->input('description');
+        }
+
+        if ($request->has('category')) {
+            $quiz->category = $request->input('category');
         }
 
         if ($request->has('video_url')) {

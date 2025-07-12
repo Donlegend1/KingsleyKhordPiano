@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Quiz extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'description', 'video_url', 'thumbnail_path', 'main_audio_path'];
+    protected $fillable = ['title', 'description', 'video_url', 'thumbnail_path', 'main_audio_path', 'category'];
 
     public function questions()
     {

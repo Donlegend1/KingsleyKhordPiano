@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Liveshow;
 use App\Http\Requests\StoreLiveshowRequest;
 use App\Http\Requests\UpdateLiveshowRequest;
+ use Carbon\Carbon;
+ use Illuminate\Http\Request;
 
 class LiveShowController extends Controller
 {
@@ -76,16 +78,25 @@ class LiveShowController extends Controller
      * Remove the specified resource from storage.
      */
    public function destroy(Liveshow $liveshow)
-{
-    $liveshow->delete();
-
-    return response()->json([
-        'message' => 'Live show deleted successfully.'
-    ]);
-}
-
-    public function list()
     {
-        return response()->json(LiveShow::orderBy('start_time')->get());
+        $liveshow->delete();
+
+        return response()->json([
+            'message' => 'Live show deleted successfully.'
+        ]);
+    }
+
+    public function list(Request $request)
+    {
+        $filter = $request->query('filter');
+        $query = LiveShow::query()->orderBy('start_time');
+
+        if ($filter === 'future') {
+            $query->where('start_time', '>', Carbon::now());
+        } elseif ($filter === 'previous') {
+            $query->where('start_time', '<=', Carbon::now());
+        }
+
+        return response()->json($query->get());
     }
 }
