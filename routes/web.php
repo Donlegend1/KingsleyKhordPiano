@@ -121,6 +121,8 @@ Route::prefix('admin')->group(function () {
     Route::get('ear-training/show', [EarTrainingController::class, 'showadmin']);
     Route::post('ear-training/update/{quiz}', [EarTrainingController::class, 'update']);
     Route::delete('ear-training/delete/{quiz}', [EarTrainingController::class, 'destroy']);
+    Route::delete('ear-training/question/{question}', [EarTrainingController::class, 'deleteQuestion']);
+    Route::post('/ear-training/{quiz}/questions', [EarTrainingController::class, 'storeQuestions']);
     Route::get('course/create', [CourseController::class, 'create']);
     Route::post('course', [CourseController::class, 'store']);
     Route::get('uploads/list', [UploadController::class, 'index']);

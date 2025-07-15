@@ -19,26 +19,27 @@ class EarTrainingController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    function earTraining() {
+    public function earTraining() {
         $data = Quiz::all();
         return view('memberpages.eartraining', compact('data'));
     }
 
-    function create() {
+    public function create() {
 
         return view('admin.eartraining.create');
     }
 
-    function index() {
+    public function index() {
        $quizzes = Quiz::with('questions')->get();
         return view('admin.eartraining.index', compact('quizzes'));
     }
 
-    function showmember($id) {
+    public function showmember($id) {
         $quiz = Quiz::with('questions')->findOrFail($id);
         return view('memberpages.eartraining.show', compact('quiz'));
     }
-     function showadmin() {
+
+    public  function showadmin() {
         return view('admin.eartraining.show');
     }
 
@@ -95,10 +96,6 @@ class EarTrainingController extends Controller
             $quiz->description = $request->input('description');
         }
 
-        if ($request->has('category')) {
-            $quiz->category = $request->input('category');
-        }
-
         if ($request->has('video_url')) {
             $quiz->video_url = $request->input('video_url');
         }
@@ -115,42 +112,49 @@ class EarTrainingController extends Controller
 
         $quiz->save();
 
-        $questionsInput = $request->input('questions', []);  
-        $questionsFiles = $request->file('questions', []);
-
-        if (!empty($questionsInput)) {
-            foreach ($questionsInput as $index => $q) {
-                $correctOption = $q['correct_option'] ?? null;
-
-                $audioFile = $questionsFiles[$index]['audio'] ?? null;
-
-                $audioPath = null;
-                if ($audioFile && $audioFile->isValid()) {
-                    $audioPath = $audioFile->store('ear_training/question_audios', 'public');
-                }
-
-                $quiz->questions()->create([
-                    'audio_path' => $audioPath,  
-                    'correct_option' => $correctOption,
-                ]);
-            }
-        }
-
         return response()->json([
             'message' => 'Quiz updated successfully.',
             'quiz' => $quiz->load('questions'),
         ]);
     }
 
-   public function destroy(Quiz $quiz)
-{
-    // Delete related questions first
-    $quiz->questions()->delete();
+    public function destroy(Quiz $quiz)
+    {
 
-    // Delete the quiz itself
-    $quiz->delete();
+        $quiz->questions()->delete();
 
-    return response()->json(['message' => 'Quiz and its questions deleted successfully.']);
-}
+        $quiz->delete();
 
+        return response()->json(['message' => 'Quiz and its questions deleted successfully.']);
+    }
+
+    public function deleteQuestion(QuizQuestion $question)
+    {
+
+    $question->delete();
+    return response()->json(['message' => 'questions deleted successfully.']);
+    }
+
+    public function storeQuestions(Request $request, Quiz $quiz)
+    {
+        $validated = $request->validate([
+            'questions' => 'required|array|min:1',
+            'questions.*.audio' => 'required|file|mimes:mp3,wav,ogg',
+            'questions.*.correct_option' => 'required|integer|min:0',
+        ]);
+
+        foreach ($validated['questions'] as $q) {
+            $audioPath = $q['audio']->store('ear_training_questions', 'public');
+
+            QuizQuestion::create([
+                'quiz_id' => $quiz->id,
+                'audio_path' => $audioPath,
+                'correct_option' => $q['correct_option'],
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Questions added successfully.',
+        ], 201);
+    }
 }

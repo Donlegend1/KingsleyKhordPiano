@@ -213,9 +213,15 @@
 
 
     {{-- Delete Account --}}
-   <div x-data="{ showModal: false }" class="mt-10 bg-red-50 p-6 rounded-2xl shadow-md border border-red-200">
+   @php
+    $userEmail = auth()->user()->email;
+@endphp
+
+<div x-data="{ showModal: false, deleteEmail: '' }" class="mt-10 bg-red-50 p-6 rounded-2xl shadow-md border border-red-200">
     <h3 class="text-xl font-semibold text-red-600 mb-2">Danger Zone</h3>
-    <p class="text-sm text-red-500 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+    <p class="text-sm text-red-500 mb-4">
+        Once you delete your account, there is no going back. Please be certain.
+    </p>
 
     <!-- Trigger Button -->
     <button
@@ -226,6 +232,7 @@
         Delete My Account
     </button>
 
+    <!-- Modal -->
     <div
         x-show="showModal"
         class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
@@ -237,8 +244,15 @@
         >
             <h2 class="text-lg font-semibold mb-2">Confirm Deletion</h2>
             <p class="text-sm text-gray-600 mb-4">
-                Are you sure you want to permanently delete your account? This action cannot be undone.
+                To confirm, please type <strong>{{ $userEmail }}</strong> below.
             </p>
+
+            <input
+                type="email"
+                x-model="deleteEmail"
+                placeholder="Enter your email to confirm"
+                class="w-full border rounded-md px-3 py-2 text-sm mb-4"
+            />
 
             <div class="flex justify-end space-x-3">
                 <button
@@ -254,7 +268,9 @@
                     @method('DELETE')
                     <button
                         type="submit"
-                        class="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+                        :disabled="deleteEmail !== '{{ $userEmail }}'"
+                        class="px-4 py-2 text-sm text-white rounded-md transition"
+                        :class="deleteEmail === '{{ $userEmail }}' ? 'bg-red-600 hover:bg-red-700' : 'bg-red-300 cursor-not-allowed'"
                     >
                         Yes, Delete
                     </button>
@@ -263,6 +279,7 @@
         </div>
     </div>
 </div>
+
 
 </div>
 @endsection

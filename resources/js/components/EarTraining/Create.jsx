@@ -24,6 +24,12 @@ const CreateEarTrainingQuiz = () => {
         "7 Degree Chords",
         "7 Degree Chords (secondary)",
         "7 Degree Chords (general)",
+        "9 degree",
+        "9 degree secondary",
+        "9 degree (general)",
+        "11th degree",
+        "13th degree",
+        "Others"
     ];
 
     const RELATIVE_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
@@ -36,7 +42,7 @@ const CreateEarTrainingQuiz = () => {
         "LAH DOH",
         "TI REH",
     ];
-    const DIATOMIC_OPTIONS = [
+    const DIATOMIC_INTERVALS = [
         "Major 2nd",
         "Major 3rd",
         "Perfect 4th",
@@ -45,13 +51,15 @@ const CreateEarTrainingQuiz = () => {
         "Major 7th",
         "Octave",
     ];
-    const NONDIATOMIC_OPTIONS = [
+    const NONDIATOMIC_INTERVALS = [
         "Minor 2nd",
         "Minor 3rd",
-        "tri tone",
+        "Tri tone",
         "Minor 6th",
         "Minor 7th",
     ];
+    const BASICTRIADS = ["Augmented", "Diminished", "Major", "Minor", "Sus"];
+
     const INTERVALS = [
         "Minor 2nd",
         "Major 2nd",
@@ -66,29 +74,96 @@ const CreateEarTrainingQuiz = () => {
         "Major 7th",
         "Octave",
     ];
-    const BASICTRIADS = ["Augmented", "Diminished", "Major", "Minor", "Sus"];
-    const DEGREECHORD = [
+
+    const SEVENDEGREECHORD = [
         "Diminished 7th",
         "Dominant 7th",
-        "Half Diminished",
+        "Minor 7b5",
         "Major 7th",
         "Minor 7th",
     ];
-    const DEGREECHORDs = [
-        "Diminished 7 (b5)",
-        "Minor Major 7",
-        "Major 7 (b5)",
-        "Dominant 7 (b13)",
-        "Diminished Major 7th",
-        "Major 7 (b13)",
+
+    const SEVENDEGREECHORDSECONDARY = [
+        "Dim (Maj7)",
+        "Dom7#5",
+        "Dom7b5",
+        "Maj7#5",
+        "Maj7b5",
+        "minMaj7",
     ];
-    const DEGREECHORDg = [
-        "Dominant 7 (b5)",
-        "Minor Major 7",
-        "Major 7 (b5)",
-        "Dominant 7 (b13)",
-        "Diminished Major 7th",
-        "Major 7 (b13)",
+    const SEVENDEGREECHORDEGENERAL = [
+        "Diminished 7th",
+        "Dominant 7th",
+        "Minor 7b5",
+        "Major 7th",
+        "Minor 7th",
+        "Dim (Maj7)",
+        "Dom7#5",
+        "Dom7b5",
+        "Maj7#5",
+        "Maj7b5",
+        "minMaj7",
+    ];
+
+    const NINEDEGREECHORD = [
+        "Dim7 (9)",
+        "Dom9",
+        "Dom7 (b9)",
+        "Maj 6/9",
+        "min 6/9",
+        "min9",
+        "min9 (b5)",
+    ];
+
+    const NINEDEGREECHORDSECONDARY = [
+        "DimMaj7 (9)",
+        "Dom9 (b5)",
+        "Dom9 (#5)",
+        "Maj9 (b5)",
+        "Maj9 (#5)",
+        "min (Maj9)",
+    ];
+
+    const NINEDEGREECHORDGENERAL = [
+        "DimMaj7 (9)",
+        "Dom9 (b5)",
+        "Dom9 (#5)",
+        "Maj9 (b5)",
+        "Maj9 (#5)",
+        "min (Maj9)",
+        "Dim7 (9)",
+        "Dom9",
+        "Dom7 (b9)",
+        "Maj 6/9",
+        "min 6/9",
+        "min9",
+        "min9 (b5)",
+    ];
+
+    const ELEVENDEGREE = [
+        "6/9 (#11)",
+        "Dom9 (#11)",
+        "Dom7 (b9#11)",
+        "Maj9 (#11)",
+        "min6/9 (11)",
+        "min 9 (11)",
+    ];
+
+    const THIRTEENDEGREE = [
+        "13sus4",
+        "Dom 9 (13) #11",
+        "Dom 13 (b9#11)",
+        "Maj13 (#11)",
+        "min13 (9,11)",
+    ];
+
+    const OTHERS = [
+        "9sus4",
+        "DimM9 (#5)",
+        "Dom9 (#5b5)",
+        "Maj9sus4",
+        "Maj9 (b5#5)",
+        "min9/11 (Maj7)",
     ];
 
     const handleQuestionChange = (index, field, value) => {
@@ -136,7 +211,7 @@ const CreateEarTrainingQuiz = () => {
             setTitle("");
             setDescription("");
             setVideoUrl("");
-            setCategory("")
+            setCategory("");
             setThumbnail(null);
             setMainAudio(null);
             setQuestions([{ audio: null, correct_option: "" }]);
@@ -290,13 +365,13 @@ const CreateEarTrainingQuiz = () => {
                                             </option>
                                         ))}
                                     {category === "Diatonic Intervals" &&
-                                        DIATOMIC_OPTIONS.map((opt, i) => (
+                                        DIATOMIC_INTERVALS.map((opt, i) => (
                                             <option key={i} value={i}>
                                                 {opt}
                                             </option>
                                         ))}
                                     {category === "Non-diatonic Intervals" &&
-                                        NONDIATOMIC_OPTIONS.map((opt, i) => (
+                                        NONDIATOMIC_INTERVALS.map((opt, i) => (
                                             <option key={i} value={i}>
                                                 {opt}
                                             </option>
@@ -314,24 +389,77 @@ const CreateEarTrainingQuiz = () => {
                                             </option>
                                         ))}
                                     {category === "7 Degree Chords" &&
-                                        DEGREECHORD.map((opt, i) => (
+                                        SEVENDEGREECHORD.map((opt, i) => (
                                             <option key={i} value={i}>
                                                 {opt}
                                             </option>
                                         ))}
                                     {category ===
                                         "7 Degree Chords (secondary)" &&
-                                        DEGREECHORDs.map((opt, i) => (
-                                            <option key={i} value={i}>
-                                                {opt}
-                                            </option>
-                                        ))}
+                                        SEVENDEGREECHORDSECONDARY.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
                                     {category === "7 Degree Chords (general)" &&
-                                        DEGREECHORDg.map((opt, i) => (
-                                            <option key={i} value={i}>
-                                                {opt}
-                                            </option>
-                                        ))}
+                                        SEVENDEGREECHORDEGENERAL.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
+                                    {category === "9 degree" &&
+                                        NINEDEGREECHORD.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
+                                    {category === "9 degree secondary" &&
+                                        NINEDEGREECHORDSECONDARY.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
+                                    {category === "9 degree (general)" &&
+                                        NINEDEGREECHORDGENERAL.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
+                                    {category === "11th degree" &&
+                                        ELEVENDEGREE.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
+                                    
+                                    {category === "13th degree" &&
+                                        THIRTEENDEGREE.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
+                                    {category === "Others" &&
+                                        OTHERS.map(
+                                            (opt, i) => (
+                                                <option key={i} value={i}>
+                                                    {opt}
+                                                </option>
+                                            )
+                                        )}
                                 </select>
                             </div>
 

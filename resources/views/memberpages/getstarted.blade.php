@@ -25,69 +25,103 @@
  </div>
 </section>
 
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-5 md:px-12">
- <div class="font-bold mb-5 text-[22px]">
-  <p>
-   Step 1 - Commence by accessing various Quick Links
-  </p>
- </div>
- <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-  <!-- Card 1 -->
-  <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
-   <img src="/icons/quicklink1.svg" alt="quick link">
-   <div class="text-center my-5 font-sf">
-    <p class="text-gray-800 font-semibold mb-2">Take a Tour of the Website</p>
-    <p>This site is big!! Kingsley has created everything here from scratch. You need to know where things are</p>
-  
-   </div>
-   <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-    View Details <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
-  </a>
+<section x-data="{ video: null }" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-5 md:px-12">
+  <div class="font-bold mb-5 text-[22px]">
+    <p>Step 1 - Commence by accessing various Quick Links</p>
   </div>
 
-  <!-- Card 2 -->
-  <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
-   <img src="/icons/piano.svg" alt="quick link">
-   <div class="text-center my-5 font-sf">
-    <p class="text-gray-800 font-semibold mb-2">Structure a good Practice Session</p>
-    <p>Step by step breakdown of learning methods. Every lesson follows a clear and practical approach that deepens your understanding</p>
-  
-   </div>
-   <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-    View Details <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
-  </a>
+  <!-- First Row -->
+  <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+    <!-- Card 1 -->
+    <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
+      <img src="/icons/quicklink1.svg" alt="quick link">
+      <div class="text-center my-5 font-sf">
+        <p class="text-gray-800 font-semibold mb-2">Take a Tour of the Website</p>
+        <p>This site is big!! Kingsley has created everything here from scratch. You need to know where things are</p>
+      </div>
+      <button
+        @click="video = 'https://your-link.com/video1'" 
+        class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
+      >
+        Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
+      <img src="/icons/piano.svg" alt="quick link">
+      <div class="text-center my-5 font-sf">
+        <p class="text-gray-800 font-semibold mb-2">Structure a good Practice Session</p>
+        <p>Step by step breakdown of learning methods...</p>
+      </div>
+      <button
+        @click="video = 'https://your-link.com/video2'" 
+        class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
+      >
+        Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
+      </button>
+    </div>
   </div>
 
-</div>
-<div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 my-5">
- <!-- Card 1 -->
- <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
-  <img src="/icons/quicklink2.svg" alt="quick link">
-  <div class="text-center my-5 font-sf">
-   <p class="text-gray-800 font-semibold mb-2">How I Arrange My Set-up</p>
-   <p>A system that gives you access to tools, resources and mastermind meetings. To give you a seamless learning experience</p>
- 
-  </div>
-  <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-   View Details <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
- </a>
- </div>
+  <!-- Second Row -->
+  <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 my-5">
+    <!-- Card 3 -->
+    <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
+      <img src="/icons/quicklink2.svg" alt="quick link">
+      <div class="text-center my-5 font-sf">
+        <p class="text-gray-800 font-semibold mb-2">How I Arrange My Set-up</p>
+        <p>A system that gives you access to tools and mastermind meetings...</p>
+      </div>
+      <button
+        @click="video = 'https://your-link.com/video3'" 
+        class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
+      >
+        Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
+      </button>
+    </div>
 
- <!-- Card 2 -->
- <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
-  <img src="/icons/trophy.png" alt="quick link">
-  <div class="text-center my-5 font-sf">
-   <p class="text-gray-800 font-semibold mb-2">How To Gain Quality Experience</p>
-   <p>Get exposed to the right opportunities, stay consistent in your learning, and transform your knowledge into life-changing results</p>
- 
+    <!-- Card 4 -->
+    <div class="flex flex-col items-center justify-center p-4 bg-gray-100 border border-gray-300 rounded-lg w-full md:w-1/2 min-h-[200px]">
+      <img src="/icons/trophy.png" alt="quick link">
+      <div class="text-center my-5 font-sf">
+        <p class="text-gray-800 font-semibold mb-2">How To Gain Quality Experience</p>
+        <p>Get exposed to the right opportunities and transform your knowledge...</p>
+      </div>
+      <button
+        @click="video = 'https://your-link.com/video4'" 
+        class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
+      >
+        Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
+      </button>
+    </div>
   </div>
-  <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-   View Details <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
- </a>
- </div>
 
-</div>
+  <!-- Modal -->
+  <div 
+    x-show="video" 
+    x-cloak 
+    class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg overflow-hidden shadow-lg max-w-3xl w-full relative">
+      <button 
+        @click="video = null" 
+        class="absolute top-2 right-2 text-black hover:text-red-600 text-xl"
+      >
+        &times;
+      </button>
+      <div class="aspect-w-16 aspect-h-9">
+        <iframe 
+          x-bind:src="video" 
+          class="w-full h-[400px]" 
+          frameborder="0" 
+          allow="autoplay; encrypted-media" 
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
 </section>
+
 
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
  <div class="font-bold mb-5 text-[22px]">
