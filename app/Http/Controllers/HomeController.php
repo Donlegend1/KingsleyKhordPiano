@@ -118,10 +118,12 @@ class HomeController extends Controller
         
     }
 
-    function profile() {
+    public function profile() {
         $subscriptions = Subscription::all();
 
-        $transactions = Payment::where('user_id', auth()->user()->id)->get();
+        $transactions = Payment::where('user_id', auth()->user()->id)
+            ->latest() // same as ->orderBy('created_at', 'desc')
+            ->get();
 
         $countries = DB::table('countries')
             ->orderBy('country_name')

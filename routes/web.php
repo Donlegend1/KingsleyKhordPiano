@@ -128,6 +128,7 @@ Route::prefix('admin')->group(function () {
     Route::get('uploads/list', [UploadController::class, 'index']);
     Route::get('uploads/create', [UploadController::class, 'create']);
     Route::post('upload/store', [UploadController::class, 'store']);
+    Route::delete('upload/{upload}', [UploadController::class, 'destroy']);
     Route::get('uploads/{id}/edit', [UploadController::class, 'edit']); 
     Route::get('upload-list', [UploadController::class, 'uploadList'])->name('upload.list');
     Route::get('live-shows', [LiveShowController::class, 'index']);

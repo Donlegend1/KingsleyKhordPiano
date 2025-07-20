@@ -54,7 +54,13 @@ const PlanSwitchAndCurrencySelect = () => {
         setSelectedPlan(plan);
     };
 
+    const authUser = window.authUser || null;
+
     const handleModalOpen = (plan) => {
+        if (!authUser) {
+            window.location.href = "/register";
+            return;
+        }
         setSelectedPlanDetails(plan);
         setModalOpen(true);
     };

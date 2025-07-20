@@ -10,8 +10,6 @@ const ShowEartraining = () => {
     const [showResult, setShowResult] = useState(false);
     const [score, setScore] = useState(0);
 
-    
-
     const RELATIVE_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
     const DITONE_OPTIONS = [
         "DOH MI",
@@ -221,29 +219,29 @@ const ShowEartraining = () => {
                 return RELATIVE_OPTIONS;
             case "Di-tone Pitch":
                 return DITONE_OPTIONS;
-            case "Diatomic":
+            case "Diatonic Intervals":
                 return DIATOMIC_INTERVALS;
-            case "Non-Diatomic":
+            case "Non-diatonic Intervals":
                 return NONDIATOMIC_INTERVALS;
             case "Intervals":
                 return INTERVALS;
-            case "Basic Triads":
+            case "Basic Triad":
                 return BASICTRIADS;
-            case "7 Degree Chords":
+            case "7th Degree Chords (Basic)":
                 return SEVENDEGREECHORD;
-            case "7 Degree Chords (secondary)":
+            case "7th Degree Chords (Gecondary)":
                 return SEVENDEGREECHORDSECONDARY;
-            case "7 Degree Chords (general)":
+            case "7th Degree Chords (General)":
                 return SEVENDEGREECHORDEGENERAL;
-            case "9 degree":
+            case "9th degree Chords (Basic)":
                 return NINEDEGREECHORD;
-            case "9 degree secondary":
+            case "9th Degree Chords (Secondary)":
                 return NINEDEGREECHORDSECONDARY;
-            case "9 degree (general)":
+            case "9th Degree Chords (General)":
                 return NINEDEGREECHORDGENERAL;
-                case "11th degree":
+            case "11th Degree Chords":
                 return ELEVENDEGREE;
-            case "13th degree":
+            case "13th Degree Chords":
                 return THIRTEENDEGREE;
             case "Others":
                 return OTHERS;
@@ -251,6 +249,13 @@ const ShowEartraining = () => {
                 return [];
         }
     };
+    const extractGoogleDriveFileId = (url) => {
+        const regex = /(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    };
+
+    const fileId = extractGoogleDriveFileId(quiz.video_url);
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg mt-6">
@@ -270,10 +275,17 @@ const ShowEartraining = () => {
             </div>
 
             {/* Main Video */}
-            <div
-                className="mb-6"
-                dangerouslySetInnerHTML={{ __html: quiz.video_url }}
-            />
+            {fileId ? (
+                <iframe
+                    src={`https://drive.google.com/file/d/${fileId}/preview`}
+                    width="100%"
+                    height="400"
+                    allow="autoplay"
+                    className="rounded shadow"
+                />
+            ) : (
+                <p className="text-red-600">Invalid video URL</p>
+            )}
 
             {/* Main Audio */}
             {quiz.main_audio_path && (

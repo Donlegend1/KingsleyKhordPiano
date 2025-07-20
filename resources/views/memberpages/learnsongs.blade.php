@@ -1,23 +1,25 @@
 @extends('layouts.member')
 
 @section('content')
+
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4">
   <div class="max-w-7xl mx-auto space-y-3">
 
-    <!-- Breadcrumbs & User -->
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
-      <div class="flex items-center flex-wrap text-sm text-gray-600 dark:text-gray-400 space-x-2">
+    <!-- Breadcrumb & User -->
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
         <a href="/home" class="hover:text-blue-600">Dashboard</a>
         <span>/</span>
         <a href="/member/learn-songs" class="hover:text-blue-600 font-semibold">Learn Songs</a>
       </div>
-      <div>
+      <div class="flex items-center space-x-2">
         <i class="fa fa-user-circle text-xl"></i>
       </div>
     </div>
 
-    <h1 class="text-xl font-bold mt-2">Learn Songs</h1>
-
+    <div>
+      <h1 class="text-xl font-bold">Learn Songs</h1>
+    </div>
   </div>
 </section>
 

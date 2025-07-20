@@ -6,7 +6,7 @@
   <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
     
     <!-- Text Content -->
-    <div class="w-full lg:w-1/2 text-white text-center lg:text-left">
+    <div class="w-full lg:w-2/3 text-white text-center lg:text-left">
       <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6">
         You are not alone in your learning journey! Even the best feel confused and stuck at times.
       </h1>
@@ -29,8 +29,8 @@
     </div>
 
     <!-- Image Content -->
-    <div class="w-full lg:w-1/2 mt-10 lg:mt-0">
-      <img src="/images/Frame.png" alt="Image" class="w-full h-auto object-cover rounded-md shadow-lg">
+    <div class="w-full lg:w-1/3 mt-10 lg:mt-0">
+      <img src="/images/Frame.png" alt="Image" class=" h-auto object-cover rounded-md shadow-lg">
     </div>
     <div class="flex justify-center md:hidden mt-6">
         <a href="/plans#pricing"

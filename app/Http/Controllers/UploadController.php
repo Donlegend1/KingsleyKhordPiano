@@ -30,7 +30,7 @@ class UploadController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-   public function store(StoreUploadRequest $request)
+ public function store(StoreUploadRequest $request)
 {
     $data = $request->only([
         'title',
@@ -40,19 +40,30 @@ class UploadController extends Controller
         'level',
         'skill_level',
         'status',
-        'tags'
+        'tags',
     ]);
 
-    // Handle file upload
-    if ($request->hasFile('thumbnail')) {
-        $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+    // Handle file upload manually using move()
+   if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
+        $thumbnail = $request->file('thumbnail');
+        $filename = time() . '_' . $thumbnail->getClientOriginalName();
+        $destination = public_path('uploads/thumbnails');
+
+        // Ensure destination exists
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        $thumbnail->move($destination, $filename);
+        $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
     }
-    $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+
 
     $upload = Upload::create($data);
 
     return response()->json($upload, 200);
 }
+
 
 
     /**
@@ -84,7 +95,8 @@ class UploadController extends Controller
      */
     public function destroy(Upload $upload)
     {
-        //
+        $upload->delete();
+        return response()->json(['message' => 'Course deleted successfully']);
     }
 
     public function uploadList(Request $request)

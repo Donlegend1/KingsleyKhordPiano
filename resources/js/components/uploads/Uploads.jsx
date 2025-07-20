@@ -80,7 +80,7 @@ const UploadList = () => {
         setLoading(true);
         try {
             const response = await axios.delete(
-                `/api/admin/courses/${selectedCourse.id}`,
+                `/admin/upload/${selectedCourse.id}`,
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,

@@ -22,5 +22,7 @@
 @include("components.faq")
 
 
-
+<script>
+    window.authUser = @json(Auth::user());
+</script>
 @endsection

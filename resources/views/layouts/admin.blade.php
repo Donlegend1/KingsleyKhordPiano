@@ -33,6 +33,9 @@
         <a href="/admin/users" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-user"></i> <span>Users</span>
         </a>
+        <a href="/admin/courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-map" aria-hidden="true"></i> <span>Course Road Map</span>
+        </a>
         <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-leanpub"></i> <span>Ear Training</span>
         </a>
@@ -72,6 +75,10 @@
         <a href="/admin/users" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-user"></i> <span>Users</span>
         </a>
+        <a href="/admin/courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-map" aria-hidden="true"></i> <span>Course Road Map</span>
+        </a>
+        
         <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-leanpub"></i> <span>Ear Training</span>
         </a>

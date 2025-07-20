@@ -21,14 +21,14 @@ const CreateEarTrainingQuiz = () => {
         "Non-diatonic Intervals",
         "Intervals",
         "Basic Triad",
-        "7 Degree Chords",
-        "7 Degree Chords (secondary)",
-        "7 Degree Chords (general)",
-        "9 degree",
-        "9 degree secondary",
-        "9 degree (general)",
-        "11th degree",
-        "13th degree",
+        "7th Degree Chords (Basic)",
+        "7th Degree Chords (Secondary)",
+        "7th Degree Chords (General)",
+        "9th degree Chords (Basic)",
+        "9th Degree Chords (Secondary)",
+        "9th Degree Chords (General)",
+        "11th Degree Chords",
+        "13th Degree Chords",
         "Others"
     ];
 
@@ -276,7 +276,7 @@ const CreateEarTrainingQuiz = () => {
 
                 <div>
                     <label className="block mb-1 font-medium">
-                        Video Embed Code (iframe)
+                        Video Embed Code (link)
                     </label>
                     <textarea
                         value={videoUrl}
@@ -388,14 +388,15 @@ const CreateEarTrainingQuiz = () => {
                                                 {opt}
                                             </option>
                                         ))}
-                                    {category === "7 Degree Chords" &&
+                                    {category === "7th Degree Chords (Basic)" &&
                                         SEVENDEGREECHORD.map((opt, i) => (
                                             <option key={i} value={i}>
                                                 {opt}
                                             </option>
                                         ))}
+                                    
                                     {category ===
-                                        "7 Degree Chords (secondary)" &&
+                                        "7th Degree Chords (Secondary)" &&
                                         SEVENDEGREECHORDSECONDARY.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -403,7 +404,7 @@ const CreateEarTrainingQuiz = () => {
                                                 </option>
                                             )
                                         )}
-                                    {category === "7 Degree Chords (general)" &&
+                                    {category === "7th Degree Chords (General)" &&
                                         SEVENDEGREECHORDEGENERAL.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -411,7 +412,7 @@ const CreateEarTrainingQuiz = () => {
                                                 </option>
                                             )
                                         )}
-                                    {category === "9 degree" &&
+                                    {category === "9th degree Chords (Basic)" &&
                                         NINEDEGREECHORD.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -419,7 +420,7 @@ const CreateEarTrainingQuiz = () => {
                                                 </option>
                                             )
                                         )}
-                                    {category === "9 degree secondary" &&
+                                    {category === "9th Degree Chords (Secondary)" &&
                                         NINEDEGREECHORDSECONDARY.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -427,7 +428,7 @@ const CreateEarTrainingQuiz = () => {
                                                 </option>
                                             )
                                         )}
-                                    {category === "9 degree (general)" &&
+                                    {category === "9th Degree Chords (General)" &&
                                         NINEDEGREECHORDGENERAL.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -435,7 +436,7 @@ const CreateEarTrainingQuiz = () => {
                                                 </option>
                                             )
                                         )}
-                                    {category === "11th degree" &&
+                                    {category === "11th Degree Chords" &&
                                         ELEVENDEGREE.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -444,7 +445,7 @@ const CreateEarTrainingQuiz = () => {
                                             )
                                         )}
                                     
-                                    {category === "13th degree" &&
+                                    {category === "13th Degree Chords" &&
                                         THIRTEENDEGREE.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>

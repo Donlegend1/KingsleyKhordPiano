@@ -127,22 +127,25 @@
     {{-- Subscriptions --}}
 
     @if (auth()->user()->role === 'member' )
-         <div class="mt-10 bg-white p-6 rounded-2xl shadow-md">
+  @php
+    $payment = Auth::user()->payments()->latest()->first();
+
+    $metadata = $payment->metadata ?? [];
+    $currency = strtoupper($metadata['currency'] ?? 'USD'); // ensure it's uppercase
+
+    $symbols = [
+        'NGN' => '₦',
+        'USD' => '$',
+        'GBP' => '£',
+        'EUR' => '€',
+    ];
+
+    $symbol = $symbols[$currency] ?? '';
+@endphp
+
+@if ($payment)
+    <div class="mt-10 bg-white p-6 rounded-2xl shadow-md">
         <h3 class="text-xl font-semibold text-gray-800 mb-4">Subscriptions</h3>
-
-        @php
-            $metadata = Auth::user()->payments()->first()->metadata ?? [];
-            $currency = $metadata['currency'] ?? 'USD';
-
-            $symbols = [
-                'NGN' => '₦',
-                'USD' => '$',
-                'GBP' => '£',
-                'EUR' => '€',
-            ];
-
-            $symbol = $symbols[$currency] ?? '';
-        @endphp
 
         <ul class="divide-y divide-gray-200">
             <li class="py-3">
@@ -152,15 +155,18 @@
                             Plan: {{ $metadata['tier'] ?? 'Free' }}
                         </p>
                         <p class="text-xs text-gray-500">
-                            Amount: {{ $symbol }}{{ number_format(Auth::user()->last_payment_amount, 2) }} ({{ $currency }})
+                            Amount: {{ $symbol }}{{ number_format($payment->amount, 2) }} ({{ $currency }})
                         </p>
                     </div>
                     <a href="#" class="text-indigo-600 hover:underline text-sm">Manage</a>
                 </div>
             </li>
         </ul>
-
     </div>
+@else
+    <p class="text-sm text-gray-500 mt-6">No subscription found.</p>
+@endif
+
 
     {{-- Transactions --}}
     <div class="mt-10 bg-white p-6 rounded-2xl shadow-md">
@@ -193,7 +199,7 @@
                             <td class="px-4 py-2">{{ $metadata['tier'] ?? 'Free' }}</td>
                             <td class="px-4 py-2">{{ $symbol }}{{ number_format($txn->amount, 2) }}</td>
                             <td class="px-4 py-2">
-                                {{ \Carbon\Carbon::parse($txn->payment_date)->format('M d, Y') }}
+                                {{ \Carbon\Carbon::parse($txn->starts_at)->format('M d, Y') }}
                             </td>
                             <td class="px-4 py-2">
                                 <span class="inline-block px-2 py-0.5 rounded text-xs font-medium 

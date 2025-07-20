@@ -17,7 +17,7 @@
     </p>
 
     <div class="flex justify-start sm:justify-center">
-      <a href="#plans"
+      <a href="#pricing"
          class="inline-flex items-center bg-white text-black text-sm sm:text-base px-6 py-3 rounded-lg font-semibold uppercase hover:bg-[#c2ab39] transition">
         Let's do this
        <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>

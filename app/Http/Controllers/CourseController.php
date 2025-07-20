@@ -32,7 +32,6 @@ class CourseController extends Controller
     {
         $validated = $request->validated();
 
-        return $validated;
         $course = Course::create($validated);
 
         return response()->json($course, 201);
@@ -109,11 +108,11 @@ class CourseController extends Controller
         return response()->json($groupedCourses);
     }
 
-public function deleteCourse(Course $course)
-{
-    $course->delete();
-    return response()->json(['message' => 'Course deleted successfully']);
-}
+    public function deleteCourse(Course $course)
+    {
+        $course->delete();
+        return response()->json(['message' => 'Course deleted successfully']);
+    }
 
     
 }

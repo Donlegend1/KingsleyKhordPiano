@@ -1,7 +1,9 @@
 @extends('layouts.member')
 
 @section('content')
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4 ">
+
+
+<section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4 ">
  <div class="max-w-7xl mx-auto space-y-3">
      
      <!-- Top Row -->
@@ -25,7 +27,7 @@
  </div>
 </section>
 
-<section x-data="{ video: null }" class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-5 md:px-12">
+<section x-data="{ video: null }" class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-5 md:px-12">
   <div class="font-bold mb-5 text-[22px]">
     <p>Step 1 - Commence by accessing various Quick Links</p>
   </div>
@@ -123,7 +125,7 @@
 </section>
 
 
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
+<section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
  <div class="font-bold mb-5 text-[22px]">
   <p>
    Step 2 - Find your Best Path & Choose your Skill Level
@@ -146,64 +148,67 @@
 </div>
 </section>
 
-  <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
+  <section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
   <div class="font-bold mb-5 text-[22px]">
     <p>
     Step 3 - Start a Course Base on your Skill Level
     </p>
   </div>
-  <div class="flex flex-wrap justify-center gap-10">
-    <div class="max-w-sm rounded overflow-hidden shadow-lg bg-[#F3F5F6]">
-      <img class="w-full p-1" src="/images/featured1.png" alt="Course Image 1">
-      <div class="p-1">
-      <p class="font-bold font-[20px]">
+<div class="flex flex-wrap justify-center gap-6">
+  <div class="w-[330px] rounded-md overflow-hidden shadow-lg bg-[#F3F5F6]">
+    <img class="w-full p-2" src="/images/featured1.jpeg" alt="Course Image 1">
+    <div class="px-3 pb-2">
+      <p class="font-bold text-[16px] mb-1">
         Beginner Course
       </p>
-      <p class="text-[15px] text-[#717171]">
+      <p class="text-sm text-[#717171]">
         Start your piano journey with a clear, step-by-step method designed to make learning both easy and practical.
       </p>
-      </div>
-      <div class="py-4 p-1">
-      <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-        Enroll Now <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
-      </a>
-      </div>
     </div>
-    <div class="max-w-sm rounded overflow-hidden shadow-lg bg-[#F3F5F6]">
-      <img class="w-full p-1" src="/images/featured2.png" alt="Course Image 2">
-      <div class="p-1">
-      <p class="font-bold font-[20px]">
-        Intermediate Course
-      </p>
-      <p class="text-[15px] text-[#717171]">
-        Once you’ve mastered the basics, take your skills to the next level with this intermediate course.
-      </p>
-      </div>
-      <div class="py-4 p-1">
-      <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-        Enroll Now <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
-      </a>
-      </div>
-    </div>
-    <div class="max-w-sm rounded overflow-hidden shadow-lg bg-[#F3F5F6]">
-      <img class="w-full p-1" src="/images/featured3.png" alt="Course Image 3">
-      <div class="p-1">
-      <p class="font-bold font-[20px]">
-        Advanced Course
-      </p>
-      <p class="text-[15px] text-[#717171]">
-        After refining your intermediate skills, take the leap into advanced playing with this course.
-      </p>
-      </div>
-      <div class="py-4 p-1">
-      <a href="/member/roadmap" class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
-        Enroll Now <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
-      </a>
-      </div>
+    <div class="px-3 py-3">
+      <a href="/member/course/beginner" class="px-5 py-2 bg-[#404348] text-white text-sm hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
+      Start Course<i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
+    </a>
     </div>
   </div>
+
+  <div class="w-[330px] rounded-md overflow-hidden shadow-lg bg-[#F3F5F6]">
+    <img class="w-full p-2" src="/images/featured2.jpeg" alt="Course Image 2">
+    <div class="px-3 pb-2">
+      <p class="font-bold text-[16px] mb-1">
+        Intermediate Course
+      </p>
+      <p class="text-sm text-[#717171]">
+        Once you’ve mastered the basics, take your skills to the next level with this intermediate course.
+      </p>
+    </div>
+    <div class="px-3 py-3">
+       <a href="/member/course/intermediate" class="px-5 py-2 bg-[#404348] text-white text-sm  hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
+      Start Course <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
+    </a>
+    </div>
+  </div>
+
+  <div class="w-[330px] rounded-md overflow-hidden shadow-lg bg-[#F3F5F6]">
+    <img class="w-full p-2" src="/images/featured3.jpeg" alt="Course Image 3">
+    <div class="px-3 pb-2">
+      <p class="font-bold text-[16px] mb-1">
+        Advanced Course
+      </p>
+      <p class="text-sm text-[#717171]">
+        After refining your intermediate skills, take the leap into advanced playing with this course.
+      </p>
+    </div>
+    <div class="px-3 py-3">
+      <a href="/member/course/advanced" class="px-5 py-2 bg-[#404348] text-white text-sm  hover:bg-yellow-400 hover:text-black transition inline-flex items-center">
+      Start Course<i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
+    </a>
+    </div>
+  </div>
+</div>
+
   </section>
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-8 pb-5 px-4 sm:px-8 md:px-12">
+<section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-8 pb-5 px-4 sm:px-8 md:px-12">
   <div class="font-bold mb-5 text-lg sm:text-xl md:text-[22px] text-left w-full md:w-9/12">
     <p>
       Step 4 - Enhance your vocabulary by Learning these songs
@@ -259,7 +264,7 @@
   </div>
 </section>
 
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-8 pb-5 px-4 sm:px-8 md:px-12">
+<section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-8 pb-5 px-4 sm:px-8 md:px-12">
   <div class="font-bold mb-5 text-lg sm:text-xl md:text-[22px] text-left w-full md:w-9/12">
   
    <p>Step 5 - Participate in the Community</p>
@@ -284,6 +289,5 @@
    <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
  </div>
 </section>
-
 
 @endsection

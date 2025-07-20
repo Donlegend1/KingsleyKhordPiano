@@ -317,21 +317,21 @@ const EarTraining = () => {
                 return INTERVALS;
             case "Basic Triad":
                 return BASICTRIADS;
-            case "7 Degree Chords":
+            case "7th Degree Chords (Basic)":
                 return SEVENDEGREECHORD;
-            case "7 Degree Chords (secondary)":
+            case "7th Degree Chords (Gecondary)":
                 return SEVENDEGREECHORDSECONDARY;
-            case "7 Degree Chords (general)":
+            case "7th Degree Chords (General)":
                 return SEVENDEGREECHORDEGENERAL;
-            case "9 degree":
+            case "9th degree Chords (Basic)":
                 return NINEDEGREECHORD;
-            case "9 degree secondary":
+            case "9th Degree Chords (Secondary)":
                 return NINEDEGREECHORDSECONDARY;
-            case "9 degree (general)":
+            case "9th Degree Chords (General)":
                 return NINEDEGREECHORDGENERAL;
-            case "11th degree":
+            case "11th Degree Chords":
                 return ELEVENDEGREE;
-            case "13th degree":
+            case "13th Degree Chords":
                 return THIRTEENDEGREE;
             case "Others":
                 return OTHERS;
