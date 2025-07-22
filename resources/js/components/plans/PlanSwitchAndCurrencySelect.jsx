@@ -123,19 +123,18 @@ const PlanSwitchAndCurrencySelect = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-center gap-6">
+           <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-6">
                 {filteredPlans &&
                     filteredPlans.map((plan) => (
                         <div
                             key={plan.id}
-                            className="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full md:w-1/3"
+                            className="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full sm:w-[48%] lg:w-[32%]"
                             style={{ backgroundImage: `url(${plan.bg})` }}
                         >
-                           
                             <img
                                 src={plan.img}
                                 alt=""
-                                className="mb-4 p-3 border h-16  rounded-3xl"
+                                className="mb-4 p-3 border h-16 rounded-3xl"
                             />
                             <h3 className="text-xl font-semibold text-black mb-4">
                                 {plan.tier} Plan
@@ -145,6 +144,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 {plan.amount[currency].toLocaleString()}
                             </p>
                             <p className="text-sm border border-gray-100 my-4"></p>
+
                             {plan.tier == "standard" && (
                                 <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
                                     <li>Roadmap for all skill levels</li>
@@ -154,6 +154,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                     <li>Supportive Community</li>
                                 </ul>
                             )}
+
                             {plan.tier == "premium" && (
                                 <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
                                     <li className="text-red-500 font-sf font-semibold">
@@ -161,10 +162,11 @@ const PlanSwitchAndCurrencySelect = () => {
                                     </li>
                                     <li>Personalized roadmap course</li>
                                     <li>Weekly live sessions</li>
-                                    <li>Structured Accoountability plan</li>
+                                    <li>Structured Accountability plan</li>
                                     <li>In-Depth Master classes</li>
                                 </ul>
                             )}
+
                             <div className="flex justify-center">
                                 <button
                                     className={`w-full px-4 py-2 rounded-lg transition ${
@@ -178,7 +180,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </button>
                             </div>
                         </div>
-                    ))}
+                ))}
             </div>
 
             {modalOpen && selectedPlanDetails && (

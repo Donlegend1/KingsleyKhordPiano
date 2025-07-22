@@ -10,33 +10,44 @@
   </div>
 
   <!-- Feature Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-  @foreach (['musictheory', 'roadmap', 'eartraining', 'pianoexercise'] as $image)
-  <div class="h-80 sm:h-96 bg-cover bg-center rounded-lg relative overflow-hidden"
-       style="background-image: url('/images/{{ $image }}.png')">
+@php
+  $features = [
+    ['image' => 'musictheory', 'title' => 'Music Theory'],
+    ['image' => 'roadmap', 'title' => 'Road Map'],
+    ['image' => 'eartraining', 'title' => 'Ear Training'],
+    ['image' => 'pianoexercise', 'title' => 'Piano Exercise'],
+  ];
+@endphp
 
-    <!-- Full overlay covering the card -->
-    <div class="absolute inset-0 bg-black bg-opacity-60 flex items-end p-4 text-white">
-      <p class="text-sm sm:text-base leading-snug">
-        @switch($image)
-          @case('musictheory')
-            Replace your nervousness with steel-like confidence. A solid understanding of the fundamentals of music theory will expose you to the structures and systems of music. Also, you'll learn to communicate your musical ideas eloquently.
-            @break
-          @case('roadmap')
-            Gain a clear, structured plan of the curriculum, designed to guide you through every skill level—beginner, intermediate, and advanced. Get a hands-on understanding of the essential steps needed to progress with confidence.
-            @break
-          @case('eartraining')
-            Learn to expand your musical vocabulary and repertoire. You'll soon be able to recognise and identify chord progressions just by listening to their melodies. This will, in turn, help you develop a flawless and incredible playing style.
-            @break
-          @case('pianoexercise')
-            Hands-on daily piano exercises to strengthen your fingers. What's learning to play the piano without consistent, hands-on practice? Your fingers need a lot of practical training and drilling to produce flawless rhythms.
-            @break
-        @endswitch
-      </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  @foreach ($features as $feature)
+    <div class="relative rounded-xl overflow-hidden shadow-lg group">
+      <!-- Background Image -->
+      <div 
+        class="absolute inset-0 bg-cover bg-center" 
+        style="background-image: url('/images/{{ $feature['image'] }}.png');">
+      </div>
+
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-black/60 transition-opacity group-hover:bg-black/70"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 p-6 text-white text-center flex flex-col h-full justify-between">
+        <div>
+          <div class="flex justify-center mb-4">
+            <img src="/icons/lessonwhite.png" alt="{{ $feature['title'] }} Icon" class="h-10 w-10">
+          </div>
+          <h3 class="text-lg font-semibold mb-2">{{ $feature['title'] }}</h3>
+          <p class="text-sm text-gray-300">
+            Enhance your piano skills effortlessly. Whether you're starting out or experienced, our lessons guide you through musical excellence at your own pace.
+          </p>
+        </div>
+      </div>
     </div>
-  </div>
   @endforeach
 </div>
+
+
 
 
   <!-- Academy Welcome Section -->

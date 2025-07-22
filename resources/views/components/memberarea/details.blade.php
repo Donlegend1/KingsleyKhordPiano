@@ -9,13 +9,13 @@
                 @else
                     <i class="fa fa-user-circle text-2xl text-gray-500"></i>
                 @endif
-                <span class="text-sm font-medium">{{ auth()->user()->name }}</span>
+                {{-- <span class="text-sm font-medium">{{ auth()->user()->first_name }}</span> --}}
             </a>
         </div>
 
         <div class="flex justify-between items-center">
             <p class="text-sm lg:text-base font-medium text-[#404348]">
-                Welcome back, <span class="font-semibold text-black">{{ auth()->user()->name }}</span>
+                Welcome back, <span class="font-semibold text-black">{{ auth()->user()->first_name }}</span>
             </p>
             <div class="flex items-center space-x-2 text-sm cursor-pointer px-3 py-2 rounded-md border border-gray-200 shadow-sm bg-[#EDEFF2] hover:shadow-md hover:bg-gray-50 transition">
                 <i class="fa fa-bookmark"></i>

@@ -38,7 +38,8 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $extracourses = \App\Models\Upload::where('category', 'extra courses')->latest()->take(3)->get();
+    return view('welcome', compact('extracourses'));
 });
 Route::get('/about', function () {
     return view('about', ['pageTitle' => 'About Us']);

@@ -27,11 +27,11 @@
         <div class="min-w-full h-full flex flex-col justify-center items-center text-center px-4">
           <div class="w-full max-w-2xl">
             <h1 class="text-xl md:text-4xl font-bold leading-tight mb-4">
-              Unlock Your Creativity
+              Practice with Purpose and Precision 
             </h1>
             <p class="text-base font-playfair text-gray-700 leading-relaxed">
-              With our guided approach, you'll explore improvisation techniques and develop your own musical ideas.
-            </p>
+              Follow a clear, step-by-step structure that tells you exactly what to practice, when to focus on it, and how to do it effectively. Our guided approach removes guesswork, helping you maximize progress and make each practice session
+               more productive. By staying on track, you'll save time while achieving better results. </p>
           </div>
         </div>
 
@@ -39,10 +39,11 @@
         <div class="min-w-full h-full flex flex-col justify-center items-center text-center px-4">
           <div class="w-full max-w-2xl">
             <h1 class="text-xl md:text-4xl font-bold leading-tight mb-4">
-              Master Theory Effortlessly
+              Play Gospel Music like a Pro
             </h1>
             <p class="text-base font-playfair text-gray-700 leading-relaxed">
-              From basic scales to advanced harmonies, gain the tools to decode music theory like a pro.
+              Learn to play all your favorite gospel songs effortlessly by mastering the correct structure and chord patterns. With our approach, you’ll be able to quickly understand and apply the essential musical elements, allowing you to play with confidence and accuracy. Whether you’re a beginner or 
+              looking to refine your skills, this method will help you learn quickly
             </p>
           </div>
         </div>

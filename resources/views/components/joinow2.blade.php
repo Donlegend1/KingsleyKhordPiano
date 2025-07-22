@@ -22,7 +22,7 @@
       <div class="hidden md:flex justify-center lg:justify-start mt-6">
         <a href="/plans#pricing"
            class="inline-flex items-center bg-[#FFD736] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-md font-semibold text-base transition">
-          Let's do this
+          Join Now
           <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
         </a>
       </div>
@@ -35,7 +35,7 @@
     <div class="flex justify-center md:hidden mt-6">
         <a href="/plans#pricing"
            class="inline-flex items-center bg-[#FFD736] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-md font-semibold text-base transition">
-          Let's do this
+          Join Now
           <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
         </a>
       </div>

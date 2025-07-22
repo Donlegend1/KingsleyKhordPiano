@@ -61,9 +61,10 @@
           <a href="https://www.instagram.com/kingsleykhord?igsh=N2p3eHZianZxOWo5" target="_blank">
             <img src="/icons/insta.png" alt="Instagram" >
           </a>
-          <a href="https://www.tiktok.com/@kingsleykhord?_t=ZN-8xOl4rI6j2M&_r=1" target="_blank">
+          {{-- <a href="https://www.tiktok.com/@kingsleykhord?_t=ZN-8xOl4rI6j2M&_r=1" target="_blank">
+            <span class="fa fa-tiktok"></span>
             <img src="/icons/tictok.png" alt="Instagram"  class="w-10 h-6">
-          </a>
+          </a> --}}
         </div>
       </div>
     </div>
