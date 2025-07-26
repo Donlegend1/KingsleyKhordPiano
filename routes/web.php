@@ -53,6 +53,14 @@ Route::get('/contact', function () {
     return view('contact', ['pageTitle' => 'Contact']);
 });
 
+Route::get('/privacy-policy', function () {
+    return view('privacy', ['pageTitle' => 'Privacy Policy']);
+});
+
+Route::get('/terms-of-service', function () {
+    return view('/terms-of-service', ['pageTitle' => 'Terms of Service']);
+});
+
 Route::get('/clear', function () {
     Artisan::call('optimize');
     return 'Application optimized!';

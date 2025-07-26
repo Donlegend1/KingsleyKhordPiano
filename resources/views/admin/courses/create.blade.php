@@ -6,7 +6,7 @@
      <header class="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
     <div>
       <h2 class="text-xl font-bold text-gray-800 mb-1">Dashboard</h2>
-      <a href="/dashboard/course">Courses</a>
+      <a href="/admin/courses">Courses</a>
       <a href="/admin/course/create" class="text-blue-600 hover:underline text-sm">Create</a>
     </div>
     

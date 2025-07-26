@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Upload;
+use App\Models\Course_video_comments;
 
 class CoursesController extends Controller
 {
@@ -16,8 +17,8 @@ class CoursesController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    function extraCourses() {
-        $all = Upload::where('category', 'extra courses')->paginate(5);
+    public function extraCourses() {
+        $all = Upload::where('category', 'extra courses')->paginate(9);
         $beginner = Upload::where('category', 'extra courses')->where('level', 'Beginner')->paginate(9);
         $intermediate = Upload::where('category', 'extra courses')->where('level', 'Intermediate')->paginate(9);
         $advanced = Upload::where('category', 'extra courses')->where('level', 'Advanced')->paginate(9);
@@ -27,6 +28,11 @@ class CoursesController extends Controller
 
     function singleCourse($id) {
         $lesson = Upload::findOrFail($id);
+        $comments  = Course_video_comments::where('category', 'course')
+            ->with(['user', 'replies.user'])
+            ->latest()
+            ->take(3)
+            ->get();
 
         $relatedUploads = collect();
 
@@ -34,7 +40,7 @@ class CoursesController extends Controller
             $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
         }
 
-        return view('memberpages.singleExtracourse', compact('lesson', 'relatedUploads'));
+        return view('memberpages.singleExtracourse', compact('lesson', 'relatedUploads', 'comments'));
     }
 
 }

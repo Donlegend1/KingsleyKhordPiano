@@ -24,13 +24,12 @@ class StoreCourseRequest extends FormRequest
          return [
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:255',
-            'description' => 'required|string',
-            'video_url' => 'nullable|string',
+            'description' => 'nullable|string',
+            'video_url' => 'required|string',
             'level' => 'nullable',
             'status' => 'nullable|in:active,inactive,draft',
             'rating_count' => 'nullable|integer',
             'average_rating' => 'nullable|numeric',
-           
         ];
     }
 }

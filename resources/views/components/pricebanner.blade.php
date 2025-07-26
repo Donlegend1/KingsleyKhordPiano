@@ -1,4 +1,7 @@
-<section class="relative bg-cover bg-center min-h-[60vh] lg:min-h-[85vh] flex items-center justify-center" style="background-image: url('/images/plansbanner.png')">
+<section 
+class="relative bg-cover bg-center min-h-[60vh] lg:min-h-[90vh] flex items-center justify-center"
+
+ style="background-image: url('/images/banner.jpg')">
   <!-- Overlay -->
   <div class="absolute inset-0 bg-black/60"></div>
 

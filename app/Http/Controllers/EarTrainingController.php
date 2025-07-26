@@ -20,7 +20,7 @@ class EarTrainingController extends Controller
      * @return \Illuminate\View\View
      */
     public function earTraining() {
-        $data = Quiz::all();
+        $data = Quiz::paginate(12);
         return view('memberpages.eartraining', compact('data'));
     }
 

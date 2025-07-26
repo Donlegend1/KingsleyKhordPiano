@@ -6,6 +6,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseProgressController;
 use App\Http\Controllers\LiveShowController;
+use App\Http\Controllers\CourseVideoCommentsController;
+use App\Http\Controllers\CourseVideoCommentRepliesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,16 +39,22 @@ use App\Http\Controllers\LiveShowController;
 
     });
 
-    Route::prefix('member')->group(function () {
+    Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
         Route::get('courses', [CourseController::class, 'index']);
-
         Route::get('courses/{level}', [CourseController::class, 'membershowAPI']);  
         Route::get('course/{course}', [CourseController::class, 'show']);
         Route::get('course/{course}/lessons', [CourseController::class, 'lessons']);
         Route::get('course/{course}/lesson/{lesson}', [CourseController::class, 'lesson']);
         Route::get('course/{course}/exercise', [CourseController::class, 'exercise']);
         Route::post('course/{course}/exercise/submit', [CourseController::class, 'submitExercise']);
+        Route::post('course/{course}/video-comment', [CourseVideoCommentsController::class, 'store']);
+        Route::get('comments/course', [CourseVideoCommentsController::class, 'index']);
+        Route::put('comment/{course_video_comments}', [CourseVideoCommentsController::class, 'update']);
+        Route::delete('comment/{course_video_comments}', [CourseVideoCommentsController::class, 'destroy']);
+
+        Route::post('comment/{comment}/reply', [CourseVideoCommentRepliesController::class, 'store']);
     });
+
 
     Route::get('exercise/{exercise}', [ExerciseController::class, 'show']);
     Route::post('exercise/{exercise}/submit', [ExerciseController::class, 'submit']);

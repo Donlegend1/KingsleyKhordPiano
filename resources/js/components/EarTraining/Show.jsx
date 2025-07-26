@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import axios from "axios";
+import CourseComment from "../Comment/CourseComment";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
+
 
 const ShowEartraining = () => {
     const [quiz, setQuiz] = useState(null);
@@ -388,6 +394,8 @@ const ShowEartraining = () => {
                             </button>
                         )}
                     </div>
+
+                    <CourseComment course={quiz} group={'quiz'} />
                 </>
             ) : (
                 <div className="text-center">
@@ -408,5 +416,11 @@ if (document.getElementById("ear-training-quiz-show")) {
     const root = ReactDOM.createRoot(
         document.getElementById("ear-training-quiz-show")
     );
-    root.render(<ShowEartraining />);
+    root.render(
+        <React.StrictMode>
+            <FlashMessageProvider>
+                <ShowEartraining />
+            </FlashMessageProvider>
+        </React.StrictMode>
+    );
 }

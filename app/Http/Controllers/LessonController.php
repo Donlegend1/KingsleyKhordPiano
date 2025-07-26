@@ -17,8 +17,9 @@ class LessonController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    function quicklession() {
-        $all = Upload::where('category', 'quick lessons')->paginate(5);
+    public function quicklession() 
+    {
+        $all = Upload::where('category', 'quick lessons')->paginate(9);
         $beginner = Upload::where('category', 'quick lessons')->where('level', 'Beginner')->paginate(9);
         $intermediate = Upload::where('category', 'quick lessons')->where('level', 'Intermediate')->paginate(9);
         $advanced = Upload::where('category', 'quick lessons')->where('level', 'Advanced')->paginate(9);
@@ -27,11 +28,12 @@ class LessonController extends Controller
         return view('memberpages.quicklesson', compact('all', 'beginner', 'intermediate', 'advanced'));
     }
 
-    function learnSongs() {
-         $all = Upload::where('category', 'learn songs')->paginate(5);
-        $beginner = Upload::where('category', 'learn songs')->where('level', 'Beginner')->paginate(9);
-        $intermediate = Upload::where('category', 'learn songs')->where('level', 'Intermediate')->paginate(9);
-        $advanced = Upload::where('category', 'learn songs')->where('level', 'Advanced')->paginate(9);
+    public function learnSongs()
+    {
+        $all = Upload::where('category', 'learn songs')->paginate(1);
+        $beginner = Upload::where('category', 'learn songs')->where('level', 'Beginner')->paginate(1);
+        $intermediate = Upload::where('category', 'learn songs')->where('level', 'Intermediate')->paginate(1);
+        $advanced = Upload::where('category', 'learn songs')->where('level', 'Advanced')->paginate(1);
 
         return view('memberpages.learnsongs', compact('all', 'beginner', 'intermediate', 'advanced'));
     }

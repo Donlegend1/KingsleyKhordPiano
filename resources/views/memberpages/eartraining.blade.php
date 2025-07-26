@@ -23,7 +23,7 @@
 
  </div>
 </section>
-<section class="bg-gray-100 py-12 px-6">
+<section class="bg-gray-100 py-6 px-6">
  <div class="max-w-7xl mx-auto">
    <h2 class="text-2xl font-bold mb-8 text-center">Ear Training Quiz</h2>
 
@@ -41,7 +41,13 @@
      </div>
      @endforeach
    </div>
+   
  </div>
+  @if ($data->hasPages())
+    <div class="col-span-full flex justify-center py-8">
+      {{ $data->withQueryString()->links('components.pagination') }}
+    </div>
+  @endif
 </section>
 
 

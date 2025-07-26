@@ -82,7 +82,7 @@
 
           @if ($exercises->hasPages())
             <div class="col-span-full flex justify-center py-8">
-              {{ $exercises->withQueryString()->links() }}
+              {{ $exercises->withQueryString()->links('components.pagination') }}
             </div>
           @endif
 

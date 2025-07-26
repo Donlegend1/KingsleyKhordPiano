@@ -154,14 +154,14 @@
       Step 3 - Start a Course Base on your Skill Level
       </p>
     </div>
-    <div class="flex flex-wrap md:flex-nowrap justify-center gap-6 lg:gap-10">
+    <div class="flex flex-wrap md:flex-nowrap justify-center gap-6 lg:gap-4">
     <!-- Card Template -->
     <div class="w-full md:w-1/3 max-w-sm rounded overflow-hidden shadow-lg bg-[#F3F5F6]">
       <div class="px-4 pt-4">
         <img class="w-full object-cover h-48 rounded-md" src="/images/featured1.jpeg" alt="Course Image 1">
       </div>
       <div class="px-4 py-3">
-        <p class="text-xl font-semibold text-black text-center">Getting Started and Mastering the Fundamentals</p>
+        <p class="text-[18px] font-semibold text-black text-center">Getting Started and Mastering the Fundamentals</p>
         <div class="pt-4 flex justify-center">
           <a href="/member/course/beginner" class="px-6 py-3 bg-[#404348] text-white text-base font-medium hover:bg-yellow-400 hover:text-black transition inline-flex items-center rounded-md">
             Start Course <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
@@ -176,7 +176,7 @@
         <img class="w-full object-cover h-48 rounded-md" src="/images/featured2.jpeg" alt="Course Image 2">
       </div>
       <div class="px-4 py-3">
-        <p class="text-xl font-semibold text-black text-center">Improve the quality of your Chords and Learn to Harmonize them</p>
+        <p class="text-[18px] font-semibold text-black text-center">Improve the quality of your Chords and Learn to Harmonize them</p>
         <div class="pt-4 flex justify-center">
           <a href="/member/course/intermediate" class="px-6 py-3 bg-[#404348] text-white text-base font-medium hover:bg-yellow-400 hover:text-black transition inline-flex items-center rounded-md">
             Start Course <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
@@ -191,7 +191,7 @@
         <img class="w-full object-cover h-48 rounded-md" src="/images/featured3.jpeg" alt="Course Image 3">
       </div>
       <div class="px-4 py-3">
-        <p class="text-xl font-semibold text-black text-center">Become a Musical Genius – Learn to Think of Music Abstractly</p>
+        <p class="text-[18px] font-semibold text-black text-center">Become a Musical Genius – Learn to Think of Music Abstractly</p>
         <div class="pt-4 flex justify-center">
           <a href="/member/course/advanced" class="px-6 py-3 bg-[#404348] text-white text-base font-medium hover:bg-yellow-400 hover:text-black transition inline-flex items-center rounded-md">
             Start Course <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>

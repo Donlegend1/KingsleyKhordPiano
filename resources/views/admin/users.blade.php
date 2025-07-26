@@ -8,7 +8,7 @@
   <header class="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
     <div>
       <h2 class="text-xl font-bold text-gray-800 mb-1">Dashboard</h2>
-      <a href="/admin/uploads/list" class="text-blue-600 hover:underline text-sm">Users</a>
+      <a href="/admin/users" class="text-blue-600 hover:underline text-sm">Users</a>
     </div>
     
     <div class="flex items-center gap-3 flex-wrap w-full md:w-auto">

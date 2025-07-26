@@ -30,4 +30,6 @@ import './components/LiveShow/Create'
 import './components/LiveShow/LiveShowCardPage'
 import './components/Calls/FreeCall'
 import './components/Calls/PaidCall'
+import './components/Comment/CourseComment';
+import './components/Comment/OtherComment';
 
