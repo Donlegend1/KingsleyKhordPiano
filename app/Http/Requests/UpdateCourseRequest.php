@@ -26,7 +26,7 @@ class UpdateCourseRequest extends FormRequest
             'description' => 'nullable|string',
             'category' => 'required|string|max:255',
             'level' => 'required|in:beginner,intermediate,advanced',
-            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         
             'status' => 'nullable|in:active,inactive,draft',
             'video_url' => 'nullable|string',

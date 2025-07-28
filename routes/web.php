@@ -119,7 +119,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community', [CommunityController::class, 'index']);
 });
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('users', [AdminController::class, 'users']);
     Route::get('courses', [CourseController::class, 'index']);
     Route::get('ear-training', [EarTrainingController::class, 'index']);

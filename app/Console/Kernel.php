@@ -13,6 +13,14 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('subscriptions:check-expired')->daily();
+        $schedule->command('email:send-roadmap')->daily();
+        $schedule->command('email:send-progress-check')->dailyAt('08:00');
+        $schedule->command('email:encouragement')->dailyAt('10:00');
+        $schedule->command('email:community-invite')->dailyAt('12:00');
+        $schedule->command('email:reengagement')->weeklyOn(1, '08:00');
+        $schedule->command('email:send-skill-assessment')->weeklyOn(2, '08:00');
+        $schedule->command('email:send-milestone')->weeklyOn(3, '08:00');
+        $schedule->command('email:send-song-breakdown')->weeklyOn(4, '08:00');
     }
 
     /**

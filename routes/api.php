@@ -8,6 +8,7 @@ use App\Http\Controllers\CourseProgressController;
 use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\CourseVideoCommentsController;
 use App\Http\Controllers\CourseVideoCommentRepliesController;
+use App\Http\Controllers\UploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,7 @@ use App\Http\Controllers\CourseVideoCommentRepliesController;
         Route::delete('user/{user}', [AdminController::class, 'destroy']);
         Route::get('courses', [CourseController::class, 'coursesList']);
         Route::patch('courses/{course}', [CourseController::class, 'update']);
+        Route::post('upload/{upload}', [UploadController::class, 'update']);
         Route::delete('courses/{course}', [CourseController::class, 'deleteCourse']);
         Route::post('course/store', [CourseController::class, 'store']);
         Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);

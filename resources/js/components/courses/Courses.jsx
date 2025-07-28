@@ -44,14 +44,10 @@ const Courses = () => {
         description: "",
         video_url: "",
         level: "beginner",
-        enrollment_count: 0,
         status: "active",
-        prerequisites: "",
         published_at: "",
-        rating_count: 0,
-        average_rating: 0,
-        // resources: [],
-        requirements: "",
+        thumbnail: null,
+        created_at: "",
     });
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
@@ -221,7 +217,7 @@ const Courses = () => {
                                                 }
                                                 className="bg-blue-500 text-white px-2 py-1 rounded"
                                             >
-                                                Edit
+                                                <span className="fa fa-edit"></span>
                                             </button>
                                             <button
                                                 onClick={() =>
@@ -229,7 +225,7 @@ const Courses = () => {
                                                 }
                                                 className="bg-red-500 text-white px-2 py-1 rounded ml-2"
                                             >
-                                                Delete
+                                                <span className="fa fa-trash"></span>
                                             </button>
                                         </td>
                                     </tr>

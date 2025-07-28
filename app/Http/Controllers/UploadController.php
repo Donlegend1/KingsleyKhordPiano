@@ -30,41 +30,39 @@ class UploadController extends Controller
     /**
      * Store a newly created resource in storage.
      */
- public function store(StoreUploadRequest $request)
-{
-    $data = $request->only([
-        'title',
-        'category',
-        'description',
-        'video_url',
-        'level',
-        'skill_level',
-        'status',
-        'tags',
-    ]);
+    public function store(StoreUploadRequest $request)
+    {
+        $data = $request->only([
+            'title',
+            'category',
+            'description',
+            'video_url',
+            'level',
+            'skill_level',
+            'status',
+            'tags',
+        ]);
 
-    // Handle file upload manually using move()
-   if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
-        $thumbnail = $request->file('thumbnail');
-        $filename = time() . '_' . $thumbnail->getClientOriginalName();
-        $destination = public_path('uploads/thumbnails');
+        // Handle file upload manually using move()
+    if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
+            $thumbnail = $request->file('thumbnail');
+            $filename = time() . '_' . $thumbnail->getClientOriginalName();
+            $destination = public_path('uploads/thumbnails');
 
-        // Ensure destination exists
-        if (!file_exists($destination)) {
-            mkdir($destination, 0755, true);
+            // Ensure destination exists
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            $thumbnail->move($destination, $filename);
+            $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
         }
 
-        $thumbnail->move($destination, $filename);
-        $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
+
+        $upload = Upload::create($data);
+
+        return response()->json($upload, 200);
     }
-
-
-    $upload = Upload::create($data);
-
-    return response()->json($upload, 200);
-}
-
-
 
     /**
      * Display the specified resource.
@@ -85,9 +83,37 @@ class UploadController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(UpdateUploadRequest $request, Upload $upload)
     {
-        //
+        $data = $request->validated();
+
+        if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
+            $thumbnail = $request->file('thumbnail');
+            $filename = time() . '_' . $thumbnail->getClientOriginalName();
+            $destination = public_path('uploads/thumbnails');
+
+            // Ensure destination exists
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Optionally delete old thumbnail
+            if ($upload->thumbnail && file_exists(public_path($upload->thumbnail))) {
+                unlink(public_path($upload->thumbnail));
+            }
+
+            $thumbnail->move($destination, $filename);
+            $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
+        }
+
+        $upload->update($data);
+
+        return response()->json([
+            'message' => 'upload updated successfully',
+            'upload' => $upload,
+            'thumbnail_url' => $upload->thumbnail ? asset($upload->thumbnail) : null,
+        ], 200);
     }
 
     /**

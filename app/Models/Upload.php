@@ -31,7 +31,7 @@ class Upload extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail ? asset( $this->thumbnail) : null;
+        return $this->thumbnail ? asset($this->thumbnail) : null;
     }
 
  

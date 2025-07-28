@@ -11,7 +11,7 @@ class UpdateUploadRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class UpdateUploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category' => 'required|string|max:255',
+            'level' => 'required',
+            'thumbnail' => 'nullable',
+            'status' => 'nullable|in:active,inactive,draft',
+            'video_url' => 'nullable|string',
+            'skill_level' => 'nullable|string|max:255',
+            'tags' => 'nullable|array',
         ];
     }
 }

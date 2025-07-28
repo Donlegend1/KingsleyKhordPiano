@@ -24,6 +24,8 @@ class LoginController extends Controller
     protected function authenticated($request, $user)
     {
         // Run your command here after login
-        Artisan::call('subscriptions:check-expired');
+        // Artisan::call('subscriptions:check-expired');
+        
+        $user->update(['last_login_at' => now()]);
     }
 }

@@ -55,6 +55,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'community_url' => env('COMMUNITY_URL', 'http://community.kingsleykhordpiano.com'),
 
     'asset_url' => env('ASSET_URL', '/'),
 

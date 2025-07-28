@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
+use App\Notifications\WelcomeEmailNotification;
+
 
 class RegisterController extends Controller
 {
@@ -66,6 +68,9 @@ class RegisterController extends Controller
         // 🔥 Again, ensure the event is triggered here too
         event(new Registered($user));
 
+        $user->notify(new WelcomeEmailNotification($user));
+            
+
         $this->guard()->login($user);
 
         return redirect($this->redirectPath());
@@ -99,6 +104,7 @@ class RegisterController extends Controller
         ]);
 
         event(new Registered($user)); 
+        $user->notify(new WelcomeEmailNotification($user));
 
         return $user;
     }

@@ -14,7 +14,7 @@ class Course extends Model
         'category',
         'description',
         'video_url',
-        // 'image_path',
+        'thumbnail',
         'price',
         'duration',
         'level',

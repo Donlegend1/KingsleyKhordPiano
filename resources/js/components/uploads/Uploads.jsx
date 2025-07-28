@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 const Modal = ({ isOpen, onClose, children }) => {
@@ -32,23 +32,42 @@ const UploadList = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     // const [selectedCourse, setSelectedCourse] = useState(null);
-  const perPage = 10;
-   const [selectedCourse, setSelectedCourse] = useState({
-      title: '',
-      category: '',
-      description: '',
-      video_url: '',
-      level: 'beginner',
-      enrollment_count: 0,
-      status: 'active',
-      prerequisites: '',
-      published_at: '',
-      rating_count: 0,
-      average_rating: 0,
-      // resources: [],
-      requirements: '',
-
+    const perPage = 10;
+    const [selectedCourse, setSelectedCourse] = useState({
+        title: "",
+        category: "",
+        description: "",
+        video_url: "",
+        level: "beginner",
+        enrollment_count: 0,
+        status: "active",
+        prerequisites: "",
+        published_at: "",
+        rating_count: 0,
+        average_rating: 0,
+        // resources: [],
+        requirements: "",
     });
+
+    const [preview, setPreview] = useState(
+        selectedCourse?.thumbnail_url || null
+    );
+    const [thumbnail, setThumbnail] = useState(null);
+    const fileInputRef = useRef(null);
+
+    const handleImageClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setThumbnail(file);
+            setPreview(URL.createObjectURL(file));
+            handleChange({ target: { name: "thumbnail", value: file } });
+        }
+    };
+
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
@@ -70,7 +89,7 @@ const UploadList = () => {
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
         } catch (error) {
-            console.error("Error fetching users:", error);
+            console.error("Error fetching upload:", error);
         } finally {
             setLoading(false);
         }
@@ -89,19 +108,18 @@ const UploadList = () => {
                 }
             );
             closeDeleteModal();
-            console.log(response.data);
             fetchCourses();
         } catch (error) {
-            console.error("Error fetching users:", error);
+            console.error("Error fetching uploads:", error);
         } finally {
             setLoading(false);
         }
-  };
-  
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSelectedCourse({ ...selectedCourse, [name]: value });
-  };
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedCourse({ ...selectedCourse, [name]: value });
+    };
 
     useEffect(() => {
         fetchCourses();
@@ -129,31 +147,46 @@ const UploadList = () => {
     const closeDeleteModal = () => {
         setIsDeleteModalOpen(false);
         setSelectedCourse(null);
-  };
-  
-  const handleSubmit = async (e) => {
-        e.preventDefault();
+    };
+
+    const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
-        try {
-            const response = await axios.patch(
-                `/api/admin/courses/${selectedCourse.id}`,
-                selectedCourse,
-                {
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
-                    withCredentials: true,
-                }
-            );
-            console.log(response.data);
-            closeEditModal();
-            fetchCourses();
-        } catch (error) {
-            console.error("Error creating course:", error);
-        } finally {
-            setLoading(false);
-        }
+
+    const formData = new FormData();
+    formData.append('title', selectedCourse.title);
+    formData.append('category', selectedCourse.category);
+    formData.append('video_url', selectedCourse.video_url);
+    formData.append('status', selectedCourse.status);
+    formData.append('level', selectedCourse.level);
+    formData.append('description', selectedCourse.description);
+
+    if (thumbnail instanceof File) {
+        formData.append('thumbnail', thumbnail);
     }
+
+    try {
+        const response = await axios.post(
+            `/api/admin/upload/${selectedCourse.id}`,
+            formData,
+            {
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            }
+        );
+        console.log(response.data);
+        closeEditModal();
+        fetchCourses();
+    } catch (error) {
+        console.error("Error updating course:", error?.response?.data || error);
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     return (
         <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
@@ -190,30 +223,35 @@ const UploadList = () => {
                         </thead>
                         <tbody>
                             {courses && courses.length > 0 ? (
-                                courses.map((user, index) => (
-                                    <tr key={user.id} className="border-b">
+                                courses.map((upload, index) => (
+                                    <tr key={upload.id} className="border-b">
                                         <td className="py-2 px-4">
                                             {index + 1}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.title}
+                                            {upload.title}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.category}
+                                            <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                <img
+                                                    src={upload.thumbnail_url}
+                                                    alt=""
+                                                />
+                                            </div>
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.category}
+                                            {upload.category}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.level}
+                                            {upload.level}
                                         </td>
                                         <td className="py-2 px-4">
-                                            {user.status}
+                                            {upload.status}
                                         </td>
                                         <td className="py-2 px-4 flex justify-center text-center items-center">
                                             <button
                                                 onClick={() =>
-                                                    openEditModal(user)
+                                                    openEditModal(upload)
                                                 }
                                                 className="bg-blue-500 text-white px-2 py-1 rounded"
                                             >
@@ -221,7 +259,7 @@ const UploadList = () => {
                                             </button>
                                             <button
                                                 onClick={() =>
-                                                    openDeleteModal(user)
+                                                    openDeleteModal(upload)
                                                 }
                                                 className="bg-red-500 text-white px-2 py-1 rounded ml-2"
                                             >
@@ -236,7 +274,7 @@ const UploadList = () => {
                                         colSpan="6"
                                         className="py-2 px-4 text-center"
                                     >
-                                        No users found.
+                                        No Upload found.
                                     </td>
                                 </tr>
                             )}
@@ -273,70 +311,114 @@ const UploadList = () => {
             >
                 <h2 className="text-lg font-bold mb-2">Edit Course</h2>
                 <p>Editing Course: {selectedCourse?.title}</p>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input
-                            name="title"
-                            placeholder="Title"
-                            defaultValue={selectedCourse?.title}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
-                        <input
-                            name="category"
-                            placeholder="Category"
-                            defaultValue={selectedCourse?.category}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
-                        <input
-                            name="video_url"
-                            placeholder="Video URL"
-                            defaultValue={selectedCourse?.video_url}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
-                       
-                        <select
-                            name="status"
-                            defaultValue={selectedCourse?.status}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="draft">Draft</option>
-                        </select>
 
-                        <select
-                            name="level"
-                            defaultValue={selectedCourse?.level}
+                <div
+                    className="
+                    max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg"
+                >
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div
+                                className="w-full h-48 bg-gray-100 border rounded-lg flex items-center justify-center cursor-pointer overflow-hidden"
+                                onClick={handleImageClick}
+                            >
+                                {preview ? (
+                                    <img
+                                        src={preview}
+                                        alt="Thumbnail Preview"
+                                        className="object-cover w-full h-full"
+                                    />
+                                ) : (
+                                    <span className="text-gray-500">
+                                        <img
+                                            src={selectedCourse?.thumbnail_url}
+                                            alt="Thumbnail Preview"
+                                            className="object-cover w-full h-full"
+                                        />
+                                    </span>
+                                )}
+                                <input
+                                    type="file"
+                                    name="thumbnail"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                />
+                            </div>
+
+                            {/* Course Info Fields */}
+                            <div className="flex flex-col space-y-4">
+                                <input
+                                    name="title"
+                                    placeholder="Title"
+                                    defaultValue={selectedCourse?.title}
+                                    onChange={handleChange}
+                                    className="w-full p-3 border rounded-lg"
+                                />
+                                <input
+                                    name="category"
+                                    placeholder="Category"
+                                    defaultValue={selectedCourse?.category}
+                                    onChange={handleChange}
+                                    className="w-full p-3 border rounded-lg"
+                                />
+                                <input
+                                    name="video_url"
+                                    placeholder="Video URL"
+                                    defaultValue={selectedCourse?.video_url}
+                                    onChange={handleChange}
+                                    className="w-full p-3 border rounded-lg"
+                                />
+                            </div>
+
+                            {/* Select Fields */}
+                            <select
+                                name="status"
+                                defaultValue={selectedCourse?.status}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="draft">Draft</option>
+                            </select>
+
+                            <select
+                                name="level"
+                                defaultValue={selectedCourse?.level}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                            >
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">
+                                    Intermediate
+                                </option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+
+                        {/* Description Field */}
+                        <textarea
+                            name="description"
+                            placeholder="Description"
+                            defaultValue={selectedCourse?.description}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
-                        >
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </div>
+                            rows="4"
+                        ></textarea>
 
-                    <textarea
-                        name="description"
-                        placeholder="Description"
-                        defaultValue={selectedCourse?.description}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                        rows="4"
-                    ></textarea>
-                    
-
-                    <button
-                        type="submit"
-                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300"
-                    >
-                        Save Course
-                    </button>
-                </form>
+                        {/* Submit Button */}
+                        <div className="text-right">
+                            <button
+                                type="submit"
+                                className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300"
+                            >
+                                Save Course
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </Modal>
 
             <Modal
