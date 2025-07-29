@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class QuickLessonEmail extends Notification
+class QuickLessonEncouragementEmail extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -21,8 +21,6 @@ class QuickLessonEmail extends Notification
 
     /**
      * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
@@ -35,19 +33,15 @@ class QuickLessonEmail extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('Welcome to the Platform')
-                    ->view('emails.welcome', ['user' => $notifiable]);
+            ->subject("{$notifiable->first_name}, got 10 minutes? Let’s level up your playing!")
+            ->view('emails.quick-lessons', ['user' => $notifiable]);
     }
 
     /**
      * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 }

@@ -2,12 +2,11 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Bus\Queueable;
 
-class EarTrainingQuizEmail extends Notification
+class FailedPaymentReminderNotification extends Notification
 {
     use Queueable;
 
@@ -19,8 +18,8 @@ class EarTrainingQuizEmail extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject("{$notifiable->first_name}, can you hear the music beyond the notes?")
-            ->view('emails.ear-training-quiz', ['user' => $notifiable]);
+            ->subject("{$notifiable->first_name}, your payment didn’t go through—let’s fix it!")
+             ->view('emails.failed-payment-reminder', ['user' => $notifiable]);
     }
 
     public function toArray(object $notifiable): array

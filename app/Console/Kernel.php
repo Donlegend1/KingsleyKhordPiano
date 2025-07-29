@@ -21,6 +21,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('email:send-skill-assessment')->weeklyOn(2, '08:00');
         $schedule->command('email:send-milestone')->weeklyOn(3, '08:00');
         $schedule->command('email:send-song-breakdown')->weeklyOn(4, '08:00');
+        $schedule->command('emails:send-quick-lessons')->daily();
+        $schedule->command('emails:send-ear-training-quiz')->daily();
+        $schedule->command('emails:send-failed-payment-reminder')->dailyAt('09:00');
+        
     }
 
     /**
