@@ -9,6 +9,10 @@ use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\CourseVideoCommentsController;
 use App\Http\Controllers\CourseVideoCommentRepliesController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostCommentController;
+use App\Http\Controllers\PostLikeController;
+use App\Http\Controllers\PostReplyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +59,18 @@ use App\Http\Controllers\UploadController;
         Route::delete('comment/{course_video_comments}', [CourseVideoCommentsController::class, 'destroy']);
 
         Route::post('comment/{comment}/reply', [CourseVideoCommentRepliesController::class, 'store']);
+         
+        Route::post('/post', [PostController::class, 'store'])->name('post.store');
+        Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.delete');
+        Route::get('/posts', [PostController::class, 'index'])->name('post.index');
+
+        Route::post('/comment', [PostCommentController::class, 'store'])->name('comment.store');
+        Route::post('/like', [PostLikeController::class, 'store'])->name('like.toggle');
+
+
+        Route::post('/comment/reply/{postComment}', [PostReplyController::class, 'store'])->name('reply.post');
+
+        
     });
 
 
@@ -65,3 +81,4 @@ use App\Http\Controllers\UploadController;
     Route::get('live-sessions', [LiveSessionController::class, 'index']);
     Route::get('live-sessions/{session}', [LiveSessionController::class, 'show']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
+   

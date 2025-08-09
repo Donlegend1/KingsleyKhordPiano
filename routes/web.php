@@ -23,6 +23,8 @@ use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CommunityIndexController;
+
 use Illuminate\Support\Facades\Artisan;
 
 
@@ -116,7 +118,12 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
     Route::get('/shop', [ShopController::class, 'index']);
-    Route::get('/community', [CommunityController::class, 'index']);
+    Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
+    Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
+    Route::get('/community/space', [CommunityIndexController::class, 'space'])->name('community.space');
+    Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');
+    Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
+    ->name('notifications.markAllAsRead');
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {

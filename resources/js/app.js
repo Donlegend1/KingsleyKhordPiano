@@ -32,4 +32,8 @@ import './components/Calls/FreeCall'
 import './components/Calls/PaidCall'
 import './components/Comment/CourseComment';
 import './components/Comment/OtherComment';
+import "./components/CreatePostBox.jsx";
+import "./components/PostList.jsx";
+import "./components/Members/MemberList.jsx"
+
 
