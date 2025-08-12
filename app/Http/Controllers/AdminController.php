@@ -17,16 +17,40 @@ class AdminController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    function users() {
-        $users = User::paginate(10);
+    public function users() {
+        $users = User::with('community')->paginate(10);
         return view('admin.users', compact('users'));
     }
 
-    function usersList() {
-        $users = User::with('plan')->paginate(10);
+    public function usersList(Request $request)
+    {
+        $query = User::with('plan', 'community');
+
+        // ==== SORTING ====
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'display_name':
+                    $query->orderByRaw("CONCAT(first_name, ' ', last_name) ASC");
+                    break;
+
+                case 'joining_date':
+                    $query->orderBy('created_at', $request->get('sort_order', 'asc'));
+                    break;
+
+                case 'latest_activity':
+                    $query->orderBy('last_login_at', $request->get('sort_order', 'desc'));
+                    break;
+            }
+        } else {
+            // Default sorting: admins first, then by created_at desc
+            $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
+                ->orderBy('created_at', 'desc');
+        }
+
+        $users = $query->paginate($request->get('per_page', 10));
+
         return response()->json($users);
     }
-
 
     public function editUser(Request $request, User $user)
     {

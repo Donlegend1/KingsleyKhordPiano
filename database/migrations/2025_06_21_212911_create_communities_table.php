@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('communities', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id');
+            $table->json('social');
+            $table->string('user_name');
+            $table->integer('verified_status')->default(0);
+            $table->text('bio')->nullable();
+            $table->enum('status', ['active', 'pending', 'blocked'])->default('active');
             $table->timestamps();
         });
     }

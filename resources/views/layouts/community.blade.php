@@ -1,4 +1,5 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="themeToggle()" :class="{ 'dark': isDark }" x-init="init()">
 <head>
     <meta charset="utf-8">
@@ -32,9 +33,131 @@
     @vite(['resources/css/app.css', 'resources/js/app.js']) 
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
-<body x-data="{ isDark: false, showSidebar: false }" x-init class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
-    <div id="app" class="min-h-screen flex flex-col">
+<body x-data="{ isDark: false, showSidebar: false }" x-init class="bg-gray-100 dark:bg-gray-900 h-screen overflow-hidden">
 
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside 
+        x-cloak
+        x-show="showSidebar || window.innerWidth >= 768"
+        @click.away="if (window.innerWidth < 768) showSidebar = false"
+        class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700 transform transition-transform duration-200 md:relative md:translate-x-0 md:block"
+        :class="{ '-translate-x-full': !showSidebar && window.innerWidth < 768 }"
+        >
+       <div class="p-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+
+            <!-- Feeds -->
+            <div class="mb-6">
+                <a href="/member/community"
+                   class="flex items-center space-x-2 px-4 py-2 rounded-md transition
+                   {{ Request::is('/') ? 'bg-[#F0F3F5] text-[#545861] dark:text-[#E4E7EB] dark:bg-[#42464D] font-semibold' : 'hover:text-[#FFD736]' }}">
+                    <i class="fa fa-home"></i>
+                    <span>Feeds</span>
+                </a>
+            </div>
+
+            <!-- Get Started -->
+            <div x-data="{ open: true }" class="group relative mt-10 mb-6">
+            <div @click="open = !open"
+                class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
+                <div class="flex items-center space-x-2">
+                    <span>Get Started</span>
+                </div>
+                <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
+                :class="{ 'rotate-180': !open }"></i>
+            </div>
+
+            <template x-if="open">
+                <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
+                    <a href="/member/say-hello"
+                    class="flex items-center space-x-2 py-1 rounded-md transition 
+                    {{ Request::is('say-hello') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
+                        <span>👋</span><span>Say Hello</span>
+                    </a>
+                    <a href="/ask-question"
+                    class="flex items-center space-x-2 py-1 rounded-md transition 
+                    {{ Request::is('ask-question') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
+                        <span>🙏</span><span>Ask Question</span>
+                    </a>
+                </div>
+            </template>
+        </div>
+
+
+            <!-- Others -->
+            <div x-data="{ open: true }" class="group relative mt-10 mb-6">
+                <div @click="open = !open"
+                    class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
+                    <div class="flex items-center space-x-2">
+                        <span>Others</span>
+                    </div>
+                    <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
+                    :class="{ 'rotate-180': !open }"></i>
+                </div>
+                <template x-if="open">
+                    <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
+                        <a href="/post-progress"
+                        class="flex items-center space-x-2 py-1 rounded-md transition 
+                        {{ Request::is('post-progress') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
+                            <span>🎬</span><span>Post Progress</span>
+                        </a>
+                        <a href="/lessons"
+                        class="flex items-center space-x-2 py-1 rounded-md transition 
+                        {{ Request::is('lessons') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
+                            <span>🎹</span><span>Lessons</span>
+                        </a>
+                    </div>
+                </template>
+            </div>
+
+
+            <!-- Forum -->
+            <div x-data="{ open: true }" class="group relative mt-10">
+                <div @click="open = !open"
+                     class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa fa-comments"></i>
+                        <span>Forum</span>
+                    </div>
+                    <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
+                       :class="{ 'rotate-180': !open }"></i>
+                </div>
+                <template x-if="open">
+                    <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
+                        <a href="/forum/beginner"
+                           class="flex items-center space-x-2 py-1 rounded-md transition 
+                           {{ Request::is('forum/beginner') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
+                            <img src="/images/featured1.jpeg" class="h-5 " alt="Beginners forum"></i><span>Beginner</span>
+                        </a>
+                        <a href="/forum/intermediate"
+                           class="flex items-center space-x-2 py-1 rounded-md transition 
+                           {{ Request::is('forum/intermediate') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
+                           <img src="/images/featured2.jpeg" class="h-5 " alt="Intermediate forum"><span>Intermediate</span>
+                        </a>
+                        <a href="/forum/advance"
+                           class="flex items-center space-x-2 py-1 rounded-md transition 
+                           {{ Request::is('forum/advance') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
+                            <img src="/images/featured3.jpeg" class="h-5 " alt="Advance forum"><span>Advance</span>
+                        </a>
+                    </div>
+                </template>
+            </div>
+
+            {{-- <div class="mt-8 fixed bottom-1 bg-gray-100 dark:bg-gray-700 rounded-md">
+                <a href="/kingsleykhord.com/home"
+                   class="flex items-center space-x-2 px-4 py-2 rounded-md transition 
+                   {{ Request::is('kingsleykhord.com/home') ? 'bg-[#F0F3F5] text-[#545861] dark:text-[#E4E7EB] dark:bg-[#42464D] font-semibold' : 'hover:text-[#FFD736]' }}">
+                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                    <span>Back</span>
+                    {{auth()->user()->first_name?? ""}} {{auth()->user()->last_name  ?? ''}}
+                </a>
+            </div> --}}
+
+        </div>
+    </aside>
+
+    <!-- Main area -->
+    <div class="flex-1 flex flex-col">
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -206,140 +329,12 @@
             </div>
         </header>
 
-      <main class="flex-1 flex">
-    <!-- Sidebar -->
-    <aside 
-        x-cloak
-        x-show="showSidebar || window.innerWidth >= 768"
-        @click.away="if (window.innerWidth < 768) showSidebar = false"
-        class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700 transform transition-transform duration-200 md:relative md:translate-x-0 md:block"
-        :class="{ '-translate-x-full': !showSidebar && window.innerWidth < 768 }"
-        >
-       <div class="p-4 text-sm font-medium text-gray-700 dark:text-gray-300">
-
-            <!-- Feeds -->
-            <div class="mb-6">
-                <a href="/member/community"
-                   class="flex items-center space-x-2 px-4 py-2 rounded-md transition
-                   {{ Request::is('/') ? 'bg-[#F0F3F5] text-[#545861] dark:text-[#E4E7EB] dark:bg-[#42464D] font-semibold' : 'hover:text-[#FFD736]' }}">
-                    <i class="fa fa-home"></i>
-                    <span>Feeds</span>
-                </a>
-            </div>
-
-            <!-- Get Started -->
-            <div x-data="{ open: true }" class="group relative mt-10 mb-6">
-            <div @click="open = !open"
-                class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
-                <div class="flex items-center space-x-2">
-                    <span>Get Started</span>
-                </div>
-                <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
-                :class="{ 'rotate-180': !open }"></i>
-            </div>
-
-            <template x-if="open">
-                <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
-                    <a href="/member/say-hello"
-                    class="flex items-center space-x-2 py-1 rounded-md transition 
-                    {{ Request::is('say-hello') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                        <span>👋</span><span>Say Hello</span>
-                    </a>
-                    <a href="/ask-question"
-                    class="flex items-center space-x-2 py-1 rounded-md transition 
-                    {{ Request::is('ask-question') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                        <span>🙏</span><span>Ask Question</span>
-                    </a>
-                </div>
-            </template>
-        </div>
-
-
-            <!-- Others -->
-            <div x-data="{ open: true }" class="group relative mt-10 mb-6">
-                <div @click="open = !open"
-                    class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
-                    <div class="flex items-center space-x-2">
-                        <span>Others</span>
-                    </div>
-                    <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
-                    :class="{ 'rotate-180': !open }"></i>
-                </div>
-                <template x-if="open">
-                    <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
-                        <a href="/post-progress"
-                        class="flex items-center space-x-2 py-1 rounded-md transition 
-                        {{ Request::is('post-progress') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <span>🎬</span><span>Post Progress</span>
-                        </a>
-                        <a href="/lessons"
-                        class="flex items-center space-x-2 py-1 rounded-md transition 
-                        {{ Request::is('lessons') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <span>🎹</span><span>Lessons</span>
-                        </a>
-                    </div>
-                </template>
-            </div>
-
-
-            <!-- Forum -->
-            <div x-data="{ open: true }" class="group relative mt-10">
-                <div @click="open = !open"
-                     class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa fa-comments"></i>
-                        <span>Forum</span>
-                    </div>
-                    <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
-                       :class="{ 'rotate-180': !open }"></i>
-                </div>
-                <template x-if="open">
-                    <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
-                        <a href="/forum/beginner"
-                           class="flex items-center space-x-2 py-1 rounded-md transition 
-                           {{ Request::is('forum/beginner') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <img src="/images/featured1.jpeg" class="h-5 " alt="Beginners forum"></i><span>Beginner</span>
-                        </a>
-                        <a href="/forum/intermediate"
-                           class="flex items-center space-x-2 py-1 rounded-md transition 
-                           {{ Request::is('forum/intermediate') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                           <img src="/images/featured2.jpeg" class="h-5 " alt="Intermediate forum"><span>Intermediate</span>
-                        </a>
-                        <a href="/forum/advance"
-                           class="flex items-center space-x-2 py-1 rounded-md transition 
-                           {{ Request::is('forum/advance') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <img src="/images/featured3.jpeg" class="h-5 " alt="Advance forum"><span>Advance</span>
-                        </a>
-                    </div>
-                </template>
-            </div>
-
-            {{-- <div class="mt-8 fixed bottom-1 bg-gray-100 dark:bg-gray-700 rounded-md">
-                <a href="/kingsleykhord.com/home"
-                   class="flex items-center space-x-2 px-4 py-2 rounded-md transition 
-                   {{ Request::is('kingsleykhord.com/home') ? 'bg-[#F0F3F5] text-[#545861] dark:text-[#E4E7EB] dark:bg-[#42464D] font-semibold' : 'hover:text-[#FFD736]' }}">
-                    <i class="fa fa-sign-out" aria-hidden="true"></i>
-                    <span>Back</span>
-                    {{auth()->user()->first_name?? ""}} {{auth()->user()->last_name  ?? ''}}
-                </a>
-            </div> --}}
-
-        </div>
-    </aside>
-
-
-
-
-    <!-- Page Content -->
-    <section class="flex-1">
-        @yield('content')
-    </section>
-</main>
-
-
-
+        <!-- Scrollable content area -->
+        <main class="flex-1 overflow-y-auto">
+            @yield('content')
+        </main>
     </div>
-
+</div>
     <script>
       function themeToggle() {
     return {
@@ -364,6 +359,6 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-</body>
 
+</body>
 </html>
