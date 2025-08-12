@@ -124,6 +124,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');
     Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
     ->name('notifications.markAllAsRead');
+    Route::get('/community/u/{community}', [CommunityController::class, 'show']);
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {

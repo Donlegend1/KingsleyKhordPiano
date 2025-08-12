@@ -66,7 +66,7 @@ use App\Http\Controllers\PostReplyController;
 
         Route::post('/comment', [PostCommentController::class, 'store'])->name('comment.store');
         Route::post('/like', [PostLikeController::class, 'store'])->name('like.toggle');
-
+        Route::post('/community/{user}/status', [AdminController::class, 'updateUserStatus']);
 
         Route::post('/comment/reply/{postComment}', [PostReplyController::class, 'store'])->name('reply.post');
 

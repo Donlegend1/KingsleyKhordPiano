@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Community;
 use App\Enums\Roles\UserRoles;
 
 class AdminController extends Controller
@@ -72,6 +73,21 @@ class AdminController extends Controller
         $user->delete();
 
         return response()->json(['message' => "Record deleted"]);
+    }
+
+    public function updateUserStatus(Request $request, User $user)
+    {
+        $request->validate([
+            'status' => 'required|string|in:active,pending,blocked'
+        ]);
+
+        Community::where('user_id', $user->id)->update([
+            'status' => $request->input('status')
+        ]);
+
+        return response()->json([
+            'message' => 'Community status updated successfully'
+        ]);
     }
 
 }

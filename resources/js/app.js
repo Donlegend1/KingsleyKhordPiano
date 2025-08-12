@@ -35,5 +35,6 @@ import './components/Comment/OtherComment';
 import "./components/CreatePostBox.jsx";
 import "./components/PostList.jsx";
 import "./components/Members/MemberList.jsx"
+import "./components/Members/ProfileSection.jsx"
 
 

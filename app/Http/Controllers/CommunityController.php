@@ -37,7 +37,7 @@ class CommunityController extends Controller
      */
     public function show(Community $community)
     {
-        //
+        return view('community.single', compact('community'));
     }
 
     /**

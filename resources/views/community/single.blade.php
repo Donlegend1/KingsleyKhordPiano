@@ -1,28 +1,36 @@
-@extends("layouts.community")
+@extends('layouts.community')
 
-@section("content")
-
+@section('content')
 <!-- Header Section -->
-<div class="border border-gray-200 dark:border-gray-500">
-    <div class="flex justify-between items-center px-10 py-2 bg-white dark:bg-gray-800">
-        <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Members</h1>
-        <i class="fa fa-ellipsis-v text-gray-500 dark:text-gray-300" aria-hidden="true"></i>
+<div class="flex justify-between items-center mx-auto border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-500 px-10 py-4">
+    <!-- Breadcrumb -->
+    <div class="flex gap-2 items-center">
+        <a 
+            href="/member/community/members" 
+            class="font-semibold text-gray-800 dark:text-gray-100 hover:underline"
+        >
+            Members
+        </a>
+        <span>/</span>
+        <span class="text-sm text-gray-600 dark:text-gray-300">
+            {{ $community->user_name }}
+        </span>
     </div>
+
+    <!-- Edit Profile Button -->
+    <a 
+        href="#" 
+        class="flex items-center gap-1 bg-black dark:bg-gray-100 rounded-md px-3 py-1 text-white dark:text-black text-sm hover:opacity-90"
+    >
+        <span class="fa fa-edit"></span>
+        Edit Profile
+    </a>
 </div>
 
-<div class="overflow-scroll h-screen">
-  <!-- Quick Links Navigation -->
-<div class="flex justify-between items-center px-10 py-2 bg-white dark:bg-gray-800 border border-t-0 border-gray-200 dark:border-gray-500">
-    <div class="flex space-x-6 text-gray-500 dark:text-gray-200 text-sm">
-        <a href="/home" class="hover:text-gray-700">🏠 Dashboard</a>
-        <a href="/member/roadmap" class="hover:text-gray-700">🗺️ Roadmap</a>
-        <a href="//member/plugins" class="hover:text-gray-700">📁 Download</a>
-    </div>
+<!-- Main Content -->
+<div class="overflow-y-auto h-screen p-4">
+   <div id="community-profile">
+
+   </div>
 </div>
-
-</div>
-
-
-
-
 @endsection

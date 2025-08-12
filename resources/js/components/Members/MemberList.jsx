@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { MoreVertical, Search, LucideVerified, X } from "lucide-react";
+import {
+    FaCheckCircle,
+    FaFacebook,
+    FaInstagram,
+    FaYoutube,
+    FaTwitter,
+    FaSearch,
+    FaEllipsisV,
+} from "react-icons/fa";
 import ReactDOM from "react-dom/client";
-import { FlashMessageProvider, useFlashMessage } from "../Alert/FlashMessageContext";
+import {
+    FlashMessageProvider,
+    useFlashMessage,
+} from "../Alert/FlashMessageContext";
 import CustomPagination from "../Pagination/CustomPagination";
 import axios from "axios";
 
@@ -92,13 +103,17 @@ const MemberList = () => {
 
     const updateUserStatus = async (userId, status) => {
         try {
-            const res = await axios.post(`/api/users/${userId}/status`, {
-                status: status,
-            });
+            const res = await axios.post(
+                `/api/member/community/${userId}/status`,
+                {
+                    status: status,
+                }
+            );
             if (res.ok) {
-                showMessage("Status updated", 'success')
+                showMessage("Status updated", "success");
+                fetchUsers();
             } else {
-                showMessage("Status updated", 'success')
+                showMessage("Status updated", "success");
                 console.error("Failed to update status");
             }
         } catch (error) {
@@ -130,7 +145,7 @@ const MemberList = () => {
             {/* Search */}
             <div className="px-10 py-6 bg-gray-50 dark:bg-gray-900">
                 <div className="w-full relative">
-                    <Search
+                    <FaSearch
                         className="absolute mt-2 left-3 top-1/2 -translate-y-1/2 text-gray-400"
                         size={18}
                     />
@@ -191,12 +206,17 @@ const MemberList = () => {
                                             }
                                         >
                                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer">
-                                                {member.first_name}{" "}
-                                                {member.last_name}
+                                                <a
+                                                    className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:underline"
+                                                    href={`/member/community/u/${member?.community?.id}`}
+                                                >
+                                                    {member.first_name}{" "}
+                                                    {member.last_name}
+                                                </a>
                                             </p>
                                             {member.community
                                                 ?.verified_status === 1 && (
-                                                <LucideVerified className="text-blue-400 w-4 h-4" />
+                                                <FaCheckCircle className="text-blue-400 w-4 h-4" />
                                             )}
                                             <span className="text-xs text-gray-500">
                                                 {member.community?.user_name}
@@ -214,10 +234,14 @@ const MemberList = () => {
                                                             alt={member.name}
                                                             className="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600"
                                                         />
-                                                        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                                        <a
+                                                            className="text-sm font-semibold text-gray-900 dark:text-gray-100"
+                                                            href={`/member/community/u/${member?.community?.id}`}
+                                                        >
                                                             {member.first_name}{" "}
                                                             {member.last_name}
-                                                        </h4>
+                                                        </a>
+
                                                         <p className="text-xs text-gray-600 dark:text-gray-400">
                                                             {member.role ===
                                                             "admin"
@@ -245,7 +269,7 @@ const MemberList = () => {
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                             >
-                                                                <span className="fa fa-facebook text-blue-600 hover:opacity-80" />
+                                                                <FaFacebook className="fa fa-instagram text-blue-600 hover:opacity-80" />{" "}
                                                             </a>
                                                         )}
                                                         {member.community
@@ -261,7 +285,7 @@ const MemberList = () => {
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                             >
-                                                                <X className=" text-sky-500 hover:opacity-80" />
+                                                                <FaTwitter className=" text-sky-500 hover:opacity-80" />
                                                             </a>
                                                         )}
                                                         {member.community
@@ -277,7 +301,7 @@ const MemberList = () => {
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                             >
-                                                                <span className="fa fa-instagram text-pink-500 hover:opacity-80" />
+                                                                <FaInstagram className="fa fa-instagram text-pink-500 hover:opacity-80" />
                                                             </a>
                                                         )}
                                                         {member.community
@@ -293,7 +317,7 @@ const MemberList = () => {
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                             >
-                                                                <span className="fa fa-youtube text-red-500 hover:opacity-80" />
+                                                                <FaYoutube className="fa fa-instagram text-pink-500 hover:opacity-80" />
                                                             </a>
                                                         )}
                                                     </div>
@@ -330,7 +354,7 @@ const MemberList = () => {
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                 >
-                                                    <span className="fa fa-facebook text-blue-600 hover:opacity-80" />
+                                                    <FaFacebook className="fa fa-instagram text-blue-600 hover:opacity-80" />
                                                 </a>
                                             )}
                                             {member.community?.social?.x && (
@@ -343,7 +367,7 @@ const MemberList = () => {
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                 >
-                                                    <X className=" text-sky-500 hover:opacity-80" />
+                                                    <FaTwitter className=" text-sky-500 hover:opacity-80" />
                                                 </a>
                                             )}
                                             {member.community?.social
@@ -356,7 +380,7 @@ const MemberList = () => {
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                 >
-                                                    <span className="fa fa-instagram text-pink-500 hover:opacity-80" />
+                                                    <FaInstagram className="fa fa-instagram text-pink-500 hover:opacity-80" />
                                                 </a>
                                             )}
                                             {member.community?.social
@@ -369,7 +393,7 @@ const MemberList = () => {
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                 >
-                                                    <span className="fa fa-youtube text-red-500 hover:opacity-80" />
+                                                    <FaYoutube className="fa fa-instagram text-red-500 hover:opacity-80" />
                                                 </a>
                                             )}
                                         </div>
@@ -386,10 +410,7 @@ const MemberList = () => {
                                             toggleMenu(e, member.id)
                                         }
                                     >
-                                        <MoreVertical
-                                            size={18}
-                                            className="text-gray-600 dark:text-gray-300"
-                                        />
+                                        <FaEllipsisV className="text-gray-600 dark:text-gray-300" />
                                     </button>
                                     {openMenuId === member.id && (
                                         <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
@@ -409,7 +430,7 @@ const MemberList = () => {
                                                 onClick={() =>
                                                     updateUserStatus(
                                                         member.id,
-                                                        "inactive"
+                                                        "pending"
                                                     )
                                                 }
                                             >
@@ -420,7 +441,7 @@ const MemberList = () => {
                                                 onClick={() =>
                                                     updateUserStatus(
                                                         member.id,
-                                                        "banned"
+                                                        "blocked"
                                                     )
                                                 }
                                             >
