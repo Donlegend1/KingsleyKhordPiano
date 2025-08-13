@@ -1,24 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaCheckCircle,
     FaUserEdit,
     FaCalendar,
-    FaTimesCircle,
     FaClock,
     FaFacebook,
     FaInstagram,
     FaYoutube,
 } from "react-icons/fa";
 import ReactDOM from "react-dom/client";
+import { useParams } from "react-router-dom";
 import {
     FlashMessageProvider,
     useFlashMessage,
 } from "../Alert/FlashMessageContext";
-import CustomPagination from "../Pagination/CustomPagination";
 import axios from "axios";
 import { FaX } from "react-icons/fa6";
+import PostList from "../PostList";
+import { formatRelativeTime } from "../../utils/formatRelativeTime";
+
 const ProfileSection = () => {
     const [activeTab, setActiveTab] = useState("about");
+    const [member, setMember] = useState({});
+    // const { id } = useParams();
+    const { showMessage } = useFlashMessage();
+
+    const lastSegment = window.location.pathname
+        .split("/")
+        .filter(Boolean)
+        .pop();
 
     const tabs = [
         { id: "about", label: "About" },
@@ -26,6 +36,19 @@ const ProfileSection = () => {
         { id: "spaces", label: "Spaces" },
         { id: "comments", label: "Comments" },
     ];
+    
+    const getMemberDetails = async () => {
+        try {
+            const res = await axios.get(`/api/member/user/${lastSegment}`);
+            setMember(res.data);
+        } catch (error) {
+            showMessage(error.response?.data?.message, "error");
+        }
+    };
+
+    useEffect(() => {
+        getMemberDetails();
+    }, []);
 
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen rounded-full">
@@ -47,12 +70,14 @@ const ProfileSection = () => {
                     <div>
                         <div className="flex items-center space-x-1">
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                Kingsley Akunwa
+                                {member.user?.first_name} {member.user?.last_name}
                             </h2>
-                            <FaCheckCircle className="text-blue-500" />
+                            {member.community?.verified_status === 1 && (
+                                <FaCheckCircle className="text-blue-500" />
+                            )}
                         </div>
                         <p className="text-gray-500 dark:text-gray-400">
-                            @kingsleykhord
+                            {member.community?.user_name}
                         </p>
                     </div>
                 </div>
@@ -86,7 +111,7 @@ const ProfileSection = () => {
                                     About
                                 </h3>
                                 <a
-                                    href="/"
+                                    href={`/member/community/u/${member?.id}/update`}
                                     className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
                                 >
                                     <FaUserEdit size={18} />
@@ -95,16 +120,19 @@ const ProfileSection = () => {
 
                             {/* Details */}
                             <div className="space-y-3 text-gray-700 dark:text-gray-300 text-sm">
-                                <p className="font-medium">Piano Instructor</p>
+                                <p className="font-medium">
+                                    {" "}
+                                    {member.community?.bio}
+                                </p>
 
                                 <p className="flex items-center gap-2">
                                     <FaCalendar className="text-gray-500 dark:text-gray-400" />
-                                    Joined 7 months ago
+                                    {formatRelativeTime(member.user?.created_at)}
                                 </p>
 
                                 <p className="flex items-center gap-2">
                                     <FaClock className="text-gray-500 dark:text-gray-400" />
-                                    Last Seen a few seconds ago
+                                    {formatRelativeTime(member.user?.last_login_at)}
                                 </p>
 
                                 <div className="flex flex-col pt-2">
@@ -114,31 +142,41 @@ const ProfileSection = () => {
 
                                     <div className="flex flex-col gap-4 text-sm">
                                         <a
-                                            href="#"
+                                            target="blank"
+                                            href={
+                                                member.social?.instagram
+                                            }
                                             className="flex items-center gap-1 text-pink-500 hover:text-pink-600"
                                         >
-                                            <FaInstagram /> Kingsleykhord
+                                            <FaInstagram /> {member.user_name}
                                         </a>
 
                                         <a
-                                            href="#"
+                                            target="blank"
+                                            href={
+                                                member.social?.facebook
+                                            }
                                             className="flex items-center gap-1 text-blue-500 hover:text-blue-600"
                                         >
-                                            <FaFacebook /> Kingsleykhord
+                                            <FaFacebook /> {member.user_name}
                                         </a>
 
                                         <a
-                                            href="#"
+                                            target="blank"
+                                            href={
+                                                member?.social?.youtube
+                                            }
                                             className="flex items-center gap-1 text-red-500 hover:text-red-600"
                                         >
-                                            <FaYoutube /> Kingsleykhord
+                                            <FaYoutube /> {member.user_name}
                                         </a>
 
                                         <a
-                                            href="#"
+                                            target="blank"
+                                            href={member?.social?.x}
                                             className="flex items-center gap-1 text-gray-800 hover:text-gray-900 dark:text-gray-200 dark:hover:text-gray-100"
                                         >
-                                            <FaX /> Kingsleykhord
+                                            <FaX /> {member.user_name}
                                         </a>
                                     </div>
                                 </div>
@@ -146,14 +184,9 @@ const ProfileSection = () => {
                         </div>
                     )}
 
-                    {activeTab === "post" && (
+                    {activeTab === "posts" && (
                         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
-                                Post Details
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">
-                                User posts go here...
-                            </p>
+                            <PostList />
                         </div>
                     )}
                     {activeTab === "spaces" && (

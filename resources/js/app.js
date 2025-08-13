@@ -36,5 +36,7 @@ import "./components/CreatePostBox.jsx";
 import "./components/PostList.jsx";
 import "./components/Members/MemberList.jsx"
 import "./components/Members/ProfileSection.jsx"
+import "./components/Members/MemberSpaces.jsx"
+import "./components/Members/ProfileSectionEdit.jsx"
 
 

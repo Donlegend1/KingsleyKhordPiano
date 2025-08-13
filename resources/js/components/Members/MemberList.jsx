@@ -113,7 +113,7 @@ const MemberList = () => {
                 showMessage("Status updated", "success");
                 fetchUsers();
             } else {
-                showMessage("Status updated", "success");
+                showMessage("Status not updated", "error");
                 console.error("Failed to update status");
             }
         } catch (error) {
@@ -208,7 +208,7 @@ const MemberList = () => {
                                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer">
                                                 <a
                                                     className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:underline"
-                                                    href={`/member/community/u/${member?.community?.id}`}
+                                                    href={`/member/community/user/${member?.community?.id}`}
                                                 >
                                                     {member.first_name}{" "}
                                                     {member.last_name}

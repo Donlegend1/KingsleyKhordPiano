@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 
+import { formatRelativeTime } from "../utils/formatRelativeTime"
+
 const getInitials = (firstName, lastName) => {
     return `${firstName?.charAt(0) || ""}${
         lastName?.charAt(0) || ""
@@ -31,26 +33,6 @@ const PostWithComments = ({
     const author = post.user || {};
     const initials = getInitials(author.first_name, author.last_name);
 
-    const formatRelativeTime = (dateString) => {
-        const now = Date.now(); // current UTC timestamp in ms
-        const posted = Date.parse(dateString); // parse ISO date string as UTC
-
-        const diffInSeconds = Math.floor((now - posted) / 1000);
-
-        if (isNaN(diffInSeconds)) return "Invalid date";
-
-        if (diffInSeconds < 60) {
-            return `${diffInSeconds} second${
-                diffInSeconds !== 1 ? "s" : ""
-            } ago`;
-        } else if (diffInSeconds < 3600) {
-            const minutes = Math.floor(diffInSeconds / 60);
-            return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
-        } else {
-            const hours = Math.floor(diffInSeconds / 3600);
-            return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-        }
-    };
 
     const capitaliseAndRemoveHyphen = (text) => {
         return text

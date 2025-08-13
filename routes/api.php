@@ -13,6 +13,8 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\PostReplyController;
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +49,7 @@ use App\Http\Controllers\PostReplyController;
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
         Route::get('courses', [CourseController::class, 'index']);
+        Route::get('user/{community}', [UserController::class, 'getSingleUser']);
         Route::get('courses/{level}', [CourseController::class, 'membershowAPI']);  
         Route::get('course/{course}', [CourseController::class, 'show']);
         Route::get('course/{course}/lessons', [CourseController::class, 'lessons']);

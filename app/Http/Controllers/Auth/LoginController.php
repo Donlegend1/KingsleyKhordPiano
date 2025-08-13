@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -19,13 +19,12 @@ class LoginController extends Controller
     }
 
     /**
-     * This method is called automatically after successful login.
+     * Called automatically after a successful login.
      */
-    protected function authenticated($request, $user)
+    protected function authenticated(Request $request, $user)
     {
-        // Run your command here after login
-        // Artisan::call('subscriptions:check-expired');
-        
-        $user->update(['last_login_at' => now()]);
+        $user->update([
+            'last_login_at' => now()
+        ]);
     }
 }
