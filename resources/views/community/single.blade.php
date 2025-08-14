@@ -19,7 +19,7 @@
 
     <!-- Edit Profile Button -->
     <a 
-        href="#" 
+        href="/member/community/u/{{$community->id}}/update" 
         class="flex items-center gap-1 bg-black dark:bg-gray-100 rounded-md px-3 py-1 text-white dark:text-black text-sm hover:opacity-90"
     >
         <span class="fa fa-edit"></span>

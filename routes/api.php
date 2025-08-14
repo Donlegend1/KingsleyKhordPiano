@@ -50,6 +50,8 @@ use App\Http\Controllers\UserController;
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
         Route::get('courses', [CourseController::class, 'index']);
         Route::get('user/{community}', [UserController::class, 'getSingleUser']);
+        Route::post('user/{community}/update', [UserController::class, 'updateUserCommunity']);
+        Route::post('passport', [UserController::class, 'updateUserPassport']);
         Route::get('courses/{level}', [CourseController::class, 'membershowAPI']);  
         Route::get('course/{course}', [CourseController::class, 'show']);
         Route::get('course/{course}/lessons', [CourseController::class, 'lessons']);
@@ -66,6 +68,7 @@ use App\Http\Controllers\UserController;
         Route::post('/post', [PostController::class, 'store'])->name('post.store');
         Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.delete');
         Route::get('/posts', [PostController::class, 'index'])->name('post.index');
+        Route::get('/posts/member/{community}', [PostController::class, 'postByUser'])->name('post.user');
 
         Route::post('/comment', [PostCommentController::class, 'store'])->name('comment.store');
         Route::post('/like', [PostLikeController::class, 'store'])->name('like.toggle');

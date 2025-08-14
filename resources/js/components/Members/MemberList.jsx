@@ -191,7 +191,7 @@ const MemberList = () => {
                                 {/* Left Section */}
                                 <div className="flex items-start gap-3">
                                     <img
-                                        src={member.avatar || "/avatar1.jpg"}
+                                        src={member.passport || "/avatar1.jpg"}
                                         alt={member.name}
                                         className="w-10 h-10 rounded-full object-cover border border-gray-300 dark:border-gray-600"
                                     />

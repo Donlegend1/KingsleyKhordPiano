@@ -13,7 +13,7 @@
         </a>
         <span>/</span>
         <span class="text-sm text-gray-600 dark:text-gray-300">
-          <a href="/member/community/u/{{$community->user_id}}">{{ $community->user_name }}</a>  
+          <a href="/member/community/user/{{$community->id}}">{{ $community->user_name }}</a>  
         </span>
     </div>
 

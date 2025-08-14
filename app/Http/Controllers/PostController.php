@@ -8,6 +8,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\Community;
 
 class PostController extends Controller
 {
@@ -149,4 +150,31 @@ class PostController extends Controller
         ], 200);
     }
 
+    public function postByUser(Request $request, Community $community)
+    {
+         $query = Post::where('user_id', $community->user_id)->with([
+            'comments.user',          
+            'comments.replies.user',  
+            'likes.user',             
+            'user' ,                 
+            'media'
+        ]);
+
+        switch ($request->get('sort')) {
+            case 'old':
+                $query->oldest();
+                break;
+            case 'popular':
+                $query->withCount('comments')->orderByDesc('comments_count');
+                break;
+            case 'likes':
+                $query->withCount('likes')->orderByDesc('likes_count');
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+        }
+
+        return response()->json($query->paginate(5));
+    }
 }

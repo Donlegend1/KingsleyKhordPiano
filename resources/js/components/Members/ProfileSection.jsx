@@ -7,6 +7,8 @@ import {
     FaFacebook,
     FaInstagram,
     FaYoutube,
+    FaEdit,
+    FaTwitter,
 } from "react-icons/fa";
 import ReactDOM from "react-dom/client";
 import { useParams } from "react-router-dom";
@@ -15,15 +17,20 @@ import {
     useFlashMessage,
 } from "../Alert/FlashMessageContext";
 import axios from "axios";
-import { FaX } from "react-icons/fa6";
+import { FaWebAwesome, FaX } from "react-icons/fa6";
 import PostList from "../PostList";
 import { formatRelativeTime } from "../../utils/formatRelativeTime";
+import MemberSpaces from "./MemberSpaces";
+import ProfileCover from "./ProfileCover";
+import Comments from "./Comments";
 
 const ProfileSection = () => {
     const [activeTab, setActiveTab] = useState("about");
     const [member, setMember] = useState({});
-    // const { id } = useParams();
     const { showMessage } = useFlashMessage();
+    const [coverImage, setCoverImage] = useState(
+        member.user?.passport || "/avatar1.jpg"
+    );
 
     const lastSegment = window.location.pathname
         .split("/")
@@ -36,7 +43,7 @@ const ProfileSection = () => {
         { id: "spaces", label: "Spaces" },
         { id: "comments", label: "Comments" },
     ];
-    
+
     const getMemberDetails = async () => {
         try {
             const res = await axios.get(`/api/member/user/${lastSegment}`);
@@ -50,27 +57,47 @@ const ProfileSection = () => {
         getMemberDetails();
     }, []);
 
+    const imageClick = () => {
+        document.getElementById("passport").click();
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const imageUrl = URL.createObjectURL(file);
+            setCoverImage(imageUrl);
+        }
+    };
+
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen rounded-full">
             {/* Cover Image */}
-            <div className="relative bg-gray-300 h-48">
-                <button className="absolute top-3 right-3 bg-white text-sm px-3 py-1 rounded shadow">
+            {/* <div className="relative bg-gray-300 h-48">
+                <button
+                    className="absolute top-3 right-3 bg-white text-sm px-3 py-1 rounded shadow"
+                    onClick={imageClick}
+                >
                     Upload Cover
                 </button>
-            </div>
+                <input
+                    type="file"
+                    name="passport"
+                    id="passport"
+                    className="hidden"
+                    onChange={handleImageChange}
+                />
+            </div> */}
+
+            <ProfileCover member={member} />
 
             {/* Profile Info */}
             <div className="bg-white dark:bg-gray-800 p-6 relative">
                 <div className="flex items-center space-x-4">
-                    <img
-                        src="/avatar1.jpg"
-                        alt="Profile"
-                        className="z-30 w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 -mt-12"
-                    />
                     <div>
                         <div className="flex items-center space-x-1">
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                {member.user?.first_name} {member.user?.last_name}
+                                {member.user?.first_name}{" "}
+                                {member.user?.last_name}
                             </h2>
                             {member.community?.verified_status === 1 && (
                                 <FaCheckCircle className="text-blue-500" />
@@ -127,12 +154,16 @@ const ProfileSection = () => {
 
                                 <p className="flex items-center gap-2">
                                     <FaCalendar className="text-gray-500 dark:text-gray-400" />
-                                    {formatRelativeTime(member.user?.created_at)}
+                                    {formatRelativeTime(
+                                        member.user?.created_at
+                                    )}
                                 </p>
 
                                 <p className="flex items-center gap-2">
                                     <FaClock className="text-gray-500 dark:text-gray-400" />
-                                    {formatRelativeTime(member.user?.last_login_at)}
+                                    {formatRelativeTime(
+                                        member.user?.last_login_at
+                                    )}
                                 </p>
 
                                 <div className="flex flex-col pt-2">
@@ -143,9 +174,7 @@ const ProfileSection = () => {
                                     <div className="flex flex-col gap-4 text-sm">
                                         <a
                                             target="blank"
-                                            href={
-                                                member.social?.instagram
-                                            }
+                                            href={member.social?.instagram}
                                             className="flex items-center gap-1 text-pink-500 hover:text-pink-600"
                                         >
                                             <FaInstagram /> {member.user_name}
@@ -153,9 +182,7 @@ const ProfileSection = () => {
 
                                         <a
                                             target="blank"
-                                            href={
-                                                member.social?.facebook
-                                            }
+                                            href={member.social?.facebook}
                                             className="flex items-center gap-1 text-blue-500 hover:text-blue-600"
                                         >
                                             <FaFacebook /> {member.user_name}
@@ -163,9 +190,7 @@ const ProfileSection = () => {
 
                                         <a
                                             target="blank"
-                                            href={
-                                                member?.social?.youtube
-                                            }
+                                            href={member?.social?.youtube}
                                             className="flex items-center gap-1 text-red-500 hover:text-red-600"
                                         >
                                             <FaYoutube /> {member.user_name}
@@ -191,37 +216,108 @@ const ProfileSection = () => {
                     )}
                     {activeTab === "spaces" && (
                         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
-                                Spaces Details
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">
-                                Spaces details go here...
-                            </p>
+                            <MemberSpaces showSection={lastSegment !== null} />
                         </div>
                     )}
                     {activeTab === "comments" && (
                         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
-                                Comment Details
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">
-                                Comments go here...
-                            </p>
+                            <Comments />
                         </div>
                     )}
                 </div>
 
                 {/* Right Column (Recent Activities) */}
-                <div className="w-1/3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
-                        Recent Activities
-                    </h3>
-                    <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                        <li>📝 Posted an update</li>
-                        <li>💬 Commented on a post</li>
-                        <li>📌 Joined a new space</li>
-                    </ul>
-                </div>
+                {activeTab === "about" && (
+                    <div className="w-1/3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
+                            Recent Activities
+                        </h3>
+                        <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <li>📝 Posted an update</li>
+                            <li>💬 Commented on a post</li>
+                            <li>📌 Joined a new space</li>
+                        </ul>
+                    </div>
+                )}
+                {activeTab !== "about" && activeTab !== "spaces" && (
+                    <div className="w-1/3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg max-h-fit">
+                        <div className="flex justify-between">
+                            <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
+                                About{" "}
+                            </h3>
+                            <a
+                                className="hover:bg-gray-100"
+                                href={`/member/community/u/${member.id}/update`}
+                            >
+                                <FaEdit />
+                            </a>
+                        </div>
+
+                        <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <p>{member.bio}</p>
+                        </ul>
+                        <div className="border-b border-gray-300 px-3"></div>
+
+                        <div className="text-xs text-gray-500 my-5">
+                            <p>
+                                Joined{" "}
+                                {formatRelativeTime(member.user?.created_at)}
+                            </p>
+                            <p>
+                                Last seen{" "}
+                                {formatRelativeTime(member.user?.last_login_at)}
+                            </p>
+                        </div>
+
+                        <div className="flex justify-between gap-2 mx-12 my-5">
+                            {member.social?.web_url && (
+                                <a
+                                    href={member.social?.web_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <FaWebAwesome />
+                                </a>
+                            )}
+                            {member.social?.instagram && (
+                                <a
+                                    href={member.social?.instagram}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <FaInstagram />
+                                </a>
+                            )}
+                            {member.social?.facebook && (
+                                <a
+                                    href={member.social?.facebook}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <FaFacebook />
+                                </a>
+                            )}
+                            {member.social?.x && (
+                                <a
+                                    href={member.social?.x}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <FaTwitter />
+                                </a>
+                            )}
+                            {member.social?.youtube && (
+                                <a
+                                    href={member.social?.youtube}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <FaYoutube />
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

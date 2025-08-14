@@ -26,11 +26,21 @@ const PostList = () => {
         body: "",
         category: "",
         subcategory: "",
-        media: []
+        media: [],
     });
 
     const [showSkeleton, setShowSkeleton] = useState(false);
     const [mediaFiles, setMediaFiles] = useState([]);
+
+    const lastSegment = (() => {
+        const segment = window.location.pathname
+            .split("/")
+            .filter(Boolean)
+            .pop();
+
+        const num = Number(segment);
+        return isNaN(num) ? null : num;
+    })();
 
     useEffect(() => {
         let timer;
@@ -97,6 +107,41 @@ const PostList = () => {
         }
     }, [sortBy, hasMore, loading, page]);
 
+    const fetchPostsByMember = useCallback(async () => {
+        if (!hasMore || loading) return;
+        setLoading(true);
+
+        try {
+            const response = await axios.get(
+                `/api/member/posts/member/${lastSegment}`,
+                {
+                    params: {
+                        page,
+                        sort: sortBy,
+                    },
+                }
+            );
+
+            const newPosts = response.data.data;
+            const currentPage = response.data.current_page;
+            const lastPage = response.data.last_page;
+
+            setPosts((prev) => {
+                const existingIds = new Set(prev.map((p) => p.id));
+                const uniqueNewPosts = newPosts.filter(
+                    (p) => !existingIds.has(p.id)
+                );
+                return [...prev, ...uniqueNewPosts];
+            });
+
+            setHasMore(currentPage < lastPage);
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [sortBy, hasMore, loading, page]);
+
     useEffect(() => {
         setPosts([]);
         setPage(1);
@@ -104,7 +149,11 @@ const PostList = () => {
     }, [sortBy]);
 
     useEffect(() => {
-        fetchPosts();
+        if (lastSegment) {
+            fetchPostsByMember();
+        } else {
+            fetchPosts();
+        }
     }, [page, sortBy]);
 
     useEffect(() => {
@@ -141,7 +190,7 @@ const PostList = () => {
                 category: "",
                 subcategory: "",
             });
-            setMediaFiles([])
+            setMediaFiles([]);
             setExpanded(false);
             setPosts([]);
             setPage(1);

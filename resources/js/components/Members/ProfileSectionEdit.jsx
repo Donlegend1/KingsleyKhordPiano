@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
     FaCheckCircle,
     FaUserEdit,
-    FaCalendar,
-    FaClock,
     FaFacebook,
     FaInstagram,
     FaYoutube,
@@ -15,25 +13,28 @@ import {
 } from "../Alert/FlashMessageContext";
 import axios from "axios";
 import { FaX } from "react-icons/fa6";
-import PostList from "../PostList";
-import { formatRelativeTime } from "../../utils/formatRelativeTime";
+import ProfileCover from "./ProfileCover";
 
 const ProfileSectionEdit = () => {
     const [activeTab, setActiveTab] = useState("about");
     const [member, setMember] = useState({});
+    const [loading, setLoading] = useState(false);
+    const { showMessage } = useFlashMessage();
     const [formData, setFormData] = useState({
+        id: null,
         first_name: "",
         last_name: "",
         email: "",
-        website: "",
-        bio: "",
+        web_url: "",
+        short_bio: "",
         instagram: "",
         facebook: "",
         youtube: "",
         x: "",
         status: "",
-        nickname: "",
+        user_name: "",
     });
+
     const segments = window.location.pathname.split("/").filter(Boolean);
 
     const secondToLast = segments[segments.length - 2] || null;
@@ -61,17 +62,18 @@ const ProfileSectionEdit = () => {
     useEffect(() => {
         if (member && Object.keys(member).length > 0) {
             setFormData({
+                id: member.id,
                 first_name: member.user?.first_name || "",
                 last_name: member.user?.last_name || "",
                 email: member.user?.email || "",
-                website: member?.website || "",
-                bio: member?.bio || "",
+                web_url: member?.social?.website || "",
+                short_bio: member?.bio || "",
                 instagram: member?.social?.instagram || "",
                 facebook: member?.social?.facebook || "",
                 youtube: member?.social?.youtube || "",
                 x: member?.social?.x || "",
                 status: member.status || "",
-                nickname: member.user_name || "",
+                user_name: member.user_name || "",
             });
         }
     }, [member]);
@@ -80,29 +82,33 @@ const ProfileSectionEdit = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form submitted:", formData);
-        // TODO: send data to backend
+        setLoading(true);
+
+        try {
+            await axios.post(
+                `/api/member/user/${formData?.id}/update`,
+                formData
+            );
+
+            showMessage("Details Updated", "success");
+            window.location = `/member/community/user/${formData?.id}`;
+        } catch (error) {
+            showMessage("Error updating user.", "error");
+            console.error("Error creating post:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen rounded-full">
             {/* Cover Image */}
-            <div className="relative bg-gray-300 h-48">
-                <button className="absolute top-3 right-3 bg-white text-sm px-3 py-1 rounded shadow">
-                    Upload Cover
-                </button>
-            </div>
+            <ProfileCover member={member}/>
 
-            {/* Profile Info */}
             <div className="bg-white dark:bg-gray-800 p-6 relative">
                 <div className="flex items-center space-x-4">
-                    <img
-                        src="/avatar1.jpg"
-                        alt="Profile"
-                        className="z-30 w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 -mt-12"
-                    />
                     <div>
                         <div className="flex items-center space-x-1">
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -158,7 +164,7 @@ const ProfileSectionEdit = () => {
                                 type="text"
                                 name="first_name"
                                 placeholder="First Name"
-                                value={formData.first_name}
+                                defaultValue={formData.first_name}
                                 onChange={handleChange}
                                 className="px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
                             />
@@ -166,7 +172,7 @@ const ProfileSectionEdit = () => {
                                 type="text"
                                 name="last_name"
                                 placeholder="Last Name"
-                                value={formData.last_name}
+                                defaultValue={formData.last_name}
                                 onChange={handleChange}
                                 className="px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
                             />
@@ -178,15 +184,15 @@ const ProfileSectionEdit = () => {
                                 type="email"
                                 name="email"
                                 placeholder="Email"
-                                value={formData.email}
+                                defaultValue={formData.email}
                                 onChange={handleChange}
                                 className="px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
                             />
                             <input
                                 type="text"
-                                name="nickname"
+                                name="user_name"
                                 placeholder="Nickname"
-                                value={formData.nickname}
+                                defaultValue={formData.user_name}
                                 onChange={handleChange}
                                 className="px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
                             />
@@ -197,16 +203,15 @@ const ProfileSectionEdit = () => {
                             type="url"
                             name="web_url"
                             placeholder="Website URL"
-                            value={formData.web_url}
+                            defaultValue={formData.web_url}
                             onChange={handleChange}
                             className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
                         />
 
-                        {/* Short Bio */}
                         <textarea
                             name="short_bio"
                             placeholder="Short Bio"
-                            value={formData.short_bio}
+                            defaultValue={formData.short_bio}
                             onChange={handleChange}
                             className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
                             rows="3"
@@ -274,10 +279,11 @@ const ProfileSectionEdit = () => {
 
                         {/* Submit */}
                         <button
+                            disabled={loading}
                             type="submit"
                             className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                         >
-                            Save Changes
+                            {loading ? "Saving" : "Save Changes"}
                         </button>
                     </form>
                 </div>
