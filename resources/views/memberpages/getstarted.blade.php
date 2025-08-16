@@ -42,7 +42,7 @@
         <p>This site is big!! Kingsley has created everything here from scratch. You need to know where things are</p>
       </div>
       <button
-        @click="video = 'https://your-link.com/video1'" 
+        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -57,7 +57,7 @@
         <p>Step by step breakdown of learning methods...</p>
       </div>
       <button
-        @click="video = 'https://your-link.com/video2'" 
+        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -75,7 +75,7 @@
         <p>A system that gives you access to tools and mastermind meetings...</p>
       </div>
       <button
-        @click="video = 'https://your-link.com/video3'" 
+        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -90,7 +90,7 @@
         <p>Get exposed to the right opportunities and transform your knowledge...</p>
       </div>
       <button
-        @click="video = 'https://your-link.com/video4'" 
+        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -114,7 +114,7 @@
       <div class="aspect-w-16 aspect-h-9">
         <iframe 
           x-bind:src="video" 
-          class="w-full h-[400px]" 
+          class="w-full h-[500px]" 
           frameborder="0" 
           allow="autoplay; encrypted-media" 
           allowfullscreen
@@ -269,6 +269,7 @@
   <!-- Community Area -->
   <div class="bg-gray-200 rounded-lg p-4 w-full  mx-auto flex justify-between items-center">
     <!-- Left side: Icon and text -->
+    <a href="/member/community">
     <div class="flex items-center space-x-4">
       <img src="/icons/community.png" alt="community">
       <div class="flex flex-col text-left">
@@ -276,6 +277,7 @@
         <span class="text-gray-700 text-[16px] font-sf">View the latest community activities</span>
       </div>
     </div>
+    </a>
     
 
     <!-- Right side: Forward Icon -->

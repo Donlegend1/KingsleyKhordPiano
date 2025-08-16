@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\Post;
+use App\Models\PostMedia;
+use Illuminate\Support\Str;
+use App\Models\Community;
+
 class CommunityIndexController extends Controller
 {
 
@@ -31,4 +36,14 @@ class CommunityIndexController extends Controller
     {
        return view('community.single');
     }
+
+    public function subcategory($subcategory)
+    {
+       return view('community.subcategory', compact('subcategory'));
+    }
+
+   public function singlePost(Post $post)
+   {
+      return view('community.single-post', compact('post'));
+   }
 }

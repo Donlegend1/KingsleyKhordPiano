@@ -55,79 +55,79 @@ class EarTrainingController extends Controller
         return response()->json($quiz);
     }
 
-   public function store(StoreQuizRequest $request)
-{
-    $thumbnail = $request->file('thumbnail');
-    $mainAudio = $request->file('main_audio');
+    public function store(StoreQuizRequest $request)
+    {
+        $thumbnail = $request->file('thumbnail');
+        $mainAudio = $request->file('main_audio');
 
-    $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-    $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
+        $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
+        $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
 
-    $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
-    $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
+        // Save in storage/ear_training/
+        $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
+        $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
 
-    $quiz = Quiz::create([
-        'title' => $request->title,
-        'description' => $request->description,
-        'video_url' => $request->video_url,
-        'thumbnail_path' => "/ear_training/thumbnails/$thumbnailName",
-        'main_audio_path' => "/ear_training/main_audios/$mainAudioName",
-        'category' => $request->category,
-    ]);
+        $quiz = Quiz::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'video_url' => $request->video_url,
+            'thumbnail_path' => "/storage/ear_training/thumbnails/$thumbnailName",
+            'main_audio_path' => "/storage/ear_training/main_audios/$mainAudioName",
+            'category' => $request->category,
+        ]);
 
-    foreach ($request->questions as $q) {
-        $audio = $q['audio'];
-        $audioName = time() . '_' . $audio->getClientOriginalName();
-        $audio->move(public_path('/ear_training/question_audios'), $audioName);
+        foreach ($request->questions as $q) {
+            $audio = $q['audio'];
+            $audioName = time() . '_' . $audio->getClientOriginalName();
+            $audio->move(public_path('storage/ear_training/question_audios'), $audioName);
 
-        $quiz->questions()->create([
-            'audio_path' => "/ear_training/question_audios/$audioName",
-            'correct_option' => $q['correct_option'],
+            $quiz->questions()->create([
+                'audio_path' => "/storage/ear_training/question_audios/$audioName",
+                'correct_option' => $q['correct_option'],
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Quiz created successfully.',
+            'quiz' => $quiz->load('questions'),
+        ], 201);
+    }
+
+    public function update(Request $request, Quiz $quiz)
+    {
+        if ($request->has('title')) {
+            $quiz->title = $request->title;
+        }
+
+        if ($request->has('description')) {
+            $quiz->description = $request->description;
+        }
+
+        if ($request->has('video_url')) {
+            $quiz->video_url = $request->video_url;
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+            $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
+            $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
+            $quiz->thumbnail_path = "/storage/ear_training/thumbnails/$thumbnailName";
+        }
+
+        if ($request->hasFile('main_audio')) {
+            $mainAudio = $request->file('main_audio');
+            $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
+            $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
+            $quiz->main_audio_path = "/storage/ear_training/main_audios/$mainAudioName";
+        }
+
+        $quiz->save();
+
+        return response()->json([
+            'message' => 'Quiz updated successfully.',
+            'quiz' => $quiz->load('questions'),
         ]);
     }
-
-    return response()->json([
-        'message' => 'Quiz created successfully.',
-        'quiz' => $quiz->load('questions'),
-    ], 201);
-}
-
-
-public function update(Request $request, Quiz $quiz)
-{
-    if ($request->has('title')) {
-        $quiz->title = $request->title;
-    }
-
-    if ($request->has('description')) {
-        $quiz->description = $request->description;
-    }
-
-    if ($request->has('video_url')) {
-        $quiz->video_url = $request->video_url;
-    }
-
-    if ($request->hasFile('thumbnail')) {
-        $thumbnail = $request->file('thumbnail');
-        $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-        $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
-        $quiz->thumbnail_path = "/ear_training/thumbnails/$thumbnailName";
-    }
-
-    if ($request->hasFile('main_audio')) {
-        $mainAudio = $request->file('main_audio');
-        $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
-        $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
-        $quiz->main_audio_path = "/ear_training/main_audios/$mainAudioName";
-    }
-
-    $quiz->save();
-
-    return response()->json([
-        'message' => 'Quiz updated successfully.',
-        'quiz' => $quiz->load('questions'),
-    ]);
-}
 
 
     public function destroy(Quiz $quiz)

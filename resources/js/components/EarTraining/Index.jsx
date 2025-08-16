@@ -29,7 +29,7 @@ const EarTraining = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     // const [selectedQuiz, setSelectedQuiz] = useState(null);
-    
+
     const [newQuestions, setNewQuestions] = useState([]);
 
     const perPage = 10;
@@ -365,46 +365,52 @@ const EarTraining = () => {
         }
     };
 
+    const addNewQuestionField = () => {
+        setNewQuestions([...newQuestions, { audio: null, correct_option: "" }]);
+    };
 
-const addNewQuestionField = () => {
-    setNewQuestions([...newQuestions, { audio: null, correct_option: "" }]);
-};
+    const removeNewQuestion = (index) => {
+        const updated = [...newQuestions];
+        updated.splice(index, 1);
+        setNewQuestions(updated);
+    };
 
-const removeNewQuestion = (index) => {
-    const updated = [...newQuestions];
-    updated.splice(index, 1);
-    setNewQuestions(updated);
-};
+    const handleNewQuestionChange = (index, field, value) => {
+        const updated = [...newQuestions];
+        updated[index][field] = value;
+        setNewQuestions(updated);
+    };
 
-const handleNewQuestionChange = (index, field, value) => {
-    const updated = [...newQuestions];
-    updated[index][field] = value;
-    setNewQuestions(updated);
-};
+    const submitNewQuestions = async () => {
+        if (!selectedQuiz?.id) return;
 
-const submitNewQuestions = async () => {
-    if (!selectedQuiz?.id) return;
-
-    const formData = new FormData();
-    newQuestions.forEach((q, i) => {
-        formData.append(`questions[${i}][audio]`, q.audio);
-        formData.append(`questions[${i}][correct_option]`, q.correct_option);
-    });
-
-    try {
-        await axios.post(`/admin/ear-training/${selectedQuiz.id}/questions`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-                "X-CSRF-TOKEN": csrfToken,
-            },
+        const formData = new FormData();
+        newQuestions.forEach((q, i) => {
+            formData.append(`questions[${i}][audio]`, q.audio);
+            formData.append(
+                `questions[${i}][correct_option]`,
+                q.correct_option
+            );
         });
 
-        setNewQuestions([]); // reset new question form
-        fetchQuizzes(); // refetch updated quiz
-    } catch (err) {
-        console.error("Error adding questions:", err);
-    }
-};
+        try {
+            await axios.post(
+                `/admin/ear-training/${selectedQuiz.id}/questions`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                }
+            );
+
+            setNewQuestions([]); // reset new question form
+            fetchQuizzes(); // refetch updated quiz
+        } catch (err) {
+            console.error("Error adding questions:", err);
+        }
+    };
 
     return (
         <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
@@ -453,10 +459,7 @@ const submitNewQuestions = async () => {
                                         <td className="py-2 px-4">
                                             <img
                                                 className="object-cover h-10 w-10"
-                                                src={
-                                                    "/storage/" +
-                                                    user.thumbnail_path
-                                                }
+                                                src={user.thumbnail_path}
                                                 alt=""
                                             />
                                         </td>
@@ -532,10 +535,7 @@ const submitNewQuestions = async () => {
                                     Thumbnail
                                 </label>
                                 <img
-                                    src={
-                                        "/storage/" +
-                                        selectedQuiz?.thumbnail_path
-                                    }
+                                    src={selectedQuiz?.thumbnail_path}
                                     alt="Thumbnail"
                                     className="w-48 h-32 object-cover rounded border"
                                 />
@@ -597,11 +597,11 @@ const submitNewQuestions = async () => {
                         {/* Main Audio Upload */}
                         <div>
                             <label className="block mb-1 font-medium">
-                                Main Audio
+                                Main Audio 
                             </label>
                             <audio
                                 controls
-                                src={`/storage/${selectedQuiz?.main_audio_path}`}
+                                src={`${selectedQuiz?.main_audio_path}`}
                                 className="mb-2 w-full"
                             />
                             <input
@@ -635,7 +635,7 @@ const submitNewQuestions = async () => {
                                             {q.audio_path && (
                                                 <audio
                                                     controls
-                                                    src={`/storage/${q.audio_path}`}
+                                                    src={`${q.audio_path}`}
                                                     className="mb-2 w-full"
                                                 />
                                             )}

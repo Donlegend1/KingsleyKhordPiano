@@ -76,6 +76,6 @@ class PostCommentController extends Controller
     public function destroy(PostComment $postComment)
     {
         $postComment->delete();
-        return redirect()->route('post_comments.index')->with('success', 'Post Comment deleted successfully.');
+        return response()->json('Post Comment deleted successfully', 200);
     }
 }

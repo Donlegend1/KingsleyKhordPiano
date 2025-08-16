@@ -7,6 +7,9 @@ import {
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
 
+const shuffleArray = (array) => {
+    return [...array].sort(() => Math.random() - 0.5);
+};
 
 const ShowEartraining = () => {
     const [quiz, setQuiz] = useState(null);
@@ -161,7 +164,13 @@ const ShowEartraining = () => {
                 const response = await axios.get(
                     `/admin/ear-training/${lastSegment}`
                 );
-                setQuiz(response.data);
+                let fetchedQuiz = response.data;
+
+                if (fetchedQuiz?.questions?.length) {
+                    fetchedQuiz.questions = shuffleArray(fetchedQuiz.questions);
+                }
+
+                setQuiz(fetchedQuiz);
             } catch (error) {
                 console.error("Error fetching quiz:", error);
             }
@@ -301,7 +310,7 @@ const ShowEartraining = () => {
                     </p>
                     <audio
                         controls
-                        src={`/storage/${quiz.main_audio_path}`}
+                        src={`${quiz.main_audio_path}`}
                         className="w-full max-w-2xl rounded-lg"
                     />
                 </div>
@@ -318,7 +327,7 @@ const ShowEartraining = () => {
                         <audio
                             controls
                             autoPlay
-                            src={`/storage/${question.audio_path}`}
+                            src={`${question.audio_path}`}
                             className="w-full max-w-md mx-auto rounded"
                         />
                     </div>
@@ -395,7 +404,7 @@ const ShowEartraining = () => {
                         )}
                     </div>
 
-                    <CourseComment course={quiz} group={'quiz'} />
+                    <CourseComment course={quiz} group={"quiz"} />
                 </>
             ) : (
                 <div className="text-center">

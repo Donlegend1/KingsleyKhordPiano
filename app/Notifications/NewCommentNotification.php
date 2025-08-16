@@ -42,10 +42,11 @@ class NewCommentNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('New Comment on Your Post')
-            ->greeting('Hello ' . $notifiable->first_name)
-            ->line($this->comment->user->first_name . ' ' . $this->comment->user->last_name . ' commented on your post.')
-            ->line('Comment: "' . $this->comment->body . '"')
-            ->action('View Comment', url('/posts/' . $this->comment->post_id . '#comment-' . $this->comment->id))
-            ->line('Thank you for being part of our community!');
+            ->view('emails.notifications.new_comment', [
+                'notifiable' => $notifiable,
+                'comment' => $this->comment,
+                'url' => url('/member/post/' . $this->comment->post_id . '#comment-' . $this->comment->id),
+            ]);
     }
+
 }

@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import { capitaliseAndRemoveHyphen } from "../utils/formatRelativeTime";
 
 const CreatePostBox = ({
     handlePost,
@@ -8,9 +9,9 @@ const CreatePostBox = ({
     expanded,
     setExpanded,
     mediaFiles,
-    setMediaFiles
+    setMediaFiles,
+    subcategory,
 }) => {
-
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
 
@@ -64,11 +65,38 @@ const CreatePostBox = ({
         },
     ];
 
+    useEffect(() => {
+        if (subcategory !== undefined) {
+            const formattedSubcategory = subcategory.replace(/-/g, "_");
+
+            const foundCategory = postCategories.find((cat) =>
+                cat.subCategories.some(
+                    (sub) => sub.value === formattedSubcategory
+                )
+            );
+
+            const categoryValue = foundCategory
+                ? foundCategory.category.value
+                : null;
+
+            setPostDetails((prev) => ({
+                ...prev,
+                subcategory: formattedSubcategory,
+                category: categoryValue,
+            }));
+        }
+    }, [subcategory]);
+
     const submitPost = () => {
         const formData = new FormData();
         formData.append("body", postDetails.body);
         formData.append("category", postDetails.category);
-        formData.append("subcategory", postDetails.subcategory);
+        if (subcategory != null) {
+            formData.append("subcategory", postDetails.subcategory);
+        } else {
+            formData.append("subcategory", postDetails.subcategory);
+        }
+
         mediaFiles.forEach((file) => {
             formData.append("media[]", file);
         });
@@ -186,52 +214,60 @@ const CreatePostBox = ({
                             <span className="text-gray-500 dark:text-gray-400 font-medium">
                                 Post in:
                             </span>
-                            <select
-                                className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-sm px-3 py-1 focus:outline-none focus:ring-2 focus:ring-[#FFD736]"
-                                value={postDetails.subcategory}
-                                onChange={(e) => {
-                                    const selectedSub = e.target.value;
-                                    const foundCategory = postCategories.find(
-                                        (cat) =>
-                                            cat.subCategories.some(
-                                                (sub) =>
-                                                    sub.value === selectedSub
-                                            )
-                                    );
+                            {subcategory !== null && (
+                                <p>{capitaliseAndRemoveHyphen(subcategory)}</p>
+                            )}{" "}
+                            {subcategory === undefined && (
+                                <select
+                                    className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-sm px-3 py-1 focus:outline-none focus:ring-2 focus:ring-[#FFD736]"
+                                    value={postDetails.subcategory}
+                                    onChange={(e) => {
+                                        const selectedSub = e.target.value;
+                                        const foundCategory =
+                                            postCategories.find((cat) =>
+                                                cat.subCategories.some(
+                                                    (sub) =>
+                                                        sub.value ===
+                                                        selectedSub
+                                                )
+                                            );
 
-                                    if (foundCategory) {
-                                        setPostDetails({
-                                            ...postDetails,
-                                            category:
-                                                foundCategory.category.value,
-                                            subcategory: selectedSub,
-                                        });
-                                    }
-                                }}
-                            >
-                                <option value="" disabled>
-                                    Select
-                                </option>
-                                {postCategories.map((category, index) => (
-                                    <React.Fragment key={index}>
-                                        <option
-                                            disabled
-                                            className="font-bold text-gray-500"
-                                        >
-                                            ─ {category.category.name} ─
-                                        </option>
-                                        {category.subCategories.map((sub) => (
+                                        if (foundCategory) {
+                                            setPostDetails({
+                                                ...postDetails,
+                                                category:
+                                                    foundCategory.category
+                                                        .value,
+                                                subcategory: selectedSub,
+                                            });
+                                        }
+                                    }}
+                                >
+                                    <option value="" disabled>
+                                        Select
+                                    </option>
+                                    {postCategories.map((category, index) => (
+                                        <React.Fragment key={index}>
                                             <option
-                                                key={sub.value}
-                                                value={sub.value}
+                                                disabled
+                                                className="font-bold text-gray-500"
                                             >
-                                                {sub.name}
+                                                ─ {category.category.name} ─
                                             </option>
-                                        ))}
-                                    </React.Fragment>
-                                ))}
-                            </select>
-
+                                            {category.subCategories.map(
+                                                (sub) => (
+                                                    <option
+                                                        key={sub.value}
+                                                        value={sub.value}
+                                                    >
+                                                        {sub.name}
+                                                    </option>
+                                                )
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </select>
+                            )}
                             <button
                                 disabled={posting}
                                 className="bg-black dark:bg-gray-800 text-white px-4 py-1 rounded hover:brightness-90 transition text-sm"

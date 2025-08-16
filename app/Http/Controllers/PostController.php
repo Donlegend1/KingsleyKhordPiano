@@ -16,13 +16,23 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $query = Post::with([
-            'comments.user',          // comment author
-            'comments.replies.user',  // reply author
-            'likes.user',             // likes with users
-            'user' ,                   // post author
+            'comments.user',
+            'comments.replies.user',
+            'likes.user',
+            'user',
             'media'
         ]);
 
+        if ($request->filled('subcategory')) {
+            $subcategory = Str::replace('-', '_', $request->get('subcategory'));
+            $query->where('subcategory', $subcategory);
+        }
+
+         if ($request->filled('post_id')) {
+            $query->where('id', $request->post_id);
+        }
+
+        // Sorting logic
         switch ($request->get('sort')) {
             case 'old':
                 $query->oldest();
@@ -40,7 +50,6 @@ class PostController extends Controller
 
         return response()->json($query->paginate(5));
     }
-
     /**
      * Show the form for creating a new resource.
      */

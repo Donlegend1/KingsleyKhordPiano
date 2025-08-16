@@ -17,7 +17,7 @@ class Quiz extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail_path ? asset('storage/' . $this->thumbnail_path) : null;
+        return $this->thumbnail_path ? asset( $this->thumbnail_path) : null;
     }
 
 }

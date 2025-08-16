@@ -5,13 +5,13 @@ import { FlashMessageProvider } from "../Alert/FlashMessageContext";
 import SpaceCard from "./SpaceCard";
 
 const cardDetails = [
-    { title: "Ask a question", isAdmin: true, members: "13" },
-    { title: "Beginners Forum", isAdmin: true, members: "20" },
-    { title: "Intermediates Forum", isAdmin: true, members: "19" },
-    { title: "Lessons", isAdmin: true, members: "30" },
-    { title: "Post Your progress", isAdmin: true, members: "18" },
-    { title: "Professional Forum", isAdmin: true, members: "4" },
-    { title: "Say Hello", isAdmin: true, members: "14" },
+    { title: "Ask a question", isAdmin: true, members: "13", slug: "ask-question" },
+    { title: "Beginners Forum", isAdmin: true, members: "20",slug: "beginner" },
+    { title: "Intermediates Forum", isAdmin: true, members: "19", slug: "intermediate" },
+    { title: "Lessons", isAdmin: true, members: "30", slug: "lessons" },
+    { title: "Post Your progress", isAdmin: true, members: "18", slug: "post-progress" },
+    { title: "Professional Forum", isAdmin: true, members: "4", slug: "advance" },
+    { title: "Say Hello", isAdmin: true, members: "14" , slug: "say-hello"},
 ];
 
 const MemberSpaces = ({ showSection }) => {
@@ -105,6 +105,7 @@ const MemberSpaces = ({ showSection }) => {
                             isAdmin={detail.isAdmin}
                             members={detail.members}
                             title={detail.title}
+                            slug={detail.slug}
                         />
                     ))}
                 </div>

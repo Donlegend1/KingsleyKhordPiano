@@ -22,13 +22,18 @@ class PostComment extends Model
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function user()
-{
-    return $this->belongsTo(User::class);
-}
+    {
+        return $this->belongsTo(User::class);
+    }
 
-public function replies()
-{
-    return $this->hasMany(PostReply::class, 'comment_id');
-}
+    public function replies()
+    {
+        return $this->hasMany(PostReply::class, 'comment_id');
+    }
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
 
 }

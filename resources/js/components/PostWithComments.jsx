@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 
-import { formatRelativeTime } from "../utils/formatRelativeTime"
+import {
+    formatRelativeTime,
+    capitaliseAndRemoveHyphen,
+} from "../utils/formatRelativeTime";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "./Alert/FlashMessageContext";
 
 const getInitials = (firstName, lastName) => {
     return `${firstName?.charAt(0) || ""}${
@@ -16,10 +23,12 @@ const PostWithComments = ({
     handleCommentSubmit,
     setSelectedPost,
     handleDeletePost,
+    commenting,
 }) => {
     const [comments, setComments] = useState(post.comments || []);
     const [showPostAction, setShowPostAction] = useState(false);
     const [showCommentAction, setShowCommentAction] = useState(false);
+    const { showMessage } = useFlashMessage();
     const [showCommentActionId, setShowCommentActionId] = useState(null);
 
     const [commentsVisible, setCommentsVisible] = useState(false);
@@ -32,14 +41,6 @@ const PostWithComments = ({
 
     const author = post.user || {};
     const initials = getInitials(author.first_name, author.last_name);
-
-
-    const capitaliseAndRemoveHyphen = (text) => {
-        return text
-            .split("_")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ");
-    };
 
     const toggleLike = async () => {
         try {
@@ -66,11 +67,11 @@ const PostWithComments = ({
 
     const handleDeleteComment = async (commentId) => {
         try {
-            await axios.delete(`/api/member/comment/${commentId}`);
+            await axios.delete(`/api/member/comments/${commentId}`);
             showMessage("Comment deleted", "success");
-            fetchPosts(); // Refresh
+            window.location.reload(); // Refresh the page to reflect changes
         } catch (error) {
-            showMessage("Failed to delete comment", "error");
+            showMessage(error.response?.data?.message, "error");
         }
     };
 
@@ -95,9 +96,9 @@ const PostWithComments = ({
                 body: newReply,
             });
             showMessage("Relied", "success");
-            fetchPosts(); // Refresh
+            window.location.reload(); // Refresh the page to reflect changes
         } catch (error) {
-            showMessage("Failed to add reply", "error");
+            showMessage(error.response?.data?.message, "error");
         }
     };
 
@@ -193,7 +194,10 @@ const PostWithComments = ({
                 )}
             </div>
 
-            <div className="mt-4 border-t  border-gray-300 dark:border-gray-600 pt-4" onFocus={() => setSelectedPost(post)}>
+            <div
+                className="mt-4 border-t  border-gray-300 dark:border-gray-600 pt-4"
+                onFocus={() => setSelectedPost(post)}
+            >
                 <div className="flex justify-between items-center mb-4">
                     <div className="flex justify-end space-x-4 text-gray-600 dark:text-gray-300 text-sm">
                         <div className="flex space-x-5">
@@ -242,8 +246,9 @@ const PostWithComments = ({
                             </button>
 
                             <button
-                                
-                                onClick={() => setCommentsVisible(!commentsVisible)}
+                                onClick={() =>
+                                    setCommentsVisible(!commentsVisible)
+                                }
                                 className="flex items-center space-x-1 hover:text-blue-500"
                             >
                                 <i
@@ -310,27 +315,45 @@ const PostWithComments = ({
                                                     src={
                                                         comment.user
                                                             ?.passport ||
-                                                        "/avatar1.png"
+                                                        "/avatar1.jpg"
                                                     }
                                                     alt="avatar"
                                                     className="w-8 h-8 rounded-full"
                                                 />
+
                                                 <div className="flex-1">
-                                                    <p className="text-sm font-semibold">
-                                                        {
-                                                            comment.user
-                                                                ?.first_name
-                                                        }{" "}
-                                                        {
-                                                            comment.user
-                                                                ?.last_name
-                                                        }
-                                                        <small className="mx-2">
-                                                            {formatRelativeTime(
-                                                                comment.created_at
-                                                            )}
-                                                        </small>
-                                                    </p>
+                                                    <div className="flex justify-between items-start">
+                                                        {/* Name + time */}
+                                                        <p className="text-sm font-semibold">
+                                                            {
+                                                                comment.user
+                                                                    ?.first_name
+                                                            }{" "}
+                                                            {
+                                                                comment.user
+                                                                    ?.last_name
+                                                            }
+                                                            <small className="mx-2">
+                                                                {formatRelativeTime(
+                                                                    comment.created_at
+                                                                )}
+                                                            </small>
+                                                        </p>
+
+                                                        {/* Delete button on the far right */}
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDeleteComment(
+                                                                    comment.id
+                                                                )
+                                                            }
+                                                            className="text-red-500 hover:text-red-700 ml-2"
+                                                        >
+                                                            <i className="fa fa-trash"></i>
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Comment body */}
                                                     <p className="text-sm text-gray-700 dark:text-gray-300">
                                                         {comment.body}
                                                     </p>
@@ -348,7 +371,7 @@ const PostWithComments = ({
                                                         </button>
                                                     </div>
 
-                                                    {/* Reply input for this comment */}
+                                                    {/* Reply input */}
                                                     {replySectionFor ===
                                                         comment.id && (
                                                         <form
@@ -467,10 +490,11 @@ const PostWithComments = ({
                                 onChange={(e) => setNewComment(e.target.value)}
                             />
                             <button
+                                disabled={commenting}
                                 type="submit"
                                 className="px-4 py-1.5 bg-[#FFD736] text-gray-800 font-semibold rounded-full hover:bg-yellow-400 transition text-sm"
                             >
-                                Post
+                                {commenting ? "Commenting" : "Post"}
                             </button>
                         </form>
                     </div>

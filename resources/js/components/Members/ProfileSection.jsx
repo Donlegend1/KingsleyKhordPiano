@@ -28,9 +28,6 @@ const ProfileSection = () => {
     const [activeTab, setActiveTab] = useState("about");
     const [member, setMember] = useState({});
     const { showMessage } = useFlashMessage();
-    const [coverImage, setCoverImage] = useState(
-        member.user?.passport || "/avatar1.jpg"
-    );
 
     const lastSegment = window.location.pathname
         .split("/")
@@ -57,36 +54,8 @@ const ProfileSection = () => {
         getMemberDetails();
     }, []);
 
-    const imageClick = () => {
-        document.getElementById("passport").click();
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setCoverImage(imageUrl);
-        }
-    };
-
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen rounded-full">
-            {/* Cover Image */}
-            {/* <div className="relative bg-gray-300 h-48">
-                <button
-                    className="absolute top-3 right-3 bg-white text-sm px-3 py-1 rounded shadow"
-                    onClick={imageClick}
-                >
-                    Upload Cover
-                </button>
-                <input
-                    type="file"
-                    name="passport"
-                    id="passport"
-                    className="hidden"
-                    onChange={handleImageChange}
-                />
-            </div> */}
 
             <ProfileCover member={member} />
 
@@ -221,7 +190,7 @@ const ProfileSection = () => {
                     )}
                     {activeTab === "comments" && (
                         <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <Comments />
+                            <Comments member={member} />
                         </div>
                     )}
                 </div>

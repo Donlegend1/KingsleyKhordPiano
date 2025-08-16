@@ -276,7 +276,7 @@ const CreateEarTrainingQuiz = () => {
 
                 <div>
                     <label className="block mb-1 font-medium">
-                        Video Embed Code (link)
+                        Google Video Link
                     </label>
                     <textarea
                         value={videoUrl}

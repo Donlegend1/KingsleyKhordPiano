@@ -69,7 +69,9 @@ use App\Http\Controllers\UserController;
         Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.delete');
         Route::get('/posts', [PostController::class, 'index'])->name('post.index');
         Route::get('/posts/member/{community}', [PostController::class, 'postByUser'])->name('post.user');
+        Route::delete('/postComment/{postComment}', [PostCommentController::class, 'destroy'])->name('comment.delete');
 
+        Route::delete('/comments/{postComment}', [PostCommentController::class, 'destroy'])->name('comment.destroy');
         Route::post('/comment', [PostCommentController::class, 'store'])->name('comment.store');
         Route::post('/like', [PostLikeController::class, 'store'])->name('like.toggle');
         Route::post('/community/{user}/status', [AdminController::class, 'updateUserStatus']);

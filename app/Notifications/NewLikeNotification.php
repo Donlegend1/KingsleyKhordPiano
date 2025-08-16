@@ -7,48 +7,53 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewLikeNotification extends Notification
+class NewLikeNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    public $like;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($like)
     {
-        //
+        $this->like = $like;
     }
 
     /**
      * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database', 'mail'];
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Store notification in database.
+     */
+    public function toDatabase($notifiable): array
+    {
+        return [
+            'type' => 'like',
+            'post_id' => $this->like->post_id,
+            'by_user_id' => $this->like->user->id,
+            'first_name' => $this->like->user->first_name,
+            'last_name' => $this->like->user->last_name,
+        ];
+    }
+
+    /**
+     * Send notification via email.
      */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            //
-        ];
+            ->subject('New Like on Your Post')
+            ->view('emails.notifications.new_like', [
+                'notifiable' => $notifiable,
+                'like' => $this->like,
+                'url' => url('/member/post/' . $this->like->post_id),
+            ]);
     }
 }

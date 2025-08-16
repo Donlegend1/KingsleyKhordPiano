@@ -30,3 +30,10 @@ export const formatRelativeTime = (dateString) => {
         return `${years} year${years !== 1 ? "s" : ""} ago`;
     }
 };
+
+   export const capitaliseAndRemoveHyphen = (text) => {
+        return text
+            ?.split("_")
+            ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            ?.join(" ");
+    };

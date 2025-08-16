@@ -6,6 +6,7 @@ use App\Models\PostLike;
 use App\Models\Post;
 use App\Http\Requests\StorePostLikeRequest;
 use App\Http\Requests\UpdatePostLikeRequest;
+use App\Notifications\NewLikeNotification;
 
 class PostLikeController extends Controller
 {
@@ -38,19 +39,23 @@ class PostLikeController extends Controller
         $existingLike = $post->likes()->where('user_id', $user_id)->first();
 
         if ($existingLike) {
-            // If exists, remove the like
             $existingLike->delete();
+            $like = null;
         } else {
-            // Otherwise, create the like
-            $post->likes()->create([
+            $like = $post->likes()->create([
                 'user_id' => $user_id,
             ]);
+        }
+
+        if ($like && $post->user_id !== $user_id) {
+            $post->user->notify(new NewLikeNotification($like));
         }
 
         return response()->json([
             'likes' => $post->likes()->with('user')->get()
         ]);
     }
+
 
     /**
      * Display the specified resource.

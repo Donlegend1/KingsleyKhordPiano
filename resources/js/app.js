@@ -38,5 +38,7 @@ import "./components/Members/MemberList.jsx"
 import "./components/Members/ProfileSection.jsx"
 import "./components/Members/MemberSpaces.jsx"
 import "./components/Members/ProfileSectionEdit.jsx"
+import "./components/Members/SubCategory.jsx"
+import "./components/Members/SinglePost.jsx"
 
 
