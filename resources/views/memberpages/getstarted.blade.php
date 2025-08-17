@@ -157,9 +157,11 @@
     <div class="flex flex-wrap md:flex-nowrap justify-center gap-6 lg:gap-4">
     <!-- Card Template -->
     <div class="w-full md:w-1/3 max-w-sm rounded overflow-hidden shadow-lg bg-[#F3F5F6]">
+      <a href="/member/course/beginner">
       <div class="px-4 pt-4">
         <img class="w-full object-cover h-48 rounded-md" src="/images/featured1.jpeg" alt="Course Image 1">
       </div>
+      </a>
       <div class="px-4 py-3">
         <p class="text-[18px] font-semibold text-black text-center">Getting Started and Mastering the Fundamentals</p>
         <div class="pt-4 flex justify-center">
@@ -172,9 +174,11 @@
 
     <!-- Card 2 -->
     <div class="w-full md:w-1/3 max-w-sm rounded overflow-hidden shadow-lg bg-[#F3F5F6]">
+      <a href="/member/course/intermediate" >
       <div class="px-4 pt-4">
         <img class="w-full object-cover h-48 rounded-md" src="/images/featured2.jpeg" alt="Course Image 2">
       </div>
+      </a>
       <div class="px-4 py-3">
         <p class="text-[18px] font-semibold text-black text-center">Improve the quality of your Chords and Learn to Harmonize them</p>
         <div class="pt-4 flex justify-center">
@@ -187,9 +191,11 @@
 
     <!-- Card 3 -->
     <div class="w-full md:w-1/3 max-w-sm rounded overflow-hidden shadow-lg bg-[#F3F5F6]">
+      <a href="/member/course/advanced" >
       <div class="px-4 pt-4">
         <img class="w-full object-cover h-48 rounded-md" src="/images/featured3.jpeg" alt="Course Image 3">
       </div>
+      </a>
       <div class="px-4 py-3">
         <p class="text-[18px] font-semibold text-black text-center">Become a Musical Genius – Learn to Think of Music Abstractly</p>
         <div class="pt-4 flex justify-center">

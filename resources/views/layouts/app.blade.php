@@ -37,7 +37,7 @@
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
     <div id="app">
-    <header class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50">
+    <header class="bg-black dark:bg-gray-800 shadow top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <!-- Left: Logo -->
             <div class="flex items-center flex-shrink-0">
@@ -142,7 +142,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-gray-100 shadow sticky bottom-0 z-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-5">
+        <footer class="bg-gray-100 shadow bottom-0 z-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-5">
             <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center text-sm text-gray-500 dark:text-gray-400 space-y-2 md:space-y-0 md:space-x-4">
                 <div class="flex items-center space-x-2">
                     <div>&copy; {{ date('Y') }} {{ config('app.name') }}</div>

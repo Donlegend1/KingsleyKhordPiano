@@ -51,7 +51,7 @@ class StripeController extends Controller
             'payment_method'=> 'stripe',
             'notified_at'   => null,
             'starts_at'     => now(),
-            'ends_at'       => $request->duration === "monthly" ? now()->addMonths(3) : now()->addYear(),
+            'ends_at'       => $request->duration === "monthly" ? now()->addMonths() : now()->addYear(),
             'status'        => 'pending',
             'created_at'    => now(),
             'updated_at'    => now(),

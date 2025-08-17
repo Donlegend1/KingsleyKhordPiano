@@ -1,6 +1,6 @@
-<section class="relative bg-cover bg-center mt-24 py-16 px-4 sm:px-6 lg:px-12" style="background-image: url('/images/banner2.jpg')">
+<section class="relative bg-cover bg-center mt-24 py-16 px-4 sm:px-6 lg:px-12" style="background-image: url('/images/bannerOld1.png')">
   <!-- Overlay: Optional dark background -->
-  <div class="bg-black/50 absolute inset-0 z-0"></div>
+  <div class="bg-black/80 absolute inset-0 z-0"></div>
 
   <!-- Content Wrapper -->
   <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">

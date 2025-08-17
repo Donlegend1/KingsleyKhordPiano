@@ -1,9 +1,9 @@
-<section class="container mx-auto px-5 py-10 md:py-20 bg-white">
+<section class="container mx-auto px-5 py-5 md:py-10 bg-white">
   <div class="space-y-12">
 
     <!-- Intro Text -->
     <div class="flex">
-      <div class="md:w-3/5 text-left max-w-5xl">
+      <div class=" text-left max-w-5xl">
         <p class="font-bold text-[24px] mb-4">
           Welcome to KingsleyKhord Music Academy, where piano playing meets mastery.
         </p>

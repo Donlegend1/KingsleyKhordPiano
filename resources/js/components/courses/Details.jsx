@@ -572,35 +572,37 @@ const CoursesPage = () => {
 
     return (
         <>
-            <div className="flex items-center container mx-auto mb-12 justify-between bg-white dark:bg-gray-600 p-4 shadow rounded w-full">
-                {/* Progress area - 70% width */}
-                <div className="w-full md:w-3/4 pr-4">
-                    <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {calculateGeneralProgress()}% Completed
-                        </span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {(() => {
-                                const allCourses =
-                                    Object.values(courses).flat();
-                                const completed = allCourses.filter(
-                                    (c) => c.completed
-                                ).length;
-                                return `${completed} out of ${allCourses.length} left`;
-                            })()}
-                            <span className=" mx-2 fa fa-info-circle"></span>
-                        </span>
-                    </div>
-                    <div className="w-full bg-gray-300 rounded-full h-2">
-                        <div
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${generalProgress}%` }}
-                        ></div>
+            <div className="flex justify-between items-center bg-white dark:bg-gray-600 p-4 shadow rounded w-full max-w-7xl mx-auto mb-5">
+                {/* Progress area - Centered */}
+                <div className="flex-1 flex justify-center pr-4 ">
+                    <div className="w-full max-w-md">
+                        <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {calculateGeneralProgress()}% Completed
+                            </span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                                {(() => {
+                                    const allCourses =
+                                        Object.values(courses).flat();
+                                    const completed = allCourses.filter(
+                                        (c) => c.completed
+                                    ).length;
+                                    return `${completed} out of ${allCourses.length} left`;
+                                })()}
+                                <span className="mx-2 fa fa-info-circle"></span>
+                            </span>
+                        </div>
+                        <div className="w-full bg-gray-300 rounded-full h-2">
+                            <div
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${generalProgress}%` }}
+                            ></div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Night mode + avatar - 30% width */}
-                <div className="w-1/4 flex items-center justify-end space-x-4">
+                {/* Night mode + avatar - Right aligned */}
+                <div className="flex items-center justify-end space-x-4">
                     <button
                         onClick={toggleDarkMode}
                         className="text-gray-600 dark:text-gray-300 focus:outline-none text-lg"
@@ -611,11 +613,13 @@ const CoursesPage = () => {
                         ></i>
                     </button>
 
-                    <img
-                        src="/avatar1.jpg"
-                        alt="User Avatar"
-                        className="w-8 h-8 rounded-full border-2 border-gray-300 dark:border-gray-600"
-                    />
+                    <a href="/member/profile" className="flex items-center">
+                        <img
+                            src="/avatar1.jpg"
+                            alt="User Avatar"
+                            className="w-8 h-8 rounded-full border-2 border-gray-300 dark:border-gray-600"
+                        />
+                    </a>
                 </div>
             </div>
 
@@ -644,7 +648,9 @@ const CoursesPage = () => {
                         {!sidebarCollapsed && (
                             <h2 className="text-lg font-bold flex items-center gap-2">
                                 <span className="fa fa-book"></span>{" "}
-                                {lastSegment.toUpperCase()} Piano Road-map
+                                {lastSegment.charAt(0).toUpperCase() +
+                                    lastSegment.slice(1)}{" "}
+                                Piano Road-map
                             </h2>
                         )}
                         <button
@@ -663,7 +669,7 @@ const CoursesPage = () => {
 
                     {!sidebarCollapsed && (
                         <>
-                            <a
+                            {/* <a
                                 href="/member/roadmap"
                                 className="text-sm text-blue-600 hover:text-black mb-4 block"
                             >
@@ -672,7 +678,7 @@ const CoursesPage = () => {
                                     aria-hidden="true"
                                 ></i>{" "}
                                 Back to course
-                            </a>
+                            </a> */}
 
                             <CourseList />
                         </>

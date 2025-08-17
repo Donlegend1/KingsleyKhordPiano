@@ -1,0 +1,437 @@
+Transaction_Id,Invoice_Id,First_Name,Last_Name,User,"User Email",Membership,Gateway,Payment_Type,Payer_Email,Transaction_Status,Payment_Date,Amount,Credit_Card_Number
+ch_3Rx8hNB0pqpbXiCi1EUYXcc6,670,Jack,Raj,Jack,jackcollinsraj64@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jackcollinsraj64@gmail.com,success,"August 17, 2025 3:42 pm","22.00 USD",xxxx-xxxx-xxxx-5750
+in_1RwxtuB0pqpbXiCiR6BSW9z0,668,Seun,Omotosho,gigood4a,gigood4a@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",gigood4a@gmail.com,success,"August 17, 2025 4:09 am","22.00 USD",
+,667,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"August 16, 2025 10:02 pm","22.00 USD",
+in_1RtjpJB0pqpbXiCiXEC5Kli8,664,Desmond,Brown,Junior,browndesmond30@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",browndesmond30@yahoo.com,success,"August 16, 2025 3:32 am","22.00 USD",
+in_1RwEQRB0pqpbXiCiK7FEM7JI,663,Samuel,Sivol,Samuelsivol1,Samuelsivol@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Samuelsivol@yahoo.com,success,"August 15, 2025 3:35 am","22.00 USD",
+ch_3RulhNB0pqpbXiCi1nGCps0W,658,VINNCY_KEYS,Dikai,Vinncy,dikaivincent@gmail.com,"Monthly Membership",Stripe,"Subscription  ",dikaivincent@gmail.com,success,"August 11, 2025 2:43 am","22.00 USD",xxxx-xxxx-xxxx-4707
+ch_3Rty9UB0pqpbXiCi1dBmYsIF,653,kenny,chris,umurundi,kennychrisn95@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",kennychrisn95@gmail.com,success,"August 8, 2025 9:52 pm","22.00 USD",xxxx-xxxx-xxxx-7300
+in_1RtuBRB0pqpbXiCiQKQaHcLR,652,Christian,Thomas,christiant512,christiant512@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",christiant512@gmail.com,success,"August 8, 2025 6:35 pm","22.00 USD",
+in_1RtULYB0pqpbXiCiVZ892FNA,651,LaJeune,James,lkjmpbgmailcom,lkjmpb@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",lkjmpb@gmail.com,success,"August 7, 2025 3:00 pm","22.00 USD",
+in_1RtS9gB0pqpbXiCic8j9D2Ns,650,Favour,Godson,FavG,favourealist@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",favourealist@gmail.com,success,"August 7, 2025 12:39 pm","22.00 USD",
+in_1RtLd9B0pqpbXiCiClVmrXnw,648,Onesmo,Joel,Onesmo,onesmojoel65@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",onesmojoel65@gmail.com,success,"August 7, 2025 5:40 am","22.00 USD",
+ch_3RszwSB0pqpbXiCi0XotNLcI,647,Adrienne,Carbon,Ad,Adriennecarbon@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Adriennecarbon@yahoo.com,success,"August 6, 2025 5:36 am","22.00 USD",xxxx-xxxx-xxxx-9162
+in_1RsmLoB0pqpbXiCiuy2oNeTa,646,daniel,adjaino,dannykcesh,adjainodaniel4@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",adjainodaniel4@gmail.com,success,"August 5, 2025 4:01 pm","22.00 USD",
+in_1Rs7e4B0pqpbXiCipBdjYL1g,643,Dakpogan,Paul,Paul,Dakpoganpaul9@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Dakpoganpaul9@gmail.com,success,"August 3, 2025 8:33 pm","22.00 USD",
+in_1Rs5pJB0pqpbXiCiNV7oPqF3,642,Gaxtoff,Rostant-Daniel,m0rf,cars-10@hotmail.de,"Monthly Membership",Stripe,"Subscription (Automatic) ",cars-10@hotmail.de,success,"August 3, 2025 6:36 pm","22.00 USD",
+in_1RqfnDB0pqpbXiCidemEwv3B,638,Eniola,Adegoju,Eniaki,eniolaakiyode@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",eniolaakiyode@gmail.com,success,"July 30, 2025 8:36 pm","22.00 USD",
+,637,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 26, 2025 7:36 am","22.00 USD",
+,636,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 26, 2025 7:35 am","22.00 USD",
+,635,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 26, 2025 7:35 am","22.00 USD",
+,634,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 26, 2025 7:34 am","22.00 USD",
+,633,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 26, 2025 7:34 am","22.00 USD",
+ch_3RopEQB0pqpbXiCi1iCphBwf,630,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Stripe,"Subscription  ",cemenix@gmail.com,success,"July 25, 2025 5:19 pm","22.00 USD",xxxx-xxxx-xxxx-8412
+in_1RoUWMB0pqpbXiCiKWwr6jk6,629,Elizabeth,Chang,ebethchang,bethmchang@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",bethmchang@gmail.com,success,"July 24, 2025 8:09 pm","22.00 USD",
+,628,"Sunday Joseph",Onimisi,Jokeyz,wealthonimisi@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 24, 2025 7:44 pm","22.00 USD",
+,627,Robinson,Mgbah,robinson,acho.mgbah@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 24, 2025 4:56 pm","22.00 USD",
+ch_3RnjELB0pqpbXiCi1UFk6c2f,626,Tobi,Agaba,st_gsd,stproducer1@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",stproducer1@gmail.com,success,"July 22, 2025 4:41 pm","22.00 USD",xxxx-xxxx-xxxx-1603
+ch_3RnRubB0pqpbXiCi14V4tenY,624,Michelle,Mitchell,Michelle,Mdmitchell1165@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",Mdmitchell1165@gmail.com,success,"July 21, 2025 10:11 pm","189.00 USD",xxxx-xxxx-xxxx-7053
+in_1RnPduB0pqpbXiCiuZPDjRad,623,Emamode,Akwerigbe,Mode9,mremamode@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",mremamode@gmail.com,success,"July 21, 2025 8:45 pm","22.00 USD",
+ch_3RnEMDB0pqpbXiCi1vYTb9BJ,621,Robinson,Mgbah,robinson,acho.mgbah@gmail.com,"Monthly Membership",Stripe,"Subscription  ",acho.mgbah@gmail.com,success,"July 21, 2025 7:48 am","22.00 USD",xxxx-xxxx-xxxx-7024
+in_1RlbFoB0pqpbXiCiuLLYpZBC,620,Josh,Reeves,josh_fast,reevesjosh98@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",reevesjosh98@gmail.com,success,"July 20, 2025 6:45 am","22.00 USD",
+,619,Lukushe,yannick,lukushe,lukushe.yanick88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 19, 2025 10:51 am","22.00 USD",
+in_1Rlj7eB0pqpbXiCiqVoOjXe8,618,Seun,Omotosho,gigood4a,gigood4a@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",gigood4a@gmail.com,success,"July 17, 2025 5:09 am","22.00 USD",
+,617,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 16, 2025 3:08 pm","22.00 USD",
+in_1Rg074B0pqpbXiCiW39twF47,615,Peter,Anih,Piroro,Piroro9240@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Piroro9240@gmail.com,success,"July 15, 2025 8:26 am","22.00 USD",
+in_1RkzdoB0pqpbXiCihDlv7zUt,614,Samuel,Sivol,Samuelsivol1,Samuelsivol@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Samuelsivol@yahoo.com,success,"July 15, 2025 4:35 am","22.00 USD",
+in_1RkW3zB0pqpbXiCijVjzWTSa,612,Thomas,Johnson,troy6363,thom.johnson6363@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",thom.johnson6363@gmail.com,success,"July 13, 2025 9:00 pm","22.00 USD",
+in_1RjnbrB0pqpbXiCiYjCqbg9Y,611,Barrington,Soares,Bsoares,Soaresbarrington4@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Soaresbarrington4@gmail.com,success,"July 11, 2025 9:32 pm","22.00 USD",
+,610,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 9, 2025 8:02 am","22.00 USD",
+,609,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 9, 2025 7:59 am","22.00 USD",
+,608,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"July 9, 2025 7:59 am","22.00 USD",
+ch_3RifObB0pqpbXiCi0hXe1mbp,606,Christian,Thomas,christiant512,christiant512@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",christiant512@gmail.com,success,"July 8, 2025 5:33 pm","22.00 USD",xxxx-xxxx-xxxx-4693
+ch_3RiV0hB0pqpbXiCi0ZzK7WjJ,605,Desmond,Brown,Junior,browndesmond30@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",browndesmond30@yahoo.com,success,"July 8, 2025 6:30 am","22.00 USD",xxxx-xxxx-xxxx-4549
+ch_3RiFV1B0pqpbXiCi0BNlRaPF,604,LaJeune,James,lkjmpbgmailcom,lkjmpb@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",lkjmpb@gmail.com,success,"July 7, 2025 1:58 pm","22.00 USD",xxxx-xxxx-xxxx-0327
+ch_3RiDLgB0pqpbXiCi15QU349x,603,Favour,Godson,FavG,favourealist@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",favourealist@gmail.com,success,"July 7, 2025 11:37 am","22.00 USD",xxxx-xxxx-xxxx-5219
+ch_3Ri6pkB0pqpbXiCi19ntUF6x,601,Onesmo,Joel,Onesmo,onesmojoel65@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",onesmojoel65@gmail.com,success,"July 7, 2025 4:40 am","22.00 USD",xxxx-xxxx-xxxx-3545
+ch_3RhtnhB0pqpbXiCi0l5Er3dL,600,Simarlord-Almighty,MOUSSOUAMOU-MABIALA,simarlord,moussouamousimar@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",moussouamousimar@gmail.com,success,"July 6, 2025 2:44 pm","22.00 USD",xxxx-xxxx-xxxx-8070
+in_1RhXQwB0pqpbXiCizeP8wtKB,599,Gilbert,Perez,PerezG622,perez.gilbert622@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",perez.gilbert622@gmail.com,success,"July 5, 2025 3:52 pm","22.00 USD",
+ch_3RhXYpB0pqpbXiCi0H58YqrH,598,daniel,adjaino,dannykcesh,adjainodaniel4@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",adjainodaniel4@gmail.com,success,"July 5, 2025 2:59 pm","22.00 USD",xxxx-xxxx-xxxx-4707
+in_1RhTQPB0pqpbXiCiIjR924PF,597,Gabriel,Besong,obriel6,besonggabriel@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",besonggabriel@yahoo.com,success,"July 5, 2025 11:34 am","22.00 USD",
+ch_3RgsqQB0pqpbXiCi1Zzapnv2,595,Dakpogan,Paul,Paul,Dakpoganpaul9@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Dakpoganpaul9@gmail.com,success,"July 3, 2025 7:32 pm","22.00 USD",xxxx-xxxx-xxxx-7368
+ch_3Rgr1FB0pqpbXiCi1HGG7dL0,594,Gaxtoff,Rostant-Daniel,m0rf,cars-10@hotmail.de,"Monthly Membership",Stripe,"Subscription (Automatic) ",cars-10@hotmail.de,success,"July 3, 2025 5:35 pm","22.00 USD",xxxx-xxxx-xxxx-1007
+in_1Rg7tLB0pqpbXiCiZocgLjH7,592,Russel,Hlatshwayo,RusselTH,taruzel@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",taruzel@gmail.com,success,"July 1, 2025 6:23 pm","22.00 USD",
+ch_3Rg4XVB0pqpbXiCi0kt0ULRk,591,Ryan,Nair,Nairr,ryan.nair@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",ryan.nair@gmail.com,success,"July 1, 2025 1:48 pm","189.00 USD",xxxx-xxxx-xxxx-6761
+ch_3RfnR5B0pqpbXiCi1Djks6yx,589,Eniola,Adegoju,Eniaki,eniolaakiyode@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",eniolaakiyode@gmail.com,success,"June 30, 2025 7:35 pm","22.00 USD",xxxx-xxxx-xxxx-8945
+ch_3RfXfKB0pqpbXiCi11ELVOlK,588,Thomas,Stokes,tstokes616yahoocom,tstokes616@yahoo.com,"Quarterly Membership",Stripe,"Subscription (Automatic) ",tstokes616@yahoo.com,success,"June 30, 2025 2:42 am","57.00 USD",xxxx-xxxx-xxxx-8575
+in_1Rf0PmB0pqpbXiCiGAZOGfmd,586,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"June 28, 2025 4:12 pm","22.00 USD",
+,585,VINNCY_KEYS,Dikai,Vinncy,dikaivincent@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"June 28, 2025 9:59 am","22.00 USD",
+ch_3RevIMB0pqpbXiCi1ND3AGHA,584,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Stripe,"Subscription  ",sallalouis@gmail.com,success,"June 28, 2025 9:44 am","22.00 USD",xxxx-xxxx-xxxx-7508
+ch_3RdrbNB0pqpbXiCi0hSckFUA,581,Joshua,D,Joshuad,joshuasboa@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",joshuasboa@gmail.com,success,"June 25, 2025 11:37 am","22.00 USD",xxxx-xxxx-xxxx-0442
+ch_3RdcjlB0pqpbXiCi1TgZbRXJ,580,"Anh Tuan",Lai,TuanMario,mariokeyvn@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",mariokeyvn@gmail.com,success,"June 24, 2025 7:43 pm","22.00 USD",xxxx-xxxx-xxxx-4659
+ch_3RdcDLB0pqpbXiCi1BWmnuh3,579,Elizabeth,Chang,ebethchang,bethmchang@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",bethmchang@gmail.com,success,"June 24, 2025 7:09 pm","22.00 USD",xxxx-xxxx-xxxx-2001
+ch_3RcXJlB0pqpbXiCi1V4y3G5R,576,Emamode,Akwerigbe,Mode9,mremamode@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",mremamode@gmail.com,success,"June 21, 2025 7:44 pm","22.00 USD",xxxx-xxxx-xxxx-3269
+ch_3RaqmQB0pqpbXiCi06nXwsbs,572,Seun,Omotosho,gigood4a,gigood4a@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",gigood4a@gmail.com,success,"June 17, 2025 4:08 am","22.00 USD",xxxx-xxxx-xxxx-7973
+ch_3Raiw6B0pqpbXiCi0Itw7clW,571,Josh,Reeves,josh_fast,reevesjosh98@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",reevesjosh98@gmail.com,success,"June 16, 2025 7:44 pm","22.00 USD",xxxx-xxxx-xxxx-7726
+ch_3Ra7KOB0pqpbXiCi1thdmmCP,568,Samuel,Sivol,Samuelsivol1,Samuelsivol@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Samuelsivol@yahoo.com,success,"June 15, 2025 3:34 am","22.00 USD",xxxx-xxxx-xxxx-0407
+in_1RZzTnB0pqpbXiCitxZtLlev,567,Mayowa,Alomoge,Mayuski,alomoge007@yahoo.com,"Quarterly Membership",Stripe,"Subscription (Automatic) ",alomoge007@yahoo.com,success,"June 14, 2025 8:12 pm","57.00 USD",
+ch_3RZdk3B0pqpbXiCi1ivQACox,566,Thomas,Johnson,troy6363,thom.johnson6363@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",thom.johnson6363@gmail.com,success,"June 13, 2025 7:59 pm","22.00 USD",xxxx-xxxx-xxxx-7684
+ch_3RZOXCB0pqpbXiCi1FToStzy,565,Jermaine,Clarke,Jermaineanu,jermaineclarke_1972@hotmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",jermaineclarke_1972@hotmail.com,success,"June 13, 2025 3:45 am","189.00 USD",xxxx-xxxx-xxxx-2685
+in_1RZ5ixB0pqpbXiCiRvAh6lAj,564,Jonathan,Jean-Privat,Joneskeys,j.privat972@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",j.privat972@gmail.com,success,"June 12, 2025 8:39 am","22.00 USD",
+ch_3RYvISB0pqpbXiCi0yiIIqyU,563,Barrington,Soares,Bsoares,Soaresbarrington4@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Soaresbarrington4@gmail.com,success,"June 11, 2025 8:31 pm","22.00 USD",xxxx-xxxx-xxxx-2616
+ch_3RYtxlB0pqpbXiCi099x0bwo,562,Emmanuel,Inalegwu,Adejo,inalegwu37@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",inalegwu37@gmail.com,success,"June 11, 2025 7:12 pm","189.00 USD",xxxx-xxxx-xxxx-2735
+,561,Tendai,Lee,10dai,tendai1702@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"June 10, 2025 4:02 pm","22.00 USD",
+,560,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"June 10, 2025 10:28 am","22.00 USD",
+,559,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"June 10, 2025 10:27 am","22.00 USD",
+ch_3RWf7WB0pqpbXiCi0oO8cqpT,556,Gilbert,Perez,PerezG622,perez.gilbert622@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",perez.gilbert622@gmail.com,success,"June 5, 2025 2:50 pm","22.00 USD",xxxx-xxxx-xxxx-9319
+ch_3RWb6qB0pqpbXiCi020H9gal,555,Gabriel,Besong,obriel6,besonggabriel@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",besonggabriel@yahoo.com,success,"June 5, 2025 10:33 am","22.00 USD",xxxx-xxxx-xxxx-3493
+in_1RWPHuB0pqpbXiCiOlzYDmN0,554,"The Healing",Sound,thehealingsound,thehealingsound@yahoo.com,"Quarterly Membership",Stripe,"Subscription (Automatic) ",thehealingsound@yahoo.com,success,"June 4, 2025 10:56 pm","57.00 USD",
+in_1RVvEDB0pqpbXiCiYvErl0rU,553,Ronique,Henry,Kevon1000,ronique.henry@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ronique.henry@yahoo.com,success,"June 3, 2025 2:50 pm","22.00 USD",
+ch_3RVFZjB0pqpbXiCi1Dx1x1qK,550,Russel,Hlatshwayo,RusselTH,taruzel@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",taruzel@gmail.com,success,"June 1, 2025 5:22 pm","22.00 USD",xxxx-xxxx-xxxx-1016
+ch_3RUlKIB0pqpbXiCi1BamtidZ,549,Peter,Anih,Piroro,Piroro9240@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Piroro9240@gmail.com,success,"May 31, 2025 9:04 am","22.00 USD",xxxx-xxxx-xxxx-3515
+in_1RTtMFB0pqpbXiCi41rDMoIL,547,Martinson,Sarfo,icgcdallas,icgcdallas@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",icgcdallas@gmail.com,success,"May 29, 2025 12:27 am","22.00 USD",
+ch_3RTlcrB0pqpbXiCi0NAlAoO7,546,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"May 28, 2025 3:10 pm","22.00 USD",xxxx-xxxx-xxxx-2842
+,538,Lukushe,yannick,lukushe,lukushe.yanick88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"May 21, 2025 7:01 pm","22.00 USD",
+,535,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"May 18, 2025 11:48 pm","22.00 USD",
+,534,"Sunday Joseph",Onimisi,Jokeyz,wealthonimisi@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"May 18, 2025 12:20 pm","22.00 USD",
+in_1RPzczB0pqpbXiCi2dNwVp3d,533,JM,Ferreiras,jmferreiras,jmferreirasprod@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jmferreirasprod@gmail.com,success,"May 18, 2025 6:19 am","22.00 USD",
+ch_3RNqvQB0pqpbXiCi1c3nycZs,530,Jonathan,Jean-Privat,Joneskeys,j.privat972@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",j.privat972@gmail.com,success,"May 12, 2025 7:38 am","22.00 USD",xxxx-xxxx-xxxx-9737
+,526,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"May 10, 2025 7:26 am","22.00 USD",
+in_1RLsjcB0pqpbXiCiI4oMb6SK,522,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jodt16@gmail.com,success,"May 6, 2025 10:09 pm","22.00 USD",
+in_1RL6X0B0pqpbXiCiMJAzPMYx,520,Daniel,Adedapo,Danielade,danieladedapo10@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Danieladedapo10@gmail.com,success,"May 4, 2025 6:41 pm","22.00 USD",
+ch_3RKgQDB0pqpbXiCi0LFp1Fbk,519,Ronique,Henry,Kevon1000,ronique.henry@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ronique.henry@yahoo.com,success,"May 3, 2025 1:49 pm","22.00 USD",xxxx-xxxx-xxxx-5745
+in_1RK94pB0pqpbXiCiOxiZp7Qq,518,Ednis,Jeanty,ednisj,ednisj@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ednisj@gmail.com,success,"May 2, 2025 3:12 am","22.00 USD",
+ch_3RJguJB0pqpbXiCi0xbEFDRd,515,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 30, 2025 8:08 pm","22.00 USD",xxxx-xxxx-xxxx-1246
+ch_3RJPS2B0pqpbXiCi0na6kV5f,514,Manasseh,Menghisteab,LBJMamba23,m.manasseh01@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",m.manasseh01@gmail.com,success,"April 30, 2025 1:29 am","22.00 USD",xxxx-xxxx-xxxx-9025
+ch_3RJ12GB0pqpbXiCi0np9TwZH,512,Martinson,Sarfo,icgcdallas,icgcdallas@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",icgcdallas@gmail.com,success,"April 28, 2025 11:25 pm","22.00 USD",xxxx-xxxx-xxxx-7998
+ch_3RIb61B0pqpbXiCi1o2A4YqJ,510,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 27, 2025 7:43 pm","22.00 USD",xxxx-xxxx-xxxx-9681
+ch_3RHZdIB0pqpbXiCi1I3gI8mK,506,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 24, 2025 11:57 pm","22.00 USD",xxxx-xxxx-xxxx-9681
+ch_3RGVs7B0pqpbXiCi1YdjsMcE,501,Justin,Winthers,jwinthers,justin@gracehillchurch.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",justin@gracehillchurch.com,success,"April 22, 2025 1:44 am","22.00 USD",xxxx-xxxx-xxxx-1006
+ch_3RFMSxB0pqpbXiCi1SO0eLOp,496,"Stephen Baafi",Amponsah,Stephenbaafi,Amponsahstephenbaafi@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Amponsahstephenbaafi@gmail.com,success,"April 18, 2025 9:29 pm","22.00 USD",xxxx-xxxx-xxxx-8145
+ch_3RF7JJB0pqpbXiCi03QSrpjm,495,JM,Ferreiras,jmferreiras,jmferreirasprod@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jmferreirasprod@gmail.com,success,"April 18, 2025 5:19 am","22.00 USD",xxxx-xxxx-xxxx-4779
+,494,JoeDavid,Ndifor,ndifordavid,Joedavidndifor@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 17, 2025 7:52 pm","22.00 USD",
+,493,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 17, 2025 11:09 am","22.00 USD",
+ch_3RDgbLB0pqpbXiCi0Bwt9OsR,490,Taiwo,David,Jaz90,davidben898@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",davidben898@gmail.com,success,"April 14, 2025 6:40 am","22.00 USD",xxxx-xxxx-xxxx-2709
+in_1RDfN8B0pqpbXiCiwS5KTkm1,489,Success,Daka,sdaka,successdaka21@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",successdaka21@gmail.com,success,"April 14, 2025 6:17 am","22.00 USD",
+in_1RD9sZB0pqpbXiCidPSqzc95,487,René,Antonio,Rene2405,renetungaantonio@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",renetungaantonio@gmail.com,success,"April 12, 2025 8:39 pm","22.00 USD",
+,486,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 11, 2025 7:32 am","22.00 USD",
+ch_3RCYrGB0pqpbXiCi1RpMjdHC,482,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 11, 2025 4:06 am","22.00 USD",xxxx-xxxx-xxxx-4381
+in_1RCK68B0pqpbXiCiuSy715uk,481,Kevin,Tran,kevintran12321,kevin.tran12321@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",kevin.tran12321@gmail.com,success,"April 10, 2025 1:21 pm","22.00 USD",
+,480,Adewale,Adefala,peacefulmusic,adewaleadefala08@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 10, 2025 9:43 am","22.00 USD",
+,479,Adewale,Adefala,peacefulmusic,adewaleadefala08@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 10, 2025 9:43 am","22.00 USD",
+,478,Adewale,Adefala,peacefulmusic,adewaleadefala08@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 10, 2025 9:43 am","22.00 USD",
+,477,Adewale,Adefala,peacefulmusic,adewaleadefala08@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 10, 2025 9:43 am","22.00 USD",
+,476,Adewale,Adefala,peacefulmusic,adewaleadefala08@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 10, 2025 9:43 am","22.00 USD",
+in_1RCEk3B0pqpbXiCiI5lkwPX1,475,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 10, 2025 7:38 am","22.00 USD",
+,472,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 8, 2025 7:59 pm","22.00 USD",
+,471,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 8, 2025 7:58 pm","22.00 USD",
+,470,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"April 8, 2025 7:57 pm","22.00 USD",
+ch_3RBhNCB0pqpbXiCi0VgcAGIe,469,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 8, 2025 7:00 pm","22.00 USD",xxxx-xxxx-xxxx-1652
+ch_3RBc4zB0pqpbXiCi18m6w4ot,468,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 8, 2025 1:21 pm","22.00 USD",xxxx-xxxx-xxxx-8080
+ch_3RBE0nB0pqpbXiCi1GRRrYjL,466,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"April 7, 2025 11:39 am","22.00 USD",xxxx-xxxx-xxxx-4764
+ch_3RB0PFB0pqpbXiCi0CeenZL3,465,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Stripe,"Subscription  ",jodt16@gmail.com,success,"April 6, 2025 9:08 pm","22.00 USD",xxxx-xxxx-xxxx-4207
+ch_3RAEDVB0pqpbXiCi0aZ8IJhz,463,Daniel,Adedapo,Danielade,danieladedapo10@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",danieladedapo10@gmail.com,success,"April 4, 2025 5:40 pm","22.00 USD",xxxx-xxxx-xxxx-7715
+ch_3R9Gl5B0pqpbXiCi0QAUkjtw,456,Ednis,Jeanty,ednisj,ednisj@gmail.com,"Monthly Membership",Stripe,"Subscription  ",ednisj@gmail.com,success,"April 2, 2025 2:10 am","22.00 USD",xxxx-xxxx-xxxx-4517
+ch_3R8d6FB0pqpbXiCi02Q4motX,452,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"March 31, 2025 7:50 am","22.00 USD",xxxx-xxxx-xxxx-5132
+ch_3R80HOB0pqpbXiCi0JiQAF9T,450,COLLINS,ASADU-BEMPAH,collins22a,Collins22a@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Collins22a@yahoo.com,success,"March 29, 2025 2:23 pm","22.00 USD",xxxx-xxxx-xxxx-0704
+ch_3R7n6vB0pqpbXiCi1JUDbMaj,449,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"March 29, 2025 12:20 am","22.00 USD",xxxx-xxxx-xxxx-8469
+ch_3R7CCiB0pqpbXiCi0x6Vc6kN,446,Liam,Soifuaga,Modu,lsoifuaga@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",lsoifuaga@gmail.com,success,"March 27, 2025 8:56 am","22.00 USD",xxxx-xxxx-xxxx-3915
+,444,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 27, 2025 5:57 am","22.00 USD",
+ch_3R6WbQB0pqpbXiCi1lIuYMvP,442,Jarron,Hill,jarron013,jarron209901@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jarron209901@gmail.com,success,"March 25, 2025 12:29 pm","22.00 USD",xxxx-xxxx-xxxx-0092
+,441,Hakizimana,Marc,Hakimarc,hakimarc38@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 18, 2025 10:35 pm","22.00 USD",
+,435,Osei,Boffah,cobs123313,okboffahboy@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 19, 2025 9:20 pm","22.00 USD",
+ch_3R3l6ZB0pqpbXiCi0icXTHDF,425,Gerod,Sturgis,Roddie,ballersturgis@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ballersturgis@gmail.com,success,"March 17, 2025 9:22 pm","22.00 USD",xxxx-xxxx-xxxx-0704
+,424,Lukushe,yannick,lukushe,lukushe.yanick88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 17, 2025 5:19 pm","22.00 USD",
+ch_3R2dcaB0pqpbXiCi1IYXX43c,422,Mayowa,Alomoge,Mayuski,alomoge007@yahoo.com,"Quarterly Membership",Stripe,"Subscription (Automatic) ",alomoge007@yahoo.com,success,"March 14, 2025 7:10 pm","57.00 USD",xxxx-xxxx-xxxx-3280
+ch_3R2QXwB0pqpbXiCi02pVbUgg,420,Success,Daka,sdaka,successdaka21@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",successdaka21@gmail.com,success,"March 14, 2025 5:15 am","22.00 USD",xxxx-xxxx-xxxx-6901
+in_1R22X6B0pqpbXiCiuhud0wuV,417,Corey,Wilmot,Cwize138,cwize138@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",cwize138@gmail.com,success,"March 13, 2025 4:35 am","22.00 USD",
+ch_3R1zoqB0pqpbXiCi09zaNdhs,416,Nelvin,Polneau,Nelvin,Nelvinpolno@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",Nelvinpolno@gmail.com,success,"March 13, 2025 12:45 am","189.00 USD",xxxx-xxxx-xxxx-6212
+ch_3R1v4nB0pqpbXiCi00z5c9Fl,415,René,Antonio,Rene2405,renetungaantonio@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",renetungaantonio@gmail.com,success,"March 12, 2025 7:37 pm","22.00 USD",xxxx-xxxx-xxxx-3367
+ch_3R15J6B0pqpbXiCi0QDL5w5O,411,Kevin,Tran,kevintran12321,kevin.tran12321@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",kevin.tran12321@gmail.com,success,"March 10, 2025 12:20 pm","22.00 USD",xxxx-xxxx-xxxx-9422
+ch_3R0zwcB0pqpbXiCi1LOvDoym,408,,,,,"Monthly Membership",Stripe,"Subscription  ",,success,"March 10, 2025 6:36 am","22.00 USD",xxxx-xxxx-xxxx-9021
+,406,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 9, 2025 2:20 pm","22.00 USD",
+,405,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 9, 2025 2:19 pm","22.00 USD",
+,404,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 9, 2025 2:18 pm","22.00 USD",
+ch_3R0k6nB0pqpbXiCi0GzDUrlV,403,Kuhle,Mthembu,Kuhlemusic,kuhlemusic@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",kuhlemusic@gmail.com,success,"March 9, 2025 1:43 pm","22.00 USD",xxxx-xxxx-xxxx-6040
+in_1R0SKnB0pqpbXiCiW2RyRlqn,402,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"March 8, 2025 7:43 pm","22.00 USD",
+in_1R0AXUB0pqpbXiCi9N79b5tt,401,Jeffrey,Jones,jeffrey7,jones.jeffrey38@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jones.jeffrey38@gmail.com,success,"March 8, 2025 12:43 am","22.00 USD",
+,400,Lovis ,Rendel,Lovis,dudelovisrendel@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 7, 2025 8:40 pm","22.00 USD",
+ch_3R006iB0pqpbXiCi1rAK3qVo,399,Augusto,Baptista,Gusto992,gusto992@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",gusto992@gmail.com,success,"March 7, 2025 12:37 pm","22.00 USD",xxxx-xxxx-xxxx-9484
+,397,Ednis,Jeanty,ednisj,ednisj@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 28, 2025 1:59 pm","22.00 USD",
+,395,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"March 6, 2025 12:52 pm","22.00 USD",
+ch_3Qz3QJB0pqpbXiCi1D8ZCTfV,393,"The Healing",Sound,thehealingsound,thehealingsound@yahoo.com,"Quarterly Membership",Stripe,"Subscription (Automatic) ",thehealingsound@yahoo.com,success,"March 4, 2025 9:55 pm","57.00 USD",xxxx-xxxx-xxxx-0553
+,391,Robinson,Mgbah,robinson,acho.mgbah@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"March 2, 2025 8:20 pm","22.00 USD",
+ch_3QxYt4B0pqpbXiCi1zip9SF5,389,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"February 28, 2025 7:07 pm","22.00 USD",xxxx-xxxx-xxxx-4291
+ch_3Qx9SWB0pqpbXiCi1hCOGlPm,388,Andrew,Simsack,asimsack,ajsimsack@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ajsimsack@gmail.com,success,"February 27, 2025 3:57 pm","22.00 USD",xxxx-xxxx-xxxx-7307
+ch_3QwoHHB0pqpbXiCi1TWH8Uol,387,Ebo,Kwabena,peb0284,kebok2023@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",kebok2023@gmail.com,success,"February 26, 2025 5:21 pm","22.00 USD",xxxx-xxxx-xxxx-5010
+ch_3QwGFNB0pqpbXiCi1rK8oEoh,385,Oluwatobi,Karim,tobi,karimoluwatobi@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",karimoluwatobi@gmail.com,success,"February 25, 2025 5:00 am","189.00 USD",xxxx-xxxx-xxxx-2829
+ch_3Qw5lQB0pqpbXiCi0docnFgK,384,VINNCY_KEYS,,Vinncy,dikaivincent@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",dikaivincent@gmail.com,success,"February 24, 2025 5:48 pm","22.00 USD",xxxx-xxxx-xxxx-4707
+ch_3QvucMB0pqpbXiCi06ywcwPw,382,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"February 24, 2025 5:59 am","22.00 USD",xxxx-xxxx-xxxx-7147
+,378,Lukushe,yannick,lukushe,lukushe.yanick88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 21, 2025 7:17 pm","22.00 USD",
+ch_3QuLvvB0pqpbXiCi0HrNrn9k,377,Matthew,Graham,John64,mjg6464@hotmail.co.uk,"Monthly Membership",Stripe,"Subscription (Automatic) ",mjg6464@hotmail.co.uk,success,"February 19, 2025 10:42 pm","22.00 USD",xxxx-xxxx-xxxx-0963
+ch_3Qu5JzB0pqpbXiCi1LflqUkv,376,Mark,Kenneth,Marky_46,Marky462017@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Marky462017@gmail.com,success,"February 19, 2025 4:56 am","22.00 USD",xxxx-xxxx-xxxx-3864
+ch_3QtgAnB0pqpbXiCi0i43O9rH,373,Roberto,Paul,Bertox20,bertox20@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",bertox20@gmail.com,success,"February 18, 2025 2:05 am","22.00 USD",xxxx-xxxx-xxxx-8262
+ch_3QtdMBB0pqpbXiCi0uTgujfh,372,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"February 17, 2025 11:07 pm","22.00 USD",xxxx-xxxx-xxxx-0764
+,371,J,Nic,Jnic75,Ijustwannaplaymusick@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 16, 2025 4:24 pm","22.00 USD",
+,369,Sola,Ogunniyi,Olusola1,contact@propertyowlsltd.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 16, 2025 4:23 pm","22.00 USD",
+ch_3QtGKiB0pqpbXiCi1GDmWxrP,367,Ferry,Doliscar,Ferryd,ferrydoliscar@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ferrydoliscar@gmail.com,success,"February 16, 2025 10:29 pm","22.00 USD",xxxx-xxxx-xxxx-5098
+,365,Dale,Charles,Scruffman,djcharles1@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 16, 2025 6:07 am","22.00 USD",
+,363,Derrick,Hall,Derrick25,deethekid17@icloud.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 15, 2025 6:06 am","22.00 USD",
+,361,Jeho,"A. Yeboah",Jeho,jehoayeboah@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 15, 2025 6:04 am","22.00 USD",
+,359,barniemo,,barniemo,barniemoses@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 15, 2025 6:03 am","22.00 USD",
+,357,SAMUEL,MUNOH,samuel,samuelmunoh@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 14, 2025 6:01 am","22.00 USD",
+,355,Philippe,Onana,Onana,onanaphilippe907@yahoo.fr,"Monthly Membership",Manual,"Subscription  ",,success,"February 12, 2025 6:00 am","22.00 USD",
+,353,Nelson,Nicholas,IamNelson002,nellyeze57@gmail.com,"Yearly Membership",Manual,"Subscription  ",,success,"February 16, 2025 5:56 am","189.00 USD",
+,351,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 26, 2025 12:00 am","22.00 USD",
+,350,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 26, 2024 12:00 am","22.00 USD",
+,349,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 26, 2024 12:00 am","22.00 USD",
+,348,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 26, 2024 10:41 pm","22.00 USD",
+,347,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Half-year Membership",Manual,"Subscription  ",,success,"October 26, 2024 10:41 pm","105.00 USD",
+ch_3QrtAkB0pqpbXiCi0G6NQrzY,345,Corey,Wilmot,Cwize138,cwize138@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",cwize138@gmail.com,success,"February 13, 2025 3:33 am","22.00 USD",xxxx-xxxx-xxxx-3371
+,343,Gerald,Ashie,GeraldAsh,gerald.kotey@outlook.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 3, 2025 12:00 am","22.00 USD",
+,342,Gerald,Ashie,GeraldAsh,gerald.kotey@outlook.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 3, 2025 10:48 am","22.00 USD",
+,341,Gerald,Ashie,GeraldAsh,gerald.kotey@outlook.com,"Half-year Membership",Manual,"Subscription  ",,success,"January 3, 2025 10:46 am","105.00 USD",
+,339,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 9, 2025 12:00 am","22.00 USD",
+,338,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 9, 2025 12:00 am","22.00 USD",
+,337,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 9, 2024 12:00 am","22.00 USD",
+,336,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 9, 2024 10:45 am","22.00 USD",
+,335,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Half-year Membership",Manual,"Subscription  ",,success,"November 9, 2024 10:44 am","105.00 USD",
+,333,Lascelles,Williams,lwill7,lascelles.gwilliamsjr@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 9, 2025 12:00 am","22.00 USD",
+,332,Lascelles,Williams,lwill7,lascelles.gwilliamsjr@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 9, 2025 10:40 am","22.00 USD",
+,331,Lascelles,Williams,lwill7,lascelles.gwilliamsjr@gmail.com,"Half-year Membership",Manual,"Subscription  ",,success,"January 9, 2025 10:40 am","105.00 USD",
+,329,Eric,Scales,Escales1911,revescales@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 8, 2025 12:00 am","22.00 USD",
+,328,Eric,Scales,Escales1911,revescales@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 8, 2025 10:37 am","22.00 USD",
+,327,Eric,Scales,Escales1911,revescales@yahoo.com,"Half-year Membership",Manual,"Subscription  ",,success,"January 8, 2025 10:37 am","105.00 USD",
+,325,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 8, 2025 12:00 am","22.00 USD",
+,324,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 8, 2025 12:00 am","22.00 USD",
+,323,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 8, 2024 12:00 am","22.00 USD",
+,322,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 10:36 am","22.00 USD",
+,321,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Half-year Membership",Manual,"Subscription  ",,success,"November 8, 2024 10:35 am","105.00 USD",
+,319,George,Luseni,Glusen,g.luseni@hotmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 6, 2025 12:00 am","22.00 USD",
+,318,George,Luseni,Glusen,g.luseni@hotmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 6, 2025 10:32 am","22.00 USD",
+,317,George,Luseni,Glusen,g.luseni@hotmail.com,"Half-year Membership",Manual,"Subscription  ",,success,"January 6, 2025 10:31 am","105.00 USD",
+,315,Ose,Matthew,matthew,osemu.matthew@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 29, 2025 12:00 am","22.00 USD",
+,314,Ose,Matthew,matthew,osemu.matthew@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 29, 2024 12:00 am","22.00 USD",
+,313,Ose,Matthew,matthew,osemu.matthew@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 29, 2024 10:28 am","22.00 USD",
+,312,Ose,Matthew,matthew,osemu.matthew@gmail.com,"Quarterly Membership",Manual,"Subscription  ",,success,"November 29, 2024 10:28 am","57.00 USD",
+ch_3QrEGUB0pqpbXiCi117rnLht,310,Oluwanifemi,Ogundeko,nifemi,oluwanifemiogundeko02@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",oluwanifemiogundeko02@gmail.com,success,"February 11, 2025 7:52 am","22.00 USD",xxxx-xxxx-xxxx-5667
+,308,nick,rob,nick101,isniq.robinson@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 10, 2025 5:38 am","22.00 USD",
+,307,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"February 6, 2025 12:00 am","22.00 USD",
+,306,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"January 6, 2025 5:33 am","22.00 USD",
+,305,,,,,"Half-year Membership",Manual,"Subscription  ",,success,"January 6, 2025 5:33 am","105.00 USD",
+,303,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Monthly Membership",Manual,"Subscription  ",,success,"February 7, 2025 12:00 am","22.00 USD",
+,302,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Monthly Membership",Manual,"Subscription  ",,success,"January 7, 2025 12:00 am","22.00 USD",
+,301,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Monthly Membership",Manual,"Subscription  ",,success,"December 7, 2024 12:00 am","22.00 USD",
+,300,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Monthly Membership",Manual,"Subscription  ",,success,"November 7, 2024 8:15 pm","22.00 USD",
+,299,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Quarterly Membership",Manual,"Subscription  ",,success,"February 7, 2025 12:00 am","57.00 USD",
+,298,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Quarterly Membership",Manual,"Subscription  ",,success,"November 7, 2024 8:15 pm","57.00 USD",
+,290,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 8, 2025 7:43 pm","22.00 USD",
+,289,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 8, 2025 7:43 pm","22.00 USD",
+,288,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 8, 2025 7:41 pm","22.00 USD",
+ch_3QqIyBB0pqpbXiCi1Djqqd4c,287,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"February 8, 2025 6:42 pm","22.00 USD",xxxx-xxxx-xxxx-7338
+,286,Lovis ,Rendel,Lovis,dudelovisrendel@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"February 8, 2025 8:43 am","22.00 USD",
+ch_3Qq1BOB0pqpbXiCi05iGh29r,285,Jeffrey,Jones,jeffrey7,jones.jeffrey38@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jones.jeffrey38@gmail.com,success,"February 7, 2025 11:42 pm","22.00 USD",xxxx-xxxx-xxxx-0136
+,284,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"February 7, 2025 10:02 am","22.00 USD",
+ch_3QpSrZB0pqpbXiCi0jFuSRWI,282,Tendai,Lee,10dai,tendai1702@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",tendai1702@gmail.com,success,"February 6, 2025 11:04 am","22.00 USD",xxxx-xxxx-xxxx-1708
+ch_3QoE0HB0pqpbXiCi1pJoDSJD,278,Jimmy,Petiote,jpetior3,jimmypetiote@rocketmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jimmypetiote@rocketmail.com,success,"February 3, 2025 1:00 am","22.00 USD",xxxx-xxxx-xxxx-8552
+in_1QmdqvB0pqpbXiCihQHXKldR,274,Ednis,Jeanty,ednisj,ednisj@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ednisj@gmail.com,success,"January 29, 2025 5:11 pm","22.00 USD",
+,273,Nelson,Nicholas,IamNelson002,nellyeze57@gmail.com,"Yearly Membership",Manual,"Subscription  ",,success,"January 28, 2025 3:54 pm","189.00 USD",
+ch_3Qm5GRB0pqpbXiCi1Q1iw05N,271,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"January 28, 2025 3:16 am","22.00 USD",xxxx-xxxx-xxxx-8584
+ch_3QlyiJB0pqpbXiCi1rDEoexI,270,,,,,"Yearly Membership",Stripe,"Subscription (Automatic) ",,success,"January 27, 2025 8:16 pm","189.00 USD",xxxx-xxxx-xxxx-9377
+ch_3QlqrTB0pqpbXiCi1hamySoJ,268,Fiyin,Adeniranye,PxddlezOnKeyz,fiyin.niranye@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",fiyin.niranye@gmail.com,success,"January 27, 2025 1:23 pm","22.00 USD",xxxx-xxxx-xxxx-8290
+ch_3QlgUtB0pqpbXiCi10rnnosH,266,Neo,Mothwa,NeoMothwa,blessmothwa@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",blessmothwa@gmail.com,success,"January 27, 2025 12:58 am","22.00 USD",xxxx-xxxx-xxxx-5046
+,264,Dorian,Phillip,Pianoplaya73,pianoplaya73@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 25, 2025 6:25 pm","22.00 USD",
+,261,Lukushe,yannick,lukushe,lukushe.yanick88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 21, 2025 4:23 pm","22.00 USD",
+ch_3QjeKAB0pqpbXiCi18x8fVCF,260,Dayalan,Thangaraj,Dayapaul3591,dl.thanga@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",dl.thanga@gmail.com,success,"January 21, 2025 10:05 am","22.00 USD",xxxx-xxxx-xxxx-9952
+in_1QjV5jB0pqpbXiCiSEamdgps,259,Thomas,Anderson,bando,thomas@ando.codes,"Monthly Membership",Stripe,"Subscription (Automatic) ",thomas@ando.codes,success,"January 21, 2025 12:13 am","22.00 USD",
+in_1QjU8AB0pqpbXiCii4jqnyhY,258,Oluwatobi,Karim,tobi,karimoluwatobi@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",karimoluwatobi@gmail.com,success,"January 20, 2025 11:11 pm","22.00 USD",
+ch_3QjT5YB0pqpbXiCi0k8wJdeg,257,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"January 20, 2025 10:06 pm","22.00 USD",xxxx-xxxx-xxxx-9484
+in_1QiuY2B0pqpbXiCiJmVpxjkf,256,Josh,Reeves,josh_fast,reevesjosh98@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",reevesjosh98@gmail.com,success,"January 19, 2025 10:13 am","22.00 USD",
+in_1QioNqB0pqpbXiCiwmAYNWl5,255,Osei,Boffah,cobs123313,okboffahboy@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",okboffahboy@gmail.com,success,"January 19, 2025 2:37 am","22.00 USD",
+ch_3QiejZB0pqpbXiCi15uPgdDX,254,Leslie,Hawkins,7144lesamen,lesamen@comcast.net,"Yearly Membership",Stripe,"Subscription (Automatic) ",lesamen@comcast.net,success,"January 18, 2025 4:30 pm","189.00 USD",xxxx-xxxx-xxxx-4522
+in_1QiawlB0pqpbXiCioxxyzOK0,253,Hakizimana,Marc,Hakimarc,hakimarc38@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",hakimarc38@gmail.com,success,"January 18, 2025 1:17 pm","22.00 USD",
+in_1Qh8X2B0pqpbXiCi83tQh0aj,251,SAMUEL,MUNOH,samuel,samuelmunoh@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",samuelmunoh@gmail.com,success,"January 17, 2025 10:44 am","22.00 USD",
+in_1QgYn6B0pqpbXiCirhVoTR0O,250,Promise,Maduka,PromiseM,savedpromo@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",savedpromo@gmail.com,success,"January 17, 2025 6:35 am","22.00 USD",
+ch_3QhyhxB0pqpbXiCi0ngmLuES,249,J,Nic,Jnic75,Ijustwannaplaymusick@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Ijustwannaplaymusick@gmail.com,success,"January 16, 2025 7:30 pm","22.00 USD",xxxx-xxxx-xxxx-9644
+in_1Qhx4QB0pqpbXiCiNus78AEz,248,Sola,Ogunniyi,Olusola1,contact@propertyowlsltd.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",contact@propertyowlsltd.com,success,"January 16, 2025 5:41 pm","22.00 USD",
+in_1Qhi4MB0pqpbXiCi71fzQA7g,246,Dale,Charles,Scruffman,djcharles1@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",djcharles1@yahoo.com,success,"January 16, 2025 2:57 am","22.00 USD",
+in_1QhflVB0pqpbXiCiZP3Ip3Wq,245,Derrick,Hall,Derrick25,deethekid17@icloud.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",deethekid17@icloud.com,success,"January 15, 2025 11:12 pm","22.00 USD",
+ch_3QhRXKB0pqpbXiCi1q7bC4EC,244,Jeho,"A. Yeboah",Jeho,jehoayeboah@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jehoayeboah@gmail.com,success,"January 15, 2025 8:02 am","22.00 USD",xxxx-xxxx-xxxx-6955
+in_1QhLjJB0pqpbXiCiKenXnn3y,242,barniemo,,barniemo,barniemoses@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",barniemoses@gmail.com,success,"January 15, 2025 2:49 am","22.00 USD",
+in_1QhIVHB0pqpbXiCicwmM0e9t,241,Tremblay,Tremblay,Kelly,marieevekellyt@hotmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",marieevekellyt@hotmail.com,success,"January 14, 2025 10:22 pm","22.00 USD",
+ch_3QhBRYB0pqpbXiCi0zGU1JJv,240,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"January 14, 2025 2:51 pm","22.00 USD",xxxx-xxxx-xxxx-9485
+in_1QhAbSB0pqpbXiCi9xnspJf9,239,Robinson,Mgbah,robinson,acho.mgbah@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",acho.mgbah@gmail.com,success,"January 14, 2025 1:56 pm","22.00 USD",
+ch_3QgV7fB0pqpbXiCi0LiUfp9M,235,Philippe,Onana,Onana,onanaphilippe907@yahoo.fr,"Monthly Membership",Stripe,"Subscription (Automatic) ",onanaphilippe907@yahoo.fr,success,"January 12, 2025 5:41 pm","22.00 USD",xxxx-xxxx-xxxx-9866
+in_1QfMxoB0pqpbXiCiGgfQsQfR,233,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jodt16@gmail.com,success,"January 9, 2025 2:44 pm","22.00 USD",
+in_1QfIWXB0pqpbXiCiyttegAcy,232,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",sallalouis@gmail.com,success,"January 9, 2025 9:59 am","22.00 USD",
+ch_3QfCK2B0pqpbXiCi13brRHJC,230,Lascelles,Williams,lwill7,lascelles.gwilliamsjr@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",lascelles.gwilliamsjr@gmail.com,success,"January 9, 2025 3:24 am","22.00 USD",xxxx-xxxx-xxxx-0963
+ch_3Qf8hDB0pqpbXiCi0rXqEuk3,229,Kenneth,Omirigbe,Ken,kennysman@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",kennysman@yahoo.com,success,"January 8, 2025 11:31 pm","22.00 USD",xxxx-xxxx-xxxx-3241
+,228,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 8, 2025 7:28 pm","22.00 USD",
+,227,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 8, 2025 7:27 pm","22.00 USD",
+,226,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 8, 2025 7:25 pm","22.00 USD",
+ch_3Qf4HrB0pqpbXiCi1lf9ZN5K,225,Eric,Scales,Escales1911,revescales@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",revescales@yahoo.com,success,"January 8, 2025 6:47 pm","22.00 USD",xxxx-xxxx-xxxx-2950
+in_1QettoB0pqpbXiCifNxNpXrA,224,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Juleeda27@gmail.com,success,"January 8, 2025 7:41 am","22.00 USD",
+,223,nick,rob,nick101,isniq.robinson@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 7, 2025 9:48 pm","22.00 USD",
+,222,Lovis ,Rendel,Lovis,dudelovisrendel@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 7, 2025 9:47 pm","22.00 USD",
+ch_3QeiB8B0pqpbXiCi1zVtmN2A,221,kelechi,Daniels,iamzamar,dannykaylay@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",dannykaylay@gmail.com,success,"January 7, 2025 7:12 pm","22.00 USD",xxxx-xxxx-xxxx-3630
+,220,Fatunde,Gbolahan,gbolafat01,gbolafat01@gmail.com,"Yearly Membership",Manual,"Subscription  ",,success,"January 7, 2025 6:16 pm","189.00 USD",
+in_1QeaNWB0pqpbXiCi7LpVnVPu,219,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Monthly Membership",Stripe,"Subscription (Automatic) ",bkluday@yahoo.co.uk,success,"January 7, 2025 10:51 am","22.00 USD",
+ch_3QeNRQB0pqpbXiCi1Sc2WM94,216,George,Luseni,Glusen,g.luseni@hotmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",g.luseni@hotmail.com,success,"January 6, 2025 9:02 pm","22.00 USD",xxxx-xxxx-xxxx-3033
+in_1QeMInB0pqpbXiCiWAeRQ7z5,215,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",sallalouis@gmail.com,success,"January 6, 2025 8:49 pm","22.00 USD",
+ch_3QeK9cB0pqpbXiCi1wklC2n1,214,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"January 6, 2025 5:32 pm","22.00 USD",xxxx-xxxx-xxxx-9013
+,213,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"January 6, 2025 2:52 pm","22.00 USD",
+,212,"Enoma Divine",Omozusi,Imoffixialdee,Omozusidivine@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 6, 2025 2:48 pm","22.00 USD",
+ch_3QdnNaB0pqpbXiCi0ASRp42l,211,Diemelar,Paswa,Diemelar,big123dee@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",big123dee@gmail.com,success,"January 5, 2025 6:33 am","22.00 USD",xxxx-xxxx-xxxx-4438
+ch_3Qczh4B0pqpbXiCi0pB5SL6f,209,Gerald,Ashie,GeraldAsh,gerald.kotey@outlook.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",gerald.kotey@outlook.com,success,"January 3, 2025 1:33 am","22.00 USD",xxxx-xxxx-xxxx-1015
+,208,Andile,Siluma,Andile,Andiles7@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"January 2, 2025 5:17 pm","22.00 USD",
+,205,Tiriman,"Lino Jnr",Tlino,linotiriman2@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 30, 2024 7:04 am","22.00 USD",
+in_1QbSeBB0pqpbXiCiLEVbaohy,204,Ose,Matthew,matthew,osemu.matthew@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",osemu.matthew@gmail.com,success,"December 29, 2024 9:00 pm","22.00 USD",
+ch_3QbP3aB0pqpbXiCi1vUqchXI,203,Ednis,Jeanty,ednisj,ednisj@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ednisj@gmail.com,success,"December 29, 2024 4:10 pm","22.00 USD",xxxx-xxxx-xxxx-4517
+in_1QbDh0B0pqpbXiCiFGrGlvub,200,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"December 29, 2024 4:01 am","22.00 USD",
+,199,Taiwo,Kanyenda,Taiwo,Kanyenda88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 27, 2024 7:01 am","22.00 USD",
+in_1QaIDrB0pqpbXiCiCWLJ5fBJ,198,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",emanfrimpong@gmail.com,success,"December 26, 2024 3:39 pm","22.00 USD",
+,197,J,colby,Jcolby,bdotsoul2@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 26, 2024 11:36 am","22.00 USD",
+in_1Qa8P9B0pqpbXiCiqwfyiN0C,196,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",drwallacecolvin@outlook.com,success,"December 26, 2024 4:10 am","22.00 USD",
+,194,Dorian,Phillip,Pianoplaya73,pianoplaya73@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 25, 2024 8:43 am","22.00 USD",
+ch_3QZeMdB0pqpbXiCi1GDeRay6,192,Fiyin,Adeniranye,PxddlezOnKeyz,fiyin.niranye@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",fiyin.niranye@gmail.com,success,"December 24, 2024 8:32 pm","22.00 USD",xxxx-xxxx-xxxx-8290
+in_1QZbY4B0pqpbXiCisreupA3O,191,Lase,McBride,Lasemcbride,Lasemcbride@icloud.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Lasemcbride@icloud.com,success,"December 24, 2024 6:06 pm","22.00 USD",
+ch_3QYjhOB0pqpbXiCi1h8Tkxp6,189,VINNCY_KEYS,,Vinncy,dikaivincent@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",dikaivincent@gmail.com,success,"December 22, 2024 7:36 am","22.00 USD",xxxx-xxxx-xxxx-4707
+in_1QYemgB0pqpbXiCiSwsiMuxA,188,Milton,Lewis,Mlewis,Dentist300@aol.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Dentist300@aol.com,success,"December 22, 2024 3:21 am","22.00 USD",
+in_1QYGKkB0pqpbXiCiyPWBuUDF,186,Thomas,Anderson,bando,thomas@ando.codes,"Monthly Membership",Stripe,"Subscription (Automatic) ",thomas@ando.codes,success,"December 21, 2024 1:15 am","22.00 USD",
+in_1QYFMQB0pqpbXiCiIDAMGett,185,Oluwatobi,Karim,tobi,karimoluwatobi@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",karimoluwatobi@gmail.com,success,"December 20, 2024 11:12 pm","22.00 USD",
+in_1QRhKtB0pqpbXiCijPO2Zl8h,184,Antoine,Ndongala,ProfLuza,dieu.ndongala@icloud.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",dieu.ndongala@icloud.com,success,"December 20, 2024 7:39 pm","22.00 USD",
+,182,Joseph,Onyedikachi,Blinks,joeblinks133@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 19, 2024 5:18 pm","22.00 USD",
+,181,Lukushe,yannick,lukushe,lukushe.yanick88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 19, 2024 12:16 pm","22.00 USD",
+ch_3QXfkxB0pqpbXiCi1pLwhm4I,180,Josh,Reeves,josh_fast,reevesjosh98@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",reevesjosh98@gmail.com,success,"December 19, 2024 9:11 am","22.00 USD",xxxx-xxxx-xxxx-9194
+in_1QXZeKB0pqpbXiCizPFUKcSj,178,Osei,Boffah,cobs123313,okboffahboy@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",okboffahboy@gmail.com,success,"December 19, 2024 3:39 am","22.00 USD",
+ch_3QXM94B0pqpbXiCi19Y6ZUp4,177,Hakizimana,Marc,Hakimarc,hakimarc38@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",hakimarc38@gmail.com,success,"December 18, 2024 12:15 pm","22.00 USD",xxxx-xxxx-xxxx-0696
+ch_3QXEtxB0pqpbXiCi0DCS3ffN,176,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"December 18, 2024 4:31 am","22.00 USD",xxxx-xxxx-xxxx-0267
+ch_3QX5cuB0pqpbXiCi1we6VsL5,175,Vince,Choco,Chocovince,chocovince@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",chocovince@gmail.com,success,"December 17, 2024 6:40 pm","22.00 USD",xxxx-xxxx-xxxx-0067
+ch_3QWluPB0pqpbXiCi0muXnCk6,174,Peter,Ayeni,Peter,peter.ayeni@hotmail.co.uk,"Yearly Membership",Stripe,"Subscription (Automatic) ",peter.ayeni@hotmail.co.uk,success,"December 16, 2024 9:35 pm","189.00 USD",xxxx-xxxx-xxxx-1007
+,172,Samuel,Achiaa,sammyda,samuelachiaa126@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 16, 2024 7:04 pm","22.00 USD",
+in_1QWiI8B0pqpbXiCieWbPuEw3,171,Sola,Ogunniyi,Olusola1,contact@propertyowlsltd.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",contact@propertyowlsltd.com,success,"December 16, 2024 5:41 pm","22.00 USD",
+,170,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 16, 2024 9:55 am","22.00 USD",
+ch_3QWTHEB0pqpbXiCi1imk1uvs,169,Dale,Charles,Scruffman,djcharles1@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",djcharles1@yahoo.com,success,"December 16, 2024 1:40 am","22.00 USD",xxxx-xxxx-xxxx-5306
+in_1QWQyzB0pqpbXiCiijQAHDi9,168,Derrick,Hall,Derrick25,deethekid17@icloud.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",deethekid17@icloud.com,success,"December 16, 2024 12:13 am","22.00 USD",
+ch_3QW6viB0pqpbXiCi1M0YriSv,167,barniemo,,barniemo,barniemoses@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",barniemoses@gmail.com,success,"December 15, 2024 1:48 am","22.00 USD",xxxx-xxxx-xxxx-3157
+in_1QW3jdB0pqpbXiCiOrWhBoJ6,165,Tremblay,Tremblay,Kelly,marieevekellyt@hotmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",marieevekellyt@hotmail.com,success,"December 14, 2024 11:23 pm","22.00 USD",
+in_1QVvpFB0pqpbXiCixapjzFR3,164,Robinson,Mgbah,robinson,acho.mgbah@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",acho.mgbah@gmail.com,success,"December 14, 2024 1:56 pm","22.00 USD",
+ch_3QVtjMB0pqpbXiCi1I1wmvCy,163,SAMUEL,MUNOH,samuel,samuelmunoh@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",samuelmunoh@gmail.com,success,"December 14, 2024 11:43 am","22.00 USD",xxxx-xxxx-xxxx-4613
+,162,Chisom,"Lois Joel",chichi,loisjoels001@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 14, 2024 9:28 am","22.00 USD",
+,161,"Ivan del",Campo,Ivan101,ywbass@hotmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 14, 2024 9:15 am","22.00 USD",
+ch_3QVpAgB0pqpbXiCi1OAdEhMS,159,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"December 14, 2024 6:50 am","22.00 USD",xxxx-xxxx-xxxx-9229
+ch_3QVJzlB0pqpbXiCi1xnyPCXF,158,Promise,Maduka,PromiseM,savedpromo@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",savedpromo@gmail.com,success,"December 12, 2024 9:33 pm","22.00 USD",xxxx-xxxx-xxxx-0566
+,148,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 11, 2024 9:14 am","22.00 USD",
+,146,nick,rob,nick101,isniq.robinson@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 10, 2024 10:22 pm","22.00 USD",
+,144,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 9, 2024 6:31 pm","22.00 USD",
+in_1QU8EHB0pqpbXiCiTngl2tJY,143,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jodt16@gmail.com,success,"December 9, 2024 3:47 pm","22.00 USD",
+in_1QU3keB0pqpbXiCiaWnDQXZn,142,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",sallalouis@gmail.com,success,"December 9, 2024 11:00 am","22.00 USD",
+,141,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 8, 2024 3:41 pm","22.00 USD",
+in_1QTf73B0pqpbXiCiSS8IDsUy,140,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Juleeda27@gmail.com,success,"December 8, 2024 8:42 am","22.00 USD",
+in_1QTLapB0pqpbXiCiErq9U8HO,139,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Monthly Membership",Stripe,"Subscription (Automatic) ",bkluday@yahoo.co.uk,success,"December 7, 2024 11:51 am","22.00 USD",
+ch_3QT7TdB0pqpbXiCi1Xq3BIL0,138,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Stripe,"Subscription  ",sallalouis@gmail.com,success,"December 6, 2024 7:49 pm","22.00 USD",xxxx-xxxx-xxxx-2526
+,137,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 6, 2024 7:05 pm","22.00 USD",
+in_1QP9tTB0pqpbXiCinzWcwVbU,136,GIRESSE,NSUNDI,Giresse89,nsundigiresse@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",nsundigiresse@gmail.com,success,"December 6, 2024 9:33 am","22.00 USD",
+,135,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"December 6, 2024 8:45 am","22.00 USD",
+,133,Donnie,Johnson,rayjohnsonrx,rayjohnsonrx@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"December 3, 2024 11:50 am","22.00 USD",
+ch_3QRgFCB0pqpbXiCi1N1MZVMR,131,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"December 2, 2024 8:29 pm","22.00 USD",xxxx-xxxx-xxxx-0882
+in_1QNfqTB0pqpbXiCisvilKQy2,128,Andile,Siluma,Andile,Andiles7@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Andiles7@gmail.com,success,"November 30, 2024 9:15 pm","22.00 USD",
+ch_3QQvz9B0pqpbXiCi0jFyvgAk,127,Mon,Ami,myadsmail17,myadsmail17@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",myadsmail17@gmail.com,success,"November 30, 2024 7:06 pm","22.00 USD",xxxx-xxxx-xxxx-4386
+ch_3QQaJJB0pqpbXiCi1RuyA63q,125,Ose,Matthew,matthew,osemu.matthew@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",osemu.matthew@gmail.com,success,"November 29, 2024 7:59 pm","22.00 USD",xxxx-xxxx-xxxx-3120
+ch_3QQPCEB0pqpbXiCi11IuWcmo,124,Jeho,"A. Yeboah",Jeho,jehoayeboah@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jehoayeboah@gmail.com,success,"November 29, 2024 8:05 am","22.00 USD",xxxx-xxxx-xxxx-6955
+in_1QQLOgB0pqpbXiCi8i8Ojp8I,123,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"November 29, 2024 5:02 am","22.00 USD",
+ch_3QQ4TkB0pqpbXiCi0GMGMEUY,122,Ransford,Koomson,Randy,brownkoomson@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",brownkoomson@gmail.com,success,"November 28, 2024 9:59 am","189.00 USD",xxxx-xxxx-xxxx-0211
+,121,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"November 27, 2024 9:39 pm","22.00 USD",
+ch_3QPPtmB0pqpbXiCi0i0Y3KBm,120,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Stripe,"Subscription  ",emanfrimpong@gmail.com,success,"November 26, 2024 2:38 pm","22.00 USD",xxxx-xxxx-xxxx-4746
+,119,J,colby,Jcolby,bdotsoul2@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 26, 2024 1:04 pm","22.00 USD",
+,118,"Isaac Temidayo",Oyelola,Temkeys,isaactemidayo84@gmail.com,"Yearly Membership",Manual,"Subscription  ",,success,"November 26, 2024 12:52 pm","189.00 USD",
+,117,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"November 26, 2024 12:43 pm","22.00 USD",
+,116,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"November 26, 2024 6:34 am","22.00 USD",
+in_1QPG7HB0pqpbXiCiPBepLmbI,114,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",drwallacecolvin@outlook.com,success,"November 26, 2024 5:12 am","22.00 USD",
+,112,Dorian,Phillip,Pianoplaya73,pianoplaya73@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 25, 2024 1:57 pm","22.00 USD",
+ch_3QOjEzB0pqpbXiCi0ZeSNsVy,110,Lase,McBride,Lasemcbride,Lasemcbride@icloud.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Lasemcbride@icloud.com,success,"November 24, 2024 5:05 pm","22.00 USD",xxxx-xxxx-xxxx-2468
+,109,Taiwo,Kanyenda,Taiwo,Kanyenda88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 23, 2024 3:33 pm","22.00 USD",
+ch_3QNmOhB0pqpbXiCi09jX2bwy,108,Milton,Lewis,Mlewis,Dentist300@aol.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Dentist300@aol.com,success,"November 22, 2024 2:20 am","22.00 USD",xxxx-xxxx-xxxx-3665
+ch_3QNNz5B0pqpbXiCi1G2IvK1z,105,Thomas,Anderson,bando,thomas@ando.codes,"Monthly Membership",Stripe,"Subscription (Automatic) ",thomas@ando.codes,success,"November 21, 2024 12:12 am","22.00 USD",xxxx-xxxx-xxxx-2245
+in_1QNN3aB0pqpbXiCitWREmlDE,104,Oluwatobi,Karim,tobi,karimoluwatobi@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",karimoluwatobi@gmail.com,success,"November 21, 2024 12:11 am","22.00 USD",
+ch_3QNHEOB0pqpbXiCi0TzMEQ5z,103,Diemelar,Paswa,Diemelar,big123dee@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",big123dee@gmail.com,success,"November 20, 2024 4:59 pm","22.00 USD",xxxx-xxxx-xxxx-4438
+ch_3QMhIWB0pqpbXiCi1xTgTGzE,99,Osei,Boffah,cobs123313,okboffahboy@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",okboffahboy@gmail.com,success,"November 19, 2024 2:36 am","22.00 USD",xxxx-xxxx-xxxx-8015
+,97,Samuel,Achiaa,sammyda,samuelachiaa126@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 17, 2024 6:10 am","22.00 USD",
+ch_3QLs9AB0pqpbXiCi1vthxPfn,96,Cian,Ohm,cohm123,ciznohm@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ciznohm@gmail.com,success,"November 16, 2024 8:00 pm","22.00 USD",xxxx-xxxx-xxxx-7636
+in_1QLpzTB0pqpbXiCisAetuuEu,95,Sola,Ogunniyi,Olusola1,contact@propertyowlsltd.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",contact@propertyowlsltd.com,success,"November 16, 2024 6:41 pm","22.00 USD",
+ch_3QLaYRB0pqpbXiCi1OnEV3SK,94,Elijah,Grant,Afropartydancer,assurancesofgod@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",assurancesofgod@gmail.com,success,"November 16, 2024 1:12 am","189.00 USD",xxxx-xxxx-xxxx-9208
+ch_3QLYfxB0pqpbXiCi1K2xSwNP,93,Derrick,Hall,Derrick25,deethekid17@icloud.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",deethekid17@icloud.com,success,"November 15, 2024 11:11 pm","22.00 USD",xxxx-xxxx-xxxx-2088
+ch_3QLBOkB0pqpbXiCi1IILiU8L,92,Tremblay,Tremblay,Kelly,marieevekellyt@hotmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",marieevekellyt@hotmail.com,success,"November 14, 2024 10:21 pm","22.00 USD",xxxx-xxxx-xxxx-0854
+in_1QL3WfB0pqpbXiCi150WnKGv,91,Robinson,Mgbah,robinson,acho.mgbah@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",acho.mgbah@gmail.com,success,"November 14, 2024 2:56 pm","22.00 USD",
+in_1QKvFFB0pqpbXiCiOarEc32s,89,Jack,Raj,Jack,jackcollinsraj64@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jackcollinsraj64@gmail.com,success,"November 14, 2024 6:06 am","22.00 USD",
+,87,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 11, 2024 2:17 pm","22.00 USD",
+,86,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"November 11, 2024 2:15 pm","22.00 USD",
+ch_3QJvu0B0pqpbXiCi10f0SDOT,85,Satish,Sundarapalli,SATISHKEY,satishsundarapallisax@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",satishsundarapallisax@gmail.com,success,"November 11, 2024 11:38 am","22.00 USD",xxxx-xxxx-xxxx-5299
+ch_3QJFrlB0pqpbXiCi186zKcnK,84,Tshimanga,Jonathan,Stbls,jodt16@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jodt16@gmail.com,success,"November 9, 2024 2:43 pm","22.00 USD",xxxx-xxxx-xxxx-4207
+ch_3QJBPqB0pqpbXiCi16edOA8M,83,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Stripe,"Subscription  ",sallalouis@gmail.com,success,"November 9, 2024 9:59 am","22.00 USD",xxxx-xxxx-xxxx-2526
+,81,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 9:55 pm","22.00 USD",
+,80,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 9:22 pm","22.00 USD",
+,79,Joseph,Onyedikachi,Blinks,joeblinks133@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 8:16 pm","22.00 USD",
+,78,tounda,boaz,tounda,toundaboaz@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 8:10 pm","22.00 USD",
+,77,vinncy,vinncy,vinncy777,vinncy777@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 7:55 pm","22.00 USD",
+,76,benedict,nyamekeh,benedict,benedictnyamekeh@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 8:08 am","22.00 USD",
+,75,Blue,Print,Blueprint,blueprint472@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 7:59 am","22.00 USD",
+,74,Kj,owusu,Kj23,Kj23owusu@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 7:51 am","22.00 USD",
+,73,Abed,Abed,Abeddmb,abeddmb@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 7:43 am","22.00 USD",
+ch_3QIml9B0pqpbXiCi0piqR7YI,72,Leed,Mirville,Juleeda27,Juleeda27@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Juleeda27@gmail.com,success,"November 8, 2024 7:41 am","22.00 USD",xxxx-xxxx-xxxx-8294
+,71,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"November 8, 2024 6:59 am","22.00 USD",
+,70,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"November 5, 2024 4:57 pm","22.00 USD",
+,69,,,,,"Yearly Membership",Manual,"Subscription  ",,success,"November 7, 2024 4:57 pm","189.00 USD",
+ch_3QITGeB0pqpbXiCi0T6cynil,68,MR.B,KLU-DAY,Bkluday,bkluday@yahoo.co.uk,"Monthly Membership",Stripe,"Subscription (Automatic) ",bkluday@yahoo.co.uk,success,"November 7, 2024 10:50 am","22.00 USD",xxxx-xxxx-xxxx-5668
+,67,Lovis ,Rendel,Lovis,dudelovisrendel@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 7, 2024 8:57 am","22.00 USD",
+,66,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 8, 2024 8:10 am","22.00 USD",
+,64,Elysee,Lukusa,Elyseelks,elyselukusa@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"November 6, 2024 3:48 pm","22.00 USD",
+ch_3QHzRAB0pqpbXiCi04cghhSW,63,Nicolaus,dayihimbaze,ndayihimbaze,ndayihimbze@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",ndayihimbze@gmail.com,success,"November 6, 2024 2:58 am","22.00 USD",xxxx-xxxx-xxxx-9986
+ch_3QGp0IB0pqpbXiCi1ONO4MSA,62,Antoine,Ndongala,ProfLuza,dieu.ndongala@icloud.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",dieu.ndongala@icloud.com,success,"November 2, 2024 9:38 pm","22.00 USD",xxxx-xxxx-xxxx-2250
+,61,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"October 31, 2024 4:59 pm","22.00 USD",
+ch_3QFurJB0pqpbXiCi01yPh5Cy,60,Josh,Reeves,josh_fast,reevesjosh98@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",reevesjosh98@gmail.com,success,"October 31, 2024 9:40 am","22.00 USD",xxxx-xxxx-xxxx-9566
+,59,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 8, 2024 7:44 am","22.00 USD",
+,58,Lesly,Polynice,LPolynice,leslypolynice@yahoo.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 9, 2024 7:43 am","22.00 USD",
+,57,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"October 10, 2024 7:42 am","22.00 USD",
+,56,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 5, 2024 7:41 am","22.00 USD",
+,55,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 5, 2024 7:40 am","22.00 USD",
+,54,Donnie,Johnson,rayjohnsonrx,rayjohnsonrx@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 3, 2024 7:36 am","22.00 USD",
+,53,Nathan,Utiam,nutiam,nathanutiam@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 3, 2024 7:35 am","22.00 USD",
+,52,Adewale,Adefala,peacefulmusic,adewaleadefala08@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 30, 2024 9:21 am","22.00 USD",
+ch_3QF6Y9B0pqpbXiCi1G5cwR7F,51,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"October 29, 2024 4:00 am","22.00 USD",xxxx-xxxx-xxxx-0266
+ch_3QEow1B0pqpbXiCi0BJ7XMVF,50,Faithful,Anere,faithful,faithfulanere@gmail.com,"Yearly Membership",Stripe,"Subscription (Automatic) ",faithfulanere@gmail.com,success,"October 28, 2024 9:11 am","189.00 USD",xxxx-xxxx-xxxx-0286
+,48,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"October 27, 2024 10:28 pm","22.00 USD",
+ch_3QEHTHB0pqpbXiCi1ok7tnA0,47,Steve,Antwi,steveantwi,stvnantwi@outlook.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",stvnantwi@outlook.com,success,"October 26, 2024 9:32 pm","22.00 USD",xxxx-xxxx-xxxx-5456
+ch_3QE1grB0pqpbXiCi1wVhq3Jm,46,Quinxy,Hammond,QHam,quincyhammond2007@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",quincyhammond2007@gmail.com,success,"October 26, 2024 4:34 am","22.00 USD",xxxx-xxxx-xxxx-9365
+ch_3QE1HBB0pqpbXiCi0YwRzS4R,45,Wallace,Colvin,Wallace,drwallacecolvin@outlook.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",drwallacecolvin@outlook.com,success,"October 26, 2024 4:10 am","22.00 USD",xxxx-xxxx-xxxx-8108
+ch_3QDv5gB0pqpbXiCi0afxrpfQ,44,GIRESSE,NSUNDI,Giresse89,nsundigiresse@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",nsundigiresse@gmail.com,success,"October 25, 2024 9:32 pm","22.00 USD",xxxx-xxxx-xxxx-4855
+ch_3QCRtcB0pqpbXiCi0f3DPlgx,42,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Stripe,"Subscription  ",emanfrimpong@gmail.com,success,"October 21, 2024 8:08 pm","22.00 USD",xxxx-xxxx-xxxx-6383
+ch_3QCR2PB0pqpbXiCi0iTadtil,41,Andile,Siluma,Andile,Andiles7@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Andiles7@gmail.com,success,"October 21, 2024 7:14 pm","22.00 USD",xxxx-xxxx-xxxx-7190
+ch_3QC8EBB0pqpbXiCi1IuDilcY,40,Oluwatobi,Karim,tobi,karimoluwatobi@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",karimoluwatobi@gmail.com,success,"October 20, 2024 11:11 pm","22.00 USD",xxxx-xxxx-xxxx-5307
+ch_3QAbBaB0pqpbXiCi0UjKSMoK,38,Sola,Ogunniyi,Olusola1,contact@propertyowlsltd.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",contact@propertyowlsltd.com,success,"October 16, 2024 5:40 pm","22.00 USD",xxxx-xxxx-xxxx-3193
+,37,Lukushe,yannick,lukushe,lukushe.yanick88@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 16, 2024 3:07 pm","22.00 USD",
+,36,Samuel,Achiaa,sammyda,samuelachiaa126@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 16, 2024 1:26 pm","22.00 USD",
+ch_3Q9ojBB0pqpbXiCi0UXUqyiU,35,Robinson,Mgbah,robinson,acho.mgbah@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",acho.mgbah@gmail.com,success,"October 14, 2024 1:55 pm","22.00 USD",xxxx-xxxx-xxxx-5383
+ch_3Q9gQrB0pqpbXiCi0y3lWa1J,34,Jack,Raj,Jack,jackcollinsraj64@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jackcollinsraj64@gmail.com,success,"October 14, 2024 5:04 am","22.00 USD",xxxx-xxxx-xxxx-5750
+ch_3Q9RlgB0pqpbXiCi1qmXpsEQ,32,Nelson,Nicholas,IamNelson002,nellyeze57@gmail.com,"TEST PLAN",Stripe,"Subscription (Automatic) ",nellyeze57@gmail.com,success,"October 13, 2024 1:23 pm","2.00 USD",xxxx-xxxx-xxxx-4337
+,31,Geordy,Bouefibele,Prince,abouefibele@gmail.com,"Yearly Membership",Manual,"Subscription  ",,success,"October 11, 2024 8:00 pm","189.00 USD",
+ch_3Q8TN3CdoEn15Vgy1DQO1pt4,30,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"October 10, 2024 8:54 pm","22.00 USD",xxxx-xxxx-xxxx-2865
+,29,Kingsley,khord,Khord,myfreestudyweb@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 10, 2024 3:12 pm","22.00 USD",
+,28,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"October 9, 2024 4:23 pm","22.00 USD",
+ch_3Q7w4fCdoEn15Vgy0mMdhNFs,27,Lesly,Polynice,LPolynice,leslypolynice@yahoo.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",leslypolynice@yahoo.com,success,"October 9, 2024 9:21 am","22.00 USD",xxxx-xxxx-xxxx-6965
+ch_3Q7iHfCdoEn15Vgy0tRT3tTa,26,Jose,Jacinto,JOSEJ11,jacintojose32@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",jacintojose32@gmail.com,success,"October 8, 2024 6:37 pm","22.00 USD",xxxx-xxxx-xxxx-3989
+ch_3Q7dOeCdoEn15Vgy1rjBzGCt,25,Tenoramentae,Young,Classicalfoundation,Classicalfoundation@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",Classicalfoundation@gmail.com,success,"October 8, 2024 1:24 pm","22.00 USD",xxxx-xxxx-xxxx-0249
+ch_3Q78KuCdoEn15Vgy0GKVmhyf,24,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"October 7, 2024 4:16 am","22.00 USD",xxxx-xxxx-xxxx-4235
+ch_3Q6hSaCdoEn15Vgy0ZHHoVLa,23,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"October 5, 2024 11:33 pm","22.00 USD",xxxx-xxxx-xxxx-5929
+ch_3Q6b2ECdoEn15Vgy0pd8oQmH,22,Louis-Gerard,"Salla Minfoungo",sallalouis,sallalouis@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",sallalouis@gmail.com,success,"October 5, 2024 4:47 pm","22.00 USD",xxxx-xxxx-xxxx-9716
+ch_3Q6VA2CdoEn15Vgy1hF4uD6j,21,Francis,Emenike,Fntracks,cemenix@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",cemenix@gmail.com,success,"October 5, 2024 10:26 am","22.00 USD",xxxx-xxxx-xxxx-8412
+ch_3Q5hB7CdoEn15Vgy0gdISTVh,20,Donnie,Johnson,rayjohnsonrx,rayjohnsonrx@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",rayjohnsonrx@gmail.com,success,"October 3, 2024 5:02 am","22.00 USD",xxxx-xxxx-xxxx-2951
+,19,Kingsley,khord,Khord,myfreestudyweb@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"October 2, 2024 7:31 am","22.00 USD",
+ch_3Q4p3TCdoEn15Vgy0UdtVXav,18,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 30, 2024 7:15 pm","22.00 USD",xxxx-xxxx-xxxx-7435
+ch_3Q3f4ZCdoEn15Vgy1tgu4Y4t,17,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 27, 2024 2:23 pm","22.00 USD",xxxx-xxxx-xxxx-5101
+ch_3Q3Q6RCdoEn15Vgy0G97latz,16,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 26, 2024 10:27 pm","22.00 USD",xxxx-xxxx-xxxx-4707
+ch_3Q3KMhCdoEn15Vgy0XgAfRzY,15,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 26, 2024 4:17 pm","22.00 USD",xxxx-xxxx-xxxx-6922
+ch_3Q32hcCdoEn15Vgy0IrCy9jy,14,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 25, 2024 9:25 pm","22.00 USD",xxxx-xxxx-xxxx-8324
+ch_3Q2wb3CdoEn15Vgy1dp4VgfG,13,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 25, 2024 2:53 pm","22.00 USD",xxxx-xxxx-xxxx-9011
+ch_3Q2gjfCdoEn15Vgy14qkUYcV,12,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 24, 2024 9:58 pm","22.00 USD",xxxx-xxxx-xxxx-9162
+,11,Dorian,Phillip,Pianoplaya73,pianoplaya73@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"September 24, 2024 9:49 pm","22.00 USD",
+ch_3Q2RuUCdoEn15Vgy0pdeh1vv,10,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 24, 2024 6:08 am","22.00 USD",xxxx-xxxx-xxxx-7729
+ch_3Q2HGuCdoEn15Vgy1q8nELfO,9,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 23, 2024 6:46 pm","22.00 USD",xxxx-xxxx-xxxx-5216
+ch_3Q1YtSCdoEn15Vgy16K3gDQd,8,Giuseppe,Palladino,Giuseppe56,gpalladino56@gmail.com,"Monthly Membership",Stripe,"Subscription (Automatic) ",gpalladino56@gmail.com,success,"September 21, 2024 7:28 pm","22.00 USD",xxxx-xxxx-xxxx-0917
+ch_3Q0tAnCdoEn15Vgy1ZWHT70I,7,,,,,"Monthly Membership",Stripe,"Subscription (Automatic) ",,success,"September 19, 2024 10:50 pm","22.00 USD",xxxx-xxxx-xxxx-8963
+ch_3Q0ly0CdoEn15Vgy0qtYM3fb,6,,,,,"TEST PLAN",Stripe,"One Time  ",,success,"September 19, 2024 3:08 pm","1.00 USD",xxxx-xxxx-xxxx-4337
+,5,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"September 16, 2024 3:16 pm","22.00 USD",
+,4,Emmanuel,Asamoah-Frimpong,emanfrimpong,emanfrimpong@gmail.com,"Monthly Membership",Manual,"Subscription  ",,success,"September 16, 2024 2:39 pm","22.00 USD",
+,3,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"September 16, 2024 2:38 pm","22.00 USD",
+,2,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"September 14, 2024 1:31 pm","22.00 USD",
+,1,,,,,"Monthly Membership",Manual,"Subscription  ",,success,"September 14, 2024 1:30 pm","22.00 USD",

@@ -33,12 +33,9 @@
           <summary class="font-semibold text-black">I must admit, I'm just starting out. Much of what you do appears to be quite advanced. Do you offer resources for beginners?</summary>
           <p class="text-sm text-gray-600 mt-2">Certainly! While many of my YouTube videos tend to cater to intermediate and advanced players, we understand the importance of providing instruction for all skill levels. Our website features a Roadmap tool that guides you from Beginner to Advanced stages. This Roadmap not only outlines the precise steps necessary for skill progression but also includes a comprehensive Beginner Course. This course covers all the essential scales, chords, and theory that beginners need to get started.</p>
         </details>
+
         <details class="border rounded-lg p-4 cursor-pointer">
-          <summary class="font-semibold text-black">Are there any limits on access and streaming?</summary>
-          <p class="text-sm text-gray-600 mt-2">You only need access to a piano or keyboard and internet connection. All lessons are accessible from your browser.</p>
-        </details>
-        <details class="border rounded-lg p-4 cursor-pointer">
-          <summary class="font-semibold text-black">Can I watch the lessons from any device?</summary>
+          <summary class="font-semibold text-black">Are they any limits on access and streaming?</summary>
           <p class="text-sm text-gray-600 mt-2">No! Your membership includes unlimited access and streaming to all of our video, audio and file contents. We want you to get the full experience with no limitations!</p>
         </details>
         <details class="border rounded-lg p-4 cursor-pointer">

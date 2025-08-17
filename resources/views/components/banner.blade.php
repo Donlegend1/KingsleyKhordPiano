@@ -1,7 +1,6 @@
 <section
-  class="relative min-h-[60vh] lg:min-h-[90vh] flex items-center justify-center bg-black text-white overflow-hidden"
-  style="background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.6) 10%, rgba(0, 0, 0, 0.6) 10%, rgba(0, 0, 0, 0.2) 10%, transparent), url('/images/banner2.jpg'); background-size: cover; background-position: right center;">
-  
+  class="relative min-h-[60vh] lg:min-h-[90vh] flex items-center justify-center bg-black text-white overflow-hidden bg-cover md:bg-center sm:bg-left"
+  style="background-image: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.2)), url('/images/banner2.jpg');">
   <!-- Content -->
   <div class="relative z-10 px-4 w-full max-w-4xl text-left sm:text-center">
     <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight sm:mb-0 mb-4">

@@ -63,20 +63,43 @@
         <!-- Right-side nav & mobile button -->
         <div class="flex items-center space-x-4">
 
-            <nav class="hidden lg:flex items-center space-x-3">
-                <a href="/member/getstarted" class="text-sm font-semibold {{ Request::is('member/getstarted') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Get Started</a>
-                <a href="/member/community" class="text-sm font-semibold {{ Request::is('member/community') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Community</a>
-                <a href="/member/shop" class="text-sm font-semibold {{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Shop</a>
-                <a href="/member/profile" class="text-sm font-semibold {{ Request::is('member/profile') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">My Account</a>
-                <a href="/member/support" class="text-sm font-semibold {{ Request::is('member/support') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">Support</a>
+           <div class="hidden lg:flex items-center space-x-4">
+            <a href="/member/getstarted" 
+            title="Get Started"
+            class="{{ Request::is('member/getstarted') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <i class="fa fa-play-circle text-lg"></i>
+            </a>
+            <a href="/member/community" 
+            title="Community"
+            class="{{ Request::is('member/community') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <i class="fa fa-users text-lg"></i>
+            </a>
+            <a href="/member/shop" 
+            title="Shop"
+            class="{{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <i class="fa fa-shopping-bag text-lg"></i>
+            </a>
+            <a href="/member/profile" 
+            title="My Account"
+            class="{{ Request::is('member/profile') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <i class="fa fa-user-circle text-lg"></i>
+            </a>
+            <a href="/member/support" 
+            title="Support"
+            class="{{ Request::is('member/support') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <i class="fa fa-life-ring text-lg"></i>
+            </a>
 
-                <button @click="showLogoutModal = true" class="text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-gray-700 bg-gray-100 transition">
-                    {{ __('Logout') }}
-                </button>
-            </nav>
+            <button @click="showLogoutModal = true" 
+                title="Logout"
+                class="text-red-500 hover:text-red-600 transition">
+                <i class="fa fa-sign-out text-lg"></i>
+            </button>
+        </div>
+
 
             <!-- Mobile Menu Button -->
-            <button @click="openMobileNav = true" class="lg:hidden navbar-burger" aria-label="Open Menu">
+            <button @click="openMobileNav = true" class="lg:hidden navbar-burger text-red-500" aria-label="Open Menu">
                 <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
@@ -122,14 +145,27 @@
                     @endforeach
                 </div>
 
-                <div class="flex flex-col gap-2">
-                <a href="/member/getstarted" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Get Started</a>
-                <a href="/member/community" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Community</a>
-                <a href="/member/profile" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">My Account</a>
-                <a href="/member/shop" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Shop</a>
-                <a href="/member/support" class=" text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">Support</a>
+               <div class="flex flex-col gap-2">
+                    <a href="/member/getstarted" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
+                        <i class="fa fa-play-circle"></i> Get Started
+                    </a>
+                    <a href="/member/community" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
+                        <i class="fa fa-users"></i> Community
+                    </a>
+                    <a href="/member/profile" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
+                        <i class="fa fa-user-circle"></i> My Account
+                    </a>
+                    <a href="/member/shop" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
+                        <i class="fa fa-shopping-bag"></i> Shop
+                    </a>
+                    <a href="/member/support" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
+                        <i class="fa fa-life-ring"></i> Support
+                    </a>
                 </div>
-                <button @click="showLogoutModal = true" class="mt-4 text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-white bg-red-500">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></button>
+
+                <button @click="showLogoutModal = true" class="mt-4 flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#FFD736] text-white bg-red-500">
+                    <i class="fa fa-sign-out"></i> Logout
+                </button>
 
             </div>
         </div>
