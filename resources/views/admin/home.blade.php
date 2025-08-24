@@ -96,6 +96,15 @@
                 <td class="px-4 py-2">{{ $user->created_at->format('M d, Y') }}</td>
               </tr>
             @endforeach
+
+            @if ($users->hasPages())
+              <tr>
+                <td colspan="4" class="px-4 py-2">
+                  {{ $users->links('components.pagination') }}
+                </td>
+              </tr>
+            @endif
+
           </tbody>
         </table>
       </div>

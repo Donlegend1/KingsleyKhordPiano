@@ -8,9 +8,8 @@
      <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
        <a href="/home" class="hover:text-blue-600">Dashboard</a>
        <span>/</span>
-       <a href="/member/extra-courses" class="hover:text-blue-600 font-semibold">Lession</a>
-       <span>/</span>
-       <a href="/member/lesson/{{$lesson->id}}" class="hover:text-blue-600 font-semibold">{{$lesson->id}}</a>
+       <a href="/member/extra-courses" class="hover:text-blue-600 font-semibold">{{ $lesson->category}} / </a>
+       <a href="/member/lesson/{{$lesson->id}}" class="hover:text-blue-600 font-semibold">{{ $lesson->title }}</a>
      </div>
      <div class="flex items-center space-x-2">
        <i class="fa fa-user-circle text-xl"></i>
@@ -19,7 +18,7 @@
 
    <!-- Second Row -->
   <div>
-  <h1 class="text-xl font-bold">{{ strtoupper($lesson->category) }} / {{ $lesson->title }}</h1>
+  {{-- <h1 class="text-xl font-bold">{{ strtoupper($lesson->category) }} / {{ $lesson->title }}</h1> --}}
 </div>
 
  </div>

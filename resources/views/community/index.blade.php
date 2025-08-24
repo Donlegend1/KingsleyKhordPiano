@@ -1,6 +1,8 @@
-@extends("layouts.community")
+@extends("layouts.member")
 
-@section("content")
+{{-- @extends("layouts.community") --}}
+
+{{-- @section("content")
 
 <!-- Header Section -->
 <div class="border border-gray-200 dark:border-gray-500">
@@ -115,4 +117,12 @@
 
 
 
+@endsection --}}
+
+@section('content')
+<div class="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
+    <h1 class="text-4xl font-bold text-gray-800 dark:text-white animate-pulse">
+        Coming Soon
+    </h1>
+</div>
 @endsection

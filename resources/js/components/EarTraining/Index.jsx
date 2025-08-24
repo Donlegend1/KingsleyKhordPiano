@@ -1,6 +1,8 @@
 import ReactDOM from "react-dom/client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import CustomPagination from "../Pagination/CustomPagination";
+
 
 const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
@@ -497,25 +499,11 @@ const EarTraining = () => {
                     </table>
 
                     <div className="flex items-center justify-center gap-6 mt-6">
-                        <button
-                            disabled={currentPage === 1}
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                        >
-                            <i className="fas fa-chevron-left"></i>
-                        </button>
-
-                        <span className="text-gray-700 text-sm font-medium">
-                            Page {currentPage} of {totalPages}
-                        </span>
-
-                        <button
-                            disabled={currentPage === totalPages}
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            className="p-3 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                        >
-                            <i className="fas fa-chevron-right"></i>
-                        </button>
+                        <CustomPagination
+                                currentPage={currentPage}   
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                        />
                     </div>
                 </>
             )}

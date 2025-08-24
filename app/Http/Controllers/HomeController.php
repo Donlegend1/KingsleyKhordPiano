@@ -36,7 +36,7 @@ class HomeController extends Controller
     {
 
         if (Auth::user()->role == UserRoles::ADMIN->value) {
-            $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->get();
+            $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->paginate(20);
             $usdRevenue = Payment::where('status', 'successful')
             ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'USD'")
             ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));

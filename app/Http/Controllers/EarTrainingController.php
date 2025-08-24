@@ -57,41 +57,55 @@ class EarTrainingController extends Controller
 
     public function store(StoreQuizRequest $request)
     {
-        $thumbnail = $request->file('thumbnail');
-        $mainAudio = $request->file('main_audio');
+        try {
+            $thumbnail = $request->file('thumbnail');
+            $mainAudio = $request->file('main_audio');
 
-        $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-        $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
+            $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
+            $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
 
-        // Save in storage/ear_training/
-        $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
-        $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
+            // Save in storage/ear_training/
+            $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
+            $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
 
-        $quiz = Quiz::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'video_url' => $request->video_url,
-            'thumbnail_path' => "/storage/ear_training/thumbnails/$thumbnailName",
-            'main_audio_path' => "/storage/ear_training/main_audios/$mainAudioName",
-            'category' => $request->category,
-        ]);
-
-        foreach ($request->questions as $q) {
-            $audio = $q['audio'];
-            $audioName = time() . '_' . $audio->getClientOriginalName();
-            $audio->move(public_path('storage/ear_training/question_audios'), $audioName);
-
-            $quiz->questions()->create([
-                'audio_path' => "/storage/ear_training/question_audios/$audioName",
-                'correct_option' => $q['correct_option'],
+            $quiz = Quiz::create([
+                'title'          => $request->title,
+                'description'    => $request->description,
+                'video_url'      => $request->video_url,
+                'thumbnail_path' => "/storage/ear_training/thumbnails/$thumbnailName",
+                'main_audio_path'=> "/storage/ear_training/main_audios/$mainAudioName",
+                'category'       => $request->category,
             ]);
-        }
 
-        return response()->json([
-            'message' => 'Quiz created successfully.',
-            'quiz' => $quiz->load('questions'),
-        ], 201);
+            foreach ($request->questions as $q) {
+                $audio = $q['audio'];
+                $audioName = time() . '_' . $audio->getClientOriginalName();
+                $audio->move(public_path('storage/ear_training/question_audios'), $audioName);
+
+                $quiz->questions()->create([
+                    'audio_path'     => "/storage/ear_training/question_audios/$audioName",
+                    'correct_option' => $q['correct_option'],
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Quiz created successfully.',
+                'quiz'    => $quiz->load('questions'),
+            ], 201);
+
+        } catch (\Throwable $e) {
+            // Log the error for debugging
+            \Log::error('Quiz creation failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'error'   => 'Failed to create quiz.',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
+
 
     public function update(Request $request, Quiz $quiz)
     {
@@ -162,7 +176,7 @@ class EarTrainingController extends Controller
 
         QuizQuestion::create([
             'quiz_id' => $quiz->id,
-            'audio_path' => "/ear_training/question_audios/$audioName",
+            'audio_path' => "/storage/ear_training/question_audios/$audioName",
             'correct_option' => $q['correct_option'],
         ]);
     }

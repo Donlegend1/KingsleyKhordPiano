@@ -2,15 +2,15 @@
   <div class="space-y-12">
 
     <!-- Intro Text -->
-    <div class="flex">
-      <div class=" text-left max-w-5xl">
+    <div class="flex w-full">
+      <div class="text-left w-full">
         <p class="font-bold text-[24px] mb-4">
           Welcome to KingsleyKhord Music Academy, where piano playing meets mastery.
         </p>
         <p class="mb-4 text-sm text-gray-500">
           Under the guidance of Kingsley Akunwa, one of Nigeria’s leading piano instructors, we support musicians at every level.
         </p>
-        <p class="font-bold mb-2">
+        <p class="font-bold mb-2 text-[22px]">
           Our mission is to help you achieve piano mastery through personalized, step-by-step programs that build your skills and confidence.
         </p>
         <p class="text-sm font-normal leading-relaxed">
@@ -18,6 +18,7 @@
         </p>
       </div>
     </div>
+
 
     <div class="border border-gray-200 hidden md:"></div>
 

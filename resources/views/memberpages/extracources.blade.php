@@ -68,8 +68,11 @@
       <div x-show="activeTab === 'all'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($all as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+            <a href="/member/lesson/{{ $exercise->id }}">
+            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full object-cover rounded-md">
+            </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
             <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
               Watch Now
             </a>
@@ -90,8 +93,11 @@
       <div x-show="activeTab === 'beginner'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($beginner as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+            <a href="/member/lesson/{{ $exercise->id }}">
+            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+            </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
             <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
               Watch Now
             </a>
@@ -113,8 +119,11 @@
       <div x-show="activeTab === 'intermediate'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($intermediate as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+             <a href="/member/lesson/{{ $exercise->id }}">
+            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+             </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
             <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
               Watch Now
             </a>
@@ -136,8 +145,11 @@
       <div x-show="activeTab === 'advanced'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($advanced as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+             <a href="/member/lesson/{{ $exercise->id }}">
+            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+             </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
             <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
               Watch Now
             </a>

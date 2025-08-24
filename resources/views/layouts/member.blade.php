@@ -61,56 +61,79 @@
         </div>
 
         <!-- Right-side nav & mobile button -->
-        <div class="flex items-center space-x-4">
+        <div x-data="{ openMenu: false }" class="flex items-center space-x-4 relative">
 
-           <div class="hidden lg:flex items-center space-x-4">
-            <a href="/member/getstarted" 
-            title="Get Started"
-            class="{{ Request::is('member/getstarted') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                <i class="fa fa-play-circle text-lg"></i>
-            </a>
-            <a href="/member/community" 
-            title="Community"
-            class="{{ Request::is('member/community') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                <i class="fa fa-users text-lg"></i>
-            </a>
-            <a href="/member/shop" 
-            title="Shop"
-            class="{{ Request::is('member/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                <i class="fa fa-shopping-bag text-lg"></i>
-            </a>
-            <a href="/member/profile" 
-            title="My Account"
-            class="{{ Request::is('member/profile') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                <i class="fa fa-user-circle text-lg"></i>
-            </a>
-            <a href="/member/support" 
-            title="Support"
-            class="{{ Request::is('member/support') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                <i class="fa fa-life-ring text-lg"></i>
-            </a>
+    <!-- Existing desktop links -->
+    <div class="hidden lg:flex items-center space-x-4">
 
-            <button @click="showLogoutModal = true" 
-                title="Logout"
-                class="text-red-500 hover:text-red-600 transition">
-                <i class="fa fa-sign-out text-lg"></i>
+    <!-- New Button to toggle small list (popover) -->
+    <button @click="openMenu = !openMenu" class="relative flex items-center gap-1">
+        <i class="fa fa-bars text-white text-lg"></i>
+        <span class="text-xs text-gray-300">Menu</span>
+    </button>
+
+    <a href="/member/profile" 
+        title="My Account"
+        class="{{ Request::is('member/profile') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+        <i class="fa fa-user-circle text-lg"></i>
+    </a>
+
+    <button @click="showLogoutModal = true" 
+        title="Logout"
+        class="text-red-500 hover:text-red-600 transition">
+        <i class="fa fa-sign-out text-lg"></i>
+    </button>
+    </div>
+
+  <!-- Dropdown Content -->
+    <div 
+    x-show="openMenu"
+    @click.away="openMenu = false"
+    x-transition
+    class="absolute hidden md:block right-0 mt-28 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-1000"
+>
+        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
+        <li>
+            <a href="/member/getstarted" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i class="fa fa-play-circle"></i> Get Started
+            </a>
+        </li>
+        <li>
+            <a href="/member/community" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i class="fa fa-users"></i> Community
+            </a>
+        </li>
+        <li>
+            <a href="/member/shop" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i class="fa fa-shopping-bag"></i> Shop
+            </a>
+        </li>
+        {{-- <li>
+            <a href="/member/profile" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i class="fa fa-user-circle"></i> My Account
+            </a>
+        </li> --}}
+        <li>
+            <a href="/member/support" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i class="fa fa-life-ring"></i> Support
+            </a>
+        </li>
+        {{-- <li>
+            <button @click="showLogoutModal = true; openMenu = false" 
+                    class="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <i class="fa fa-sign-out"></i> Logout
             </button>
-        </div>
+        </li> --}}
+        </ul>
+    </div>
 
+    </div>
 
-            <!-- Mobile Menu Button -->
-            <button @click="openMobileNav = true" class="lg:hidden navbar-burger text-red-500" aria-label="Open Menu">
-                <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-
-        </div>
 
     </div>
 
     <!-- Mobile Nav Sliding Sidebar -->
-    <div x-show="openMobileNav" class="fixed inset-0 z-50 flex" x-transition>
+    <div x-show="openMobileNav" class="fixed inset-0 z-10  flex" x-transition>
         <div class="fixed inset-0 bg-black bg-opacity-60" @click="openMobileNav = false"></div>
 
         <div class="relative bg-black text-white w-72 max-w-full h-full overflow-y-auto p-4 transform transition-transform duration-300" :class="openMobileNav ? 'translate-x-0' : '-translate-x-full'">

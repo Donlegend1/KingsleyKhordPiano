@@ -25,11 +25,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://js.paystack.co/v2/inline.js"></script>
-     <script src="https://js.stripe.com/v3/"></script>
-       <script src="/build/manifest.json"></script>
-    <link rel="stylesheet" href="/build/assets/app-DDKpoaqD.css">
-    <link rel="stylesheet" href="/build/assets/app-B_jciIra.css">
-    <script src="/assets/app-tHA-qcZZ.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
 
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js']) 
