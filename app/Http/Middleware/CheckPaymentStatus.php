@@ -17,7 +17,8 @@ class CheckPaymentStatus
         $user = Auth::user();
 
         if ($user->role === 'member') {
-            if (in_array($user->payment_status, ['pending', 'expired'])) {
+            $activePayment = $user->payments()->where('status', 'successful')->where('ends_at', '>', now())->first();
+            if (in_array($user->payment_status, ['pending', 'expired']) || !$activePayment) {
                 return redirect('/member/plan');
             }
 

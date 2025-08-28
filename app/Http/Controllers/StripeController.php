@@ -73,7 +73,10 @@ class StripeController extends Controller
             'line_items' => [[
                 'price_data' => [
                     'currency'     => $request->currency,
-                    'product_data' => ['name' => $request->tier],
+                    'product_data' => [
+                    'name'        => $request->tier,
+                    'description' => 'Subscription for ' . config('app.name'), 
+                ],
                     'unit_amount'  => $plan->price_eur * 100,
                 ],
                 'quantity' => 1,
@@ -124,5 +127,78 @@ class StripeController extends Controller
             Log::error('Stripe Payment Error: ' . $e->getMessage());
             return redirect()->route('home')->with('error', 'An error occurred while processing your payment.');
         }
+    }
+
+    public function stripeWebHook(Request $request)
+    {
+        $stripe = new \Stripe\StripeClient($this->stripeKey);
+        $endpoint_secret = config('services.stripe.webhook_secret'); 
+        $payload = $request->getContent();
+        $sig_header = $request->server('HTTP_STRIPE_SIGNATURE');
+        $event = null;
+
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload,
+                $sig_header,
+                $endpoint_secret
+            );
+        } catch (\UnexpectedValueException $e) {
+            return response('Invalid payload', 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            return response('Invalid signature', 400);
+        }
+
+        switch ($event->type) {
+            case 'checkout.session.completed':
+                $session = $event->data->object;
+
+                $userId   = $session->metadata->user_id ?? null;
+                $tier     = $session->metadata->tier ?? null;
+                $duration = $session->metadata->duration ?? 'monthly';
+                $currency = $session->currency ?? 'eur';
+                $amount   = $session->amount_total / 100; 
+
+                if (!$userId || !$tier) {
+                    \Log::error("Missing metadata in Stripe session: " . json_encode($session->metadata));
+                    return response('Missing metadata', 400);
+                }
+
+                $user = User::find($userId);
+                DB::table('payments')->updateOrInsert(
+                    ['reference' => $session->id],
+                    [
+                        'user_id'        => $userId,
+                        'reference'      => $session->id,
+                        'amount'         => $amount,
+                        'metadata'       => json_encode([
+                            'currency' => $currency,
+                            'tier'     => $tier,
+                            'duration' => $duration,
+                        ]),
+                        'payment_method' => 'stripe',
+                        'notified_at'    => null,
+                        'starts_at'      => now(),
+                        'ends_at'        => $duration === "monthly" ? now()->addMonth() : now()->addYear(),
+                        'status'         => 'successful',
+                        'updated_at'     => now(),
+                    ]
+                );
+
+                break;
+
+            case 'invoice.payment_succeeded':
+                $invoice = $event->data->object;
+                DB::table('payments')
+                    ->where('reference', $invoice->id)
+                    ->update(['status' => 'successful', 'updated_at' => now()]);
+                break;
+
+            default:
+                \Log::info("Unhandled Stripe event: {$event->type}");
+                break;
+        }
+
+        return response('Webhook received', 200);
     }
 }

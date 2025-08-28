@@ -5,7 +5,10 @@
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">{{ __('Welcome Back') }}</h2>
     
     <form class="space-y-5" method="POST" action="{{ route('login') }}">
-    @csrf
+      <p class="text-center text-xs text-gray-600">
+        We’ve recently migrated our system. If your old password doesn’t work, please use the “Forgot Password” option to reset it.
+      </p>
+  @csrf
       <div>
         <label for="email" class="block text-gray-700 mb-1">{{ __('Email Address') }}</label>
         <input

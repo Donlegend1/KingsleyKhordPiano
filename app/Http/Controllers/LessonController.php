@@ -30,10 +30,10 @@ class LessonController extends Controller
 
     public function learnSongs()
     {
-        $all = Upload::where('category', 'learn songs')->paginate(1);
-        $beginner = Upload::where('category', 'learn songs')->where('level', 'Beginner')->paginate(1);
-        $intermediate = Upload::where('category', 'learn songs')->where('level', 'Intermediate')->paginate(1);
-        $advanced = Upload::where('category', 'learn songs')->where('level', 'Advanced')->paginate(1);
+        $all = Upload::where('category', 'learn songs')->paginate(9);
+        $beginner = Upload::where('category', 'learn songs')->where('level', 'Beginner')->paginate(9);
+        $intermediate = Upload::where('category', 'learn songs')->where('level', 'Intermediate')->paginate(9);
+        $advanced = Upload::where('category', 'learn songs')->where('level', 'Advanced')->paginate(9);
 
         return view('memberpages.learnsongs', compact('all', 'beginner', 'intermediate', 'advanced'));
     }

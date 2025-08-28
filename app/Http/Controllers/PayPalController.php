@@ -27,6 +27,7 @@ private $gateway;
 
     function pay(Request $request)
     {
+        
          $user = Auth::user();
          if (!$user) {
             return redirect('register');

@@ -78,6 +78,7 @@ Auth::routes(
 );
 
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(['check.payment', 'verified']);
+Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')->middleware(['check.payment', 'verified']);
 
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
@@ -87,6 +88,8 @@ Route::get('/stripe/success', [StripeController::class, 'retrievePaymentIntent']
 Route::get('/stripe/cancel', function () {
     return redirect()->route('home')->with('error', 'Payment was cancelled.');
 })->name('stripe.cancel');
+
+Route::post('/stripe/webhook', [StripeController::class, 'stripeWebHook'])->name('stripe.webhook');
 
 
 Route::post('paypal/create-order', [PayPalController::class, 'pay']);

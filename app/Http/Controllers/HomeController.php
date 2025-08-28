@@ -34,25 +34,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-
-        if (Auth::user()->role == UserRoles::ADMIN->value) {
-            $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->paginate(20);
-            $usdRevenue = Payment::where('status', 'successful')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'USD'")
-            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
-
-        $eurRevenue = Payment::where('status', 'successful')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'EUR'")
-            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
-
-        $nairaRevenue = Payment::where('status', 'successful')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'NGN'")
-            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
-            
-            $courses =Course::count();
-
-            return view('admin.home', compact('users', 'usdRevenue', 'eurRevenue', 'nairaRevenue', 'courses'));
-        }
         if (Auth::user()->role == UserRoles::MEMBER->value) {
             $completedCourses = DB::table('course_progress')
                 ->join('courses', 'course_progress.course_id', '=', 'courses.id')
@@ -116,6 +97,27 @@ class HomeController extends Controller
             return view('home', compact('completedCourses', 'categoryProgress'));
         }
         
+    }
+
+    public function admin(){
+        if (Auth::user()->role == UserRoles::ADMIN->value) {
+            $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->paginate(20);
+            $usdRevenue = Payment::where('status', 'successful')
+            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'USD'")
+            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
+
+        $eurRevenue = Payment::where('status', 'successful')
+            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'EUR'")
+            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
+
+        $nairaRevenue = Payment::where('status', 'successful')
+            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'NGN'")
+            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
+            
+            $courses =Course::count();
+
+            return view('admin.home', compact('users', 'usdRevenue', 'eurRevenue', 'nairaRevenue', 'courses'));
+        }
     }
 
     public function profile() {

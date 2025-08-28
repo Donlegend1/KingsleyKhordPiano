@@ -233,7 +233,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </button>
                             </form>
 
-                            <form action="/paypal/create-order" method="POST">
+                            {/* <form action="/paypal/create-order" method="POST">
                                 <input type="hidden" name="_token" value={csrfToken} />
                                 <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
                                 <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
@@ -245,7 +245,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 >
                                     Pay with PayPal
                                 </button>
-                            </form>
+                            </form> */}
 
                         </div>
 
@@ -267,13 +267,13 @@ const PlanSwitchAndCurrencySelect = () => {
                                         className="h-4"
                                     />
                                 </span>
-                                <span className="inline-block mx-2 bg-gray-300 rounded-md p-1">
+                                {/* <span className="inline-block mx-2 bg-gray-300 rounded-md p-1">
                                     <img
                                         src="/icons/paypal.png"
                                         alt="Paystack"
                                         className="h-4"
                                     />
-                                </span>
+                                </span> */}
                             </p>
                         </div>
                     </div>

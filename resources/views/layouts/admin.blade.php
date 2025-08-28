@@ -21,13 +21,13 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="hidden md:block w-64 bg-black text-white p-6 flex-shrink-0">
       <div class="mb-10">
-        <a href="/home" class="text-2xl font-bold">
+        <a href="/" class="text-2xl font-bold">
           <img src="/logo/logo.png" alt="Logo">
         </a>
       </div>
 
       <nav class="space-y-4">
-        <a href="/home" class="flex items-center gap-3 p-2 rounded-lg border border-gray-600 hover:bg-gray-200 hover:text-black">
+        <a href="/admin/dashboard" class="flex items-center gap-3 p-2 rounded-lg border border-gray-600 hover:bg-gray-200 hover:text-black">
           <i class="fa fa-home"></i> <span>Dashboard</span>
         </a>
         <a href="/admin/users" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">

@@ -215,7 +215,7 @@ const [lesson, setLesson] = useState(null);
                                         <img
                                             src={
                                                 c.user?.passport ||
-                                                "/avatar1.png"
+                                                "/avatar1.jpg"
                                             }
                                             alt="Avatar"
                                             className="w-10 h-10 rounded-full object-cover"

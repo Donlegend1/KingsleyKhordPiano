@@ -14,6 +14,7 @@ use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PaymentController;
 
 
 /*
@@ -44,6 +45,7 @@ use App\Http\Controllers\UserController;
         Route::post('course/store', [CourseController::class, 'store']);
         Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
+        Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
 
     });
 

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\Plan;
+use App\Models\User;
+use App\Http\Requests\ManualPaymentRequest;
 
 class PaymentController extends Controller
 {
@@ -102,7 +104,6 @@ class PaymentController extends Controller
             $data = $response->json();
     
             if ($data['data']['status'] === 'success') {
-                // ✅ Update payment record
                 DB::table('payments')->where('reference', $reference)->update([
                     'status' => 'successful',
                     'updated_at' => now(),
@@ -113,7 +114,7 @@ class PaymentController extends Controller
     
                 return redirect()->route('home')->with('success', 'Payment verified successfully');
             } else {
-                // ❌ Update as failed
+
                 DB::table('payments')->where('reference', $reference)->update([
                     'status' => 'failed',
                     'updated_at' => now(),
@@ -128,38 +129,67 @@ class PaymentController extends Controller
       
 
     public function redirectToStripe(Request $request)
-{
-    Stripe::setApiKey(env('STRIPE_SECRET'));
+    {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
 
-    $session = StripeSession::create([
-        'payment_method_types' => ['card'],
-        'line_items' => [[
-            'product_data' => [
-                'currency' => 'usd',
-                'unit_amount' => 100 * 100,
+        $session = StripeSession::create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
                 'product_data' => [
-                    'name' => "monthly plan",
+                    'currency' => 'usd',
+                    'unit_amount' => 100 * 100,
+                    'product_data' => [
+                        'name' => "monthly plan",
+                    ],
                 ],
-            ],
-            'quantity' => 1,
-        ]],
-        'mode' => 'payment',
-        'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url' => route('stripe.cancel'),
-    ]);
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => route('stripe.cancel'),
+        ]);
 
-    return redirect($session->url);
-}
+        return redirect($session->url);
+    }
 
-public function stripeSuccess(Request $request)
-{
-    // You can validate the session if needed
-    return view('payment.success');
-}
+    public function stripeSuccess(Request $request)
+    {
+        return view('payment.success');
+    }
 
-public function stripeCancel()
-{
-    return view('payment.cancel');
-}
+    public function stripeCancel()
+    {
+        return view('payment.cancel');
+    }
+
+    public function manualPayment(ManualPaymentRequest $request)
+    {
+        $reference = Str::uuid()->toString(); 
+        $user = User::find($request->user_id);
+       
+      $payment =  DB::table('payments')->insert([
+            'user_id' => $user->id,
+            'reference' => $reference,
+            'amount' => $request->amount,
+            'metadata' => json_encode($request->all()),
+            'payment_method' =>'Manual',
+            'starts_at' => $request->starts_at,
+            'notified_at' => null,
+            'ends_at' =>  $request->ends_at,
+            'status' => 'successful',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $user->metadata = $request->all();
+        $user->premium = $request->premium === 'premium';
+        $user->payment_method ='Manual';
+        $user->last_payment_reference = $reference;
+        $user->last_payment_amount = $request->amount;
+        $user->payment_status = 'successful';
+        $user->last_payment_at = now();
+        $user->save();
+       return response()->json($payment, 200);
+    }
 }
 

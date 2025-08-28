@@ -27,6 +27,7 @@ const UsersList = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
     const [editForm, setEditForm] = useState({
         first_name: "",
         last_name: "",
@@ -34,6 +35,14 @@ const UsersList = () => {
         premium: 0,
         payment_status: null,
     });
+    const [paymentDetails, setPaymentDetails] = useState({
+        user_id: selectedUser?.id,
+        starts_at: "",
+        ends_at: "",
+        amount: "",
+        premium: 0,
+    });
+
     const perPage = 10;
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
@@ -120,6 +129,47 @@ const UsersList = () => {
         }
     };
 
+    const handleOpenPaymentModal = (user) => {
+        setSelectedUser(user);
+        setPaymentModalOpen(true);
+        setPaymentDetails({
+            user_id: user?.id,
+        });
+        // window.location.href = `/admin/subscriptions/${userId}`;
+    };
+
+    const handleClosePaymentModal = () => {
+        setPaymentModalOpen(false);
+        setPaymentDetails({
+            duration: "",
+            tier: "",
+            starts_at: "",
+            ends_at: "",
+        });
+    };
+
+    const handleChangeSubscription = (e) => {
+        const { name, value } = e.target;
+        setPaymentDetails({ ...paymentDetails, [name]: value });
+    };
+
+    const handleUpdateSubscription = async () => {
+        console.log(paymentDetails, "payment details");
+        try {
+            await axios.post(`/api/admin/payment/update`, paymentDetails, {
+                headers: { "X-CSRF-TOKEN": csrfToken },
+            });
+            handleClosePaymentModal();
+            showMessage("payment updated", "success");
+             fetchUsers();
+        } catch (error) {
+            console.error("Error updating payment:", error);
+            showMessage("Error updating payment", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
             <h2 className="text-lg font-bold mb-4">Users List</h2>
@@ -166,6 +216,14 @@ const UsersList = () => {
                                         <td className="py-2 px-4">
                                             {user.metadata?.duration} (
                                             {user.metadata?.tier})
+                                            <button
+                                                onClick={() =>
+                                                    handleOpenPaymentModal(user)
+                                                }
+                                                className="ml-2 px-3 py-1 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none"
+                                            >
+                                                Update
+                                            </button>
                                         </td>
                                         <td className="py-2 px-4 flex justify-center text-center items-center">
                                             <div className="flex gap-2">
@@ -204,9 +262,9 @@ const UsersList = () => {
 
                     <div className="flex items-center justify-center gap-6 mt-6">
                         <CustomPagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={handlePageChange}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
                         />
                     </div>
                 </>
@@ -290,6 +348,101 @@ const UsersList = () => {
                     <button
                         disabled={loading}
                         onClick={handleEditSubmit}
+                        className="px-4 py-2 bg-red-600 text-white rounded"
+                    >
+                        {loading ? (
+                            <>
+                                <svg
+                                    className="animate-spin h-5 w-5 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+                                    ></path>
+                                </svg>
+                                <span>Updating...</span>
+                            </>
+                        ) : (
+                            <span>Update</span>
+                        )}
+                    </button>
+                </div>
+            </Modal>
+
+            <Modal
+                isOpen={paymentModalOpen}
+                onClose={() => handleClosePaymentModal()}
+            >
+                <h2 className="text-lg font-bold mb-4">
+                    Update Subscription for {selectedUser?.first_name}{" "}
+                    {selectedUser?.last_name}
+                </h2>
+                <label className="block mb-2">
+                    Start Date
+                    <input
+                        type="date"
+                        name="starts_at"
+                        defaultValue={paymentDetails.starts_at}
+                        onChange={handleChangeSubscription}
+                        className="w-full border rounded px-3 py-2 mt-1"
+                    />
+                </label>
+                <label className="block mb-2">
+                    End Date
+                    <input
+                        type="date"
+                        name="ends_at"
+                        defaultValue={paymentDetails.ends_at}
+                        onChange={handleChangeSubscription}
+                        className="w-full border rounded px-3 py-2 mt-1"
+                    />
+                </label>
+                <label className="block mb-2">
+                    Amount
+                    <input
+                        type="text"
+                        name="amount"
+                        defaultValue={paymentDetails.amount}
+                        onChange={handleChangeSubscription}
+                        className="w-full border rounded px-3 py-2 mt-1"
+                    />
+                </label>
+                <label className="block mb-2">
+                    Premium:
+                    <select
+                        name="premium"
+                        defaultValue={paymentDetails.premium}
+                        onChange={handleChangeSubscription}
+                        className="w-full border rounded px-3 py-2 mt-1"
+                    >
+                        <option value="">--select--</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </label>
+
+                <div className="mt-4 flex justify-between space-x-3">
+                    <button
+                        onClick={() => handleClosePaymentModal()}
+                        className="px-4 py-2 bg-gray-400 text-white rounded"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        disabled={loading}
+                        onClick={handleUpdateSubscription}
                         className="px-4 py-2 bg-red-600 text-white rounded"
                     >
                         {loading ? (
