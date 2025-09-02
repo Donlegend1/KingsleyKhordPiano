@@ -27,6 +27,7 @@ class ContactController extends Controller
             'email'      => 'required|email',
             'subject'    => 'required|string|max:255',
             'message'    => 'required|string',
+            'g-recaptcha-response' => 'required|captcha',
         ]);
 
         Mail::to('contact@kingsleykhordpiano.com')->send(new ContactMessage($validated));

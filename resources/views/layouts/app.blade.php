@@ -155,6 +155,8 @@
 
     </div>
 
+    {!! NoCaptcha::renderJs() !!}
+
     <script>
         // Toggle mobile nav
         document.addEventListener('DOMContentLoaded', () => {

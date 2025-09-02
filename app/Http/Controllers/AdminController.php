@@ -28,20 +28,13 @@ class AdminController extends Controller
         $query = User::with('plan', 'community');
 
         // ==== SORTING ====
-        if ($request->filled('sort')) {
-            switch ($request->sort) {
-                case 'display_name':
-                    $query->orderByRaw("CONCAT(first_name, ' ', last_name) ASC");
-                    break;
-
-                case 'joining_date':
-                    $query->orderBy('created_at', $request->get('sort_order', 'asc'));
-                    break;
-
-                case 'latest_activity':
-                    $query->orderBy('last_login_at', $request->get('sort_order', 'desc'));
-                    break;
-            }
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
         } else {
             // Default sorting: admins first, then by created_at desc
             $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")

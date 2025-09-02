@@ -161,7 +161,7 @@ const UsersList = () => {
             });
             handleClosePaymentModal();
             showMessage("payment updated", "success");
-             fetchUsers();
+            fetchUsers();
         } catch (error) {
             console.error("Error updating payment:", error);
             showMessage("Error updating payment", "error");
@@ -170,9 +170,46 @@ const UsersList = () => {
         }
     };
 
+    const handleSearchUsers = async (e) => {
+        const query = e.target.value;
+        setLoading(true);   
+        try {
+            const response = await axios.get(
+                `/api/admin/users?search=${query}&perPage=${perPage}`,  
+                {
+                    headers: { "X-CSRF-TOKEN": csrfToken },
+                    withCredentials: true,
+                }
+            );
+            setUserList(response.data.data);
+            setCurrentPage(response.data.current_page);
+            setTotalPages(response.data.last_page);
+        } catch (error) {
+            console.error("Error searching users:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Users List</h2>
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-800">Users List</h2>
+
+                <div className="relative">
+                    <input
+                        type="search"
+                        name="search"
+                        onChange={(e) => handleSearchUsers(e)}
+                        id="search"
+                        placeholder="Search users..."
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    />
+                    <span className="absolute left-3 top-2.5 text-gray-400">
+                        <i className="fa fa-search"></i>
+                    </span>
+                </div>
+            </div>
 
             {loading ? (
                 <p>Loading...</p>

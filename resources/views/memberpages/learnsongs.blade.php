@@ -28,11 +28,14 @@
 
     <!-- Mobile Dropdown -->
     <div class="block lg:hidden mb-6">
-      <select x-model="activeTab" class="w-full p-3 rounded-lg border border-gray-300 text-gray-700">
-        <div x-show="activeTab === 'all'">
-        <div x-show="activeTab === 'beginner'">
-        <div x-show="activeTab === 'intermediate'">
-        <div x-show="activeTab === 'advanced'">
+      <select 
+        x-model="activeTab" 
+        class="w-full p-3 rounded-lg border border-gray-300 text-gray-700"
+      >
+        <option value="all">All</option>
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
       </select>
     </div>
 

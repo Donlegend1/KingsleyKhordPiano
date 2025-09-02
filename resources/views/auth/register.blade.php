@@ -69,6 +69,14 @@
           </button>
         </div>
 
+        <!-- reCAPTCHA -->
+        <div>
+          {!! NoCaptcha::display() !!}
+          @error('g-recaptcha-response')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+          @enderror
+        </div>
+
         <!-- Submit Button -->
         <button type="submit"
           class="bg-[#FFD736] hover:bg-[#a7923e] text-black font-semibold py-3 px-6 rounded transition-colors w-full">
@@ -83,4 +91,5 @@
     </div>
   </div>
 </section>
+
 @endsection

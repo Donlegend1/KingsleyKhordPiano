@@ -24,41 +24,50 @@
 </section>
 
 <section class="bg-gray-100 py-10 px-4 sm:px-6 lg:px-8 xl:px-10">
-  <div class="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-6" x-data="{ activeTab: '{{ request('tab', 'all') }}' }"">
+  <div 
+    class="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-6" 
+    x-data="{ activeTab: '{{ request('tab', 'all') }}' }"
+  >
 
     <!-- Mobile Dropdown -->
     <div class="block lg:hidden mb-6">
-      <select x-model="activeTab" class="w-full p-3 rounded-lg border border-gray-300 text-gray-700">
-        <div x-show="activeTab === 'all'">
-        <div x-show="activeTab === 'beginner'">
-        <div x-show="activeTab === 'intermediate'">
-        <div x-show="activeTab === 'advanced'">
+      <select 
+        x-model="activeTab" 
+        class="w-full p-3 rounded-lg border border-gray-300 text-gray-700"
+      >
+        <option value="all">All</option>
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
       </select>
     </div>
 
     <!-- Desktop Tabs -->
-    <div class="hidden lg:flex justify-between border-b mb-6">
+    <div class="hidden lg:flex border-b mb-6 space-x-6">
       <button 
-        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2" 
+        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 transition" 
         :class="{ 'border-blue-500 text-blue-500': activeTab === 'all' }"
-        @click="activeTab = 'all'">All</button>
-
-      <a href="?tab=beginner" 
-        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-        :class="{ 'border-blue-500 text-blue-500': activeTab === 'beginner' }">
+        @click="activeTab = 'all'">
+        All
+      </button>
+      <button 
+        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 transition" 
+        :class="{ 'border-blue-500 text-blue-500': activeTab === 'beginner' }"
+        @click="activeTab = 'beginner'">
         Beginner
-      </a>
-      <a href="?tab=intermediate" 
-        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-        :class="{ 'border-blue-500 text-blue-500': activeTab === 'intermediate' }">
+      </button>
+      <button 
+        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 transition" 
+        :class="{ 'border-blue-500 text-blue-500': activeTab === 'intermediate' }"
+        @click="activeTab = 'intermediate'">
         Intermediate
-      </a>
-      <a href="?tab=advanced" 
-        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2"
-        :class="{ 'border-blue-500 text-blue-500': activeTab === 'advanced' }">
+      </button>
+      <button 
+        class="py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 transition" 
+        :class="{ 'border-blue-500 text-blue-500': activeTab === 'advanced' }"
+        @click="activeTab = 'advanced'">
         Advanced
-      </a>
-
+      </button>
     </div>
 
     <!-- Content Area -->
@@ -69,7 +78,7 @@
         @forelse ($all as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
             <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full object-cover rounded-md">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full object-cover rounded-md">
             </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
             <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
@@ -94,7 +103,7 @@
         @forelse ($beginner as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
             <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full object-cover rounded-md">
             </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
             <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
@@ -107,8 +116,7 @@
             No exercises found for this category.
           </div>
         @endforelse
-
-        @if( $beginner->hasPages())
+        @if ($beginner->hasPages())
           <div class="flex justify-center py-6 col-span-full">
             {{ $beginner->appends(['tab' => 'beginner'])->links('components.pagination') }}
           </div>
@@ -119,9 +127,9 @@
       <div x-show="activeTab === 'intermediate'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($intermediate as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-             <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
-             </a>
+            <a href="/member/lesson/{{ $exercise->id }}">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full object-cover rounded-md">
+            </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
             <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
             <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
@@ -133,7 +141,6 @@
             No exercises found for this category.
           </div>
         @endforelse
-
         @if ($intermediate->hasPages())
           <div class="flex justify-center py-6 col-span-full">
             {{ $intermediate->appends(['tab' => 'intermediate'])->links('components.pagination') }}
@@ -145,9 +152,9 @@
       <div x-show="activeTab === 'advanced'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($advanced as $exercise)
           <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-             <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
-             </a>
+            <a href="/member/lesson/{{ $exercise->id }}">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full object-cover rounded-md">
+            </a>
             <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
             <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
             <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
@@ -159,7 +166,6 @@
             No exercises found for this category.
           </div>
         @endforelse
-
         @if ($advanced->hasPages())
           <div class="flex justify-center py-6 col-span-full">
             {{ $advanced->appends(['tab' => 'advanced'])->links('components.pagination') }}
@@ -168,8 +174,8 @@
       </div>
 
     </div>
-
   </div>
 </section>
+
 
 @endsection

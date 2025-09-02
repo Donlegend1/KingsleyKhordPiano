@@ -25,16 +25,13 @@
 </section>
 <section class="flex items-start justify-center min-h-screen bg-gray-100 p-6">
  <!-- Blog Main Content -->
- <div class="bg-white max-w-3xl w-full rounded-lg shadow-lg p-6 mr-6 space-y-6">
+ <div class="bg-white max-w-3xl w-full rounded-lg shadow-lg p-2 md:p-6 mr-0 md:mr-6 space-y-2 md:space-y-6">
   <!-- Video Section -->
  <div class="w-full">
     {!! $lesson->video_url !!}
 </div>
 
-  
-
-  <!-- Comment Section -->
-  <div class="mt-6">
+  <div class="">
     <div id="comment-section">
       
 
@@ -44,7 +41,7 @@
 
 
  <!-- Sidebar -->
- <aside class="w-64 bg-white rounded-lg shadow-lg p-4 space-y-8">
+ <aside class="hidden md:flex w-64 bg-white rounded-lg shadow-lg p-4 space-y-8">
   <!-- Related Products -->
   <div class="space-y-4">
     <h3 class="text-xl font-semibold text-gray-800 mb-2">Related Courses</h3>
