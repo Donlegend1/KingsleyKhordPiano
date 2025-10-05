@@ -5,16 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Subscription extends Model
+class WebsiteVideo extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'stripe_price_id',
-        'price',
-        'billing_interval',
-        'features',
-        'status',
+        'title',
+        'video_url',
+        'video_category'
     ];
 }

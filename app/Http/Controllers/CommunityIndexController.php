@@ -11,33 +11,27 @@ use App\Models\Community;
 
 class CommunityIndexController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-    
     public function index()
     {
         return view('community.index');
     }
 
-    public function space()
-    {
-       return view('community.space');
-    }
+   public function space()
+   {
+      return view('community.space');
+   }
 
-    public function members()
-    {
+   public function members()
+   {
        return view('community.members');
-    }
+   }
 
     public function single()
     {
        return view('community.single');
     }
 
-    public function subcategory($subcategory)
+    public function subcategory( $subcategory)
     {
        return view('community.subcategory', compact('subcategory'));
     }

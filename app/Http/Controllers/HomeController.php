@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\Course;
+use App\Models\Upload;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -33,73 +34,53 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
-    {
-        if (Auth::user()->role == UserRoles::MEMBER->value) {
-            $completedCourses = DB::table('course_progress')
-                ->join('courses', 'course_progress.course_id', '=', 'courses.id')
-                ->where('course_progress.user_id', Auth::id())
-                ->select(
-                    'courses.id as course_id',
-                    'courses.title as course_title',
-                    'courses.category as course_category',
-                    'courses.level as course_level',
-                    'courses.status as course_status',
-                    DB::raw('COUNT(course_progress.id) as completion_count')
-                )
-                ->groupBy('courses.id', 'courses.title', 'courses.category', 'courses.level', 'courses.status')
-                ->get();
-             $userId = Auth::id();
+{
+    if (Auth::user()->role == UserRoles::MEMBER->value) {
+        $userId = Auth::id();
 
-            // Step 1: Get all recent progress entries
-            $recentProgress = DB::table('course_progress')
+        // Define levels
+        $levels = ['Beginner', 'Intermediate', 'Advanced'];
+
+        $progress = collect($levels)->mapWithKeys(function ($level) use ($userId) {
+            $total = DB::table('courses')
+                ->where('level', $level)
+                ->count();
+
+            $completed = DB::table('course_progress')
                 ->join('courses', 'course_progress.course_id', '=', 'courses.id')
                 ->where('course_progress.user_id', $userId)
-                ->orderBy('course_progress.created_at', 'desc')
-                ->select('courses.category', 'courses.id as course_id')
-                ->get();
+                ->where('courses.level', $level)
+                ->distinct('course_progress.course_id')
+                ->count('course_progress.course_id');
 
-        // Step 2: Extract the latest 2 unique categories
-        $latestCategories = $recentProgress->pluck('category')->unique()->take(2);
+            return [$level => [
+                'total' => $total,
+                'completed' => $completed,
+            ]];
+        });
 
-        // Step 3: Get total number of courses per category
-        $categoryTotals = DB::table('courses')
-            ->whereIn('category', $latestCategories)
-            ->select('category', DB::raw('COUNT(*) as total_courses'))
-            ->groupBy('category')
-            ->get()
-            ->keyBy('category');
+       $categories = ['piano exercise', 'extra courses', 'quick lessons', 'learn songs'];
 
-        // Step 4: Get number of completed courses by the user per category
-        $categoryCompleted = DB::table('course_progress')
-            ->join('courses', 'course_progress.course_id', '=', 'courses.id')
-            ->where('course_progress.user_id', $userId)
-            ->whereIn('courses.category', $latestCategories)
-            ->select('courses.category', DB::raw('COUNT(DISTINCT courses.id) as completed_courses'))
-            ->groupBy('courses.category')
-            ->get()
-            ->keyBy('category');
+        $latestCourses = [];
 
-        $categoryProgress = [];
+        foreach ($categories as $category) {
+            $course = Upload::
+                where('category', $category)
+                ->orderBy('created_at', 'desc')
+                ->first();
 
-        foreach ($latestCategories as $category) {
-            $completed = $categoryCompleted[$category]->completed_courses ?? 0;
-            $total = $categoryTotals[$category]->total_courses ?? 1; // avoid division by zero
-            $categoryProgress[] = [
-                'course_category' => $category,
-                'completed_courses' => $completed,
-                'total_courses' => $total,
-                'level' => $completedCourses->firstWhere('course_category', $category)->course_level ?? 'N/A',
-                'completion_percentage' => round(($completed / $total) * 100, 1),
-            ];
+            if ($course) {
+                $latestCourses[$category] = $course;
+            }
         }
-
-            // dd($categoryProgress);
-            return view('home', compact('completedCourses', 'categoryProgress'));
-        }
-        
+        // dd( $latestCourses);
+        return view('home', compact('progress', 'levels', 'latestCourses'));
     }
+}
 
-    public function admin(){
+
+    public function admin()
+    {
         if (Auth::user()->role == UserRoles::ADMIN->value) {
             $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->paginate(20);
             $usdRevenue = Payment::where('status', 'successful')
@@ -120,7 +101,8 @@ class HomeController extends Controller
         }
     }
 
-    public function profile() {
+    public function profile() 
+    {
         $subscriptions = Subscription::all();
 
         $transactions = Payment::where('user_id', auth()->user()->id)
@@ -193,12 +175,13 @@ class HomeController extends Controller
         return redirect('/')->with('success', 'Account deleted.');
     }
 
-     public function support()
+    public function support()
     {
        return view('memberpages.support');
     }
 
-    function handleGetStarted() : Returntype {
+    function handleGetStarted() 
+    {
         $user = User::find(Auth::user()->id);
         $user->metadata = ['hide_get_started' => true];
         $user->save();

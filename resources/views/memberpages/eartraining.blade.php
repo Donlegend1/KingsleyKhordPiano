@@ -25,23 +25,33 @@
 </section>
 <section class="bg-gray-100 py-6 px-6">
  <div class="max-w-7xl mx-auto">
+   <form method="GET" action="{{ route('ear.training') }}" class="mb-8 flex justify-end">
+     <div class="relative w-full max-w-xs">
+       <input type="text" name="name" id="name" value="{{ request('name') }}" class="w-full border border-gray-300 rounded-full p-2 pr-10 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Search...">
+     </div>
+     <button type="submit" class="ml-2 px-4 py-1 bg-gray-300 text-white rounded-2xl font-semibold shadow hover:bg-gray-700 transition"><span class="fa fa-search text-black hover:text-white"></span></button>
+   </form>
+
    {{-- <h2 class="text-2xl font-bold mb-8 text-center">Ear Training Quiz</h2> --}}
 
    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-     
-    @foreach ($data as  $quiz)
-    
+    @forelse ($data as  $quiz)
      <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
       <a href="/member/ear-training/{{$quiz->id}}">
        <img src="{{ $quiz->thumbnail_url }}" alt="Finger Strengthening" class="w-full  object-cover">
        </a>
-       <div class="p-6 text-center">
-         <h3 class="text-lg font-bold mb-2 text-gray-800">{{$quiz->title}}</h3>
+       <div class="p-6 text-center my-3">
+         <h3 class="text-lg font-bold mb-4 text-gray-800">{{$quiz->title}}</h3>
          {{-- <p class="text-gray-600 mb-4">{{$quiz->description}}</p> --}}
          <a href="/member/ear-training/{{$quiz->id}}" class="text-blue-500 hover:bg-black hover:text-white font-semibold border border-blue-600 p-2 rounded-lg">START QUIZ</a>
        </div>
      </div>
-     @endforeach
+    @empty
+     <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
+       <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
+       <p>No result found.</p>
+     </div>
+    @endforelse
    </div>
    
  </div>

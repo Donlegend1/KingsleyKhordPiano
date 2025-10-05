@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-<meta name="api-token" content="{{ auth()->user()?->api_token }}">
+    <meta name="api-token" content="{{ auth()->user()?->api_token }}">
     <meta name="description" content="KingsleyKhord is a platform that connects you with the best service providers in your area. Whether you're looking for a plumber, electrician, or any other service, we've got you covered.">
     <meta name="keywords" content="KingsleyKhord, service providers, local services, find services, connect with service providers">
     <meta name="author" content="LengendOSA Consultants">

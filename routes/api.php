@@ -14,7 +14,10 @@ use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\EarTrainingController;
+use App\Http\Controllers\LiveSessionController;
 
 
 /*

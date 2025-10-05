@@ -41,8 +41,9 @@
         <p class="text-gray-800 font-semibold mb-2">Take a Tour of the Website</p>
         <p>This site is big!! Kingsley has created everything here from scratch. You need to know where things are</p>
       </div>
+      <!-- Use json_encode and single quotes for safe embedding -->
       <button
-        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
+        @click='video = {{ json_encode($tour ? "https://drive.google.com/file/d/{$tour}/preview" : "") }}'
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -57,7 +58,7 @@
         <p>Step by step breakdown of learning methods...</p>
       </div>
       <button
-        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
+        @click='video = {{ json_encode($session ? "https://drive.google.com/file/d/{$session}/preview" : "") }}'
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -75,7 +76,7 @@
         <p>A system that gives you access to tools and mastermind meetings...</p>
       </div>
       <button
-        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
+        @click='video = {{ json_encode($setUp ? "https://drive.google.com/file/d/{$setUp}/preview" : "") }}'
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -90,7 +91,7 @@
         <p>Get exposed to the right opportunities and transform your knowledge...</p>
       </div>
       <button
-        @click="video = 'https://drive.google.com/file/d/1augtUffRk6vHa3V9XxUZp9B0hk112MNw/preview'" 
+        @click='video = {{ json_encode($exper ? "https://drive.google.com/file/d/{$exper}/preview" : "") }}'
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
       >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
@@ -98,32 +99,49 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal / Overlay -->
   <div 
-    x-show="video" 
+    x-show="video !== null" 
     x-cloak 
-    class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+    x-transition.opacity
+    @click.self="video = null"
+    class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
   >
-    <div class="bg-white rounded-lg overflow-hidden shadow-lg max-w-3xl w-full relative">
+    <div class="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-3xl w-full">
+
+      <!-- Close Button -->
       <button 
         @click="video = null" 
-        class="absolute top-2 right-2 text-black hover:text-red-600 text-xl"
+        aria-label="Close video"
+        class="absolute -top-3 -right-3 bg-white text-black border border-gray-300 
+               hover:bg-red-600 hover:text-white rounded-full w-9 h-9 flex items-center 
+               justify-center shadow-lg z-60"
       >
         &times;
       </button>
-      <div class="aspect-w-16 aspect-h-9">
-        <iframe 
-          x-bind:src="video" 
-          class="w-full h-[500px]" 
-          frameborder="0" 
-          allow="autoplay; encrypted-media" 
-          allowfullscreen
-        ></iframe>
+
+      <div class="aspect-w-16 aspect-h-9 flex items-center justify-center bg-black">
+        <!-- iframe shown only when video is non-empty string -->
+        <div x-show="video !== '' && video !== null" class="w-full h-[500px]">
+          <iframe 
+            x-bind:src="video" 
+            class="w-full h-full" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <!-- Coming soon when video is empty string -->
+        <div x-show="video === ''" class="px-6 py-4">
+          <p class="text-2xl font-bold text-white animate-pulse">
+            Coming Soon
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </section>
-
 
 <section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
  <div class="font-bold mb-5 text-[22px]">
@@ -232,32 +250,39 @@
 
       <div class="p-3 sm:p-4 rounded-lg">
         <div class="tab-content hidden" data-content="beginners">
-          <ul class="list-disc pl-5 sm:pl-6 text-gray-700 text-sm sm:text-base leading-relaxed">
-            <li>There's not a Friend</li>
-            <li>We Bless Your Name</li>
-            <li>Heavenly Father</li>
-            <li>Goodness of God</li>
-          </ul>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            @foreach($beginnerCourses as $course)
+              <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+                <img src="{{ $course->thumbnail_url ?? '/images/featured1.jpeg' }}" alt="{{ $course->title }}" class="w-full h-32 object-cover rounded-md mb-2">
+                <h4 class="font-bold text-gray-800 mb-2 text-center">{{ $course->title }}</h4>
+                <a href="/member/course/beginner" class="text-blue-600 hover:underline">View Course</a>
+              </div>
+            @endforeach
+          </div>
         </div>
 
         <div class="tab-content hidden" data-content="intermediate">
-          <ul class="list-disc pl-5 sm:pl-6 text-gray-700 text-sm sm:text-base leading-relaxed">
-            <li>You deserve the glory</li>
-            <li>Silent Night</li>
-            <li>What a friend we have in Jesus</li>
-            <li>Yes Jesus Loves Me</li>
-            <li>Blessed be Thy Name</li>
-          </ul>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            @foreach($intermediateCourses as $course)
+              <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+                <img src="{{ $course->thumbnail_url ?? '/images/featured2.jpeg' }}" alt="{{ $course->title }}" class="w-full h-32 object-cover rounded-md mb-2">
+                <h4 class="font-bold text-gray-800 mb-2 text-center">{{ $course->title }}</h4>
+                <a href="/member/course/intermediate" class="text-blue-600 hover:underline">View Course</a>
+              </div>
+            @endforeach
+          </div>
         </div>
 
         <div class="tab-content hidden" data-content="advanced">
-          <ul class="list-disc pl-5 sm:pl-6 text-gray-700 text-sm sm:text-base leading-relaxed">
-            <li>Falling in Love with Jesus</li>
-            <li>You are my sunshine</li>
-            <li>Open The Eyes of my Heart</li>
-            <li>He has Made me Glad</li>
-            <li>I AM THE LORD" By Jason White</li>
-          </ul>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            @foreach($advancedCourses as $course)
+              <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+                <img src="{{ $course->thumbnail_url ?? '/images/featured3.jpeg' }}" alt="{{ $course->title }}" class="w-full h-32 object-cover rounded-md mb-2">
+                <h4 class="font-bold text-gray-800 mb-2 text-center">{{ $course->title }}</h4>
+                <a href="/member/course/advanced" class="text-blue-600 hover:underline">View Course</a>
+              </div>
+            @endforeach
+          </div>
         </div>
       </div>
     </div>

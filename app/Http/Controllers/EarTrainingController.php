@@ -19,8 +19,12 @@ class EarTrainingController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function earTraining() {
-        $data = Quiz::paginate(12);
+    public function earTraining(Request $request) {
+        $query = Quiz::query()->latest();
+        if ($request->filled('name')) {
+            $query->where('title', 'like', '%' . $request->input('name') . '%');
+        }
+        $data = $query->paginate(12)->withQueryString();
         return view('memberpages.eartraining', compact('data'));
     }
 
@@ -62,18 +66,20 @@ class EarTrainingController extends Controller
             $mainAudio = $request->file('main_audio');
 
             $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-            $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
-
-            // Save in storage/ear_training/
             $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
-            $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
+
+            $mainAudioName = null;
+            if ($mainAudio) {
+                $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
+                $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
+            }
 
             $quiz = Quiz::create([
                 'title'          => $request->title,
                 'description'    => $request->description,
                 'video_url'      => $request->video_url,
                 'thumbnail_path' => "/storage/ear_training/thumbnails/$thumbnailName",
-                'main_audio_path'=> "/storage/ear_training/main_audios/$mainAudioName",
+                'main_audio_path'=> $mainAudioName ? "/storage/ear_training/main_audios/$mainAudioName" : null,
                 'category'       => $request->category,
             ]);
 

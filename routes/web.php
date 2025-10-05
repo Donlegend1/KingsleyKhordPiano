@@ -24,6 +24,10 @@ use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CommunityIndexController;
+// use App\Http\Controllers\StripeWebhookController;
+use Laravel\Cashier\Http\Controllers\WebhookController;
+use App\Http\Controllers\WebsiteVideoController;
+use App\Http\Controllers\BookMarkController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -38,6 +42,12 @@ use Illuminate\Support\Facades\Artisan;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook']);
+Route::post(
+    'stripe/webhook',
+    [WebhookController::class, 'handleWebhook']
+)->name('cashier.webhook');
 
 Route::get('/', function () {
     $extracourses = \App\Models\Upload::where('category', 'extra courses')->latest()->take(3)->get();
@@ -83,14 +93,9 @@ Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')-
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
 
-Route::post('/stripe/create', [StripeController::class, 'createPaymentIntent'])->name('stripe.create');
-Route::get('/stripe/success', [StripeController::class, 'retrievePaymentIntent'])->name('stripe.success');
-Route::get('/stripe/cancel', function () {
-    return redirect()->route('home')->with('error', 'Payment was cancelled.');
-})->name('stripe.cancel');
-
-Route::post('/stripe/webhook', [StripeController::class, 'stripeWebHook'])->name('stripe.webhook');
-
+Route::post('/stripe/create', [StripeController::class, 'checkout'])->name('stripe.create');
+Route::get('/stripe/success', [StripeController::class, 'checkoutSuccess'])->name('checkout.success');
+Route::get('/stripe/cancel',[StripeController::class, 'checkoutCancel'])->name('checkout.cancel');
 
 Route::post('paypal/create-order', [PayPalController::class, 'pay']);
 Route::get('paypal/success', [PayPalController::class, 'success']);
@@ -111,12 +116,12 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('getstarted', [GetstartedController::class, 'index']);
     Route::get('profile', [HomeController::class, 'profile']);
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
-    Route::get('extra-courses', [CoursesController::class, 'extraCourses']);
+    Route::get('extra-courses', [CoursesController::class, 'extraCourses'])->name('extra.courses');
     Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
-    Route::get('ear-training', [EarTrainingController::class, 'earTraining']);
+    Route::get('ear-training', [EarTrainingController::class, 'earTraining'])->name('ear.training');
     Route::get('ear-training/{id}', [EarTrainingController::class, 'showmember']);
-    Route::get('quick-lessons', [LessonController::class, 'quicklession']);
-    Route::get('learn-songs', [LessonController::class, 'learnSongs']);
+    Route::get('quick-lessons', [LessonController::class, 'quicklession'])->name('quick.lession');
+    Route::get('learn-songs', [LessonController::class, 'learnSongs'])->name('learn.songs');
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
@@ -131,6 +136,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     ->name('notifications.markAllAsRead');
     Route::get('/community/user/{community}', [CommunityController::class, 'show']);
     Route::get('/community/u/{community}/update', [CommunityController::class, 'edit']);
+    Route::get('bookmark', [BookMarkController::class, 'bookmark']);
+    Route::post('/bookmark/toggle', [BookmarkController::class, 'toggle'])->name('bookmark.toggle');
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
@@ -157,4 +164,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('live-shows', [LiveShowController::class, 'index']);
     Route::get('live-show/create', [LiveShowController::class, 'create']);
     Route::post('live-shows', [LiveShowController::class, 'store']);
+    Route::get('website-video', [WebsiteVideoController::class, 'index']);
+    Route::post('website-video/{video?}', [WebsiteVideoController::class, 'saveVideo']);
+    Route::post('website-video/delete/{video}', [WebsiteVideoController::class, 'destroy']);
 });

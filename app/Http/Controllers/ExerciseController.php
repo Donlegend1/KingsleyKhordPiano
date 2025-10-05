@@ -16,6 +16,7 @@ class ExerciseController extends Controller
     {
         $level = $request->query('level');
         $skillLevel = $request->query('skill_level');
+        $search = $request->query('search');
 
         $query = Upload::query()->where('category', 'piano exercise');
 
@@ -27,11 +28,15 @@ class ExerciseController extends Controller
             $query->where('skill_level', $skillLevel);
         }
 
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
         $exercises = $query->latest()->paginate(12);
 
         $levels = ['independence', 'coordination', 'flexibility', 'strength', 'dexterity'];
         $skillLevels = ['Basic', 'Competent', 'Challenging'];
 
-        return view('memberpages.pianoexercise', compact('exercises', 'level', 'skillLevel', 'levels', 'skillLevels'));
+        return view('memberpages.pianoexercise', compact('exercises', 'level', 'skillLevel', 'search', 'levels', 'skillLevels'));
     }
 }
