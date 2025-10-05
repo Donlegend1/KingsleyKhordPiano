@@ -23,7 +23,7 @@ const FreeCall = () => {
     useEffect(() => {
         if (showModal && window.Calendly && calendlyRef.current) {
             window.Calendly.initInlineWidget({
-                url: "https://calendly.com/shedrackogwuche5/30min",
+                url: "https://calendly.com/kingsleykhord/30min",
                 parentElement: calendlyRef.current,
                 prefill: {},
                 utm: {}
@@ -37,7 +37,7 @@ const FreeCall = () => {
             <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-white border border-gray-300 rounded-lg w-full min-h-[200px]">
                 <div className="text-center my-4 sm:my-6 mx-4 sm:mx-10">
                     <p className="text-gray-800  mb-2 text-base sm:text-lg font-bold">
-                        Get on a 10 mins Discovery Call with Kingsley Khod
+                        Get on a 10 mins Discovery Call with Kingsley Khord
                     </p>
                     <p className="text-gray-500 text-sm sm:text-base leading-relaxed">
                         This call will help you find clarity in your piano journey so you know where to commence your learning from.

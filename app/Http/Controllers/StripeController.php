@@ -47,4 +47,6 @@ class StripeController extends Controller
 
         return back()->with('success', 'Subscription cancelled.');
     }
+
+    
 }
