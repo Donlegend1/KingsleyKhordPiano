@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class course_video_comment_replies extends Model
+class Course_video_comment_replies extends Model
 {
     use HasFactory;
 

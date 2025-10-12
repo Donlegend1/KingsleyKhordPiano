@@ -23,7 +23,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('email:send-song-breakdown')->weeklyOn(4, '08:00');
         $schedule->command('emails:send-quick-lessons')->daily();
         $schedule->command('emails:send-ear-training-quiz')->daily();
-        $schedule->command('emails:send-failed-payment-reminder')->dailyAt('09:00');
+        $schedule->command('email:failed-payment-reminders')->dailyAt('09:00');
         $schedule->command('community:sync-users')->dailyAt('01:00');
         $schedule->command('notifications:send-discovery-calls')->everyThreeHours();
         $schedule->command('stripe:sync-subscribers')->everyThreeMinutes();

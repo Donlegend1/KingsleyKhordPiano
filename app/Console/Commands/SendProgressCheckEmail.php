@@ -17,7 +17,7 @@ class SendProgressCheckEmail extends Command
 
         foreach ($users as $user) {
             Notification::route('mail', $user->email)
-                ->notify(new ProgressCheckEmail());
+                ->notify(new ProgressCheckEmail($user));
         }
 
         $this->info("Sent progress check email to {$users->count()} user(s).");
