@@ -23,7 +23,7 @@ class SendCommunityInviteEmail extends Command
      */
     public function handle(): int
     {
-        $link = config('app.community_link') ?? 'community.kingsleykhordpiano.com';
+        $link = config('app.community_link') ?? 'kingsleykhordpiano.com/community';
 
         $users = User::whereNotNull('email')
                      ->where('created_at', '<=', now()->subDays(3)) 

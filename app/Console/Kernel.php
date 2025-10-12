@@ -25,6 +25,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('emails:send-ear-training-quiz')->daily();
         $schedule->command('emails:send-failed-payment-reminder')->dailyAt('09:00');
         $schedule->command('community:sync-users')->dailyAt('01:00');
+        $schedule->command('notifications:send-discovery-calls')->everyThreeHours();
+        $schedule->command('stripe:sync-subscribers')->everyThreeMinutes();
         
     }
 

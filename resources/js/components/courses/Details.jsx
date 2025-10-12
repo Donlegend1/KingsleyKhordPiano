@@ -590,9 +590,13 @@ const CoursesPage = () => {
                                             : ""
                                     }`}
                                     onClick={() => {
-                                        setSelectedCourse(course);
-                                        setShowCourseModal(false);
-                                    }}
+                                    setSelectedCourse(course);
+                                    setShowCourseModal(false);
+                                    setExpandedCategories((prev) => ({
+                                        ...prev,
+                                        __mobile: false,
+                                    }));
+                                }}
                                 >
                                     <div className="flex items-center gap-2">
                                         <i className="fa fa-book text-gray-400 dark:text-gray-500"></i>
@@ -614,7 +618,6 @@ const CoursesPage = () => {
 
     const generalProgress = calculateGeneralProgress();
 
-    // Add navigation for next/previous course
     const [currentIndex, setCurrentIndex] = useState(null);
     useEffect(() => {
         if (selectedCourse && courses[selectedCourse.category]) {
@@ -651,7 +654,6 @@ const CoursesPage = () => {
     return (
         <>
             <div className="flex flex-col md:flex-row">
-                {/* Sidebar for desktop */}
                 <div
                     className={`hidden md:block ${
                         sidebarCollapsed ? "w-20" : "w-1/3"

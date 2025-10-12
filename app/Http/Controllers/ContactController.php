@@ -40,25 +40,30 @@ class ContactController extends Controller
         try {
             $user = auth()->user();
 
-            // Store contact message in DB
             Contact::create([
-                'name' => $user->fist_name. " ".$user->last_name,
+                'name' => $user->first_name . " " . $user->last_name,
                 'email' => $user->email,
                 'subject' => $request->subject,
                 'message' => $request->message,
             ]);
 
-            // Send raw email (consider using a Mailable)
-            Mail::raw($request->message, function ($msg) use ($request, $user) {
+            Mail::send('emails.contact', [
+                'name' => $user->first_name . " " . $user->last_name,
+                'email' => $user->email,
+                'subject' => $request->subject,
+                'messageContent' => $request->message,
+            ], function ($msg) use ($request, $user) {
                 $msg->to('contact@kingsleykhordpiano.com')
-                    ->subject($request->subject);
+                    ->subject('Contact Form: ' . $request->subject);
             });
 
-            return redirect()->back()->with('success', 'Your message has been sent.');
+            return redirect()->back()->with('success', 'Your message has been sent successfully.');
+
         } catch (\Throwable $th) {
             \Log::error('Contact form error: ' . $th->getMessage());
 
             return redirect()->back()->with('error', 'Something went wrong. Please try again.');
         }
     }
+
 }

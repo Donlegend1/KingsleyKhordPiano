@@ -81,7 +81,7 @@ Route::get('/clear', function () {
 Route::post('/send-document', [DocumentMailController::class, 'send'])->name('subscribe');
 
 Route::get('/plans', [SubscriptionController::class, 'index']);
-Route::get('/member/plan', [SubscriptionController::class, 'memberplans'])->middleware(['auth', 'verified']);
+Route::get('/member/plan', [SubscriptionController::class, 'memberplans'])->middleware(['auth', 'verified'])->name('subscription.page');
 
 Auth::routes(
     ['verify' => true]
@@ -96,6 +96,9 @@ Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallb
 Route::post('/stripe/create', [StripeController::class, 'checkout'])->name('stripe.create');
 Route::get('/stripe/success', [StripeController::class, 'checkoutSuccess'])->name('checkout.success');
 Route::get('/stripe/cancel',[StripeController::class, 'checkoutCancel'])->name('checkout.cancel');
+Route::post('stripe/sub/cancel',[StripeController::class, 'cancelSubscription'])->name('subscription.cancel');
+
+
 
 Route::post('paypal/create-order', [PayPalController::class, 'pay']);
 Route::get('paypal/success', [PayPalController::class, 'success']);
@@ -114,7 +117,6 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('support', [HomeController::class, 'support']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
-    Route::get('profile', [HomeController::class, 'profile']);
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
     Route::get('extra-courses', [CoursesController::class, 'extraCourses'])->name('extra.courses');
     Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
@@ -125,6 +127,10 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
+});
+
+Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('profile', [HomeController::class, 'profile']);
     Route::get('/shop', [ShopController::class, 'index']);
     Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');

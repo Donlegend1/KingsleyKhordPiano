@@ -3,47 +3,64 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Payment;
+use Laravel\Cashier\Subscription;
 use App\Mail\SubscriptionExpiredMail;
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CheckExpiredSubscriptions extends Command
 {
     protected $signature = 'subscriptions:check-expired';
-    protected $description = 'Check for expired subscriptions and send email notifications';
+    protected $description = 'Check for expired Cashier subscriptions and send notifications';
 
     public function handle(): int
     {
-        $this->info('Checking for expired subscriptions...');
+        $this->info('Checking for expired Cashier subscriptions...');
 
-        $expiredSubs = Payment::where('ends_at', '<', now())
+        $expiredSubs = Subscription::whereNotNull('ends_at')
+            ->where('ends_at', '<', now())
             ->whereNull('notified_at')
-            ->where('status', 'successful')
-            ->with('user') 
+            ->where('stripe_status', '!=', 'canceled')
+            ->with('user')
             ->get();
 
+        if ($expiredSubs->isEmpty()) {
+            $this->info('No expired subscriptions found.');
+            return Command::SUCCESS;
+        }
+
         foreach ($expiredSubs as $subscription) {
-            if (!$subscription->user) {
+            $user = $subscription->user;
+
+            if (!$user) {
                 $this->warn("Subscription ID {$subscription->id} has no user.");
                 continue;
             }
 
-            Mail::to($subscription->user->email)->send(
-                new SubscriptionExpiredMail($subscription->user, $subscription)
-            );
+            try {
+                // Send notification email
+                Mail::to($user->email)->send(
+                    new SubscriptionExpiredMail($user, $subscription)
+                );
 
-            $subscription->update(['notified_at' => now()]);
-            $subscription->user->update([
-                'premium' => false,
-                'payment_status' => 'expired',
-            ]);
+                // Update subscription and user
+                $subscription->update(['notified_at' => now()]);
+                $user->update([
+                    'premium' => false,
+                    'payment_status' => 'expired',
+                ]);
 
-            $this->info("Notified: {$subscription->user->email}");
+                $this->info("Notified: {$user->email}");
+            } catch (\Throwable $e) {
+                Log::error('Failed to notify user about expired subscription', [
+                    'subscription_id' => $subscription->id,
+                    'user_id' => $user->id ?? null,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
-        $this->info('Subscription check completed.');
-
+        $this->info('Cashier subscription check completed.');
         return Command::SUCCESS;
     }
 }

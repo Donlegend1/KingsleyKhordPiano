@@ -49,7 +49,6 @@ use App\Http\Controllers\LiveSessionController;
         Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
-
     });
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {

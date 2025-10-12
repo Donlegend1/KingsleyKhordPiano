@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles\UserRoles;
 use App\Models\User;
 use App\Models\Payment;
-use App\Models\Subscription;
+use Stripe\Stripe;
+use Stripe\Price;
+use Laravel\Cashier\Subscription;
 use App\Models\Course;
 use App\Models\Upload;
 use Illuminate\Support\Facades\DB;
@@ -34,50 +36,49 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
-{
-    if (Auth::user()->role == UserRoles::MEMBER->value) {
-        $userId = Auth::id();
+    {
+        if (Auth::user()->role == UserRoles::MEMBER->value) {
+            $userId = Auth::id();
 
-        // Define levels
-        $levels = ['Beginner', 'Intermediate', 'Advanced'];
+            // Define levels
+            $levels = ['Beginner', 'Intermediate', 'Advanced'];
 
-        $progress = collect($levels)->mapWithKeys(function ($level) use ($userId) {
-            $total = DB::table('courses')
-                ->where('level', $level)
-                ->count();
+            $progress = collect($levels)->mapWithKeys(function ($level) use ($userId) {
+                $total = DB::table('courses')
+                    ->where('level', $level)
+                    ->count();
 
-            $completed = DB::table('course_progress')
-                ->join('courses', 'course_progress.course_id', '=', 'courses.id')
-                ->where('course_progress.user_id', $userId)
-                ->where('courses.level', $level)
-                ->distinct('course_progress.course_id')
-                ->count('course_progress.course_id');
+                $completed = DB::table('course_progress')
+                    ->join('courses', 'course_progress.course_id', '=', 'courses.id')
+                    ->where('course_progress.user_id', $userId)
+                    ->where('courses.level', $level)
+                    ->distinct('course_progress.course_id')
+                    ->count('course_progress.course_id');
 
-            return [$level => [
-                'total' => $total,
-                'completed' => $completed,
-            ]];
-        });
+                return [$level => [
+                    'total' => $total,
+                    'completed' => $completed,
+                ]];
+            });
 
-       $categories = ['piano exercise', 'extra courses', 'quick lessons', 'learn songs'];
+        $categories = ['piano exercise', 'extra courses', 'quick lessons', 'learn songs'];
 
-        $latestCourses = [];
+            $latestCourses = [];
 
-        foreach ($categories as $category) {
-            $course = Upload::
-                where('category', $category)
-                ->orderBy('created_at', 'desc')
-                ->first();
+            foreach ($categories as $category) {
+                $course = Upload::
+                    where('category', $category)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
 
-            if ($course) {
-                $latestCourses[$category] = $course;
+                if ($course) {
+                    $latestCourses[$category] = $course;
+                }
             }
+            // dd( $latestCourses);
+            return view('home', compact('progress', 'levels', 'latestCourses'));
         }
-        // dd( $latestCourses);
-        return view('home', compact('progress', 'levels', 'latestCourses'));
     }
-}
-
 
     public function admin()
     {
@@ -101,19 +102,44 @@ class HomeController extends Controller
         }
     }
 
-    public function profile() 
+    public function profile()
     {
-        $subscriptions = Subscription::all();
+        Stripe::setApiKey(config('cashier.secret'));
 
-        $transactions = Payment::where('user_id', auth()->user()->id)
-            ->latest() // same as ->orderBy('created_at', 'desc')
-            ->get();
+        $transactions = Subscription::with('items')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get()
+            ->map(function ($subscription) {
+                $item = $subscription->items->first();
+                $priceAmount = null;
+                $currency = 'USD';
+                $interval = null;
+
+                if ($item && $item->stripe_price) {
+                    $stripePrice = Price::retrieve($item->stripe_price);
+                    $priceAmount = $stripePrice->unit_amount / 100;
+                    $currency = strtoupper($stripePrice->currency);
+                    $interval = $stripePrice->recurring->interval ?? null;
+                }
+
+                return (object) [
+                    'name' => $subscription->name,
+                    'amount' => $priceAmount,
+                    'currency' => $currency,
+                    'interval' => $interval,
+                    'starts_at' => $subscription->created_at,
+                    'stripe_status' => $subscription->stripe_status,
+                ];
+            });
+
+            // dd($transactions);
 
         $countries = DB::table('countries')
             ->orderBy('country_name')
             ->pluck('country_name', 'country_code');
 
-        return view('memberpages.profile', compact('subscriptions', 'transactions', 'countries'));
+        return view('memberpages.profile', compact('transactions', 'countries'));
     }
 
     public function update(Request $request)

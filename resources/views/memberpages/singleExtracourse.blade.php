@@ -26,11 +26,22 @@
   <!-- Main Content -->
   <div class="bg-white max-w-3xl w-full rounded-lg shadow-lg p-4 md:p-6 space-y-6">
     <!-- Video Section -->
-    <div class="w-full aspect-video rounded-lg overflow-hidden flex items-center justify-center">
-      <div class="w-full h-full">
-        {!! $lesson->video_url !!}
+        <div class="w-full rounded-lg overflow-hidden">
+      <div class="relative w-full pb-[75%] sm:pb-[65%] md:pb-[56.25%] h-0">
+        <div class="absolute top-0 left-0 w-full h-full">
+          {!! $lesson->video_url !!}
+        </div>
       </div>
     </div>
+
+  <style>
+    iframe, video {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 0.5rem;
+    }
+  </style>
+
 
     <!-- Title + Bookmark -->
     <div class="flex items-center justify-between">

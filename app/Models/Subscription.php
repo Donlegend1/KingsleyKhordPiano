@@ -19,4 +19,9 @@ class Subscription extends Model
     'trial_ends_at',
     'ends_at',
     ];
+
+    public function item()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

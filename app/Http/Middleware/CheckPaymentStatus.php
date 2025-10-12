@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -16,9 +17,29 @@ class CheckPaymentStatus
     {
         $user = Auth::user();
 
-        if ($user->role === 'member') {
-            // Prevent access if user does not have an active Cashier subscription
-            if (!$user->subscribed('default')) {
+        if ($user && $user->role === 'member') {
+
+            $hasActiveSubscription = $user->subscribed('default');
+
+            $activePayment = $user->payments()
+                ->where('status', 'successful')
+                ->where('ends_at', '>', now())
+                ->first();
+
+            $latestPayment = $user->payments()->latest('ends_at')->first();
+
+            $isLegacyExpired = false;
+
+            if ($latestPayment && $latestPayment->ends_at->isPast()) {
+                $user->update(['payment_status' => 'expired']);
+                $isLegacyExpired = true;
+            }
+
+            $hasLegacyAccess = !in_array($user->payment_status, ['pending', 'expired']) && $activePayment;
+
+            $hasAccess = $hasActiveSubscription || $hasLegacyAccess;
+
+            if (! $hasAccess) {
                 return redirect('/member/plan');
             }
         }

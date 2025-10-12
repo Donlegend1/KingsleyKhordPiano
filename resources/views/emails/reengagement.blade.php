@@ -1,6 +1,8 @@
  @extends('layouts.email')
 
 @section('content')
+
+<div style="max-width: 480px; margin: 0 auto; padding: 12px; background: #fff; border-radius: 8px;">
 <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
             <td align="center">
@@ -38,5 +40,7 @@
             </td>
         </tr>
     </table>
+
+</div>
 
     @endsection

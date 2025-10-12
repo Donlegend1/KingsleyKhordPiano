@@ -20,7 +20,7 @@ class EarTrainingController extends Controller
      * @return \Illuminate\View\View
      */
     public function earTraining(Request $request) {
-        $query = Quiz::query()->latest();
+        $query = Quiz::query();
         if ($request->filled('name')) {
             $query->where('title', 'like', '%' . $request->input('name') . '%');
         }
