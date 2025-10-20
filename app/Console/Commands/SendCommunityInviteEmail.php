@@ -26,7 +26,7 @@ class SendCommunityInviteEmail extends Command
         $link = config('app.community_link') ?? 'kingsleykhordpiano.com/community';
 
         $users = User::whereNotNull('email')
-                     ->where('created_at', '<=', now()->subDays(3)) 
+                     ->where('created_at', now()->subDays(3)) 
                      ->get();
 
         if ($users->isEmpty()) {
