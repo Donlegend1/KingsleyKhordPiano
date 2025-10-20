@@ -8,7 +8,7 @@ const PaidCall = () => {
     useEffect(() => {
         if ( window.Calendly && calendlyRef.current) {
             window.Calendly.initInlineWidget({
-                url: "https://calendly.com/shedrackogwuche5/30min",
+                url: "https://calendly.com/kingsleykhord/30min",
                 parentElement: calendlyRef.current,
                 prefill: {},
                 utm: {},

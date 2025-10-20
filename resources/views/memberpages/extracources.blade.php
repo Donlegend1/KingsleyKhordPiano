@@ -20,13 +20,25 @@
     <div>
       <h1 class="text-xl font-bold">Extra Courses</h1>
     </div>
+       <form method="GET" action="{{ route('extra.courses') }}" class="mb-8 flex justify-end">
+     <div class="relative w-full max-w-xs">
+       <input type="text" name="name" id="name" value="{{ request('name') }}" class="w-full border border-gray-300 rounded-full p-2 pr-10 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Search...">
+     </div>
+     <button type="submit" class="ml-2 px-4 py-1 bg-gray-300 text-white rounded-2xl font-semibold shadow hover:bg-gray-700 transition"><span class="fa fa-search text-black hover:text-white"></span></button>
+   </form>
   </div>
 </section>
 
 <section class="bg-gray-100 py-10 px-4 sm:px-6 lg:px-8 xl:px-10">
   <div 
     class="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-6" 
-    x-data="{ activeTab: '{{ request('tab', 'all') }}' }"
+    x-data="{ 
+      activeTab: '{{ request('tab', 'all') }}', 
+      allPage: {{ request('all_page', 1) }}, 
+      beginnerPage: {{ request('beginner_page', 1) }}, 
+      intermediatePage: {{ request('intermediate_page', 1) }}, 
+      advancedPage: {{ request('advanced_page', 1) }} 
+    }"
   >
 
     <!-- Mobile Dropdown -->
@@ -87,13 +99,14 @@
             </a>
           </div>
         @empty
-          <div class="col-span-full text-center text-gray-500 py-12">
-            No exercises found for this category.
+          <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
+            <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
+            <p>No result found.</p>
           </div>
         @endforelse
         @if ($all->hasPages())
           <div class="flex justify-center py-6 col-span-full">
-            {{ $all->appends(['tab' => 'all'])->links('components.pagination') }}
+            {{ $all->appends(['tab' => 'all', 'all_page' => $all->currentPage()])->links('components.pagination') }}
           </div>
         @endif
       </div>
@@ -112,13 +125,14 @@
             </a>
           </div>
         @empty
-          <div class="col-span-full text-center text-gray-500 py-12">
-            No exercises found for this category.
+          <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
+            <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
+            <p>No result found.</p>
           </div>
         @endforelse
         @if ($beginner->hasPages())
           <div class="flex justify-center py-6 col-span-full">
-            {{ $beginner->appends(['tab' => 'beginner'])->links('components.pagination') }}
+            {{ $beginner->appends(['tab' => 'beginner', 'beginner_page' => $beginner->currentPage()])->links('components.pagination') }}
           </div>
         @endif
       </div>
@@ -137,13 +151,14 @@
             </a>
           </div>
         @empty
-          <div class="col-span-full text-center text-gray-500 py-12">
-            No exercises found for this category.
+          <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
+            <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
+            <p>No result found.</p>
           </div>
         @endforelse
         @if ($intermediate->hasPages())
           <div class="flex justify-center py-6 col-span-full">
-            {{ $intermediate->appends(['tab' => 'intermediate'])->links('components.pagination') }}
+            {{ $intermediate->appends(['tab' => 'intermediate', 'intermediate_page' => $intermediate->currentPage()])->links('components.pagination') }}
           </div>
         @endif
       </div>
@@ -162,13 +177,14 @@
             </a>
           </div>
         @empty
-          <div class="col-span-full text-center text-gray-500 py-12">
-            No exercises found for this category.
+          <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
+            <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
+            <p>No result found.</p>
           </div>
         @endforelse
         @if ($advanced->hasPages())
           <div class="flex justify-center py-6 col-span-full">
-            {{ $advanced->appends(['tab' => 'advanced'])->links('components.pagination') }}
+            {{ $advanced->appends(['tab' => 'advanced', 'advanced_page' => $advanced->currentPage()])->links('components.pagination') }}
           </div>
         @endif
       </div>

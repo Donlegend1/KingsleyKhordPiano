@@ -128,49 +128,135 @@
 
     @if (auth()->user()->role === 'member' )
   @php
-    $payment = Auth::user()->payments()->latest()->first();
+        $latestSubscription = $transactions->first();
+    @endphp
 
-    $metadata = $payment->metadata ?? [];
-    $currency = strtoupper($metadata['currency'] ?? 'USD'); // ensure it's uppercase
+    @if ($latestSubscription)
+        @php
+            $symbols = ['NGN' => '₦', 'USD' => '$', 'EUR' => '€', 'GBP' => '£'];
+            $symbol = $symbols[$latestSubscription->currency] ?? '';
+            $user = auth()->user();
 
-    $symbols = [
-        'NGN' => '₦',
-        'USD' => '$',
-        'GBP' => '£',
-        'EUR' => '€',
-    ];
+            if ($latestSubscription->interval === 'month') {
+                $planName = $user->is_premium
+                    ? 'Monthly Premium Plan'
+                    : 'Monthly Standard Plan';
+            } elseif ($latestSubscription->interval === 'year') {
+                $planName = $user->is_premium
+                    ? 'Yearly Premium Plan'
+                    : 'Yearly Standard Plan';
+            } else {
+                $planName = 'Standard Plan';
+            }
+        @endphp
 
-    $symbol = $symbols[$currency] ?? '';
-@endphp
+        <!-- Latest Subscription Card -->
+        <div 
+            x-data="{ openModal: false }"
+            class="mt-10 bg-white p-6 rounded-2xl shadow-md"
+        >
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Active Subscription</h3>
 
-@if ($payment)
-    <div class="mt-10 bg-white p-6 rounded-2xl shadow-md">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Subscriptions</h3>
+            <ul class="divide-y divide-gray-200">
+                <li class="py-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm font-medium">
+                                Plan: {{ $planName }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                Amount: {{ $symbol }}{{ number_format($latestSubscription->amount, 2) }} / {{ ucfirst($latestSubscription->interval) }}
+                            </p>
+                        </div>
 
-        <ul class="divide-y divide-gray-200">
-            <li class="py-3">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm font-medium">
-                            Plan: {{ $metadata['tier'] ?? 'Free' }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            Amount: {{ $symbol }}{{ number_format($payment->amount, 2) }} ({{ $currency }})
-                        </p>
+                        <button 
+                            @click="openModal = true"
+                            class="text-indigo-600 hover:underline text-sm"
+                        >
+                            Manage
+                        </button>
                     </div>
-                    <a href="#" class="text-indigo-600 hover:underline text-sm">Manage</a>
+                </li>
+            </ul>
+
+            <!-- Manage Subscription Modal -->
+           @if ($latestSubscription && $latestSubscription->stripe_status === 'active')
+            {{-- Modal for managing active subscription --}}
+            <div 
+                x-show="openModal"
+                x-cloak
+                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            >
+                <div 
+                    @click.away="openModal = false"
+                    class="bg-white rounded-xl shadow-lg w-full max-w-md p-6"
+                >
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Manage Subscription</h2>
+                    <p class="text-sm text-gray-600 mb-6">
+                        You are currently on the <strong>{{ $planName }}</strong>.<br>
+                        Do you want to cancel your subscription?
+                    </p>
+
+                    <div class="flex justify-end space-x-3">
+                        <button 
+                            @click="openModal = false"
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                        >
+                            Close
+                        </button>
+
+                        <form 
+                            method="POST" 
+                            action="{{ route('subscription.cancel') }}"
+                        >
+                            @csrf
+                            <button 
+                                type="submit"
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                            >
+                                Cancel Subscription
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </li>
-        </ul>
-    </div>
-@else
-    <p class="text-sm text-gray-500 mt-6">No subscription found.</p>
-@endif
+            </div>
+            @elseif ($latestSubscription && $latestSubscription->stripe_status === 'canceled')
+                {{-- Subscription canceled: show renewal link --}}
+                <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 mt-6">
+                    <p class="text-sm">
+                        Your subscription has been <strong>canceled</strong>. 
+                        You can renew anytime to regain access.
+                    </p>
+                    <a 
+                        href="{{ route('subscription.page') }}" 
+                        class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
+                    >
+                        View Subscription Plans
+                    </a>
+                </div>
+            @else
+                {{-- No subscription at all --}}
+                <div class="bg-gray-50 border border-gray-200 text-gray-700 rounded-xl p-4 mt-6">
+                    <p class="text-sm">
+                        You don't have an active subscription.
+                    </p>
+                    <a 
+                        href="{{ route('subscription.page') }}" 
+                        class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
+                    >
+                        Subscribe Now
+                    </a>
+                </div>
+            @endif
+            </div>
+            @else
+                <p class="text-sm text-gray-500 mt-6">No active subscription found.</p>
+            @endif
 
 
     {{-- Transactions --}}
     <div class="mt-10 bg-white p-6 rounded-2xl shadow-md">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Transactions</h3>
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Subscription</h3>
 
         @if($transactions->isEmpty())
             <p class="text-gray-500 text-sm">No transactions found.</p>
@@ -189,22 +275,36 @@
                 <tbody class="divide-y divide-gray-100 text-gray-700">
                     @foreach($transactions as $txn)
                         @php
-                            $metadata = $txn->metadata ?? [];
                             $symbols = ['NGN' => '₦', 'USD' => '$', 'EUR' => '€', 'GBP' => '£'];
-                            $currency = $metadata['currency'] ?? 'USD';
-                            $symbol = $symbols[$currency] ?? '';
+                            $symbol = $symbols[$txn->currency] ?? '';
+                            $user = auth()->user();
+
+                            if ($txn->interval === 'month') {
+                                $planName = $user->is_premium
+                                    ? 'Monthly Premium Plan'
+                                    : 'Monthly Standard Plan';
+                            } elseif ($txn->interval === 'year') {
+                                $planName = $user->is_premium
+                                    ? 'Yearly Premium Plan'
+                                    : 'Yearly Standard Plan';
+                            } else {
+                                $planName = 'Standard Plan';
+                            }
                         @endphp
+
                         <tr>
                             <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                            <td class="px-4 py-2">{{ $metadata['tier'] ?? 'Free' }}</td>
-                            <td class="px-4 py-2">{{ $symbol }}{{ number_format($txn->amount, 2) }}</td>
+                            <td class="px-4 py-2 font-medium text-gray-800">{{ $planName }}</td>
+                            <td class="px-4 py-2">
+                                {{ $symbol }}{{ number_format($txn->amount, 2) }} / {{ $txn->interval }}
+                            </td>
                             <td class="px-4 py-2">
                                 {{ \Carbon\Carbon::parse($txn->starts_at)->format('M d, Y') }}
                             </td>
                             <td class="px-4 py-2">
                                 <span class="inline-block px-2 py-0.5 rounded text-xs font-medium 
-                                    {{ $txn->status === 'successful' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                                    {{ ucfirst($txn->status) }}
+                                    {{ $txn->stripe_status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                    {{ ucfirst($txn->stripe_status) }}
                                 </span>
                             </td>
                         </tr>

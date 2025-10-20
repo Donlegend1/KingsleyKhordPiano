@@ -14,7 +14,10 @@ use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\EarTrainingController;
+use App\Http\Controllers\LiveSessionController;
 
 
 /*
@@ -46,7 +49,6 @@ use App\Http\Controllers\PaymentController;
         Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
-
     });
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {

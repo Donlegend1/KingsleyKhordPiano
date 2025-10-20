@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Bookmark;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 
@@ -95,15 +96,25 @@ class CourseController extends Controller
 
     public function membershowAPI($level)
     {
-        $courses = Course::with('progress')->where('level', $level)->get();
+        $courses = Course::with('progress')
+            ->where('level', $level)
+            ->get();
 
         if ($courses->isEmpty()) {
             return response()->json(['message' => 'No courses found for this level'], 404);
         }
 
-        // Group courses by `group_name` (adjust field name as necessary)
+        $bookmarkedIds = Bookmark::where('user_id', auth()->id())
+            ->where('source', 'courses')
+            ->pluck('video_id')
+            ->toArray();
+
+        $courses->transform(function ($course) use ($bookmarkedIds) {
+            $course->isBookmarked = in_array($course->id, $bookmarkedIds);
+            return $course;
+        });
+
         $groupedCourses = $courses->groupBy('category');
-        
 
         return response()->json($groupedCourses);
     }

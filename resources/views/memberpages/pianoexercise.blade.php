@@ -19,6 +19,12 @@
     <div>
       <h1 class="text-xl font-bold">Piano Exercises</h1>
     </div>
+    <form method="GET" action="{{ route('piano.exercise') }}" class="mb-8 flex justify-end">
+     <div class="relative w-full max-w-xs">
+       <input type="text" name="search" id="name" value="{{ request('search') }}" class="w-full border border-gray-300 rounded-full p-2 pr-10 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Search...">
+     </div>
+     <button type="submit" class="ml-2 px-4 py-1 bg-gray-300 text-white rounded-2xl font-semibold shadow hover:bg-gray-700 transition"><span class="fa fa-search text-black hover:text-white"></span></button>
+   </form>
   </div>
 </section>
 
@@ -77,8 +83,9 @@
               </a>
             </div>
           @empty
-            <div class="col-span-full text-center text-gray-500 py-12">
-              No exercises found for this selection.
+            <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
+              <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
+              <p>No result found.</p>
             </div>
           @endforelse
 
@@ -92,8 +99,8 @@
       </div>
 
       <!-- Desktop Sidebar -->
-      <aside class="hidden lg:block w-72 bg-white p-6 rounded-xl shadow-md h-fit mt-14 lg:mt-[72px]">
-        <h3 class="text-lg font-semibold mb-3 border-b pb-2 text-gray-800">Filter by Skill Level</h3>
+      <aside class="hidden lg:block w-56 bg-white pl-4 pr-2 py-4 rounded-xl shadow-md h-fit mt-14 lg:mt-[72px]">
+        <h3 class="text-base font-semibold mb-2 border-b pb-1 text-gray-800">Filter by Skill Level</h3>
         <div class="space-y-2">
           <a href="{{ route('piano.exercise', array_filter(['level' => $level])) }}" class="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm transition hover:bg-blue-50 {{ is_null($skillLevel) ? 'bg-blue-50 border-blue-300 text-blue-600 font-medium' : 'text-gray-700' }}">
             <i class="fas fa-layer-group text-gray-400"></i>

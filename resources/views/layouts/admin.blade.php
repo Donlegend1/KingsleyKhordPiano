@@ -26,7 +26,7 @@
         </a>
       </div>
 
-      <nav class="space-y-4">
+      <nav class="space-y-2">
         <a href="/admin/dashboard" class="flex items-center gap-3 p-2 rounded-lg border border-gray-600 hover:bg-gray-200 hover:text-black">
           <i class="fa fa-home"></i> <span>Dashboard</span>
         </a>
@@ -44,6 +44,9 @@
         </a>
         <a href="/admin/uploads/list" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-upload"></i> <span>Others</span>
+        </a>
+        <a href="/admin/website-video" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-upload"></i> <span>Website Videos</span>
         </a>
         <a href="/member/profile" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-cog"></i> <span>Settings</span>

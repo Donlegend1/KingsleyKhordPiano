@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import ReactDOM from "react-dom/client";
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
 
 const CreateEarTrainingQuiz = () => {
     const [title, setTitle] = useState("");
@@ -13,7 +17,7 @@ const CreateEarTrainingQuiz = () => {
         { audio: null, correct_option: "" },
     ]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
+    const { showMessage } = useFlashMessage();
     const categories = [
         "Relative Pitch",
         "Di-tone Pitch",
@@ -29,7 +33,7 @@ const CreateEarTrainingQuiz = () => {
         "9th Degree Chords (General)",
         "11th Degree Chords",
         "13th Degree Chords",
-        "Others"
+        "Others",
     ];
 
     const RELATIVE_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
@@ -184,7 +188,6 @@ const CreateEarTrainingQuiz = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        setSuccessMessage("");
 
         const formData = new FormData();
         formData.append("title", title);
@@ -192,7 +195,9 @@ const CreateEarTrainingQuiz = () => {
         formData.append("category", category);
         formData.append("video_url", videoUrl);
         formData.append("thumbnail", thumbnail);
-        formData.append("main_audio", mainAudio);
+        if (mainAudio) {
+            formData.append("main_audio", mainAudio);
+        }
 
         questions.forEach((q, index) => {
             formData.append(`questions[${index}][audio]`, q.audio);
@@ -207,7 +212,7 @@ const CreateEarTrainingQuiz = () => {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
-            setSuccessMessage("Quiz created successfully!");
+            showMessage("Quiz Saved", "success");
             setTitle("");
             setDescription("");
             setVideoUrl("");
@@ -217,6 +222,7 @@ const CreateEarTrainingQuiz = () => {
             setQuestions([{ audio: null, correct_option: "" }]);
         } catch (error) {
             console.error("Error uploading quiz:", error);
+            showMessage("Failed to create quiz", "error");
             alert("Failed to create quiz.");
         } finally {
             setIsSubmitting(false);
@@ -228,12 +234,6 @@ const CreateEarTrainingQuiz = () => {
             <h2 className="text-2xl font-bold mb-6">
                 Create New Ear Training Quiz
             </h2>
-
-            {successMessage && (
-                <div className="mb-4 p-4 bg-green-100 border border-green-500 rounded">
-                    {successMessage}
-                </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
@@ -304,7 +304,6 @@ const CreateEarTrainingQuiz = () => {
                         type="file"
                         accept="audio/*"
                         onChange={(e) => setMainAudio(e.target.files[0])}
-                        required
                         className="w-full"
                     />
                 </div>
@@ -394,7 +393,7 @@ const CreateEarTrainingQuiz = () => {
                                                 {opt}
                                             </option>
                                         ))}
-                                    
+
                                     {category ===
                                         "7th Degree Chords (Secondary)" &&
                                         SEVENDEGREECHORDSECONDARY.map(
@@ -404,7 +403,8 @@ const CreateEarTrainingQuiz = () => {
                                                 </option>
                                             )
                                         )}
-                                    {category === "7th Degree Chords (General)" &&
+                                    {category ===
+                                        "7th Degree Chords (General)" &&
                                         SEVENDEGREECHORDEGENERAL.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -413,14 +413,13 @@ const CreateEarTrainingQuiz = () => {
                                             )
                                         )}
                                     {category === "9th degree Chords (Basic)" &&
-                                        NINEDEGREECHORD.map(
-                                            (opt, i) => (
-                                                <option key={i} value={i}>
-                                                    {opt}
-                                                </option>
-                                            )
-                                        )}
-                                    {category === "9th Degree Chords (Secondary)" &&
+                                        NINEDEGREECHORD.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+                                    {category ===
+                                        "9th Degree Chords (Secondary)" &&
                                         NINEDEGREECHORDSECONDARY.map(
                                             (opt, i) => (
                                                 <option key={i} value={i}>
@@ -428,39 +427,32 @@ const CreateEarTrainingQuiz = () => {
                                                 </option>
                                             )
                                         )}
-                                    {category === "9th Degree Chords (General)" &&
-                                        NINEDEGREECHORDGENERAL.map(
-                                            (opt, i) => (
-                                                <option key={i} value={i}>
-                                                    {opt}
-                                                </option>
-                                            )
-                                        )}
+                                    {category ===
+                                        "9th Degree Chords (General)" &&
+                                        NINEDEGREECHORDGENERAL.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
                                     {category === "11th Degree Chords" &&
-                                        ELEVENDEGREE.map(
-                                            (opt, i) => (
-                                                <option key={i} value={i}>
-                                                    {opt}
-                                                </option>
-                                            )
-                                        )}
-                                    
+                                        ELEVENDEGREE.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
+
                                     {category === "13th Degree Chords" &&
-                                        THIRTEENDEGREE.map(
-                                            (opt, i) => (
-                                                <option key={i} value={i}>
-                                                    {opt}
-                                                </option>
-                                            )
-                                        )}
+                                        THIRTEENDEGREE.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
                                     {category === "Others" &&
-                                        OTHERS.map(
-                                            (opt, i) => (
-                                                <option key={i} value={i}>
-                                                    {opt}
-                                                </option>
-                                            )
-                                        )}
+                                        OTHERS.map((opt, i) => (
+                                            <option key={i} value={i}>
+                                                {opt}
+                                            </option>
+                                        ))}
                                 </select>
                             </div>
 
@@ -505,5 +497,9 @@ if (document.getElementById("ear-training-quiz")) {
     const root = ReactDOM.createRoot(
         document.getElementById("ear-training-quiz")
     );
-    root.render(<CreateEarTrainingQuiz />);
+    root.render(
+        <FlashMessageProvider>
+            <CreateEarTrainingQuiz />
+        </FlashMessageProvider>
+    );
 }

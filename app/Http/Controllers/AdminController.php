@@ -18,7 +18,8 @@ class AdminController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function users() {
+    public function users() 
+    {
         $users = User::with('community')->paginate(10);
         return view('admin.users', compact('users'));
     }
@@ -82,7 +83,4 @@ class AdminController extends Controller
             'message' => 'Community status updated successfully'
         ]);
     }
-
-    
-
 }

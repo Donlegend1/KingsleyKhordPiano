@@ -16,41 +16,55 @@
 
   <div class="font-semibold border-t-2 border-gray-300 my-4"></div>
 
- @if (!empty($categoryProgress) && count($categoryProgress))
-    @foreach ($categoryProgress as $category)
-        <div class="mt-4">
-            <label for="progress" class="text-sm text-gray-600">{{ $category['course_category'] }}</label>
-            <p class="font-semibold text-[#145CCF]">{{ $category['completed_courses'] }}/{{ $category['total_courses'] }} <span class="text-gray-400">modules in this course</span></p>
-            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $category['completion_percentage'] }}%"></div>
-            </div>
-        </div>
+@php
+    $levels = ['Beginner', 'Intermediate', 'Advanced'];
+@endphp
 
-        <div class="mt-6 text-left">
-            <a href="/member/course/{{ urlencode($category['level']) }}" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
-                Continue Learning
-                <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
-            </a>
-        </div>
-    @endforeach
-@else
-    @foreach (['Beginner', 'Intermediate', 'Advanced'] as $defaultLevel)
-        <div class="mt-4">
-            <label for="progress" class="text-sm text-gray-600">{{ $defaultLevel }}</label>
-            <p class="font-semibold text-[#145CCF]">0/0 <span class="text-gray-400">modules in this course</span></p>
-            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-300 h-2.5 rounded-full w-0"></div>
-            </div>
-        </div>
+@foreach ($levels as $level)
+    @php
+        $total = $progress[$level]['total'] ?? 0;
+        $completed = $progress[$level]['completed'] ?? 0;
+        $percentage = $total > 0 ? ($completed / $total) * 100 : 0;
+    @endphp
 
-        <div class="mt-6 text-left">
-            <a href="/member/course/{{ strtolower($defaultLevel) }}" class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
-                Start Learning
-                <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
-            </a>
-        </div>
-    @endforeach
-@endif
+    <div class="mt-4">
+        <label class="text-sm text-gray-600">{{ $level }}</label>
+
+        @if (!empty($completedByLevel[$level]))
+            <p class="font-semibold text-[#145CCF]">
+                {{ $completed }}/{{ $total }} <span class="text-gray-400">course{{ $total == 1 ? '' : 's' }} completed</span>
+            </p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div class="bg-blue-900 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+            </div>
+
+            <div class="mt-6 text-left">
+                <a href="/member/course/{{ urlencode(strtolower($level)) }}" 
+                   class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
+                    View {{ $level }} Course
+                    <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
+                </a>
+            </div>
+        @else
+            <p class="font-semibold text-[#145CCF]">
+                {{ $completed }}/{{ $total }} <span class="text-gray-400">course{{ $total == 1 ? '' : 's' }} completed</span>
+            </p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+            </div>
+
+            <div class="mt-6 text-left">
+                <a href="/member/course/{{ urlencode(strtolower($level)) }}" 
+                   class="inline-block px-6 py-2 rounded-full bg-transparent border border-[#404348] text-[#404348] transition">
+                    Start {{ $level }}
+                    <i class="fa fa-chevron-right ml-2 text-sm text-[#404348]"></i>
+                </a>
+            </div>
+        @endif
+    </div>
+@endforeach
+
+
 
 </div>
 
@@ -65,7 +79,7 @@
 
   <!-- Text Content -->
   <div>
-    <h2 class="text-2xl font-bold text-[#435065] font-sf">Student Engagement</h2>
+    <h2 class="text-2xl font-bold text-[#435065]">Student Engagement</h2>
     <p class="mt-2 text-sm text-[#5E6779] font-sf">Select one of the options below to get engaged in the Kingsley Khord piano community.</p>
   </div>
 </div>

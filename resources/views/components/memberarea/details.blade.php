@@ -19,7 +19,9 @@
             </p>
             <div class="flex items-center space-x-2 text-sm cursor-pointer px-3 py-2 rounded-md border border-gray-200 shadow-sm bg-[#EDEFF2] hover:shadow-md hover:bg-gray-50 transition">
                 <i class="fa fa-bookmark"></i>
-                <span class="font-medium text-gray-800">My Bookmarks</span>
+                <a href="/member/bookmark">
+                 <span class="font-medium text-gray-800">My Bookmarks</span>
+                </a>
             </div>
         </div>
 

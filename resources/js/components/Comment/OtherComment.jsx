@@ -16,6 +16,10 @@ const [lesson, setLesson] = useState(null);
       setLesson(window.lessonData);
     }
   }, []);
+    const lastSegment = window.location.pathname
+        .split("/")
+        .filter(Boolean)
+        .pop();
 
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
@@ -53,7 +57,7 @@ const [lesson, setLesson] = useState(null);
     const fetchComments = async () => {
         try {
             const response = await axios.get(
-                `/api/member/comments/course?category=others&course_id=${lesson.id}`,
+                `/api/member/comments/course?category=others&course_id=${lastSegment}`,
                 {
                     headers: {
                     "X-CSRF-TOKEN": csrfToken,
@@ -78,11 +82,11 @@ const [lesson, setLesson] = useState(null);
         setCommentSubmitting(true);
         try {
             const response = await axios.post(
-                `/api/member/course/${lesson.id}/video-comment`,
+                `/api/member/course/${lastSegment}/video-comment`,
                 {
                     comment: comment,
                     category: 'others', // Assuming category is quiz for this context
-                    course_id: lesson.id,
+                    course_id: lastSegment,
                 },
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -16,16 +17,29 @@ class CheckPaymentStatus
     {
         $user = Auth::user();
 
-        if ($user->role === 'member') {
-            $activePayment = $user->payments()->where('status', 'successful')->where('ends_at', '>', now())->first();
-            if (in_array($user->payment_status, ['pending', 'expired']) || !$activePayment) {
-                return redirect('/member/plan');
-            }
+        if ($user && $user->role === 'member') {
+
+            $hasActiveSubscription = $user->subscribed('default');
+
+            $activePayment = $user->payments()
+                ->where('status', 'successful')
+                ->where('ends_at', '>', now())
+                ->first();
 
             $latestPayment = $user->payments()->latest('ends_at')->first();
 
-            if (!$latestPayment || $latestPayment->ends_at->isPast()) {
+            $isLegacyExpired = false;
+
+            if ($latestPayment && $latestPayment->ends_at->isPast()) {
                 $user->update(['payment_status' => 'expired']);
+                $isLegacyExpired = true;
+            }
+
+            $hasLegacyAccess = !in_array($user->payment_status, ['pending', 'expired']) && $activePayment;
+
+            $hasAccess = $hasActiveSubscription || $hasLegacyAccess;
+
+            if (! $hasAccess) {
                 return redirect('/member/plan');
             }
         }

@@ -15,7 +15,7 @@ class StoreQuizRequest extends FormRequest
             'video_url' => 'required',
             'category' => 'required',
             'thumbnail' => 'required|image|max:2048',
-            'main_audio' => 'required|file|mimes:mp3,wav|max:10240',
+            'main_audio' => 'nullable|file|mimes:mp3,wav|max:10240',
             'questions' => 'required|array|min:1',
             'questions.*.audio' => 'required|file|mimes:mp3,wav|max:10240',
             'questions.*.correct_option' => 'required|string',

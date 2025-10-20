@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Cashier\Billable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, Billable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -34,6 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_payment_reference',
         'last_payment_amount',
         'last_payment_at',
+        'premium',
         'country',
         'passport',
         'metadata',
@@ -66,9 +69,9 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
 
-    function plan() {
-    return $this->hasOne(Subscription::class, 'id', 'plan');
-        
+    public function plan()
+    {
+       return $this->hasOne(Plan::class, 'id', 'plan');
     }
 
     public function completedVideos()

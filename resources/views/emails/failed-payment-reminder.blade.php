@@ -1,6 +1,8 @@
 @extends('layouts.email')
 
 @section('content')
+
+<div style="max-width: 480px; margin: 0 auto; padding: 12px; background: #fff; border-radius: 8px;">
 <p style="font-size: 18px;">Hey {{ $user->first_name }},</p>
 
 <p style="font-size: 16px; margin: 16px 0;">
@@ -22,4 +24,6 @@
 </p>
 
 <p style="font-size: 16px;">All the best,<br>Kingsley</p>
+
+</div>
 @endsection

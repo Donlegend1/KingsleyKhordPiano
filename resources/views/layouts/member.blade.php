@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-<meta name="api-token" content="{{ auth()->user()?->api_token }}">
+    <meta name="api-token" content="{{ auth()->user()?->api_token }}">
     <meta name="description" content="KingsleyKhord is a platform that connects you with the best service providers in your area. Whether you're looking for a plumber, electrician, or any other service, we've got you covered.">
     <meta name="keywords" content="KingsleyKhord, service providers, local services, find services, connect with service providers">
     <meta name="author" content="LengendOSA Consultants">
@@ -111,7 +111,7 @@
             </a>
         </li>
         <li>
-            <a href="/member/shop" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <a href="https://khordsounds.com/" target="blank" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
             <i class="fa fa-shopping-bag"></i> Shop
             </a>
         </li>
@@ -185,7 +185,7 @@
                     <a href="/member/profile" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
                         <i class="fa fa-user-circle"></i> My Account
                     </a>
-                    <a href="/member/shop" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
+                    <a href="https://khordsounds.com/" target="blank" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">
                         <i class="fa fa-shopping-bag"></i> Shop
                     </a>
                     <a href="/member/support" class="flex items-center gap-2 text-sm font-semibold px-3 py-1 text-gray-400 hover:text-[#FFD736]">

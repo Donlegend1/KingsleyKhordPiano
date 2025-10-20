@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\Plan;
 use App\Models\User;
+use App\Models\Subscription;
 use App\Http\Requests\ManualPaymentRequest;
 
 class PaymentController extends Controller
@@ -164,32 +165,70 @@ class PaymentController extends Controller
 
     public function manualPayment(ManualPaymentRequest $request)
     {
-        $reference = Str::uuid()->toString(); 
-        $user = User::find($request->user_id);
-       
-      $payment =  DB::table('payments')->insert([
-            'user_id' => $user->id,
-            'reference' => $reference,
-            'amount' => $request->amount,
-            'metadata' => json_encode($request->all()),
-            'payment_method' =>'Manual',
-            'starts_at' => $request->starts_at,
-            'notified_at' => null,
-            'ends_at' =>  $request->ends_at,
-            'status' => 'successful',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $user = User::findOrFail($request->user_id);
+        $reference = (string) Str::uuid();
 
-        $user->metadata = $request->all();
-        $user->premium = $request->premium === 'premium';
-        $user->payment_method ='Manual';
-        $user->last_payment_reference = $reference;
-        $user->last_payment_amount = $request->amount;
-        $user->payment_status = 'successful';
-        $user->last_payment_at = now();
-        $user->save();
-       return response()->json($payment, 200);
+        $startsAt = $request->starts_at ?? now();
+        $endsAt = $request->ends_at ?? now()->addMonth();
+        $reference = Str::uuid()->toString(); 
+
+        DB::beginTransaction();
+        try {
+            $subscription = Subscription::where('user_id', $user->id)->first();
+
+            if ($subscription) {
+                $subscription->update([
+                    'ends_at' => $endsAt,
+                    'stripe_status' => 'active',
+                    'stripe_price' => $request->plan_price_id ?? $subscription->stripe_price,
+                    'quantity' => 1,
+                ]);
+            } else {
+            DB::table('payments')->insert([
+                'user_id' => $request->user_id,
+                'reference' => $reference,
+                'amount' => $request->amount,
+                'metadata' => json_encode($request->all()),
+                'payment_method' =>'Manual',
+                'starts_at' => $startsAt,
+                'notified_at' => null,
+                'ends_at' =>  $endsAt,
+                'status' => 'successful',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            }
+
+            $user->update([
+                'metadata' => $request->all(),
+                'premium' => $request->premium === 'premium',
+                'payment_method' => 'Manual',
+                'last_payment_reference' => $reference,
+                'last_payment_amount' => $request->amount,
+                'payment_status' => 'successful',
+                'last_payment_at' => now(),
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                    'Subscription Updated successfully.',
+            ], 200);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            logger()->error('Manual Payment Failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Manual payment failed. ' . $e->getMessage(),
+            ], 500);
+        }
     }
+
 }
 
