@@ -12,10 +12,30 @@ class UploadController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function pianoExercise()
     {
-        return view('admin.uploads.index', [
-            'uploads' => Upload::all(),
+        // dd(Upload::where('category', 'piano exercise')->get());
+
+        return view('admin.uploads.piano-exercise', [
+            'uploads' => Upload::where('category', 'piano exercise')->get(),
+        ]);
+    }
+    public function extraCourses()
+    {
+        return view('admin.uploads.extra-courses', [
+            'uploads' => Upload::where('category', 'extra courses')->get(),
+        ]);
+    }
+    public function quickLessons()
+    {
+        return view('admin.uploads.quick-lessons', [
+            'uploads' => Upload::where('category', 'quick lessons')->get(),
+        ]);
+    }
+    public function learnSongs()
+    {
+        return view('admin.uploads.learn-songs', [
+            'uploads' => Upload::where('category', 'learn songs')->get(),
         ]);
     }
 
@@ -128,9 +148,9 @@ class UploadController extends Controller
     public function uploadList(Request $request)
     {
         if ($request->has('page')) {
-            $uploads = Upload::paginate(10);
+            $uploads = Upload::where('category', $request->input('category'))->latest()->paginate(10);
         } else {
-            $uploads = Upload::all();
+            $uploads = Upload::where('category', $request->input('category'))->latest()->get();
         }
 
         return response()->json($uploads, 200);

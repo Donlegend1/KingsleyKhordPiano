@@ -62,68 +62,66 @@ const UploadForm = () => {
     };
 
     const fetchCourses = async () => {
-    try {
-        const response = await axios.get(`/admin/upload-list`, {
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-            },
-            withCredentials: true,
-        });
-        const formatted = response?.data.map((item) => ({
-            value: item.id,
-            label: item.title, 
-        }));
+        try {
+            const response = await axios.get(`/admin/upload-list`, {
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                withCredentials: true,
+            });
+            const formatted = response?.data.map((item) => ({
+                value: item.id,
+                label: item.title,
+            }));
 
-        setUploadList(formatted);
-    } catch (error) {
-        console.error("Error fetching courses:", error);
-    }
+            setUploadList(formatted);
+        } catch (error) {
+            console.error("Error fetching courses:", error);
+        }
     };
 
-
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
+        e.preventDefault();
+        setSaving(true);
 
-    const formData = new FormData();
-    formData.append("thumbnail", thumbnailFile);
+        const formData = new FormData();
+        formData.append("thumbnail", thumbnailFile);
 
-    // Upload fields
-    Object.entries(upload).forEach(([key, value]) =>
-        formData.append(key, value)
-    );
+        // Upload fields
+        Object.entries(upload).forEach(([key, value]) =>
+            formData.append(key, value)
+        );
 
-    // Append selected tag IDs as an array
-    selectedTags.forEach((tag, index) => {
-        formData.append(`tags[${index}]`, tag.value);
-    });
-
-    try {
-        const response = await axios.post("/admin/upload/store", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
+        // Append selected tag IDs as an array
+        selectedTags.forEach((tag, index) => {
+            formData.append(`tags[${index}]`, tag.value);
         });
 
-        showMessage("Record Saved successfully.", "success");
-        setUpload({
-            title: "",
-            category: "",
-            description: "",
-            video_url: "",
-            level: "",
-            skill_level: "",
-            status: "active",
-        });
-        setSelectedTags([]);
-    } catch (error) {
-        showMessage("Error creating upload.", "error");
-        console.error("Error creating upload:", error);
-    } finally {
-        setSaving(false);
-    }
-};
+        try {
+            const response = await axios.post("/admin/upload/store", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
 
+            showMessage("Record Saved successfully.", "success");
+            setUpload({
+                title: "",
+                category: "",
+                description: "",
+                video_url: "",
+                level: "",
+                skill_level: "",
+                status: "active",
+            });
+            setSelectedTags([]);
+        } catch (error) {
+            showMessage("Error creating upload.", "error");
+            console.error("Error creating upload:", error);
+        } finally {
+            setSaving(false);
+        }
+    };
 
     useEffect(() => {
         fetchCourses();

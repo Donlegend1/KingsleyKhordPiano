@@ -161,7 +161,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::post('/ear-training/{quiz}/questions', [EarTrainingController::class, 'storeQuestions']);
     Route::get('course/create', [CourseController::class, 'create']);
     Route::post('course', [CourseController::class, 'store']);
-    Route::get('uploads/list', [UploadController::class, 'index']);
+    Route::get('uploads/piano-exercise', [UploadController::class, 'pianoExercise']);
+    Route::get('uploads/extra-courses', [UploadController::class, 'extraCourses']);
+    Route::get('uploads/quick-lessons', [UploadController::class, 'quickLessons']);
+    Route::get('uploads/learn-songs', [UploadController::class, 'learnSongs']);
     Route::get('uploads/create', [UploadController::class, 'create']);
     Route::post('upload/store', [UploadController::class, 'store']);
     Route::delete('upload/{upload}', [UploadController::class, 'destroy']);

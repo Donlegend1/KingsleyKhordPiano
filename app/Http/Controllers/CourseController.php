@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\CourseCategory;
 use App\Models\Bookmark;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
@@ -31,7 +33,10 @@ class CourseController extends Controller
      */
     public function store(StoreCourseRequest $request)
     {
+        $category =CourseCategory::where('category', $request->input('category'))->first();
+
         $validated = $request->validated();
+        $validated['course_category_id'] = $category->id;
 
         $course = Course::create($validated);
 
@@ -75,12 +80,38 @@ class CourseController extends Controller
     /**
      * Get a list of all courses.
      */
-    public function coursesList()
+    public function coursesList(Request $request)
     {
-        $courses = Course::paginate(10);
-        return response()->json($courses);
-    }
+        $perPage = $request->per_page === 'all' ? null : ($request->per_page ?? 9);
 
+        $fetchLevel = function ($level) {
+            $categories = CourseCategory::where('level', $level)
+                ->orderBy('position')
+                ->get(['id', 'category', 'position']);
+
+            $categories->load(['courses' => function ($q) use ($level) {
+                $q->where('level', $level)
+                ->orderBy('position');
+            }]);
+
+            $data = [];
+            foreach ($categories as $cat) {
+                $data[$cat->category] = $cat->courses->values();
+            }
+
+            return [
+                'data' => $data,
+                'current_page' => 1,
+                'last_page' => 1,
+            ];
+        };
+
+        return response()->json([
+            'beginner' => $fetchLevel('beginner'),
+            'intermediate' => $fetchLevel('intermediate'),
+            'advanced' => $fetchLevel('advanced'),
+        ]);
+    }
 
     public function membershow($level)
     {
@@ -93,31 +124,41 @@ class CourseController extends Controller
         // Fetch courses based on the level
         return view('memberpages.course.details', compact('level'));
     }
-
-    public function membershowAPI($level)
-    {
-        $courses = Course::with('progress')
-            ->where('level', $level)
-            ->get();
-
-        if ($courses->isEmpty()) {
-            return response()->json(['message' => 'No courses found for this level'], 404);
+public function membershowAPI($level)
+{
+    // Get all course categories for this level (even if they have no courses)
+    $categories = \App\Models\CourseCategory::with([
+        'courses' => function ($query) use ($level) {
+            $query->where('level', $level)
+                  ->with('progress')
+                  ->orderBy('position');
         }
+    ])
+    ->where('level', $level)
+    ->orderBy('position')
+    ->get();
 
-        $bookmarkedIds = Bookmark::where('user_id', auth()->id())
-            ->where('source', 'courses')
-            ->pluck('video_id')
-            ->toArray();
+    if ($categories->isEmpty()) {
+        return response()->json(['message' => 'No categories found for this level'], 404);
+    }
 
-        $courses->transform(function ($course) use ($bookmarkedIds) {
+    // Fetch user's bookmarked courses
+    $bookmarkedIds = Bookmark::where('user_id', auth()->id())
+        ->where('source', 'courses')
+        ->pluck('video_id')
+        ->toArray();
+
+    // Add bookmark info to each course
+    $categories->each(function ($category) use ($bookmarkedIds) {
+        $category->courses->transform(function ($course) use ($bookmarkedIds) {
             $course->isBookmarked = in_array($course->id, $bookmarkedIds);
             return $course;
         });
+    });
 
-        $groupedCourses = $courses->groupBy('category');
+    return response()->json($categories);
+}
 
-        return response()->json($groupedCourses);
-    }
 
     public function deleteCourse(Course $course)
     {
@@ -125,5 +166,27 @@ class CourseController extends Controller
         return response()->json(['message' => 'Course deleted successfully']);
     }
 
-    
+    public function updatePositions(Request $request)
+    {
+        $validated = $request->validate([
+            'level' => 'required|string',
+            'categories' => 'required|array',
+            'categories.*' => 'string',
+        ]);
+
+        $level = $validated['level'];
+        $categories = $validated['categories'];
+
+        // Loop through each category in the new order
+        foreach ($categories as $index => $categoryName) {
+            \App\Models\CourseCategory::where('level', $level)
+                ->where('category', $categoryName)
+                ->update(['position' => $index + 1]);
+        }
+
+        return response()->json([
+            'message' => 'Category positions updated successfully',
+        ]);
+    }
+
 }

@@ -83,22 +83,129 @@ class HomeController extends Controller
     public function admin()
     {
         if (Auth::user()->role == UserRoles::ADMIN->value) {
+            // Set Stripe API key
+            Stripe::setApiKey(config('cashier.secret'));
+
+            // Get users from last 2 weeks for table
             $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->paginate(20);
-            $usdRevenue = Payment::where('status', 'successful')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'USD'")
-            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
-
-        $eurRevenue = Payment::where('status', 'successful')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'EUR'")
-            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
-
-        $nairaRevenue = Payment::where('status', 'successful')
-            ->whereRaw("JSON_EXTRACT(metadata, '$.currency') = 'NGN'")
-            ->sum(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.amount')) AS UNSIGNED)"));
             
-            $courses =Course::count();
+            // Get total users (excluding admin)
+            $totalUsers = User::where('role', '!=', UserRoles::ADMIN->value)->count();
+            
+            // Get active users (logged in within the week)
+            $activeUsers = User::where('role', '!=', UserRoles::ADMIN->value)
+                ->where('last_login_at', '>=', Carbon::now()->subWeek())
+                ->count();
+                
+            // Calculate user growth percentage
+            $lastMonthUsers = User::where('role', '!=', UserRoles::ADMIN->value)
+                ->where('created_at', '>=', Carbon::now()->subMonth())
+                ->count();
+            $previousMonthUsers = User::where('role', '!=', UserRoles::ADMIN->value)
+                ->whereBetween('created_at', [
+                    Carbon::now()->subMonths(2),
+                    Carbon::now()->subMonth()
+                ])->count();
+            $userGrowth = $previousMonthUsers > 0 
+                ? round((($lastMonthUsers - $previousMonthUsers) / $previousMonthUsers) * 100, 1)
+                : 0;
 
-            return view('admin.home', compact('users', 'usdRevenue', 'eurRevenue', 'nairaRevenue', 'courses'));
+            $nairaRevenue = Payment::where('payment_method', 'Paystack')
+                ->where('status', 'successful')
+                ->sum('amount');
+
+            // Calculate subscription revenue using Cashier
+            $currentMonthRevenue = Subscription::where('stripe_status', 'active')
+                ->where('created_at', '>=', Carbon::now()->startOfMonth())
+                ->with('items')
+                ->get()
+                ->sum(function ($subscription) {
+                    $item = $subscription->items->first();
+                    if (!$item || !$item->stripe_price) return 0;
+                    
+                    try {
+                        $price = Price::retrieve($item->stripe_price);
+                        return $price->unit_amount / 100;
+                    } catch (\Exception $e) {
+                        return 0;
+                    }
+                });
+
+            $lastMonthRevenue = Subscription::where('stripe_status', 'active')
+                ->whereBetween('created_at', [
+                    Carbon::now()->subMonth()->startOfMonth(),
+                    Carbon::now()->subMonth()->endOfMonth()
+                ])
+                ->with('items')
+                ->get()
+                ->sum(function ($subscription) {
+                    $item = $subscription->items->first();
+                    if (!$item || !$item->stripe_price) return 0;
+                    
+                    try {
+                        $price = Price::retrieve($item->stripe_price);
+                        return $price->unit_amount / 100;
+                    } catch (\Exception $e) {
+                        return 0;
+                    }
+                });
+
+            $revenueGrowth = $lastMonthRevenue > 0 
+                ? round((($currentMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1)
+                : 0;
+
+            // Get revenue by currency using Cashier
+            $subscriptions = Subscription::where('stripe_status', 'active')
+                ->with('items')
+                ->get();
+
+            $usdRevenue = $subscriptions->sum(function ($subscription) {
+                $item = $subscription->items->first();
+                if (!$item || !$item->stripe_price) return 0;
+                
+                try {
+                    $price = Price::retrieve($item->stripe_price);
+                    return $price->currency === 'usd' ? $price->unit_amount / 100 : 0;
+                } catch (\Exception $e) {
+                    return 0;
+                }
+            });
+
+            $eurRevenue = $subscriptions->sum(function ($subscription) {
+                $item = $subscription->items->first();
+                if (!$item || !$item->stripe_price) return 0;
+                
+                try {
+                    $price = Price::retrieve($item->stripe_price);
+                    return $price->currency === 'eur' ? $price->unit_amount / 100 : 0;
+                } catch (\Exception $e) {
+                    return 0;
+                }
+            });
+            
+            // Get courses count and growth
+            $courses = Course::count();
+            $lastMonthCourses = Course::where('created_at', '>=', Carbon::now()->subMonth())->count();
+            $previousMonthCourses = Course::whereBetween('created_at', [
+                Carbon::now()->subMonths(2),
+                Carbon::now()->subMonth()
+            ])->count();
+            $courseGrowth = $previousMonthCourses > 0 
+                ? round((($lastMonthCourses - $previousMonthCourses) / $previousMonthCourses) * 100, 1)
+                : 0;
+
+            return view('admin.home', compact(
+                'users', 
+                'totalUsers',
+                'nairaRevenue',
+                'activeUsers',
+                'userGrowth',
+                'usdRevenue', 
+                'eurRevenue',
+                'revenueGrowth',
+                'courses',
+                'courseGrowth'
+            ));
         }
     }
 

@@ -469,7 +469,7 @@ const CourseDetails = ({ course, onComplete }) => {
 };
 
 const CoursesPage = () => {
-    const [courses, setCourses] = useState({});
+    const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [expandedCategories, setExpandedCategories] = useState({});
     const [showCourseModal, setShowCourseModal] = useState(false);
@@ -516,6 +516,7 @@ const CoursesPage = () => {
                     }
                 );
                 setCourses(response.data);
+                console.log("Courses data:", response.data);
             } catch (error) {
                 console.error("Error fetching courses:", error);
             }
@@ -559,56 +560,65 @@ const CoursesPage = () => {
 
     const CourseList = () => (
         <div className="p-2">
-            {Object.entries(courses).map(([category, courseList]) => (
-                <div key={category} className="mb-6">
-                    {/* Category Header - visually like a stack */}
+            {courses.map((categoryObj) => (
+                <div
+                    key={categoryObj.id || categoryObj.category}
+                    className="mb-6"
+                >
                     <div
                         className="px-4 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-t-lg font-bold text-lg text-gray-800 dark:text-gray-100 shadow cursor-pointer flex justify-between items-center"
-                        onClick={() => toggleCategory(category)}
+                        onClick={() => toggleCategory(categoryObj.category)}
                     >
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-2 text-sm">
                             <i className="fa fa-folder text-blue-500"></i>
-                            {category}
+                            {categoryObj.category}
                         </span>
                         <i
                             className={`fa fa-chevron-${
-                                expandedCategories[category] ? "up" : "down"
+                                expandedCategories[categoryObj.category]
+                                    ? "up"
+                                    : "down"
                             } text-gray-600 dark:text-gray-300 transition-transform`}
                         ></i>
                     </div>
-
-                    {/* Submenu Courses - stacked as smaller cards */}
-                    {expandedCategories[category] && (
+                    {expandedCategories[categoryObj.category] && (
                         <div className="bg-white dark:bg-gray-900 rounded-b-lg shadow-inner border border-t-0 border-gray-200 dark:border-gray-700 p-2 space-y-2">
-                            {courseList.map((course) => (
-                                <div
-                                    key={course.id}
-                                    className={`flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-sm transition cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 ${
-                                        selectedCourse &&
-                                        selectedCourse.id === course.id
-                                            ? "ring-2 ring-blue-500 bg-blue-100 dark:bg-blue-900"
-                                            : ""
-                                    }`}
-                                    onClick={() => {
-                                    setSelectedCourse(course);
-                                    setShowCourseModal(false);
-                                    setExpandedCategories((prev) => ({
-                                        ...prev,
-                                        __mobile: false,
-                                    }));
-                                }}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <i className="fa fa-book text-gray-400 dark:text-gray-500"></i>
-                                        <span className="text-xs text-gray-800 dark:text-gray-100 truncate font-medium">
-                                            {course.title}
-                                        </span>
+                            {categoryObj.courses &&
+                            categoryObj.courses.length > 0 ? (
+                                categoryObj.courses.map((course) => (
+                                    <div
+                                        key={course.id}
+                                        className={`flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-sm transition cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 ${
+                                            selectedCourse &&
+                                            selectedCourse.id === course.id
+                                                ? "ring-2 ring-blue-500 bg-blue-100 dark:bg-blue-900"
+                                                : ""
+                                        }`}
+                                        onClick={() => {
+                                            setSelectedCourse(course);
+                                            setShowCourseModal(false);
+                                            setExpandedCategories((prev) => ({
+                                                ...prev,
+                                                __mobile: false,
+                                            }));
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <i className="fa fa-book text-gray-400 dark:text-gray-500"></i>
+                                            <span className="text-xs text-gray-800 dark:text-gray-100 truncate font-medium">
+                                                {course.title}
+                                            </span>
+                                        </div>
+                                        {course.completed && (
+                                            <i className="fa fa-check-circle text-green-500 text-xs"></i>
+                                        )}
                                     </div>
-                                    {course.completed && (
-                                        <i className="fa fa-check-circle text-green-500 text-xs"></i>
-                                    )}
+                                ))
+                            ) : (
+                                <div className="text-sm text-gray-500 dark:text-gray-400 italic p-2">
+                                    No courses available in this category
                                 </div>
-                            ))}
+                            )}
                         </div>
                     )}
                 </div>

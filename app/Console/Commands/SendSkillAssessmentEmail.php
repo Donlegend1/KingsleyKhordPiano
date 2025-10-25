@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Notifications\SkillAssessmentEmail;
 use Illuminate\Console\Command;
+use App\Enums\Roles\UserRoles;
 
 class SendSkillAssessmentEmail extends Command
 {

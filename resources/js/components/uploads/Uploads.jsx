@@ -2,7 +2,11 @@ import ReactDOM from "react-dom/client";
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import CustomPagination from "../Pagination/CustomPagination";
-
+import {
+    useFlashMessage,
+    FlashMessageProvider,
+} from "../Alert/FlashMessageContext";
+import Select from "react-select";
 
 const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
@@ -33,8 +37,26 @@ const UploadList = () => {
     const [loading, setLoading] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    // const [selectedCourse, setSelectedCourse] = useState(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const perPage = 10;
+    const slug = window.location.pathname.split("/").pop();
+    const category = slug.replace(/-/g, " ");
+    const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [tagOptions, setUploadList] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
+    const { showMessage } = useFlashMessage();
+
+    const levels = ["Beginner", "Intermediate", "Advanced"];
+    const pianoLevels = [
+        "Independence",
+        "Coordination",
+        "Flexibility",
+        "Strength",
+        "Dexterity",
+    ];
+
+    const pianoGroup = ["Basic", "Competent", "Challenging"];
+    const [saving, setSaving] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState({
         title: "",
         category: "",
@@ -51,14 +73,36 @@ const UploadList = () => {
         requirements: "",
     });
 
+    const [upload, setUpload] = useState({
+        // tumbnail: null,
+        title: "",
+        category: category,
+        description: "",
+        video_url: "",
+        level: "",
+        skill_level: "",
+        status: "active",
+    });
+
     const [preview, setPreview] = useState(
         selectedCourse?.thumbnail_url || null
     );
     const [thumbnail, setThumbnail] = useState(null);
     const fileInputRef = useRef(null);
+    const handleChangeCreate = (e) => {
+        const { name, value } = e.target;
+        setUpload({ ...upload, [name]: value });
+    };
 
+    const handleTagsChange = (selectedOptions) => {
+        setSelectedTags(selectedOptions);
+    };
     const handleImageClick = () => {
         fileInputRef.current.click();
+    };
+
+    const handleFileChange = (e) => {
+        setThumbnailFile(e.target.files[0]);
     };
 
     const handleImageChange = (e) => {
@@ -78,15 +122,13 @@ const UploadList = () => {
         setLoading(true);
         try {
             const response = await axios.get(
-                `/admin/upload-list?page=${page}&perPage=${perPage}`,
+                `/admin/upload-list?page=${page}&perPage=${perPage}&category=${category}`,
                 {
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
+                    headers: { "X-CSRF-TOKEN": csrfToken },
                     withCredentials: true,
                 }
             );
-            console.log(response.data);
+
             setCourses(response.data.data);
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
@@ -110,9 +152,11 @@ const UploadList = () => {
                 }
             );
             closeDeleteModal();
+            showMessage("Course deleted successfully.", "success");
             fetchCourses();
         } catch (error) {
             console.error("Error fetching uploads:", error);
+            showMessage("Error deleting course.", "error");
         } finally {
             setLoading(false);
         }
@@ -151,55 +195,111 @@ const UploadList = () => {
         setSelectedCourse(null);
     };
 
+    const openCreateModal = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const closeCreateModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+        e.preventDefault();
+        setLoading(true);
 
-    const formData = new FormData();
-    formData.append('title', selectedCourse.title);
-    formData.append('category', selectedCourse.category);
-    formData.append('video_url', selectedCourse.video_url);
-    formData.append('status', selectedCourse.status);
-    formData.append('level', selectedCourse.level);
-    formData.append('description', selectedCourse.description);
+        const formData = new FormData();
+        formData.append("title", selectedCourse.title);
+        formData.append("category", selectedCourse.category);
+        formData.append("video_url", selectedCourse.video_url);
+        formData.append("status", selectedCourse.status);
+        formData.append("level", selectedCourse.level);
+        formData.append("description", selectedCourse.description);
 
-    if (thumbnail instanceof File) {
-        formData.append('thumbnail', thumbnail);
-    }
+        if (thumbnail instanceof File) {
+            formData.append("thumbnail", thumbnail);
+        }
 
-    try {
-        const response = await axios.post(
-            `/api/admin/upload/${selectedCourse.id}`,
-            formData,
-            {
+        try {
+            const response = await axios.post(
+                `/api/admin/upload/${selectedCourse.id}`,
+                formData,
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                }
+            );
+            closeEditModal();
+            showMessage("Course updated successfully.", "success");
+            fetchCourses();
+        } catch (error) {
+            console.error(
+                "Error updating course:",
+                error?.response?.data || error
+            );
+            showMessage("Error updating course.", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateCourse = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+
+        const formData = new FormData();
+        formData.append("thumbnail", thumbnailFile);
+
+        // Upload fields
+        Object.entries(upload).forEach(([key, value]) =>
+            formData.append(key, value)
+        );
+        selectedTags.forEach((tag, index) => {
+            formData.append(`tags[${index}]`, tag.value);
+        });
+
+        try {
+            const response = await axios.post("/admin/upload/store", formData, {
                 headers: {
-                    "X-CSRF-TOKEN": csrfToken,
                     "Content-Type": "multipart/form-data",
                 },
-                withCredentials: true,
-            }
-        );
-        console.log(response.data);
-        closeEditModal();
-        fetchCourses();
-    } catch (error) {
-        console.error("Error updating course:", error?.response?.data || error);
-    } finally {
-        setLoading(false);
-    }
-};
+            });
 
+            showMessage("Record Saved successfully.", "success");
+            setUpload({
+                title: "",
+                category: "",
+                description: "",
+                video_url: "",
+                level: "",
+                skill_level: "",
+                status: "active",
+            });
+            setSelectedTags([]);
+            fetchCourses();
+            closeCreateModal();
+        } catch (error) {
+            showMessage("Error creating upload.", "error");
+            console.error("Error creating upload:", error);
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Course List</h2>
+            <h2 className="text-lg font-bold mb-4">
+                {category.toLocaleUpperCase()} Course List
+            </h2>
             <div className="flex justify-end items-center mb-4 ">
-                <a
+                <button
                     className="px-4 py-2 bg-black text-white rounded-full"
-                    href="/admin/uploads/create"
+                    onClick={openCreateModal}
                 >
                     <span className="fa fa-plus"></span>
-                </a>
+                </button>
             </div>
             {loading ? (
                 <p>Loading...</p>
@@ -285,10 +385,10 @@ const UploadList = () => {
 
                     <div className="flex items-center justify-center gap-6 mt-6">
                         <CustomPagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={handlePageChange}
-                            />
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     </div>
                 </>
             )}
@@ -347,6 +447,7 @@ const UploadList = () => {
                                 <input
                                     name="category"
                                     placeholder="Category"
+                                    disabled
                                     defaultValue={selectedCourse?.category}
                                     onChange={handleChange}
                                     className="w-full p-3 border rounded-lg"
@@ -442,6 +543,244 @@ const UploadList = () => {
                     </div>
                 </div>
             </Modal>
+
+            <Modal isOpen={isCreateModalOpen} onClose={closeCreateModal}>
+                <h2 className="text-lg font-bold mb-2">Add Course to {category.toLocaleUpperCase()}</h2>
+
+                <div
+                    className="
+                    max-w-3xl mx-auto bg-white p-5 rounded-lg shadow-lg"
+                >
+                    <form onSubmit={handleCreateCourse} className="space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Thumbnail Upload */}
+                            <div>
+                                <label
+                                    htmlFor="thumbnail"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Thumbnail
+                                </label>
+                                <input
+                                    type="file"
+                                    id="thumbnail"
+                                    name="thumbnail"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    className="w-full p-3 border rounded-lg"
+                                />
+                            </div>
+
+                            {/* Title */}
+                            <div>
+                                <label
+                                    htmlFor="title"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Title
+                                </label>
+                                <input
+                                    id="title"
+                                    name="title"
+                                    placeholder="Title"
+                                    value={upload.title}
+                                    onChange={handleChangeCreate}
+                                    className="w-full p-3 border rounded-lg"
+                                />
+                            </div>
+
+                            {/* Video URL */}
+                            <div>
+                                <label
+                                    htmlFor="video_url"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Video URL
+                                </label>
+                                <input
+                                    id="video_url"
+                                    name="video_url"
+                                    placeholder="Video URL"
+                                    value={upload.video_url}
+                                    onChange={handleChangeCreate}
+                                    className="w-full p-3 border rounded-lg"
+                                />
+                            </div>
+
+                            {/* Level */}
+                            <div>
+                                <label
+                                    htmlFor="level"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Level
+                                </label>
+                                <select
+                                    id="level"
+                                    name="level"
+                                    value={upload.level}
+                                    onChange={handleChangeCreate}
+                                    className="w-full p-3 border rounded-lg"
+                                >
+                                    <option value="">Select</option>
+                                    {upload.category === "piano exercise"
+                                        ? pianoLevels.map((level) => (
+                                              <option key={level} value={level}>
+                                                  {level
+                                                      .charAt(0)
+                                                      .toUpperCase() +
+                                                      level.slice(1)}
+                                              </option>
+                                          ))
+                                        : levels.map((level) => (
+                                              <option key={level} value={level}>
+                                                  {level
+                                                      .charAt(0)
+                                                      .toUpperCase() +
+                                                      level.slice(1)}
+                                              </option>
+                                          ))}
+                                </select>
+                            </div>
+                            {upload.category === "piano exercise" && (
+                                <div>
+                                    <label
+                                        htmlFor="skill_level"
+                                        className="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Skil Level
+                                    </label>
+                                    <select
+                                        id="skill_level"
+                                        name="skill_level"
+                                        value={upload.skill_level}
+                                        onChange={handleChangeCreate}
+                                        className="w-full p-3 border rounded-lg"
+                                    >
+                                        <option value="">Select</option>
+
+                                        {upload.category === "piano exercise"
+                                            ? pianoGroup.map((level) => (
+                                                  <option
+                                                      key={level}
+                                                      value={level}
+                                                  >
+                                                      {level
+                                                          .charAt(0)
+                                                          .toUpperCase() +
+                                                          level.slice(1)}
+                                                  </option>
+                                              ))
+                                            : levels.map((level) => (
+                                                  <option
+                                                      key={level}
+                                                      value={level}
+                                                  >
+                                                      {level
+                                                          .charAt(0)
+                                                          .toUpperCase() +
+                                                          level.slice(1)}
+                                                  </option>
+                                              ))}
+                                    </select>
+                                </div>
+                            )}
+                            <div>
+                                <label
+                                    htmlFor="tags"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Related Courses
+                                </label>
+                                <Select
+                                    id="tags"
+                                    isMulti
+                                    name="tags"
+                                    options={tagOptions}
+                                    value={selectedTags}
+                                    onChange={handleTagsChange}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                />
+                            </div>
+
+                            {/* Status */}
+                            <div>
+                                <label
+                                    htmlFor="status"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Status
+                                </label>
+                                <select
+                                    id="status"
+                                    name="status"
+                                    value={upload.status}
+                                    onChange={handleChangeCreate}
+                                    className="w-full p-3 border rounded-lg"
+                                >
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                            <label
+                                htmlFor="description"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Description
+                            </label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                placeholder="Description"
+                                value={upload.description}
+                                onChange={handleChangeCreate}
+                                className="w-full p-1 border rounded-lg"
+                                rows="2"
+                            ></textarea>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            disabled={saving}
+                            type="submit"
+                            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300 flex items-center justify-center gap-2"
+                        >
+                            {saving ? (
+                                <>
+                                    <svg
+                                        className="animate-spin h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+                                        ></path>
+                                    </svg>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                <span>Save Upload</span>
+                            )}
+                        </button>
+                    </form>
+                </div>
+            </Modal>
         </div>
     );
 };
@@ -453,7 +792,9 @@ if (document.getElementById("uploads")) {
 
     Index.render(
         <React.StrictMode>
-            <UploadList />
+            <FlashMessageProvider>
+                <UploadList />
+            </FlashMessageProvider>
         </React.StrictMode>
     );
 }

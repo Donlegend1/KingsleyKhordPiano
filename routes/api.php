@@ -18,6 +18,7 @@ use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\EarTrainingController;
 use App\Http\Controllers\LiveSessionController;
+use App\Http\Controllers\CourseCategoryController;
 
 
 /*
@@ -49,6 +50,8 @@ use App\Http\Controllers\LiveSessionController;
         Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
+        Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
+        Route::post('/courses/category/create', [CourseCategoryController::class, 'create']); 
     });
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
@@ -93,4 +96,3 @@ use App\Http\Controllers\LiveSessionController;
     Route::get('live-sessions', [LiveSessionController::class, 'index']);
     Route::get('live-sessions/{session}', [LiveSessionController::class, 'show']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
-   
