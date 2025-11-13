@@ -41,106 +41,166 @@
         x-cloak
         x-show="showSidebar || window.innerWidth >= 768"
         @click.away="if (window.innerWidth < 768) showSidebar = false"
-        class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700 transform transition-transform duration-200 md:relative md:translate-x-0 md:block"
+        class="fixed inset-y-0 left-0 z-40 w-64 sm:w-[250px] bg-[#FAFAFA] dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-200 md:relative md:translate-x-0 md:block"
         :class="{ '-translate-x-full': !showSidebar && window.innerWidth < 768 }"
         >
-       <div class="p-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+       <div class="px-5 py-4 font-sans h-full overflow-y-auto scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
+           <style>
+               .scrollbar-hide::-webkit-scrollbar {
+                   display: none;
+               }
+               .scrollbar-hide {
+                   -ms-overflow-style: none;
+                   scrollbar-width: none;
+               }
+           </style>
 
-            <!-- Feeds -->
-            <div class="mb-6">
-                <a href="/member/community"
-                   class="flex items-center space-x-2 px-4 py-2 rounded-md transition
-                   {{ Request::is('/') ? 'bg-[#F0F3F5] text-[#545861] dark:text-[#E4E7EB] dark:bg-[#42464D] font-semibold' : 'hover:text-[#FFD736]' }}">
-                    <i class="fa fa-home"></i>
-                    <span>Feeds</span>
+            <!-- Logo Section -->
+            <div class="hidden md:block mb-10 px-5">
+                <a href="/member/community" class="flex items-center justify-center">
+                    <img src="/logo/logowhite.webp" alt="Logo" class="h-8 w-auto">
                 </a>
             </div>
 
-            <!-- Get Started -->
-            <div x-data="{ open: true }" class="group relative mt-10 mb-6">
-            <div @click="open = !open"
-                class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
-                <div class="flex items-center space-x-2">
-                    <span>Get Started</span>
-                </div>
-                <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
-                :class="{ 'rotate-180': !open }"></i>
-            </div>
-
-            <template x-if="open">
-                <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
+            <!-- Community Section -->
+            <div class="mb-6 mt-16 md:mt-0">
+                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-[1px] mb-2 mt-3">COMMUNITY</h3>
+                <div class="space-y-1">
+                <a href="/member/community"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Activity Feed</span>
+                    </a>
                     <a href="/member/community/space/say-hello"
-                    class="flex items-center space-x-2 py-1 rounded-md transition 
-                    {{ Request::is('member/community/space/say-hello') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                        <span>👋</span><span>Say Hello</span>
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/say-hello') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6v2.5l6.5-2.5-6.5-2.5z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Say Hello</span>
                     </a>
-                    <a href="/member/community/space/ask-question"
-                    class="flex items-center space-x-2 py-1 rounded-md transition 
-                    {{ Request::is('member/community/space/ask-question') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                        <span>🙏</span><span>Ask Question</span>
+                    <a href="/member/community/space/progress-report"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/progress-report') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Progress Report</span>
+                    </a>
+                    <a href="/member/community/space/lessons"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/lessons') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Lessons</span>
                     </a>
                 </div>
-            </template>
         </div>
 
-
-            <!-- Others -->
-            <div x-data="{ open: true }" class="group relative mt-10 mb-6">
-                <div @click="open = !open"
-                    class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
-                    <div class="flex items-center space-x-2">
-                        <span>Others</span>
-                    </div>
-                    <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
-                    :class="{ 'rotate-180': !open }"></i>
+            <!-- Forums Section -->
+            <div class="mb-6">
+                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-[1px] mb-2">FORUMS</h3>
+                <div class="space-y-1">
+                    <a href="/member/community/space/beginner"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/beginner') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Beginner</span>
+                    </a>
+                    <a href="/member/community/space/intermediate"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/intermediate') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 9.5l3-3 3 3"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Intermediate</span>
+                    </a>
+                    <a href="/member/community/space/advanced"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/advanced') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 9.5l3-3 3 3"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.5v6"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Advanced</span>
+                    </a>
                 </div>
-                <template x-if="open">
-                    <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
-                        <a href="/member/community/space/post-progress"
-                        class="flex items-center space-x-2 py-1 rounded-md transition 
-                        {{ Request::is('member/community/space/post-progress') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <span>🎬</span><span>Post Progress</span>
-                        </a>
-                        <a href="/member/community/space/lessons"
-                        class="flex items-center space-x-2 py-1 rounded-md transition 
-                        {{ Request::is('member/community/space/lessons') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <span>🎹</span><span>Lessons</span>
-                        </a>
-                    </div>
-                </template>
             </div>
 
+            <!-- Members Only Section -->
+            <div class="mb-6">
+                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-[1px] mb-2">MEMBERS ONLY</h3>
+                <div class="space-y-1">
+                    <a href="/member/community/space/exclusive-feed"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/exclusive-feed') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Exclusive Feed</span>
+                    </a>
+                    <a href="/member/community/space/pdf-downloads"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/pdf-downloads') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Pdf Downloads</span>
+                    </a>
+                    <a href="/member/community/space/audio-downloads"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/audio-downloads') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Audio Downloads</span>
+                    </a>
+                    <a href="/member/community/space/piano-breakdowns"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/piano-breakdowns') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                            <circle cx="7" cy="17" r="1"></circle>
+                            <circle cx="17" cy="17" r="1"></circle>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Piano Breakdowns</span>
+                    </a>
+                    </div>
+            </div>
 
-            <!-- Forum -->
-            <div x-data="{ open: true }" class="group relative mt-10">
-                <div @click="open = !open"
-                     class="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-[#FFD736]">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa fa-comments"></i>
-                        <span>Forum</span>
-                    </div>
-                    <i class="fa fa-chevron-down text-xs text-gray-400 group-hover:inline hidden transition-transform"
-                       :class="{ 'rotate-180': !open }"></i>
+            <!-- Quick Links - Mobile Only -->
+            <div class="block lg:hidden mt-6">
+                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-[1px] mb-2">QUICK LINKS</h3>
+                <div class="space-y-1">
+                    <a href="/home"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a href="/member/shop"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Shop Plugins</span>
+                    </a>
+                    <a href="/member/live-session"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l2 2-2 2"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Live Sessions</span>
+                    </a>
+                    <a href="/member/support"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Support</span>
+                    </a>
                 </div>
-                <template x-if="open">
-                    <div class="pl-8 space-y-1 text-gray-500 dark:text-gray-400">
-                        <a href="/member/community/space/beginner"
-                           class="flex items-center space-x-2 py-1 rounded-md transition 
-                           {{ Request::is('member/community/space/beginner') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <img src="/images/featured1.jpeg" class="h-5 " alt="Beginners forum"></i><span>Beginner</span>
-                        </a>
-                        <a href="/member/community/space/intermediate"
-                           class="flex items-center space-x-2 py-1 rounded-md transition 
-                           {{ Request::is('member/community/space/intermediate') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                           <img src="/images/featured2.jpeg" class="h-5 " alt="Intermediate forum"><span>Intermediate</span>
-                        </a>
-                        <a href="/member/community/space/advance"
-                           class="flex items-center space-x-2 py-1 rounded-md transition 
-                           {{ Request::is('member/community/space/advance') ? 'text-[#FFD736] font-semibold' : 'hover:text-[#FFD736]' }}">
-                            <img src="/images/featured3.jpeg" class="h-5 " alt="Advance forum"><span>Advance</span>
-                        </a>
-                    </div>
-                </template>
             </div>
 
             {{-- <div class="mt-8 fixed bottom-1 bg-gray-100 dark:bg-gray-700 rounded-md">
@@ -160,29 +220,43 @@
     <div class="flex-1 flex flex-col">
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
               <button @click="showSidebar = !showSidebar" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-[#FFD736]">
                   <i class="fa fa-bars text-xl"></i>
               </button>
                           
                 <!-- Left: Logo -->
-                <a href="/member/community" class="flex items-center space-x-2">
+                <a href="/member/community" class="flex items-center space-x-2 md:hidden">
                     <img src="/logo/logowhite.webp" alt="Logo" class="h-10 w-auto">
                 </a>
 
-                <!-- Center: Nav Links -->
-                <nav class="hidden md:flex space-x-6">
-                    <a href="/member/community" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
-                        <i class="fa fa-home" aria-hidden="true"></i>
-                        <span class="text-sm font-medium">Feeds</span>
+                <!-- Center: Quick Links -->
+                <nav class="hidden lg:flex items-center space-x-16">
+                    <a href="/home" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+                        </svg>
+                        <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    <a href="/member/community/space" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
-                        <i class="fa fa-users" aria-hidden="true"></i>
-                        <span class="text-sm font-medium">Spaces</span>
+                    <a href="/member/shop" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        <span class="text-sm font-medium">Shop Plugins</span>
                     </a>
-                    <a href="/member/community/members" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
-                        <i class="fa fa-users" aria-hidden="true"></i>
-                        <span class="text-sm font-medium">Members</span>
+                    <a href="/member/live-session" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l2 2-2 2"></path>
+                        </svg>
+                        <span class="text-sm font-medium">Live Sessions</span>
+                    </a>
+                    <a href="/member/support" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <span class="text-sm font-medium">Support</span>
                     </a>
                 </nav>
 
@@ -202,9 +276,9 @@
                         </svg>
                     </button>
 
-                    <button class="text-gray-500 dark:text-gray-300 hover:text-[#FFD736]" aria-label="Search">
+                    <button class="text-gray-500 dark:text-gray-300 hover:text-[#FFD736]" aria-label="Bookmarks">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" 
+                            <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
                                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
@@ -341,7 +415,7 @@
         </header>
 
         <!-- Scrollable content area -->
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
             @yield('content')
         </main>
     </div>

@@ -79,8 +79,8 @@ use App\Http\Controllers\PaymentController;
         Route::post('/community/{user}/status', [AdminController::class, 'updateUserStatus']);
 
         Route::post('/comment/reply/{postComment}', [PostReplyController::class, 'store'])->name('reply.post');
+        Route::get('/profile', [UserController::class, 'getProfile'])->name('profile.get');
 
-        
     });
 
 

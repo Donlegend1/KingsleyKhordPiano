@@ -145,12 +145,26 @@ class HomeController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'passport' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'country' => 'nullable|string|max:500',
+            'phone_number' => 'nullable|string|max:20',
+            'skill_level' => 'nullable|in:beginner,intermediate,advanced',
+            'biography' => 'nullable|string|max:1000',
+            'instagram' => 'nullable|url|max:255',
+            'youtube' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
+            'tiktok' => 'nullable|url|max:255',
         ]);
 
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
         $user->country = $request->country;
+        $user->phone_number = $request->phone_number;
+        $user->skill_level = $request->skill_level;
+        $user->biography = $request->biography;
+        $user->instagram = $request->instagram;
+        $user->youtube = $request->youtube;
+        $user->facebook = $request->facebook;
+        $user->tiktok = $request->tiktok;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

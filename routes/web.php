@@ -124,6 +124,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
+    Route::get('/community/space/pdf-downloads', [CommunityIndexController::class, 'pdfDownloads'])->name('community.pdf-downloads');
     Route::get('/community/space/{subcategory}', [CommunityIndexController::class, 'subcategory'])->name('community.subcategory');
     Route::get('/community/space', [CommunityIndexController::class, 'space'])->name('community.space');
     Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');

@@ -105,39 +105,26 @@ const CreatePostBox = ({
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm transition-all duration-300">
-            <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center space-x-3 flex-1">
-                    <img
-                        src="/avatar1.jpg"
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <input
-                        type="text"
-                        placeholder="What's on your mind?"
-                        onFocus={handleFocus}
-                        value={postDetails.body}
-                        onChange={(e) =>
-                            setPostDetails({
-                                ...postDetails,
-                                body: e.target.value,
-                            })
-                        }
-                        className={`flex-1 px-4 ${
-                            expanded ? "py-5" : "py-2"
-                        } bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md outline-none focus:ring-2 focus:ring-[#FFD736]`}
-                    />
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                    </svg>
                 </div>
-
-                {expanded && (
-                    <div className="flex items-center px-2 space-x-3 text-gray-500 dark:text-gray-300">
-                        <i className="fas fa-eye"></i>
-                        <button onClick={handleClose}>
-                            <i className="fas fa-times"></i>
-                        </button>
-                    </div>
-                )}
+                <input
+                    type="text"
+                    placeholder="Share what's on your mind..."
+                    onFocus={handleFocus}
+                    value={postDetails.body}
+                    onChange={(e) =>
+                        setPostDetails({
+                            ...postDetails,
+                            body: e.target.value,
+                        })
+                    }
+                    className="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-full text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#585757] focus:bg-white dark:focus:bg-gray-700 transition-all"
+                />
             </div>
 
             {expanded && (
@@ -172,9 +159,9 @@ const CreatePostBox = ({
                         </div>
                     )}
 
-                    <hr className="border-gray-300 dark:border-gray-600 mb-3" />
+                   
 
-                    <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+                    <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300 mt-10">
                         <div className="flex space-x-4">
                             {/* Hidden inputs for file selection */}
                             <input

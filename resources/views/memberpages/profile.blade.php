@@ -112,6 +112,91 @@
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input id="phone_number" name="phone_number" type="tel" value="{{ old('phone_number', Auth::user()->phone_number) }}"
+                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                        @error('phone_number')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Skill Level -->
+                    <div>
+                        <label for="skill_level" class="block text-sm font-medium text-gray-700 mb-1">Skill Level</label>
+                        <select id="skill_level" name="skill_level"
+                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">Select Skill Level</option>
+                            <option value="beginner" {{ old('skill_level', Auth::user()->skill_level) == 'beginner' ? 'selected' : '' }}>Beginner</option>
+                            <option value="intermediate" {{ old('skill_level', Auth::user()->skill_level) == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
+                            <option value="advanced" {{ old('skill_level', Auth::user()->skill_level) == 'advanced' ? 'selected' : '' }}>Advanced</option>
+                        </select>
+                        @error('skill_level')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Social Media Links Section -->
+                <div class="mt-6">
+                    <h4 class="text-lg font-medium text-gray-900 mb-4">Social Media Links</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Instagram -->
+                        <div>
+                            <label for="instagram" class="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+                            <input id="instagram" name="instagram" type="url" placeholder="https://instagram.com/username" value="{{ old('instagram', Auth::user()->instagram) }}"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            @error('instagram')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- YouTube -->
+                        <div>
+                            <label for="youtube" class="block text-sm font-medium text-gray-700 mb-1">YouTube</label>
+                            <input id="youtube" name="youtube" type="url" placeholder="https://youtube.com/channel/..." value="{{ old('youtube', Auth::user()->youtube) }}"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            @error('youtube')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Facebook -->
+                        <div>
+                            <label for="facebook" class="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
+                            <input id="facebook" name="facebook" type="url" placeholder="https://facebook.com/username" value="{{ old('facebook', Auth::user()->facebook) }}"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            @error('facebook')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- TikTok -->
+                        <div>
+                            <label for="tiktok" class="block text-sm font-medium text-gray-700 mb-1">TikTok</label>
+                            <input id="tiktok" name="tiktok" type="url" placeholder="https://tiktok.com/@username" value="{{ old('tiktok', Auth::user()->tiktok) }}"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            @error('tiktok')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biography Section -->
+                <div class="mt-6">
+                    <label for="biography" class="block text-sm font-medium text-gray-700 mb-1">Biography</label>
+                    <textarea id="biography" name="biography" rows="4" maxlength="1000"
+                        class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Tell us about yourself...">{{ old('biography', Auth::user()->biography) }}</textarea>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <span id="char-count">0</span>/1000 characters
+                    </p>
+                    @error('biography')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="flex justify-end mt-6">
@@ -121,6 +206,34 @@
                     </button>
                 </div>
             </form>
+
+            <!-- Character Count Script -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const textarea = document.getElementById('biography');
+                    const charCount = document.getElementById('char-count');
+
+                    function updateCharCount() {
+                        const count = textarea.value.length;
+                        charCount.textContent = count;
+
+                        // Change color based on character count
+                        if (count > 900) {
+                            charCount.style.color = '#dc2626'; // red-600
+                        } else if (count > 800) {
+                            charCount.style.color = '#d97706'; // amber-600
+                        } else {
+                            charCount.style.color = '#6b7280'; // gray-500
+                        }
+                    }
+
+                    // Initial count
+                    updateCharCount();
+
+                    // Update on input
+                    textarea.addEventListener('input', updateCharCount);
+                });
+            </script>
         </div>
     </div>
 

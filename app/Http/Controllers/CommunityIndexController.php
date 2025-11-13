@@ -46,4 +46,9 @@ class CommunityIndexController extends Controller
    {
       return view('community.single-post', compact('post'));
    }
+
+   public function pdfDownloads()
+   {
+      return view('community.pdf-downloads');
+   }
 }

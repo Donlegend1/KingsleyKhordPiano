@@ -16,9 +16,9 @@
 
     <!-- Right: Links & Ellipsis -->
     <div class="flex items-center gap-4">
-        <a 
-            href="/member/community/members" 
-            class=" bg-gray-200 px-2 py-1 text-gray-700 dark:text-gray-700 hover:underline rounded-md"
+        <a
+            href="/member/community/members"
+            class=" bg-gray-200 dark:bg-gray-700 px-2 py-1 text-gray-700 dark:text-gray-300 hover:underline rounded-md"
         >
             Posts
         </a>
@@ -35,7 +35,7 @@
 </div>
 
 <!-- Main Content -->
-<div class="overflow-y-auto h-screen p-4">
+<div class="overflow-y-auto h-screen p-4 bg-gray-50 dark:bg-gray-900">
     <div id="subcategory"></div>
 </div>
 @endsection
