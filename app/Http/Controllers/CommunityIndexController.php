@@ -51,4 +51,9 @@ class CommunityIndexController extends Controller
    {
       return view('community.pdf-downloads');
    }
+
+   public function audioDownloads()
+   {
+      return view('community.audio-downloads');
+   }
 }
