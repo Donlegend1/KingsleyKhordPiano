@@ -58,7 +58,7 @@
             <!-- Logo Section -->
             <div class="hidden md:block mb-10 px-5">
                 <a href="/member/community" class="flex items-center justify-center">
-                    <img src="/logo/logowhite.webp" alt="Logo" class="h-8 w-auto">
+                    <img src="/logo/logoblack.png" alt="Logo" class="h-12 w-auto">
                 </a>
             </div>
 
@@ -154,13 +154,16 @@
                         </svg>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Audio Downloads</span>
                     </a>
+                    <a href="/member/community/space/midi-downloads"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/midi-downloads') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14.23 12.004a2.236 2.236 0 0 1 2.235 2.236A2.236 2.236 0 0 1 14.23 16.476a2.236 2.236 0 0 1-2.235-2.236 2.236 2.236 0 0 1 2.235-2.236zm2.648-10.69c.366 0 .662.297.662.662v3.34c1.154.28 2.01 1.32 2.01 2.585a2.67 2.67 0 0 1-2.667 2.667h-4.666a2.67 2.67 0 0 1-2.667-2.667c0-1.265.856-2.305 2.01-2.585V1.976c0-.365.296-.662.662-.662h2.326zm-.662 4.666c-.735 0-1.333.598-1.333 1.333 0 .735.598 1.333 1.333 1.333h4.666c.735 0 1.333-.598 1.333-1.333 0-.735-.598-1.333-1.333-1.333h-4.666z"/>
+                        </svg>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Midi Files</span>
+                    </a>
                     <a href="/member/community/space/piano-breakdowns"
                        class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/piano-breakdowns') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
-                            <circle cx="7" cy="17" r="1"></circle>
-                            <circle cx="17" cy="17" r="1"></circle>
-                        </svg>
+                        <span class="text-lg">🎹</span>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Piano Breakdowns</span>
                     </a>
                     </div>
