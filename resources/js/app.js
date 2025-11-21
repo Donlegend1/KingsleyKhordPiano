@@ -40,5 +40,7 @@ import "./components/Members/MemberSpaces.jsx"
 import "./components/Members/ProfileSectionEdit.jsx"
 import "./components/Members/SubCategory.jsx"
 import "./components/Members/SinglePost.jsx"
+import "./components/PremiumChat/PremiumChat.jsx"
+import "./components/PremiumChat/PremiumChatButton.jsx"
 
 

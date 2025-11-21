@@ -64,47 +64,55 @@ class EarTrainingController extends Controller
         try {
             $thumbnail = $request->file('thumbnail');
             $mainAudio = $request->file('main_audio');
-
+    
             $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-            $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
-
-            $mainAudioName = null;
-            if ($mainAudio) {
-                $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
-                $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
-            }
-
+            $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
+    
+            // Save in public_html/ear_training/thumbnails
+            $thumbnail->move(
+                base_path('../public_html/ear_training/thumbnails'),
+                $thumbnailName
+            );
+    
+            $mainAudio->move(
+                base_path('../public_html/ear_training/main_audios'),
+                $mainAudioName
+            );
+    
             $quiz = Quiz::create([
-                'title'          => $request->title,
-                'description'    => $request->description,
-                'video_url'      => $request->video_url,
-                'thumbnail_path' => "/storage/ear_training/thumbnails/$thumbnailName",
-                'main_audio_path'=> $mainAudioName ? "/storage/ear_training/main_audios/$mainAudioName" : null,
-                'category'       => $request->category,
+                'title'           => $request->title,
+                'description'     => $request->description,
+                'video_url'       => $request->video_url,
+                'thumbnail_path'  => "/ear_training/thumbnails/$thumbnailName",
+                'main_audio_path' => "/ear_training/main_audios/$mainAudioName",
+                'category'        => $request->category,
             ]);
-
+    
             foreach ($request->questions as $q) {
                 $audio = $q['audio'];
                 $audioName = time() . '_' . $audio->getClientOriginalName();
-                $audio->move(public_path('storage/ear_training/question_audios'), $audioName);
-
+    
+                $audio->move(
+                    base_path('../public_html/ear_training/question_audios'),
+                    $audioName
+                );
+    
                 $quiz->questions()->create([
-                    'audio_path'     => "/storage/ear_training/question_audios/$audioName",
+                    'audio_path'     => "/ear_training/question_audios/$audioName",
                     'correct_option' => $q['correct_option'],
                 ]);
             }
-
+    
             return response()->json([
                 'message' => 'Quiz created successfully.',
                 'quiz'    => $quiz->load('questions'),
             ], 201);
-
+    
         } catch (\Throwable $e) {
-            // Log the error for debugging
             \Log::error('Quiz creation failed: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
-
+    
             return response()->json([
                 'error'   => 'Failed to create quiz.',
                 'message' => $e->getMessage(),
@@ -118,34 +126,48 @@ class EarTrainingController extends Controller
         if ($request->has('title')) {
             $quiz->title = $request->title;
         }
-
+    
         if ($request->has('description')) {
             $quiz->description = $request->description;
         }
-
+    
         if ($request->has('video_url')) {
             $quiz->video_url = $request->video_url;
         }
-
+    
         if ($request->hasFile('thumbnail')) {
             $thumbnail = $request->file('thumbnail');
             $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-            $thumbnail->move(public_path('storage/ear_training/thumbnails'), $thumbnailName);
-            $quiz->thumbnail_path = "/storage/ear_training/thumbnails/$thumbnailName";
+    
+            $destination = base_path('../public_html/ear_training/thumbnails');
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+    
+            $thumbnail->move($destination, $thumbnailName);
+    
+            $quiz->thumbnail_path = "/ear_training/thumbnails/$thumbnailName";
         }
-
+    
         if ($request->hasFile('main_audio')) {
             $mainAudio = $request->file('main_audio');
             $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
-            $mainAudio->move(public_path('storage/ear_training/main_audios'), $mainAudioName);
-            $quiz->main_audio_path = "/storage/ear_training/main_audios/$mainAudioName";
+    
+            $destination = base_path('../public_html/ear_training/main_audios');
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+    
+            $mainAudio->move($destination, $mainAudioName);
+    
+            $quiz->main_audio_path = "/ear_training/main_audios/$mainAudioName";
         }
-
+    
         $quiz->save();
-
+    
         return response()->json([
             'message' => 'Quiz updated successfully.',
-            'quiz' => $quiz->load('questions'),
+            'quiz'    => $quiz->load('questions'),
         ]);
     }
 
@@ -167,7 +189,7 @@ class EarTrainingController extends Controller
     return response()->json(['message' => 'questions deleted successfully.']);
     }
 
-   public function storeQuestions(Request $request, Quiz $quiz)
+  public function storeQuestions(Request $request, Quiz $quiz)
 {
     $validated = $request->validate([
         'questions' => 'required|array|min:1',
@@ -178,11 +200,19 @@ class EarTrainingController extends Controller
     foreach ($validated['questions'] as $q) {
         $audio = $q['audio'];
         $audioName = time() . '_' . $audio->getClientOriginalName();
-        $audio->move(public_path('storage/ear_training/question_audios'), $audioName);
+
+        // Destination inside public_html
+        $destination = base_path('../public_html/ear_training/question_audios');
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        // Move file
+        $audio->move($destination, $audioName);
 
         QuizQuestion::create([
-            'quiz_id' => $quiz->id,
-            'audio_path' => "/storage/ear_training/question_audios/$audioName",
+            'quiz_id'        => $quiz->id,
+            'audio_path'     => "/ear_training/question_audios/$audioName",
             'correct_option' => $q['correct_option'],
         ]);
     }

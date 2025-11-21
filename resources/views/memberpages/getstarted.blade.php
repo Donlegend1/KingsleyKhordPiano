@@ -20,10 +20,7 @@
          <p class="text-sm lg:text-base font-medium text-[#404348]">
             Your journey begins here, <span class="font-semibold text-black">{{ auth()->user()->name }}</span>
          </p>
-        
-
      </div>
-
  </div>
 </section>
 

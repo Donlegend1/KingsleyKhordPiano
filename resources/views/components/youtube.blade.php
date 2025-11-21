@@ -1,4 +1,4 @@
-<section class="h-full bg-cover bg-center mt-24 py-10" style="background-image: url('/images/banner2.png')">
+<section class="h-full bg-cover bg-center mt-24 py-10" style="background-image: url('/images/youtube.jpeg')">
   <!-- Overlay with dark background for better readability -->
   <div class="w-full h-full bg-black/60 flex items-center justify-center">
     <div class="flex flex-wrap items-center justify-between w-full max-w-7xl px-6 lg:px-12">

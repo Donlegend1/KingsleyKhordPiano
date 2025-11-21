@@ -37,9 +37,58 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <!-- Left: Logo -->
             <div class="flex items-center flex-shrink-0">
-                <a href="/" class="text-2xl font-bold">
-                    <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8 w-auto">
-                </a>
+                 <div class="flex items-center space-x-3 flex-shrink-0 relative">
+            <a href="/" class="text-2xl font-bold">
+                <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8 w-auto">
+            </a>
+            @php
+            use App\Models\Liveshow;
+            use Carbon\Carbon;
+            
+            $liveshow = Liveshow::where('start_time', '>=', Carbon::now())
+                ->orderBy('start_time', 'asc')
+                ->first();
+            @endphp
+
+           @if(isset($liveshow) && $liveshow)
+            <div x-data="{ open: false }" class="relative">
+                <!-- Live icon -->
+               <button
+                    @click="open = !open"
+                    class="flex items-center justify-center gap-1 relative rounded-md
+                        px-2 sm:px-3 py-1 sm:py-1.5 bg-red-600 text-white text-xs sm:text-sm 
+                        font-bold uppercase tracking-wider 
+                        hover:scale-110 transition-transform animate-pulse shadow-md"
+                    title="Live show now"
+                >
+                    <i class="fa fa-circle text-[8px] sm:text-[10px] text-white animate-ping"></i>
+                    <span>Live</span>
+                </button>
+
+                <!-- Tooltip -->
+                <div
+                    x-show="open"
+                    x-transition
+                    @mouseenter="open = true"
+                    @mouseleave="open = false"
+                    x-cloak
+                    class="absolute top-10 left-full ml-3 w-60 bg-white text-black rounded-lg shadow-lg p-3 z-50"
+                >
+                    <!-- Arrow -->
+                    <div class="absolute -left-1 top-3 w-3 h-3 bg-white rotate-45 shadow-sm"></div>
+
+                    <h3 class="text-sm font-semibold text-gray-800">{{ $liveshow->title }}</h3>
+                    <p class="text-xs text-gray-600">
+                        {{ \Carbon\Carbon::parse($liveshow->start_time)->format('M d, Y h:i A') }}
+                    </p>
+                    @if($liveshow->title)
+                    <p class="text-xs text-gray-500 mt-1">{{ Str::limit($liveshow->title, 80) }}</p>
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            </div>
             </div>
 
             <!-- Center: Desktop Nav -->
@@ -56,8 +105,9 @@
                     class="text-lg font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Contact
                 </a>
-                <a href="/shop"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                <a href="https://khordsounds.com/"
+                    target="blank"
+                    class="text-lg font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Shop
                 </a>
             </nav>
@@ -101,8 +151,9 @@
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Contact
                     </a>
-                    <a href="/shop"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('/shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    <a href="https://khordsounds.com/"
+                    target="blank"
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2  'text-white' ">
                         Shop
                     </a>
                 </div>

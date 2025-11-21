@@ -1,4 +1,4 @@
-<section class="relative bg-cover bg-center h-[75vh] min-h-[750px]" style="background-image: url('/images/banner.png')">
+<section class="relative bg-cover bg-center h-[85vh]" style="background-image: url('/images/solidhands.jpeg')">
   <!-- Overlay -->
   <div class="absolute inset-0 bg-black/40"></div>
 
@@ -10,7 +10,7 @@
       </h1>
     </div>
 
-    <p class="text-[18px] sm:text-base md:text-lg font-inter text-[#E1E1E1] max-w-3xl mx-auto px-2">
+    <p class="text-[18px] sm:text-base md:text-xl font-semibold font-inter text-[#E1E1E1] max-w-3xl mx-auto px-2">
       Remember, being the best involves understanding the fundamentals. It’s a completely different approach from following the latest tricks.
     </p>
 

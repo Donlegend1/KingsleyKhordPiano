@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Upload;
 use App\Http\Requests\StoreUploadRequest;
 use App\Http\Requests\UpdateUploadRequest;
+use App\Models\User;
+use App\Notifications\NewUploadCreated;
+use App\Enums\Roles\UserRoles;
 use Illuminate\Http\Request;
 
 class UploadController extends Controller
@@ -12,10 +15,30 @@ class UploadController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function pianoExercise()
     {
-        return view('admin.uploads.index', [
-            'uploads' => Upload::all(),
+        // dd(Upload::where('category', 'piano exercise')->get());
+
+        return view('admin.uploads.piano-exercise', [
+            'uploads' => Upload::where('category', 'piano exercise')->get(),
+        ]);
+    }
+    public function extraCourses()
+    {
+        return view('admin.uploads.extra-courses', [
+            'uploads' => Upload::where('category', 'extra courses')->get(),
+        ]);
+    }
+    public function quickLessons()
+    {
+        return view('admin.uploads.quick-lessons', [
+            'uploads' => Upload::where('category', 'quick lessons')->get(),
+        ]);
+    }
+    public function learnSongs()
+    {
+        return view('admin.uploads.learn-songs', [
+            'uploads' => Upload::where('category', 'learn songs')->get(),
         ]);
     }
 
@@ -47,19 +70,28 @@ class UploadController extends Controller
     if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
             $thumbnail = $request->file('thumbnail');
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
-            $destination = public_path('uploads/thumbnails');
-
+        
+            // Point directly to public_html/uploads/thumbnails
+            $destination = base_path('../public_html/uploads/thumbnails');
+        
             // Ensure destination exists
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
             }
-
+        
             $thumbnail->move($destination, $filename);
+
             $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
         }
 
 
         $upload = Upload::create($data);
+
+         $members = User::where('role', UserRoles::MEMBER->value)->get();
+
+        foreach ($members as $member) {
+            $member->notify(new NewUploadCreated($upload));
+        }
 
         return response()->json($upload, 200);
     }
@@ -91,7 +123,7 @@ class UploadController extends Controller
         if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
             $thumbnail = $request->file('thumbnail');
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
-            $destination = public_path('uploads/thumbnails');
+             $destination = base_path('../public_html/uploads/thumbnails');
 
             // Ensure destination exists
             if (!file_exists($destination)) {
@@ -128,9 +160,9 @@ class UploadController extends Controller
     public function uploadList(Request $request)
     {
         if ($request->has('page')) {
-            $uploads = Upload::paginate(10);
+            $uploads = Upload::where('category', $request->input('category'))->latest()->paginate(10);
         } else {
-            $uploads = Upload::all();
+            $uploads = Upload::where('category', $request->input('category'))->latest()->get();
         }
 
         return response()->json($uploads, 200);

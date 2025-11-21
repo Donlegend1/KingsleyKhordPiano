@@ -89,7 +89,6 @@ const CourseDetails = ({ course, onComplete }) => {
                     withCredentials: true,
                 }
             );
-            console.log("Fetched comments:", response.data);
             setComments(response.data?.data || []);
         } catch (error) {
             console.error("Failed to fetch comments", error.response);
@@ -229,12 +228,11 @@ const CourseDetails = ({ course, onComplete }) => {
                             : "bg-gray-200 text-gray-700 hover:bg-yellow-200"
                     }`}
                 >
-                    <i
-                        className={`fa ${
-                            isBookmarked ? "fa-bookmark" : "fa-bookmark-o"
-                        } text-lg`}
-                    ></i>
-                    {isBookmarked ? "Bookmarked" : "Bookmark"}
+                    {isBookmarked ? (
+                        <i className="fa fa-bookmark-o" aria-hidden="true"></i>
+                    ) : (
+                        <i className="fa fa-bookmark" aria-hidden="true"></i>
+                    )}
                 </button>
             </div>
 
@@ -469,7 +467,7 @@ const CourseDetails = ({ course, onComplete }) => {
 };
 
 const CoursesPage = () => {
-    const [courses, setCourses] = useState({});
+    const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [expandedCategories, setExpandedCategories] = useState({});
     const [showCourseModal, setShowCourseModal] = useState(false);
@@ -533,82 +531,90 @@ const CoursesPage = () => {
     const handleCourseCompletion = (completedCourse) => {
         setCourses((prevCourses) => {
             const updatedCourses = { ...prevCourses };
+
             const category = completedCourse.category;
+
+            if (!updatedCourses[category]) return prevCourses;
+
             updatedCourses[category] = updatedCourses[category].map((course) =>
                 course.id === completedCourse.id
-                    ? { ...course, completed: true }
+                    ? { ...course, completed: !course.completed }
                     : course
             );
+
             return updatedCourses;
         });
     };
 
-    // const calculateProgress = (category) => {
-    //     const courseList = courses[category] || [];
-    //     const total = courseList.length;
-    //     const completed = courseList.filter((c) => c.completed).length;
-    //     return total === 0 ? 0 : Math.round((completed / total) * 100);
-    // };
-
     const calculateGeneralProgress = () => {
-        const allCourses = Object.values(courses).flat();
+        if (!Array.isArray(courses)) return 0;
+        const allCourses = courses.flatMap((cat) => cat.courses || []);
         const total = allCourses.length;
-        const completed = allCourses.filter((c) => c.completed).length;
+        const completed = allCourses.filter((course) => course.progress).length;
         return total === 0 ? 0 : Math.round((completed / total) * 100);
     };
 
     const CourseList = () => (
         <div className="p-2">
-            {Object.entries(courses).map(([category, courseList]) => (
-                <div key={category} className="mb-6">
-                    {/* Category Header - visually like a stack */}
+            {courses.map((categoryObj) => (
+                <div
+                    key={categoryObj.id || categoryObj.category}
+                    className="mb-6"
+                >
                     <div
                         className="px-4 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-t-lg font-bold text-lg text-gray-800 dark:text-gray-100 shadow cursor-pointer flex justify-between items-center"
-                        onClick={() => toggleCategory(category)}
+                        onClick={() => toggleCategory(categoryObj.category)}
                     >
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-2 text-sm">
                             <i className="fa fa-folder text-blue-500"></i>
-                            {category}
+                            {categoryObj.category}
                         </span>
                         <i
                             className={`fa fa-chevron-${
-                                expandedCategories[category] ? "up" : "down"
+                                expandedCategories[categoryObj.category]
+                                    ? "up"
+                                    : "down"
                             } text-gray-600 dark:text-gray-300 transition-transform`}
                         ></i>
                     </div>
-
-                    {/* Submenu Courses - stacked as smaller cards */}
-                    {expandedCategories[category] && (
+                    {expandedCategories[categoryObj.category] && (
                         <div className="bg-white dark:bg-gray-900 rounded-b-lg shadow-inner border border-t-0 border-gray-200 dark:border-gray-700 p-2 space-y-2">
-                            {courseList.map((course) => (
-                                <div
-                                    key={course.id}
-                                    className={`flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-sm transition cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 ${
-                                        selectedCourse &&
-                                        selectedCourse.id === course.id
-                                            ? "ring-2 ring-blue-500 bg-blue-100 dark:bg-blue-900"
-                                            : ""
-                                    }`}
-                                    onClick={() => {
-                                    setSelectedCourse(course);
-                                    setShowCourseModal(false);
-                                    setExpandedCategories((prev) => ({
-                                        ...prev,
-                                        __mobile: false,
-                                    }));
-                                }}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <i className="fa fa-book text-gray-400 dark:text-gray-500"></i>
-                                        <span className="text-xs text-gray-800 dark:text-gray-100 truncate font-medium">
-                                            {course.title}
-                                        </span>
+                            {categoryObj.courses &&
+                            categoryObj.courses.length > 0 ? (
+                                categoryObj.courses.map((course) => (
+                                    <div
+                                        key={course.id}
+                                        className={`flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-sm transition cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 ${
+                                            selectedCourse &&
+                                            selectedCourse.id === course.id
+                                                ? "ring-2 ring-blue-500 bg-blue-100 dark:bg-blue-900"
+                                                : ""
+                                        }`}
+                                        onClick={() => {
+                                            setSelectedCourse(course);
+                                            setShowCourseModal(false);
+                                            setExpandedCategories((prev) => ({
+                                                ...prev,
+                                                __mobile: false,
+                                            }));
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <i className="fa fa-book text-gray-400 dark:text-gray-500"></i>
+                                            <span className="text-xs text-gray-800 dark:text-gray-100 truncate font-medium">
+                                                {course.title}
+                                            </span>
+                                        </div>
+                                        {course.completed && (
+                                            <i className="fa fa-check-circle text-green-500 text-xs"></i>
+                                        )}
                                     </div>
-                                    {course.completed && (
-                                        <i className="fa fa-check-circle text-green-500 text-xs"></i>
-                                    )}
+                                ))
+                            ) : (
+                                <div className="text-sm text-gray-500 dark:text-gray-400 italic p-2">
+                                    No courses available in this category
                                 </div>
-                            ))}
+                            )}
                         </div>
                     )}
                 </div>
@@ -718,7 +724,7 @@ const CoursesPage = () => {
                     }`}
                     style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
                 >
-                    <div className="flex justify-between items-center bg-white dark:bg-gray-600 p-4 shadow rounded w-full max-w-7xl mx-auto my-7">
+                    <div className="flex justify-between items-center bg-white dark:bg-gray-600 p-4 shadow rounded w-full max-w-7xl mx-auto my-2">
                         {/* Progress area - Centered */}
                         <div className="flex-1 flex justify-center pr-4 ">
                             <div className="w-full max-w-md">
@@ -726,7 +732,7 @@ const CoursesPage = () => {
                                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                         {calculateGeneralProgress()}% Completed
                                     </span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    {/* <span className="text-sm text-gray-500 dark:text-gray-400">
                                         {(() => {
                                             const allCourses =
                                                 Object.values(courses).flat();
@@ -736,7 +742,7 @@ const CoursesPage = () => {
                                             return `${completed}/${allCourses.length}`;
                                         })()}
                                         <span className="mx-2 fa fa-info-circle"></span>
-                                    </span>
+                                    </span> */}
                                 </div>
                                 <div className="w-full bg-gray-300 rounded-full h-2">
                                     <div
@@ -776,15 +782,15 @@ const CoursesPage = () => {
                     {selectedCourse ? (
                         <>
                             <div className="flex justify-between items-center mb-2">
-                                <button
+                                {/* <button
                                     onClick={handlePrevCourse}
                                     disabled={currentIndex === 0}
                                     className="px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-50"
                                 >
                                     <i className="fa fa-chevron-left"></i>{" "}
                                     Previous
-                                </button>
-                                <button
+                                </button> */}
+                                {/* <button
                                     onClick={handleNextCourse}
                                     disabled={
                                         !selectedCourse ||
@@ -797,7 +803,7 @@ const CoursesPage = () => {
                                     className="px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-50"
                                 >
                                     Next <i className="fa fa-chevron-right"></i>
-                                </button>
+                                </button> */}
                             </div>
                             <CourseDetails
                                 course={selectedCourse}

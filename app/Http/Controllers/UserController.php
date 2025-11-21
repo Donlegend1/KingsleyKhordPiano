@@ -60,25 +60,42 @@ class UserController extends Controller
     {
         $request->validate([
             'passport' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            // 'user_id' =>  'required|integer|exist,users:id'
         ]);
 
         $user = auth()->user();
 
-        if ($user->passport && file_exists(public_path('passports/' . $user->passport))) {
-            unlink(public_path('passports/' . $user->passport));
+        // Path to public_html/passports
+        $publicHtmlPath = base_path('../public_html/passports');
+
+        // Ensure folder exists
+        if (!file_exists($publicHtmlPath)) {
+            mkdir($publicHtmlPath, 0777, true);
         }
 
+        // Delete old passport if exists
+        if ($user->passport) {
+            // Remove leading slash if stored as "/passports/file.jpg"
+            $oldFile = ltrim($user->passport, '/');
+            $oldPath = base_path("../public_html/{$oldFile}");
+
+            if (file_exists($oldPath)) {
+                unlink($oldPath);
+            }
+        }
+
+        // Generate new file name
         $filename = time() . '_' . uniqid() . '.' . $request->passport->getClientOriginalExtension();
 
-        $request->passport->move(public_path('passports'), $filename);
+        // Move file to public_html/passports
+        $request->passport->move($publicHtmlPath, $filename);
 
-        $user->passport = "/passports/".$filename;
+        // Save path in DB
+        $user->passport = "passports/" . $filename;
         $user->save();
 
         return response()->json([
             'message' => 'Passport updated successfully',
-            'passport_url' => asset('passports/' . $filename),
+            'passport_url' => asset("passports/" . $filename),
         ]);
     }
 

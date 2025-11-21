@@ -68,9 +68,7 @@ const PlanSwitchAndCurrencySelect = () => {
     const filteredPlans = plans.filter((plan) => plan.type === selectedPlan);
 
     return (
-        <section
-            className="container mx-auto px-5 md:px-28 bg-cover bg-white mb-20"
-        >
+        <section className="container mx-auto px-5 md:px-28 bg-cover bg-white mb-20">
             <div className="text-center my-12 mx-auto">
                 <p className="font-bold text-4xl">Gain Immediate Entry to </p>
                 <p className="font-bold text-4xl my-3 text-[#BC1414]">
@@ -84,30 +82,44 @@ const PlanSwitchAndCurrencySelect = () => {
             </div>
 
             <div className="flex flex-col md:flex-row justify-between max-w-3xl mx-auto mb-8">
-                <div className="relative flex gap-0">
-                    <button
-                        className={`px-4 py-2 rounded-full z-10 -mr-8 transition ${
-                            selectedPlan === "monthly"
-                                ? "bg-gray-300 text-gray-800"
-                                : "bg-white text-gray-700 border"
-                        }`}
-                        onClick={() => handlePlanToggle("monthly")}
-                    >
-                        Monthly Plan
-                    </button>
-                    <button
-                        className={`px-4 py-2 rounded-full z-0 transition -ml-8 ${
-                            selectedPlan === "yearly"
-                                ? "bg-gray-300 text-gray-800"
-                                : "bg-white text-gray-700 border"
-                        }`}
-                        onClick={() => handlePlanToggle("yearly")}
-                    >
-                        <span className="text-gray-700 ml-12">Yearly Plan</span>
-                        <span className="text-red-600 mx-2 font-sf text-xs">
-                            Save 30%
-                        </span>
-                    </button>
+                <div className="flex items-center justify-center">
+                    <div className="relative flex bg-gray-100 rounded-full p-1 shadow-inner">
+                        {/* Toggle Indicator */}
+                        <div
+                            className={`absolute top-1 bottom-1 w-1/2 bg-white rounded-full shadow-md transition-all duration-300 ${
+                                selectedPlan === "monthly"
+                                    ? "left-1"
+                                    : "left-1/2"
+                            }`}
+                        ></div>
+
+                        {/* Monthly Button */}
+                        <button
+                            className={`relative z-10 w-32 text-sm font-medium py-2 mx-2 rounded-full transition-colors duration-300 ${
+                                selectedPlan === "monthly"
+                                    ? "text-gray-800"
+                                    : "text-gray-500 hover:text-gray-700"
+                            }`}
+                            onClick={() => handlePlanToggle("monthly")}
+                        >
+                            Monthly Plan
+                        </button>
+
+                        {/* Yearly Button */}
+                        <button
+                            className={`relative z-10 w-32 text-sm font-medium py-2 mx-2 rounded-full transition-colors duration-300 ${
+                                selectedPlan === "yearly"
+                                    ? "text-gray-800"
+                                    : "text-gray-500 hover:text-gray-700"
+                            }`}
+                            onClick={() => handlePlanToggle("yearly")}
+                        >
+                            <span className="text-sm">Yearly Plan</span>
+                            <span className="ml-1 text-red-600 text-xs font-semibold">
+                                Save 30%
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="relative mt-3">
@@ -123,7 +135,7 @@ const PlanSwitchAndCurrencySelect = () => {
                 </div>
             </div>
 
-           <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-6">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-6">
                 {filteredPlans &&
                     filteredPlans.map((plan) => (
                         <div
@@ -180,7 +192,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </button>
                             </div>
                         </div>
-                ))}
+                    ))}
             </div>
 
             {modalOpen && selectedPlanDetails && (
@@ -204,32 +216,71 @@ const PlanSwitchAndCurrencySelect = () => {
                         </p>
 
                         <div className="flex flex-col gap-6">
-
-                            <form action="/paystack" method="POST">
-                                <input type="hidden" name="_token" value={csrfToken} />
-                                <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
-                                <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
-                                <input type="hidden" name="duration" value={selectedPlanDetails.type} />
-                                <input type="hidden" name="currency" value={currency} />
-                                <button
-                                    type="submit"
-                                    className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full"
-                                >
-                                    Pay with Paystack
-                                </button>
-                            </form>
-
+                            
                             <form action="/stripe/create" method="POST">
-                                <input type="hidden" name="_token" value={csrfToken} />
-                                <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
-                                <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
-                                <input type="hidden" name="duration" value={selectedPlanDetails.type} />
-                                <input type="hidden" name="currency" value={currency} />
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value={csrfToken}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="plan_id"
+                                    value={selectedPlanDetails.id}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="tier"
+                                    value={selectedPlanDetails.tier}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="duration"
+                                    value={selectedPlanDetails.type}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="currency"
+                                    value={currency}
+                                />
                                 <button
                                     type="submit"
                                     className="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold w-full"
                                 >
                                     Pay with Stripe
+                                </button>
+                            </form>
+                            <form action="/paystack" method="POST">
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value={csrfToken}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="plan_id"
+                                    value={selectedPlanDetails.id}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="tier"
+                                    value={selectedPlanDetails.tier}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="duration"
+                                    value={selectedPlanDetails.type}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="currency"
+                                    value={currency}
+                                />
+                                <button
+                                    type="submit"
+                                    className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full"
+                                >
+                                    Pay with Paystack
                                 </button>
                             </form>
 
@@ -246,9 +297,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                     Pay with PayPal
                                 </button>
                             </form> */}
-
                         </div>
-
 
                         <div className="mt-4 flex items-center justify-center text-sm text-gray-400">
                             <p>

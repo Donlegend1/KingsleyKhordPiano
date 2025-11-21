@@ -1,9 +1,7 @@
 <section class="container mx-auto px-5 md:px-28 bg-cover my-10 bg-white">
-  <div class="text-center my-12 mx-auto">
+  <div class="text-center my-6 mx-auto">
     <p class="font-bold text-2xl">Our Approach</p>
-    <p class="text-sm text-gray-500 mx-auto max-w-lg">
-      By adopting this method, you’ll gain a deeper understanding of the music you play, enabling you to apply those techniques to countless other songs.
-    </p>
+
   </div>
 
   <div class="flex justify-center items-center">

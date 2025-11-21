@@ -1,17 +1,27 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function CustomPagination({ currentPage, totalPages, onPageChange }) {
+export default function CustomPagination({
+    currentPage,
+    totalPages,
+    onPageChange,
+}) {
     if (totalPages <= 1) return null; // No need to render
 
     const getPages = () => {
         const pages = [];
-        const maxButtons = 5;
+        const maxButtons = 10; // Changed from 5 to 10
         let start = Math.max(1, currentPage - Math.floor(maxButtons / 2));
         let end = Math.min(totalPages, start + maxButtons - 1);
 
+        // Adjust start if we're near the end
         if (end - start < maxButtons - 1) {
             start = Math.max(1, end - maxButtons + 1);
+        }
+
+        // Adjust end if we're near the start
+        if (start === 1) {
+            end = Math.min(totalPages, maxButtons);
         }
 
         for (let i = start; i <= end; i++) {

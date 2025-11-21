@@ -1,4 +1,4 @@
-<section class="relative bg-cover bg-center h-full" style="background-image: url('/images/banner.png')">
+<section class="relative bg-cover bg-center h-full" style="background-image: url('/images/membership.jpeg')">
   <!-- Overlay -->
   <div class="absolute inset-0 bg-black/60"></div>
 

@@ -6,7 +6,7 @@
 @include("components.joinow")
 @include("components.journey")
 @include("components.joinow2")
-@include("components.stats")
+@include("components.plansstats")
 @include("components.blogs")
 {{-- @include("components.courses") --}}
 @include("components.subscribe")

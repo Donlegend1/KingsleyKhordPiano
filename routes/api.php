@@ -18,6 +18,9 @@ use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\EarTrainingController;
 use App\Http\Controllers\LiveSessionController;
+use App\Http\Controllers\CourseCategoryController;
+use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\ChatMessageLikeController;
 
 
 /*
@@ -34,8 +37,6 @@ use App\Http\Controllers\LiveSessionController;
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::get('/live-shows', [LiveShowController::class, 'list']);
-
 
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminController::class, 'usersList']);
@@ -49,6 +50,8 @@ use App\Http\Controllers\LiveSessionController;
         Route::patch('/live-shows/{liveshow}', [LiveShowController::class, 'update']);
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
+        Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
+        Route::post('/courses/category/create', [CourseCategoryController::class, 'create']); 
     });
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
@@ -86,6 +89,15 @@ use App\Http\Controllers\LiveSessionController;
     });
 
 
+     Route::prefix('member')->middleware(['web', 'auth', 'premium'])->group(function () {
+        Route::get('/premium/rooms/{room}/messages', [ChatMessageController::class, 'index']);
+        Route::post('/premium/rooms/{room}/messages', [ChatMessageController::class, 'store']);
+        Route::post('/premium/messages/{message}/reply', [ChatMessageController::class, 'reply']);
+        Route::post('/premium/messages/{message}/like', [ChatMessageLikeController::class, 'toggle']);
+        Route::delete('/premium/messages/{message}', [ChatMessageController::class, 'destroy']);
+        Route::get('/live-shows', [LiveShowController::class, 'list']);
+    });
+
     Route::get('exercise/{exercise}', [ExerciseController::class, 'show']);
     Route::post('exercise/{exercise}/submit', [ExerciseController::class, 'submit']);
     Route::get('ear-training', [EarTrainingController::class, 'index']);
@@ -93,4 +105,3 @@ use App\Http\Controllers\LiveSessionController;
     Route::get('live-sessions', [LiveSessionController::class, 'index']);
     Route::get('live-sessions/{session}', [LiveSessionController::class, 'show']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
-   

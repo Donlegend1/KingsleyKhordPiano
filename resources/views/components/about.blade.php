@@ -2,22 +2,7 @@
   <div class="space-y-12">
 
     <!-- Intro Text -->
-    <div class="flex w-full">
-      <div class="text-left w-full">
-        <p class="font-bold text-[24px] mb-4">
-          Welcome to KingsleyKhord Music Academy, where piano playing meets mastery.
-        </p>
-        <p class="mb-4 text-sm text-gray-500">
-          Under the guidance of Kingsley Akunwa, one of Nigeria’s leading piano instructors, we support musicians at every level.
-        </p>
-        <p class="font-bold mb-2 text-[22px]">
-          Our mission is to help you achieve piano mastery through personalized, step-by-step programs that build your skills and confidence.
-        </p>
-        <p class="text-sm font-normal leading-relaxed">
-          Learn at your own pace, set your goals, and grow with flexible, practical instruction designed to meet your unique needs. Whether you’re playing for personal enjoyment or aspiring to teach, we’re here to guide you every step of the way.
-        </p>
-      </div>
-    </div>
+
 
 
     <div class="border border-gray-200 hidden md:"></div>
@@ -69,5 +54,26 @@
         </div>
       </div>
     </div>
+    <div class="border-t border-gray-200"></div>
+    
+  <div class="flex justify-left w-full ">
+  <div class="text-left max-w-7xl">
+    <p class="font-normal text-[18px] mb-4">
+      Welcome to KingsleyKhord Music Academy, where piano playing meets mastery. Under the guidance of Kingsley Akunwa, one of Nigeria’s leading piano instructors, we support musicians at every level.
+
+      Our mission is to help you achieve piano mastery through personalized, step-by-step programs that build your skills and confidence.
+    </p>
+
+    <p class="font-normal text-[18px] mb-3">
+      
+    </p>
+
+    <p class="text-[18px] font-normal leading-relaxed text-gray-700">
+      Learn at your own pace, set your goals, and grow with flexible, practical instruction designed to meet your unique needs.
+      Whether you’re playing for personal enjoyment or aspiring to teach, we’re here to guide you every step of the way.
+    </p>
+  </div>
+</div>
+
   </div>
 </section>

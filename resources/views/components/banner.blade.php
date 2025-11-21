@@ -5,7 +5,7 @@
   <div class="relative z-10 px-4 w-full max-w-4xl text-left sm:text-center">
     <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight sm:mb-0 mb-4">
       Master Gospel Piano
-      <p class="justify-center text-2xl sm:text-3xl text-[#FFD736] italic font-playfair mb-6 mt-0">
+      <p class="justify-center text-3xl text-[#FFD736] italic font-playfair mb-6 mt-0">
         and Play Like the Pros
       </p>
     </h1>

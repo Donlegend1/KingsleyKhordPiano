@@ -26,7 +26,9 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CommunityIndexController;
 // use App\Http\Controllers\StripeWebhookController;
 use Laravel\Cashier\Http\Controllers\WebhookController;
+use App\Http\Controllers\PremiumChatController;
 use App\Http\Controllers\WebsiteVideoController;
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\BookMarkController;
 
 use Illuminate\Support\Facades\Artisan;
@@ -49,10 +51,7 @@ Route::post(
     [WebhookController::class, 'handleWebhook']
 )->name('cashier.webhook');
 
-Route::get('/', function () {
-    $extracourses = \App\Models\Upload::where('category', 'extra courses')->latest()->take(3)->get();
-    return view('welcome', compact('extracourses'));
-});
+Route::get('/', [IndexController::class, 'index']);
 Route::get('/about', function () {
     return view('about', ['pageTitle' => 'About Us']);
 });
@@ -77,6 +76,12 @@ Route::get('/clear', function () {
     Artisan::call('optimize');
     return 'Application optimized!';
 });
+
+Route::post('/notifications/{id}/mark-read', function ($id) {
+    $notification = auth()->user()->notifications()->findOrFail($id);
+    $notification->markAsRead();
+    return back();
+})->name('notifications.markRead');
 
 Route::post('/send-document', [DocumentMailController::class, 'send'])->name('subscribe');
 
@@ -114,7 +119,7 @@ Route::post('/contact/send', [ContactController::class, 'create']);
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('roadmap', [GetstartedController::class, 'roadmap']);
-    Route::get('support', [HomeController::class, 'support']);
+    Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
@@ -132,6 +137,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
 Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     Route::get('profile', [HomeController::class, 'profile']);
     Route::get('/shop', [ShopController::class, 'index']);
+    Route::get('support', [HomeController::class, 'support']);
     Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
@@ -164,7 +170,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::post('/ear-training/{quiz}/questions', [EarTrainingController::class, 'storeQuestions']);
     Route::get('course/create', [CourseController::class, 'create']);
     Route::post('course', [CourseController::class, 'store']);
-    Route::get('uploads/list', [UploadController::class, 'index']);
+    Route::get('uploads/piano-exercise', [UploadController::class, 'pianoExercise']);
+    Route::get('uploads/extra-courses', [UploadController::class, 'extraCourses']);
+    Route::get('uploads/quick-lessons', [UploadController::class, 'quickLessons']);
+    Route::get('uploads/learn-songs', [UploadController::class, 'learnSongs']);
     Route::get('uploads/create', [UploadController::class, 'create']);
     Route::post('upload/store', [UploadController::class, 'store']);
     Route::delete('upload/{upload}', [UploadController::class, 'destroy']);

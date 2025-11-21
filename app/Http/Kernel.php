@@ -67,6 +67,7 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
     'check.payment' => \App\Http\Middleware\CheckPaymentStatus::class,
+    'premium' => \App\Http\Middleware\EnsurePremium::class,
     ];
 
     protected $commands = [

@@ -21,10 +21,10 @@ class GetstartedController extends Controller
         $setUp = WebsiteVideo::where('video_category', 'setUp')->first()?->video_url;
         $exper = WebsiteVideo::where('video_category', 'exper')->first()?->video_url;
 
-        $beginnerCourses = Course::where('category', 'Beginer')->latest()->take(3)->get();
-        // dd($beginnerCourses);
-        $intermediateCourses = Course::where('category', 'Intermidiate')->latest()->take(3)->get();
-        $advancedCourses = Course::where('category', 'Advanced')->latest()->take(3)->get();
+        $beginnerCourses = Course::where('level', 'beginner')->latest()->take(3)->get();
+        $intermediateCourses = Course::where('level', 'intermediate')->latest()->take(3)->get();
+        $advancedCourses = Course::where('level', 'advanced')->latest()->take(3)->get();
+        // dd($intermediateCourses);
 
         return view('memberpages.getstarted', [
             'tour' => $tour,

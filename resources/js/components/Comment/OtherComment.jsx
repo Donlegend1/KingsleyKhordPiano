@@ -65,7 +65,6 @@ const [lesson, setLesson] = useState(null);
                     withCredentials: true,
                 }
                 );
-            console.log("Fetched comments:", response.data);
             setComments(response.data?.data || []);
         } catch (error) {
             console.error("Failed to fetch comments", error.response);

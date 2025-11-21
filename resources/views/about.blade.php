@@ -21,5 +21,4 @@
 
 @include("components.about")
 
-@include("components.stats")
 @endsection

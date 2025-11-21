@@ -5,141 +5,89 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
-
-import CustomPagination from "../Pagination/CustomPagination";
-
-const Modal = ({ isOpen, onClose, children }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="relative bg-white rounded-lg shadow-lg max-w-3xl w-full mx-4 p-6">
-                {/* Close Button (X) */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
-                    aria-label="Close"
-                >
-                    &times;
-                </button>
-
-                {/* Modal Content */}
-                <div className="mt-2">{children}</div>
-            </div>
-        </div>
-    );
-};
+import DraggableCategoryList from "./DraggableCategoryList";
+import Modal from "../Modal/Modal";
 
 const Courses = () => {
-    const [courses, setCourses] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    // const [selectedCourse, setSelectedCourse] = useState(null);
-    const { showMessage } = useFlashMessage();
-    const perPage = 10;
-    const [selectedCourse, setSelectedCourse] = useState({
-        title: "",
-        category: "",
-        description: "",
-        video_url: "",
-        level: "beginner",
-        status: "active",
-        published_at: "",
-        thumbnail: null,
-        created_at: "",
+    // Add new state for collapsed sections
+    const [collapsedSections, setCollapsedSections] = useState({
+        beginner: false,
+        intermediate: false,
+        advanced: false,
     });
+    const [courses, setCourses] = useState({
+        beginner: { data: [], current_page: 1, last_page: 1 },
+        intermediate: { data: [], current_page: 1, last_page: 1 },
+        advanced: { data: [], current_page: 1, last_page: 1 },
+    });
+    const [loading, setLoading] = useState(false);
+    const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
+    const [newCategoryLevel, setNewCategoryLevel] = useState(null);
+    const [newCategoryName, setNewCategoryName] = useState("");
+    const { showMessage } = useFlashMessage();
+
+    const [perPage, setPerPage] = useState("9");
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
 
-    const fetchCourses = async (page = 1) => {
+    const fetchCourses = async (level = null, page = 1) => {
         setLoading(true);
         try {
             const response = await axios.get(
-                `/api/admin/courses?page=${page}&perPage=${perPage}`,
+                `/api/admin/courses?${
+                    level ? `level=${level}&` : ""
+                }page=${page}&per_page=${perPage}`,
                 {
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
+                    headers: { "X-CSRF-TOKEN": csrfToken },
                     withCredentials: true,
                 }
             );
-            console.log(response.data);
-            setCourses(response.data.data);
-            setCurrentPage(response.data.current_page);
-            setTotalPages(response.data.last_page);
+            if (level) {
+                setCourses((prev) => ({
+                    ...prev,
+                    [level]: response.data[level],
+                }));
+            } else {
+                setCourses(response.data);
+            }
         } catch (error) {
-            console.error("Error fetching users:", error);
+            console.error("Error fetching courses:", error);
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleDeleteCourse = async (page = 1) => {
-        setLoading(true);
-        try {
-            const response = await axios.delete(
-                `/api/admin/courses/${selectedCourse.id}`,
-                {
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
-                    withCredentials: true,
-                }
-            );
-            closeDeleteModal();
-            showMessage("course deleted", "success");
-            fetchCourses();
-        } catch (error) {
-            showMessage("Error deleting course", "error");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setSelectedCourse({ ...selectedCourse, [name]: value });
     };
 
     useEffect(() => {
         fetchCourses();
-    }, []);
+    }, [perPage]); // Add perPage dependency
 
-    const handlePageChange = (page) => {
-        fetchCourses(page);
+
+    const handlePageChange = (level, page) => {
+        fetchCourses(level, page);
     };
 
-    const openEditModal = (course) => {
-        setSelectedCourse(course);
-        setIsEditModalOpen(true);
+    // Add toggle function
+    const toggleSection = (level) => {
+        setCollapsedSections((prev) => ({
+            ...prev,
+            [level]: !prev[level],
+        }));
     };
 
-    const openDeleteModal = (course) => {
-        setSelectedCourse(course);
-        setIsDeleteModalOpen(true);
+    const handleNewCategoryModal = (e, level) => {
+        setNewCategoryModalOpen(!newCategoryModalOpen);
+        setNewCategoryLevel(level);
     };
 
-    const closeEditModal = () => {
-        setIsEditModalOpen(false);
-        setSelectedCourse(null);
-    };
-
-    const closeDeleteModal = () => {
-        setIsDeleteModalOpen(false);
-        setSelectedCourse(null);
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            const response = await axios.patch(
-                `/api/admin/courses/${selectedCourse.id}`,
-                selectedCourse,
+   const handleCreateCategory = async () => {
+         try {
+            const response = await axios.post(
+                `/api/admin/courses/category/create`,
+                {
+                    category: newCategoryName,
+                    level: newCategoryLevel,
+                },
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
@@ -147,223 +95,123 @@ const Courses = () => {
                     withCredentials: true,
                 }
             );
-            showMessage("course updated", "success");
-            closeEditModal();
+            showMessage("Category Created", "success");
+            handleNewCategoryModal();
             fetchCourses();
         } catch (error) {
-            showMessage("Error creating course", "error");
+            console.error("Error creating course category:", error);
+            showMessage("Error creating course category", "error");
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     return (
-        <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Course List</h2>
-            <div className="flex justify-end items-center mb-4 ">
-                <a
-                    className="px-4 py-2 bg-black text-white rounded-full"
-                    href="/admin/course/create"
-                >
-                    <span className="fa fa-plus"></span>
-                </a>
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">
+                    Course List
+                </h2>
+                <div className="flex items-center gap-4">
+                    <select
+                        value={perPage}
+                        onChange={(e) => setPerPage(e.target.value)}
+                        className="px-3 py-2 border rounded-lg text-sm"
+                    >
+                        <option value="9">Show 9</option>
+                        <option value="18">Show 18</option>
+                        <option value="27">Show 27</option>
+                        <option value="all">Show All</option>
+                    </select>
+                    {/* <a
+                        className="px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors"
+                        href="/admin/course/create"
+                    >
+                        <span className="fa fa-plus"></span>
+                    </a> */}
+                </div>
             </div>
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                <>
-                    <table className="min-w-full bg-white mb-4">
-                        <thead className="bg-gray-800 text-white">
-                            <tr>
-                                <th className="py-2 px-4 text-left">S/N</th>
-                                <th className="py-2 px-4 text-left">
-                                    Course Title
-                                </th>
-                                <th className="py-2 px-4 text-left">
-                                    Banner Image
-                                </th>
-                                <th className="py-2 px-4 text-left">
-                                    Category
-                                </th>
-                                <th className="py-2 px-4 text-left">Level</th>
-                                <th className="py-2 px-4 text-left">Status</th>
-                                <th className="py-2 px-4 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {courses && courses.length > 0 ? (
-                                courses.map((user, index) => (
-                                    <tr key={user.id} className="border-b">
-                                        <td className="py-2 px-4">
-                                            {index + 1}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.title}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.category}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.category}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.level}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.status}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            <button
-                                                onClick={() =>
-                                                    openEditModal(user)
-                                                }
-                                                className="bg-blue-500 text-white px-2 py-1 rounded"
-                                            >
-                                                <span className="fa fa-edit"></span>
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    openDeleteModal(user)
-                                                }
-                                                className="bg-red-500 text-white px-2 py-1 rounded ml-2"
-                                            >
-                                                <span className="fa fa-trash"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td
-                                        colSpan="6"
-                                        className="py-2 px-4 text-center"
-                                    >
-                                        No users found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
 
-                    <div className="flex items-center justify-center gap-6 mt-6">
-                        <CustomPagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={handlePageChange}
-                        />
-                    </div>
-                </>
+            {loading ? (
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                </div>
+            ) : (
+                <div className="space-y-8">
+                    {["beginner", "intermediate", "advanced"].map((level) => (
+                        <div key={level} className="mb-8">
+                            {/* Level Header */}
+                            <h3
+                                onClick={() => toggleSection(level)}
+                                className="text-xl font-semibold mb-4 px-4 py-2 bg-gray-50 rounded-lg capitalize flex justify-between items-center cursor-pointer hover:bg-gray-100"
+                            >
+                                <span>{level} Courses</span>
+                                <i
+                                    className={`fa ${
+                                        collapsedSections[level]
+                                            ? "fa-chevron-down"
+                                            : "fa-chevron-up"
+                                    } text-sm`}
+                                ></i>
+                            </h3>
+
+                            {/* Add Button */}
+                            <div className="mb-4 flex justify-end">
+                                <button className="rounded-md bg-black p-2 text-white" onClick={(e) => handleNewCategoryModal(e, level)}>
+                                    New Category
+                                </button>
+                            </div>
+
+                            {/* Level Content */}
+                            <div
+                                className={`transition-all duration-300 ${
+                                    collapsedSections[level]
+                                        ? "hidden"
+                                        : "block"
+                                }`}
+                            >
+                                {/* Draggable Category List */}
+                                <DraggableCategoryList
+                                    level={level}
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                    courses={courses}
+                                    handlePageChange={handlePageChange}
+                                    perPage={perPage}
+                                    fetchCourses={fetchCourses}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
             )}
 
             <Modal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
+                isOpen={newCategoryModalOpen}
+                onClose={handleNewCategoryModal}    
             >
-                <h2 className="text-lg font-bold mb-2">Edit Course</h2>
-                <p>Editing Course: {selectedCourse?.title}</p>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input
-                            name="title"
-                            placeholder="Title"
-                            defaultValue={selectedCourse?.title}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
-                        <input
-                            name="category"
-                            placeholder="Category"
-                            defaultValue={selectedCourse?.category}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
-                        <input
-                            name="video_url"
-                            placeholder="Video URL"
-                            defaultValue={selectedCourse?.video_url}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        />
+                <h2 className="text-xl font-bold mb-4">Create New Category</h2>
+                <p>Create a new category in {newCategoryLevel}</p>
 
-                        <select
-                            name="status"
-                            defaultValue={selectedCourse?.status}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="draft">Draft</option>
-                        </select>
-
-                        <select
-                            name="level"
-                            defaultValue={selectedCourse?.level}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        >
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </div>
-
-                    <textarea
-                        name="description"
-                        placeholder="Description"
-                        defaultValue={selectedCourse?.description}
-                        onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
-                        rows="4"
-                    ></textarea>
-
+                <div>
+                    <label className="block mb-2 font-medium">Category Name:</label>
+                    <input
+                        type="text" 
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg"
+                    />
+                </div>
+                <div>
                     <button
-                        type="submit"
-                        disabled={loading}
-                        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleCreateCategory}
+                        className="mt-4 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800" 
                     >
-                        {loading ? (
-                            <span className="fa fa-spinner fa-spin"></span>
-                        ) : (
-                            "Update Course"
-                        )}
+                        Create Category
                     </button>
-                </form>
-            </Modal>
-
-            <Modal
-                isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-            >
-                <div className="text-center p-6">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                        Confirm Deletion
-                    </h2>
-                    <p className="text-gray-600 mb-6">
-                        Are you sure you want to delete{" "}
-                        <span className="font-semibold text-red-600">
-                            {selectedCourse?.title}
-                        </span>
-                        ?
-                    </p>
-                    <small>This action cannot be undone.</small>
-
-                    <div className="flex justify-center space-x-4">
-                        <button
-                            onClick={() => setIsDeleteModalOpen(false)}
-                            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleDeleteCourse} // Make sure to define this function
-                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
-                        >
-                            Yes, Delete
-                        </button>
-                    </div>
                 </div>
             </Modal>
+
         </div>
     );
 };
@@ -374,10 +222,8 @@ if (document.getElementById("courses")) {
     const Index = ReactDOM.createRoot(document.getElementById("courses"));
 
     Index.render(
-        <React.StrictMode>
             <FlashMessageProvider>
                 <Courses />
             </FlashMessageProvider>
-        </React.StrictMode>
     );
 }

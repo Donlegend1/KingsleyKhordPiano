@@ -19,6 +19,7 @@ class Course extends Model
         'duration',
         'level',
         'status',
+        'course_category_id',
         // 'prerequisites',
         // 'what_you_will_learn',
         // 'resources',
@@ -33,5 +34,15 @@ class Course extends Model
 
     public function progress(){
         return $this->hasOne(CourseProgress::class);
+    }
+
+    public function categoryPosition()
+    {
+        return $this->belongsTo(CourseCategory::class, 'course_category_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(CourseCategory::class, 'course_category_id');
     }
 }

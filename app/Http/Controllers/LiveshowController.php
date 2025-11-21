@@ -89,14 +89,22 @@ class LiveShowController extends Controller
     public function list(Request $request)
     {
         $filter = $request->query('filter');
-        $query = LiveShow::query()->orderBy('start_time');
+        $query = LiveShow::query();
 
         if ($filter === 'future') {
-            $query->where('start_time', '>', Carbon::now());
+            $query->where('start_time', '>', Carbon::now())
+                ->orderBy('start_time', 'asc');
         } elseif ($filter === 'previous') {
-            $query->where('start_time', '<=', Carbon::now());
+            $query->where('start_time', '<=', Carbon::now())
+                ->orderBy('start_time', 'desc');
+        } else {
+            $query->orderByRaw("
+                CASE WHEN start_time > NOW() THEN 0 ELSE 1 END, 
+                start_time ASC
+            ");
         }
 
         return response()->json($query->get());
     }
+
 }

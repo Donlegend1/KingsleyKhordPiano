@@ -13,4 +13,9 @@ class CourseProgress extends Model
         'course_id',
         'course_category',
     ];
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 }
