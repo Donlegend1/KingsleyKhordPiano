@@ -19,7 +19,7 @@
         @foreach ($extracourses as $blog)
           <div class="bg-white rounded-lg border border-gray-200 overflow-hidden group hover:shadow-lg transition">
             <div class="w-full h-48 overflow-hidden">
-              <img src="/storage/{{ $blog->thumbnail }}" alt="{{ $blog->title }}"
+              <img src="{{ $blog->thumbnail }}" alt="{{ $blog->title }}"
                    class="w-full h-full object-cover transition duration-300 group-hover:scale-105" />
             </div>
             <div class="p-5">

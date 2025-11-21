@@ -270,7 +270,6 @@ const UploadList = () => {
             showMessage("Record Saved successfully.", "success");
             setUpload({
                 title: "",
-                category: "",
                 description: "",
                 video_url: "",
                 level: "",

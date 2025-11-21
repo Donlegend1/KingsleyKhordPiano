@@ -89,7 +89,6 @@ const CourseDetails = ({ course, onComplete }) => {
                     withCredentials: true,
                 }
             );
-            console.log("Fetched comments:", response.data);
             setComments(response.data?.data || []);
         } catch (error) {
             console.error("Failed to fetch comments", error.response);
@@ -229,12 +228,11 @@ const CourseDetails = ({ course, onComplete }) => {
                             : "bg-gray-200 text-gray-700 hover:bg-yellow-200"
                     }`}
                 >
-                    <i
-                        className={`fa ${
-                            isBookmarked ? "fa-bookmark" : "fa-bookmark-o"
-                        } text-lg`}
-                    ></i>
-                    {isBookmarked ? "Bookmarked" : "Bookmark"}
+                    {isBookmarked ? (
+                        <i className="fa fa-bookmark-o" aria-hidden="true"></i>
+                    ) : (
+                        <i className="fa fa-bookmark" aria-hidden="true"></i>
+                    )}
                 </button>
             </div>
 
@@ -516,7 +514,6 @@ const CoursesPage = () => {
                     }
                 );
                 setCourses(response.data);
-                console.log("Courses data:", response.data);
             } catch (error) {
                 console.error("Error fetching courses:", error);
             }
@@ -534,27 +531,26 @@ const CoursesPage = () => {
     const handleCourseCompletion = (completedCourse) => {
         setCourses((prevCourses) => {
             const updatedCourses = { ...prevCourses };
+
             const category = completedCourse.category;
+
+            if (!updatedCourses[category]) return prevCourses;
+
             updatedCourses[category] = updatedCourses[category].map((course) =>
                 course.id === completedCourse.id
-                    ? { ...course, completed: true }
+                    ? { ...course, completed: !course.completed }
                     : course
             );
+
             return updatedCourses;
         });
     };
 
-    // const calculateProgress = (category) => {
-    //     const courseList = courses[category] || [];
-    //     const total = courseList.length;
-    //     const completed = courseList.filter((c) => c.completed).length;
-    //     return total === 0 ? 0 : Math.round((completed / total) * 100);
-    // };
-
     const calculateGeneralProgress = () => {
-        const allCourses = Object.values(courses).flat();
+        if (!Array.isArray(courses)) return 0;
+        const allCourses = courses.flatMap((cat) => cat.courses || []);
         const total = allCourses.length;
-        const completed = allCourses.filter((c) => c.completed).length;
+        const completed = allCourses.filter((course) => course.progress).length;
         return total === 0 ? 0 : Math.round((completed / total) * 100);
     };
 
@@ -728,7 +724,7 @@ const CoursesPage = () => {
                     }`}
                     style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
                 >
-                    <div className="flex justify-between items-center bg-white dark:bg-gray-600 p-4 shadow rounded w-full max-w-7xl mx-auto my-7">
+                    <div className="flex justify-between items-center bg-white dark:bg-gray-600 p-4 shadow rounded w-full max-w-7xl mx-auto my-2">
                         {/* Progress area - Centered */}
                         <div className="flex-1 flex justify-center pr-4 ">
                             <div className="w-full max-w-md">
@@ -736,7 +732,7 @@ const CoursesPage = () => {
                                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                         {calculateGeneralProgress()}% Completed
                                     </span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    {/* <span className="text-sm text-gray-500 dark:text-gray-400">
                                         {(() => {
                                             const allCourses =
                                                 Object.values(courses).flat();
@@ -746,7 +742,7 @@ const CoursesPage = () => {
                                             return `${completed}/${allCourses.length}`;
                                         })()}
                                         <span className="mx-2 fa fa-info-circle"></span>
-                                    </span>
+                                    </span> */}
                                 </div>
                                 <div className="w-full bg-gray-300 rounded-full h-2">
                                     <div
@@ -786,15 +782,15 @@ const CoursesPage = () => {
                     {selectedCourse ? (
                         <>
                             <div className="flex justify-between items-center mb-2">
-                                <button
+                                {/* <button
                                     onClick={handlePrevCourse}
                                     disabled={currentIndex === 0}
                                     className="px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-50"
                                 >
                                     <i className="fa fa-chevron-left"></i>{" "}
                                     Previous
-                                </button>
-                                <button
+                                </button> */}
+                                {/* <button
                                     onClick={handleNextCourse}
                                     disabled={
                                         !selectedCourse ||
@@ -807,7 +803,7 @@ const CoursesPage = () => {
                                     className="px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-50"
                                 >
                                     Next <i className="fa fa-chevron-right"></i>
-                                </button>
+                                </button> */}
                             </div>
                             <CourseDetails
                                 course={selectedCourse}

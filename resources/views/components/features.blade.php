@@ -1,6 +1,6 @@
 <section class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-28 bg-white">
   <div class="text-center my-12 mx-auto">
-    <p class="font-bold text-2xl"> Membership Features </p>
+    <p class="font-bold text-3xl"> Membership Features </p>
     <p class="text-sm text-gray-500"> Get the most value from your subscription. Courses and contents carefully crafted to make you a Piano Pro. </p>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

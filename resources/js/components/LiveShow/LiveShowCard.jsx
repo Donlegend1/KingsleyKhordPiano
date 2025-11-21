@@ -109,7 +109,6 @@ const LiveShowCard = () => {
                                 {show.access_type === "premium" && (
                                     <div className="absolute top-2 right-2 bg-black text-white text-xs font-semibold px-2 py-1 rounded shadow-md z-20">
                                         <div className="flex gap-2">
-                                            <p>Premium</p>
 
                                             <img
                                                 src="/icons/diamondred.png"

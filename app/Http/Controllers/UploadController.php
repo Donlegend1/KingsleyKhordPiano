@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Upload;
 use App\Http\Requests\StoreUploadRequest;
 use App\Http\Requests\UpdateUploadRequest;
+use App\Models\User;
+use App\Notifications\NewUploadCreated;
+use App\Enums\Roles\UserRoles;
 use Illuminate\Http\Request;
 
 class UploadController extends Controller
@@ -67,19 +70,28 @@ class UploadController extends Controller
     if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
             $thumbnail = $request->file('thumbnail');
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
-            $destination = public_path('uploads/thumbnails');
-
+        
+            // Point directly to public_html/uploads/thumbnails
+            $destination = base_path('../public_html/uploads/thumbnails');
+        
             // Ensure destination exists
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
             }
-
+        
             $thumbnail->move($destination, $filename);
+
             $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
         }
 
 
         $upload = Upload::create($data);
+
+         $members = User::where('role', UserRoles::MEMBER->value)->get();
+
+        foreach ($members as $member) {
+            $member->notify(new NewUploadCreated($upload));
+        }
 
         return response()->json($upload, 200);
     }
@@ -111,7 +123,7 @@ class UploadController extends Controller
         if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
             $thumbnail = $request->file('thumbnail');
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
-            $destination = public_path('uploads/thumbnails');
+             $destination = base_path('../public_html/uploads/thumbnails');
 
             // Ensure destination exists
             if (!file_exists($destination)) {

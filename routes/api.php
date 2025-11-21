@@ -19,6 +19,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\EarTrainingController;
 use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\CourseCategoryController;
+use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\ChatMessageLikeController;
 
 
 /*
@@ -35,8 +37,6 @@ use App\Http\Controllers\CourseCategoryController;
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::get('/live-shows', [LiveShowController::class, 'list']);
-
 
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminController::class, 'usersList']);
@@ -88,6 +88,15 @@ use App\Http\Controllers\CourseCategoryController;
         
     });
 
+
+     Route::prefix('member')->middleware(['web', 'auth', 'premium'])->group(function () {
+        Route::get('/premium/rooms/{room}/messages', [ChatMessageController::class, 'index']);
+        Route::post('/premium/rooms/{room}/messages', [ChatMessageController::class, 'store']);
+        Route::post('/premium/messages/{message}/reply', [ChatMessageController::class, 'reply']);
+        Route::post('/premium/messages/{message}/like', [ChatMessageLikeController::class, 'toggle']);
+        Route::delete('/premium/messages/{message}', [ChatMessageController::class, 'destroy']);
+        Route::get('/live-shows', [LiveShowController::class, 'list']);
+    });
 
     Route::get('exercise/{exercise}', [ExerciseController::class, 'show']);
     Route::post('exercise/{exercise}/submit', [ExerciseController::class, 'submit']);

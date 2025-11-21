@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\Bookmark;
+use App\Models\User;
+use App\Notifications\NewCourseCreated;
+use App\Enums\Roles\UserRoles;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use Illuminate\Http\Request;
@@ -39,6 +42,11 @@ class CourseController extends Controller
         $validated['course_category_id'] = $category->id;
 
         $course = Course::create($validated);
+        $members = User::where('role', UserRoles::MEMBER->value)->get();
+
+        foreach ($members as $member) {
+            $member->notify(new NewCourseCreated($course));
+        }
 
         return response()->json($course, 201);
     }
@@ -124,41 +132,40 @@ class CourseController extends Controller
         // Fetch courses based on the level
         return view('memberpages.course.details', compact('level'));
     }
-public function membershowAPI($level)
-{
-    // Get all course categories for this level (even if they have no courses)
-    $categories = \App\Models\CourseCategory::with([
-        'courses' => function ($query) use ($level) {
-            $query->where('level', $level)
-                  ->with('progress')
-                  ->orderBy('position');
+    public function membershowAPI($level)
+    {
+        // Get all course categories for this level (even if they have no courses)
+        $categories = \App\Models\CourseCategory::with([
+            'courses' => function ($query) use ($level) {
+                $query->where('level', $level)
+                    ->with('progress')
+                    ->orderBy('position');
+            }
+        ])
+        ->where('level', $level)
+        ->orderBy('position')
+        ->get();
+
+        if ($categories->isEmpty()) {
+            return response()->json(['message' => 'No categories found for this level'], 404);
         }
-    ])
-    ->where('level', $level)
-    ->orderBy('position')
-    ->get();
 
-    if ($categories->isEmpty()) {
-        return response()->json(['message' => 'No categories found for this level'], 404);
-    }
+        // Fetch user's bookmarked courses
+        $bookmarkedIds = Bookmark::where('user_id', auth()->id())
+            ->where('source', 'courses')
+            ->pluck('video_id')
+            ->toArray();
 
-    // Fetch user's bookmarked courses
-    $bookmarkedIds = Bookmark::where('user_id', auth()->id())
-        ->where('source', 'courses')
-        ->pluck('video_id')
-        ->toArray();
-
-    // Add bookmark info to each course
-    $categories->each(function ($category) use ($bookmarkedIds) {
-        $category->courses->transform(function ($course) use ($bookmarkedIds) {
-            $course->isBookmarked = in_array($course->id, $bookmarkedIds);
-            return $course;
+        // Add bookmark info to each course
+        $categories->each(function ($category) use ($bookmarkedIds) {
+            $category->courses->transform(function ($course) use ($bookmarkedIds) {
+                $course->isBookmarked = in_array($course->id, $bookmarkedIds);
+                return $course;
+            });
         });
-    });
 
-    return response()->json($categories);
-}
-
+        return response()->json($categories);
+    }
 
     public function deleteCourse(Course $course)
     {

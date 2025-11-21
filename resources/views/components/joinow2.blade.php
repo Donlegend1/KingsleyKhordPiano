@@ -1,4 +1,4 @@
-<section class="relative bg-cover bg-center mt-24 py-16 px-4 sm:px-6 lg:px-12" style="background-image: url('/images/bannerOld1.png')">
+<section class="relative bg-cover bg-center mt-24 py-16 px-4 sm:px-6 lg:px-12" style="background-image: url('/images/notALone.jpeg')">
   <!-- Overlay: Optional dark background -->
   <div class="bg-black/80 absolute inset-0 z-0"></div>
 

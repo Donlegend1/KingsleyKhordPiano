@@ -37,5 +37,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CourseCategorySeeder::class
         ]);
+        $this->call([
+        ChatRoomSeeder::class,
+    ]);
     }
 }

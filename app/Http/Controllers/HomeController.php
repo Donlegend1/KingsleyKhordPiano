@@ -257,8 +257,8 @@ class HomeController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
-            'passport' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'new_password_input' => 'nullable|string|min:4|confirmed',
+            'passport' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // 5MB
             'country' => 'nullable|string|max:500',
         ]);
 
@@ -267,8 +267,8 @@ class HomeController extends Controller
         $user->email = $request->email;
         $user->country = $request->country;
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+        if ($request->filled('new_password')) {
+            $user->password = Hash::make($request->new_password);
         }
 
         if ($request->hasFile('passport')) {
