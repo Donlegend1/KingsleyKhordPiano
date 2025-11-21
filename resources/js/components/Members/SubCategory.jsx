@@ -9,6 +9,7 @@ import {
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
 import { FaRepublican } from "react-icons/fa6";
+import { FaCheck } from "react-icons/fa";
 
 const SubCategory = () => {
     const { showMessage } = useFlashMessage();
@@ -32,6 +33,8 @@ const SubCategory = () => {
 
     const [showSkeleton, setShowSkeleton] = useState(false);
     const [mediaFiles, setMediaFiles] = useState([]);
+    const [userProfile, setUserProfile] = useState(null);
+    const [latestUpdates, setLatestUpdates] = useState([]);
 
     const lastSegment = window.location.pathname
         .split("/")
@@ -58,6 +61,50 @@ const SubCategory = () => {
         setPosts([]);
         setHasMore(true);
     };
+
+    const fetchUserProfile = useCallback(async () => {
+        try {
+            const response = await axios.get('/api/member/profile');
+            setUserProfile(response.data);
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+        }
+    }, []);
+
+    const fetchLatestUpdates = useCallback(async () => {
+        try {
+            // This would be replaced with actual API endpoint for latest updates
+            // For now, using mock data similar to the blade template
+            setLatestUpdates([
+                {
+                    id: 1,
+                    user: 'John',
+                    action: 'posted an update',
+                    time: '4 years ago'
+                },
+                {
+                    id: 2,
+                    user: 'Adele',
+                    action: 'posted an update',
+                    time: '4 years ago'
+                },
+                {
+                    id: 3,
+                    user: 'John',
+                    action: 'posted an update',
+                    time: '5 years ago'
+                },
+                {
+                    id: 4,
+                    user: 'John',
+                    action: 'posted an update in the group Coffee Addicts',
+                    time: '5 years ago'
+                }
+            ]);
+        } catch (error) {
+            console.error('Error fetching latest updates:', error);
+        }
+    }, []);
 
     const handleValidation = () => {
         if (!postDetails.body.trim()) {
@@ -129,6 +176,11 @@ const SubCategory = () => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, [loading, hasMore]);
+
+    useEffect(() => {
+        fetchUserProfile();
+        fetchLatestUpdates();
+    }, [fetchUserProfile, fetchLatestUpdates]);
 
     const handlePost = async (data) => {
         if (!handleValidation()) return;
@@ -218,9 +270,46 @@ const SubCategory = () => {
         }
     };
 
+    const getProfileCompletionData = () => {
+        if (!userProfile) return { completionPercentage: 0, fields: {} };
+
+        const totalFields = 6;
+        let completedFields = 0;
+
+        const hasProfilePhoto = !!userProfile.passport;
+        const hasBiography = !!userProfile.biography;
+        const hasSocialMedia = !!(userProfile.instagram || userProfile.youtube || userProfile.facebook || userProfile.tiktok);
+        const hasSkillLevel = !!userProfile.skill_level;
+        const hasPhoneNumber = !!userProfile.phone_number;
+        const hasCountry = !!userProfile.country;
+
+        if (hasProfilePhoto) completedFields++;
+        if (hasBiography) completedFields++;
+        if (hasSocialMedia) completedFields++;
+        if (hasSkillLevel) completedFields++;
+        if (hasPhoneNumber) completedFields++;
+        if (hasCountry) completedFields++;
+
+        const completionPercentage = Math.round((completedFields / totalFields) * 100);
+        const strokeDashoffset = 339.292 - (339.292 * completionPercentage / 100);
+
+        return {
+            completionPercentage,
+            strokeDashoffset,
+            fields: {
+                hasProfilePhoto,
+                hasBiography,
+                hasSocialMedia,
+                hasSkillLevel,
+                hasPhoneNumber,
+                hasCountry
+            }
+        };
+    };
+
     return (
         <>
-            <div className="flex">
+            <div className="flex gap-6">
                 <div className=" w-full md:w-2/3">
                     <div className="flex-1 space-y-6 mb-5">
                         <CreatePostBox
@@ -294,25 +383,203 @@ const SubCategory = () => {
                         ) : null}
                     </div>
                 </div>
+                {/* hidden md:block mx-4 md:mx-7 w-1/3 */}
+                <div className="hidden lg:block w-80 xl:w-96  flex-shrink-0 space-y-6">
+                    {/* Complete Your Profile Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Complete Your Profile</h3>
+                            <a href="/member/profile" className="text-sm text-yellow-500 hover:text-yellow-600 font-medium transition-colors">
+                                Edit Profile →
+                            </a>
+                        </div>
 
-                <div className="hidden md:block mx-4 md:mx-7 w-1/3">
-                    {/* About Section */}
-                    <div className="bg-white rounded-md w-full px-3 mb-5 py-5">
-                        <p className="text-black font-semibold">About</p>
-                        <p className="flex items-center gap-2">
-                            <FaRepublican />
-                            <span className="font-semibold">Public</span>
-                        </p>
-                        <p className="text-sm text-gray-500">
-                            Any site member can see who's in the Space and what
-                            they post.
-                        </p>
+                        {/* Progress Circle */}
+                        <div className="flex justify-center mb-5">
+                            <div className="relative w-32 h-32">
+                                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                                    <circle
+                                        cx="60"
+                                        cy="60"
+                                        r="54"
+                                        stroke="#E5E7EB"
+                                        strokeWidth="8"
+                                        fill="none"
+                                    />
+                                    <circle
+                                        cx="60"
+                                        cy="60"
+                                        r="54"
+                                        stroke="#10B981"
+                                        strokeWidth="8"
+                                        fill="none"
+                                        strokeDasharray="339.292"
+                                        strokeDashoffset={getProfileCompletionData().strokeDashoffset}
+                                        strokeLinecap="round"
+                                        className="transition-all duration-300"
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className="text-3xl font-bold text-gray-900">{getProfileCompletionData().completionPercentage}</span>
+                                    <span className="text-base text-gray-500">%</span>
+                                    <span className="text-xs text-gray-400 mt-1">Complete</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Checklist Items */}
+                        <div className="space-y-3">
+                            {/* Profile Photo */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    {getProfileCompletionData().fields.hasProfilePhoto ? (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-green-500 flex items-center justify-center">
+                                                <FaCheck className="w-3 h-3 text-green-500" />
+                                            </div>
+                                            <span className="text-sm text-green-500 font-medium">Profile Photo</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </div>
+                                            <span className="text-sm text-gray-500">Profile Photo</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Biography */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    {getProfileCompletionData().fields.hasBiography ? (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-green-500 flex items-center justify-center">
+                                                <FaCheck className="w-3 h-3 text-green-500" />
+                                            </div>
+                                            <span className="text-sm text-green-500 font-medium">Biography</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </div>
+                                            <span className="text-sm text-gray-500">Biography</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Social Media Links */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    {getProfileCompletionData().fields.hasSocialMedia ? (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-green-500 flex items-center justify-center">
+                                                <FaCheck className="w-3 h-3 text-green-500" />
+                                            </div>
+                                            <span className="text-sm text-green-500 font-medium">Social Media Links</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </div>
+                                            <span className="text-sm text-gray-500">Social Media Links</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Skill Level */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    {getProfileCompletionData().fields.hasSkillLevel ? (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-green-500 flex items-center justify-center">
+                                                <FaCheck className="w-3 h-3 text-green-500" />
+                                            </div>
+                                            <span className="text-sm text-green-500 font-medium">Skill Level</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </div>
+                                            <span className="text-sm text-gray-500">Skill Level</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Phone Number */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    {getProfileCompletionData().fields.hasPhoneNumber ? (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-green-500 flex items-center justify-center">
+                                                <FaCheck className="w-3 h-3 text-green-500" />
+                                            </div>
+                                            <span className="text-sm text-green-500 font-medium">Phone Number</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </div>
+                                            <span className="text-sm text-gray-500">Phone Number</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Location / Country */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    {getProfileCompletionData().fields.hasCountry ? (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-green-500 flex items-center justify-center">
+                                                <FaCheck className="w-3 h-3 text-green-500" />
+                                            </div>
+                                            <span className="text-sm text-green-500 font-medium">Location / Country</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </div>
+                                            <span className="text-sm text-gray-500">Location / Country</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Recent Activities */}
-                    <div className="bg-white rounded-md w-full px-3 mb-5 py-5">
-                        <p className="font-semibold">Recent Space Activities</p>
+                    {/* Latest Updates Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Latest updates</h3>
+
+                        <div className="space-y-4">
+                            {latestUpdates.map((update) => (
+                                <div key={update.id} className="flex items-start gap-3">
+                                    <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-800 dark:text-gray-200">
+                                            <span className="font-semibold">{update.user}</span> {update.action}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{update.time}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
+
                 </div>
             </div>
         </>

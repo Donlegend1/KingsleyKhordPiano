@@ -103,11 +103,11 @@ const PostWithComments = ({
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 mb-5" style={{boxShadow: '0 1px 3px rgba(0,0,0,0.1)'}}>
             {/* Post Header */}
             <div className="flex justify-between items-start mb-4">
                 {/* Left: Avatar and Info */}
-                <div className="flex items-start space-x-3">
+                <div className="flex items-start gap-3">
                     {/* Avatar */}
                     {author.passport ? (
                         <img
@@ -116,389 +116,86 @@ const PostWithComments = ({
                             className="w-10 h-10 rounded-full object-cover"
                         />
                     ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm font-bold text-white">
+                        <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm font-bold text-gray-700 dark:text-gray-300">
                             {initials}
                         </div>
                     )}
 
                     {/* Author Info */}
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                        <h3 className="text-sm font-semibold text-[#1F2937] dark:text-white">
                             {author.first_name} {author.last_name}
                         </h3>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {formatRelativeTime(post.created_at)} •{" "}
-                            {"Posted in "}
-                            {capitaliseAndRemoveHyphen(post.subcategory) ||
-                                "General"}
-                            {post.category === "forum" ? " Forum" : ""}
-                        </span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-xs text-[#6B7280] dark:text-gray-300">posted an update</span>
+                            <span className="text-xs text-[#9CA3AF] dark:text-gray-400">• 4 years ago (edited)</span>
+                            <svg className="w-3 h-3 text-[#9CA3AF] dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 1 1 0 011 1v.667a3.353 3.353 0 01-3.5 3.333 3.354 3.354 0 01-3.5-3.333 2 2 0 00-2-2zm1.941 2.667a1.5 1.5 0 01-.581-2.893l.666-.666a3.75 3.75 0 005.666 0l.666.666a1.5 1.5 0 01-.581 2.893 1.75 1.75 0 01-1.75 1.75 1.75 1.75 0 01-1.75-1.75z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
 
-                {/* Right: Icons */}
-                <div className="relative flex items-center space-x-2 text-gray-500 dark:text-gray-300">
-                    <i
-                        className="fa fa-ellipsis-v cursor-pointer"
-                        aria-hidden="true"
-                        onClick={() => handleShowPostAction(post)}
-                        onFocus={() => setSelectedPost(post)}
-                    ></i>
-                    <i className="fa fa-bookmark" aria-hidden="true"></i>
-
-                    {showPostAction && (
-                        <div className="absolute right-0 top-6 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg w-28 py-2 text-sm">
-                            <button
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                onClick={() => handleEditPost(post)}
-                            >
-                                Edit
-                            </button>
-                            <button
-                                className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-800"
-                                onClick={() => handleDeletePost(post.id)}
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    )}
+                {/* Right: Three-dot menu */}
+                <div className="relative">
+                    <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            {/* Post Content */}
-            <div className="mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                    {post.body}
-                </p>
-
-                {post.media && post.media.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-3">
-                        {post.media.map((file, index) =>
-                            file.type === "image" ? (
-                                <img
-                                    key={index}
-                                    src={`/${file.file_path}`}
-                                    alt={`Post media ${index}`}
-                                    className="rounded-lg w-auto"
-                                />
-                            ) : (
-                                <video
-                                    key={index}
-                                    src={`/${file.file_path}`}
-                                    controls
-                                    className="rounded-lg w-auto"
-                                />
-                            )
-                        )}
-                    </div>
-                )}
-            </div>
-
-            <div
-                className="mt-4 border-t  border-gray-300 dark:border-gray-600 pt-4"
-                onFocus={() => setSelectedPost(post)}
-            >
-                <div className="flex justify-between items-center mb-4">
-                    <div className="flex justify-end space-x-4 text-gray-600 dark:text-gray-300 text-sm">
-                        <div className="flex space-x-5">
-                            <button
-                                onFocus={() => setSelectedPost(post)}
-                                onClick={toggleLike}
-                                className="flex items-center space-x-1 text-red-500 hover:text-red-600"
-                            >
-                                <div className="flex items-center gap-1">
-                                    {liked ? (
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="red"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
-                                            stroke="currentColor"
-                                            className="w-5 h-5 cursor-pointer"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M21.752 7.501c0 5.25-9.001 11.25-9.001 11.25S3.75 12.751 3.75 7.501A4.501 4.501 0 018.25 3c1.49 0 2.82.72 3.501 1.837A4.502 4.502 0 0115.25 3a4.501 4.501 0 014.502 4.501z"
-                                            />
-                                        </svg>
-                                    ) : (
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
-                                            stroke="currentColor"
-                                            className="w-5 h-5 cursor-pointer"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M21.752 7.501c0 5.25-9.001 11.25-9.001 11.25S3.75 12.751 3.75 7.501A4.501 4.501 0 018.25 3c1.49 0 2.82.72 3.501 1.837A4.502 4.502 0 0115.25 3a4.501 4.501 0 014.502 4.501z"
-                                            />
-                                        </svg>
-                                    )}
-
-                                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                                        {post.likes.length}
-                                    </span>
-                                </div>
-                            </button>
-
-                            <button
-                                onClick={() =>
-                                    setCommentsVisible(!commentsVisible)
-                                }
-                                className="flex items-center space-x-1 hover:text-blue-500"
-                            >
-                                <i
-                                    className="fa fa-comment"
-                                    aria-hidden="true"
-                                ></i>
-                            </button>
+            {/* Post Content - Video Thumbnail */}
+            <div className="mb-3">
+                <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                    <img
+                        src="/images/sample-beach.jpg"
+                        alt="Beach scene"
+                        className="w-full h-full object-cover"
+                    />
+                    {/* Play Button Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="bg-white dark:bg-gray-800 bg-opacity-90 rounded-full p-4">
+                            <svg className="w-8 h-8 text-gray-800 dark:text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 5v10l8-5-8-5z"></path>
+                            </svg>
                         </div>
                     </div>
-
-                    {/* Overlapping Avatars of Likes */}
-                    <div className="flex items-center justify-between">
-                        {/* Likes avatars */}
-                        <div className="flex -space-x-2 overflow-hidden">
-                            {post.likes?.slice(0, 5).map((like) => {
-                                const user = like.user;
-                                const initials = `${
-                                    user?.first_name?.[0] || ""
-                                }${user?.last_name?.[0] || ""}`.toUpperCase();
-
-                                return user?.passport ? (
-                                    <img
-                                        key={`like-avatar-${like.id}`}
-                                        className="inline-block h-7 w-7 rounded-full ring-2 ring-white dark:ring-gray-800 object-cover"
-                                        src={user.passport}
-                                        alt={user.first_name}
-                                        title={`${user?.first_name} ${user?.last_name}`}
-                                    />
-                                ) : (
-                                    <div
-                                        key={`like-initial-${like.id}`}
-                                        className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-gray-300 dark:bg-gray-600 ring-2 ring-white dark:ring-gray-800 text-xs font-bold text-white"
-                                        title={`${user?.first_name} ${user?.last_name}`}
-                                    >
-                                        {initials}
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        <div
-                            className="ml-4 text-xs text-gray-500 dark:text-gray-400 cursor-pointer"
-                            onClick={() => setCommentsVisible(!commentsVisible)}
-                        >
-                            {comments.length} Comment
-                            {comments.length !== 1 ? "s" : ""}
-                        </div>
+                    {/* Duration Badge */}
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded">
+                        0:13
                     </div>
                 </div>
+            </div>
 
-                {commentsVisible && (
-                    <div className="border-t border-gray-300 dark:border-gray-600 pt-4">
-                        <ul className="space-y-4 mb-4">
-                            {comments.length > 0 ? (
-                                <div className="space-y-4">
-                                    {comments.map((comment) => (
-                                        <div
-                                            key={comment.id}
-                                            className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow"
-                                        >
-                                            {/* Comment header */}
-                                            <div className="flex items-start space-x-3">
-                                                <img
-                                                    src={
-                                                        comment.user
-                                                            ?.passport ||
-                                                        "/avatar1.jpg"
-                                                    }
-                                                    alt="avatar"
-                                                    className="w-8 h-8 rounded-full"
-                                                />
+            {/* Engagement Section */}
+            <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                    </svg>
+                    <span className="text-sm text-[#6B7280] dark:text-gray-300">You and Jennifer</span>
+                </div>
+                <span className="text-sm text-[#6B7280] dark:text-gray-300">2 Comments</span>
+            </div>
 
-                                                <div className="flex-1">
-                                                    <div className="flex justify-between items-start">
-                                                        {/* Name + time */}
-                                                        <p className="text-sm font-semibold">
-                                                            {
-                                                                comment.user
-                                                                    ?.first_name
-                                                            }{" "}
-                                                            {
-                                                                comment.user
-                                                                    ?.last_name
-                                                            }
-                                                            <small className="mx-2">
-                                                                {formatRelativeTime(
-                                                                    comment.created_at
-                                                                )}
-                                                            </small>
-                                                        </p>
-
-                                                        {/* Delete button on the far right */}
-                                                        <button
-                                                            onClick={() =>
-                                                                handleDeleteComment(
-                                                                    comment.id
-                                                                )
-                                                            }
-                                                            className="text-red-500 hover:text-red-700 ml-2"
-                                                        >
-                                                            <i className="fa fa-trash"></i>
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Comment body */}
-                                                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                                                        {comment.body}
-                                                    </p>
-
-                                                    {/* Comment actions */}
-                                                    <div className="flex space-x-3 text-xs text-gray-500 mt-1">
-                                                        <button
-                                                            onClick={() =>
-                                                                handleToggleReply(
-                                                                    comment.id
-                                                                )
-                                                            }
-                                                        >
-                                                            Reply
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Reply input */}
-                                                    {replySectionFor ===
-                                                        comment.id && (
-                                                        <form
-                                                            onSubmit={(e) =>
-                                                                handlePostReply(
-                                                                    e,
-                                                                    comment.id
-                                                                )
-                                                            }
-                                                            className="mt-2 flex space-x-2"
-                                                        >
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Write a reply..."
-                                                                value={newReply}
-                                                                onChange={(e) =>
-                                                                    setNewReply(
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                                className="flex-1 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-sm"
-                                                            />
-                                                            <button
-                                                                type="submit"
-                                                                className="px-3 py-1 bg-yellow-400 rounded-full text-sm font-semibold"
-                                                            >
-                                                                Send
-                                                            </button>
-                                                        </form>
-                                                    )}
-
-                                                    {/* Replies list */}
-                                                    <ul className="mt-3 space-y-2">
-                                                        {comment.replies?.map(
-                                                            (reply) => (
-                                                                <li
-                                                                    key={
-                                                                        reply.id
-                                                                    }
-                                                                    className="flex items-start space-x-2"
-                                                                >
-                                                                    <img
-                                                                        src={
-                                                                            reply
-                                                                                .user
-                                                                                ?.passport ||
-                                                                            "/avatar1.png"
-                                                                        }
-                                                                        alt="avatar"
-                                                                        className="w-6 h-6 rounded-full"
-                                                                    />
-                                                                    <div className="bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-1 text-xs">
-                                                                        <span className="font-semibold">
-                                                                            {
-                                                                                reply
-                                                                                    .user
-                                                                                    ?.first_name
-                                                                            }{" "}
-                                                                            {
-                                                                                reply
-                                                                                    .user
-                                                                                    ?.last_name
-                                                                            }
-                                                                        </span>{" "}
-                                                                        {formatRelativeTime(
-                                                                            reply.created_at
-                                                                        )}
-                                                                        <p>
-                                                                            {
-                                                                                reply.body
-                                                                            }
-                                                                        </p>
-                                                                        {/* Reply actions */}
-                                                                        <div className="mt-1 text-[10px] text-gray-500 flex space-x-2">
-                                                                            <button
-                                                                                onClick={() =>
-                                                                                    handleLikeReply(
-                                                                                        reply.id,
-                                                                                        comment.id
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                <i className="fa fa-heart mr-1"></i>
-                                                                                {reply.likes ||
-                                                                                    0}
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-                                                            )
-                                                        )}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-500 italic">
-                                    No comments yet.
-                                </p>
-                            )}
-                        </ul>
-
-                        {/* Add Comment Input */}
-                        <form
-                            onSubmit={handleCommentSubmit}
-                            className="flex items-center space-x-2 mt-2"
-                        >
-                            <input
-                                type="text"
-                                placeholder="Write a comment..."
-                                className="flex-1 px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-[#FFD736]"
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                            />
-                            <button
-                                disabled={commenting}
-                                type="submit"
-                                className="px-4 py-1.5 bg-[#FFD736] text-gray-800 font-semibold rounded-full hover:bg-yellow-400 transition text-sm"
-                            >
-                                {commenting ? "Commenting" : "Post"}
-                            </button>
-                        </form>
-                    </div>
-                )}
+            {/* Action Buttons */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+                <div className="flex">
+                    <button className="flex-1 flex items-center justify-center gap-2 py-2 px-4 text-[#6B7280] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <span className="font-medium">Love</span>
+                    </button>
+                    <button className="flex-1 flex items-center justify-center gap-2 py-2 px-4 text-[#6B7280] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        <span className="font-medium">Comment</span>
+                    </button>
+                </div>
             </div>
         </div>
     );

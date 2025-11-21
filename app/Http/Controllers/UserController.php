@@ -82,4 +82,25 @@ class UserController extends Controller
         ]);
     }
 
+    public function getProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        return response()->json([
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'email' => $user->email,
+            'passport' => $user->passport,
+            'biography' => $user->biography,
+            'skill_level' => $user->skill_level,
+            'phone_number' => $user->phone_number,
+            'country' => $user->country,
+            'instagram' => $user->instagram,
+            'youtube' => $user->youtube,
+            'facebook' => $user->facebook,
+            'tiktok' => $user->tiktok,
+        ]);
+    }
+
 }

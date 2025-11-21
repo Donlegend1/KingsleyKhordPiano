@@ -1,118 +1,279 @@
-@extends("layouts.member")
-
 @extends("layouts.community")
 
 @section("content")
 
+@php
+    // Calculate profile completion
+    $user = auth()->user();
+    $totalFields = 6;
+    $completedFields = 0;
+
+    // Check each field
+    $hasProfilePhoto = !empty($user->passport);
+    $hasBiography = !empty($user->biography);
+    $hasSocialMedia = !empty($user->instagram) || !empty($user->youtube) || !empty($user->facebook) || !empty($user->tiktok);
+    $hasSkillLevel = !empty($user->skill_level);
+    $hasPhoneNumber = !empty($user->phone_number);
+    $hasCountry = !empty($user->country);
+
+    // Count completed fields
+    if ($hasProfilePhoto) $completedFields++;
+    if ($hasBiography) $completedFields++;
+    if ($hasSocialMedia) $completedFields++;
+    if ($hasSkillLevel) $completedFields++;
+    if ($hasPhoneNumber) $completedFields++;
+    if ($hasCountry) $completedFields++;
+
+    // Calculate percentage
+    $completionPercentage = round(($completedFields / $totalFields) * 100);
+
+    // Calculate stroke-dashoffset for progress circle (339.292 is the circumference of the circle)
+    $strokeDashoffset = 339.292 - (339.292 * $completionPercentage / 100);
+@endphp
+
 <!-- Header Section -->
-<div class="border border-gray-200 dark:border-gray-500">
-    <div class="flex justify-between items-center px-10 py-2 bg-white dark:bg-gray-800">
-        <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Feed</h1>
-        <i class="fa fa-ellipsis-v text-gray-500 dark:text-gray-300" aria-hidden="true"></i>
+<div class="bg-white dark:bg-gray-800 mb-6">
+    <div class="px-4 sm:px-6 py-4">
+        <h1 class="text-2xl sm:text-3xl font-bold text-[#1F2937] dark:text-white">Activity Feed</h1>
     </div>
 </div>
-
-<div class="overflow-scroll h-screen">
-  <!-- Quick Links Navigation -->
-<div class="flex justify-between items-center px-10 py-2 bg-white dark:bg-gray-800 border border-t-0 border-gray-200 dark:border-gray-500">
-    <div class="flex space-x-6 text-gray-500 dark:text-gray-200 text-sm">
-        <a href="/home" class="hover:text-gray-700">🏠 Dashboard</a>
-        <a href="/member/roadmap" class="hover:text-gray-700">🗺️ Roadmap</a>
-        <a href="//member/plugins" class="hover:text-gray-700">📁 Download</a>
-    </div>
-</div>
-
 <!-- Main Feed Section -->
-<section class="bg-gray-100 dark:bg-gray-900 py-6 px-2 md:px-10 ">
-  <div class="flex flex-col lg:flex-row gap-6 ">
+<section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-gray-900">
+  <div class="flex flex-col lg:flex-row gap-6">
 
     <!-- Left: Main Feed Area -->
     <div class="flex-1 space-y-6">
-      <div class=" rounded-lg p-4">
-        <div id="post-list"></div>
-      </div>
+        <!-- Feed Posts Container -->
+        <div id="post-list" class="space-y-6"></div>
     </div>
 
-    <!-- Right: Recent Activity -->
-    <div class="w-full lg:w-[300px]">
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-            Recent Activities
-        </h2>
-        <div>
-          <ul class="space-y-3">
-    @php
-        $activities = \Illuminate\Support\Facades\DB::table('notifications')
-            ->latest()
-            ->take(10)
-            ->get();
-    @endphp
+    <!-- Right Sidebar -->
+    <div class="hidden lg:block w-80 xl:w-96 flex-shrink-0 space-y-6">
 
-    @forelse ($activities as $activity)
-        @php
-            $data = json_decode($activity->data, true);
-            $firstName = $data['first_name'] ?? '';
-            $lastName = $data['last_name'] ?? '';
-            $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
-            $postId = $data['post_id'] ?? null;
-        @endphp
-
-        @if($postId)
-            <li>
-                <a href="/member/post/{{ $postId }}" class="flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition">
-                    <!-- Avatar or Initials -->
-                    @if(!empty($data['by_user_avatar']))
-                        <img 
-                            src="{{ $data['by_user_avatar'] }}" 
-                            alt="{{ trim($firstName . ' ' . $lastName) ?: 'User' }}"
-                            class="w-8 h-8 rounded-full object-cover"
-                        >
-                    @else
-                        <div class="w-12 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold text-gray-700">
-                            {{ $initials ?: '?' }}
-                        </div>
-                    @endif
-
-                    <!-- Text & Time -->
-                    <div class="flex flex-col">
-                        <span class="text-gray-800 dark:text-gray-100 font-semibold">
-                            {{ trim($firstName . ' ' . $lastName) ?: 'Someone' }}
-                        </span>
-
-                        <span class="text-gray-500 dark:text-gray-400 text-sm">
-                            @if($data['type'] === 'post')
-                                made a new post
-                            @elseif($data['type'] === 'comment')
-                                commented on a post
-                            @elseif($data['type'] === 'reply')
-                                replied to a comment
-                            @elseif($data['type'] === 'like')
-                                liked a post
-                            @else
-                                did something
-                            @endif
-                            • {{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}
-                        </span>
-                    </div>
+        <!-- Complete Your Profile Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-[#1F2937] dark:text-white">Complete Your Profile</h3>
+                <a href="/member/profile" class="text-sm text-[#FFD736] hover:text-[#E5C634] font-medium transition-colors">
+                    Edit Profile →
                 </a>
-            </li>
-        @endif
-    @empty
-        <li class="text-sm text-gray-500 dark:text-gray-400">
-            No recent activities
-        </li>
-    @endforelse
-</ul>
+            </div>
 
-        </div>
-    </div>
+            <!-- Progress Circle -->
+            <div class="flex justify-center mb-5">
+                <div class="relative w-32 h-32">
+                    <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                        <circle
+                            cx="60"
+                            cy="60"
+                            r="54"
+                            stroke="#E5E7EB"
+                            stroke-width="8"
+                            fill="none"
+                        />
+                        <circle
+                            cx="60"
+                            cy="60"
+                            r="54"
+                            stroke="#10B981"
+                            stroke-width="8"
+                            fill="none"
+                            stroke-dasharray="339.292"
+                            stroke-dashoffset="{{ $strokeDashoffset }}"
+                            stroke-linecap="round"
+                            class="transition-all duration-300"
+                        />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-3xl font-bold text-[#1F2937]">{{ $completionPercentage }}</span>
+                        <span class="text-base text-[#6B7280]">%</span>
+                        <span class="text-xs text-[#9CA3AF] mt-1">Complete</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checklist Items -->
+            <div class="space-y-3">
+                <!-- Profile Photo -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        @if($hasProfilePhoto)
+                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
+                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-[#10B981] font-medium">Profile Photo</span>
+                        @else
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-[#6B7280]">Profile Photo</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Biography -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        @if($hasBiography)
+                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
+                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-[#10B981] font-medium">Biography</span>
+                        @else
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-[#6B7280]">Biography</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Social Media Links -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        @if($hasSocialMedia)
+                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
+                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-[#10B981] font-medium">Social Media Links</span>
+                        @else
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-[#6B7280]">Social Media Links</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Skill Level -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        @if($hasSkillLevel)
+                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
+                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-[#10B981] font-medium">Skill Level</span>
+                        @else
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-[#6B7280]">Skill Level</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        @if($hasPhoneNumber)
+                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
+                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-[#10B981] font-medium">Phone Number</span>
+                        @else
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-[#6B7280]">Phone Number</span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Location / Country -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        @if($hasCountry)
+                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
+                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-[#10B981] font-medium">Location / Country</span>
+                        @else
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-[#6B7280]">Location / Country</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
 </div>
 
+        <!-- Latest Updates Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+            <h3 class="text-lg font-bold text-[#1F2937] dark:text-white mb-4">Latest updates</h3>
 
+            <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">John</span> posted an update</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">4 years ago</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">Adele</span> posted an update</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">4 years ago</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">John</span> posted an update</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">5 years ago</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">John</span> posted an update in the group <span class="font-semibold">Coffee Addicts</span></p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">5 years ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
   </div>
 </section>
 
-</div>
+<!-- Floating Action Button -->
+<button class="fixed bottom-6 right-6 w-14 h-14 bg-[#FF6B35] dark:bg-[#E55A2B] rounded-full shadow-lg hover:bg-[#E55A2B] dark:hover:bg-[#CC5A27] transition-colors duration-200 flex items-center justify-center">
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5H19M7 13l-1.1 5M7 13l4 4h4l4-4m-8 4V9m0 8v4"></path>
+    </svg>
+</button>
 
 
 
