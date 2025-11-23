@@ -59,6 +59,9 @@
             <a href="/admin/website-video" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-upload"></i> <span>Website Videos</span>
             </a>
+             <a href="/admin/midi-file" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa fa-upload"></i> <span>Midi File</span>
+            </a>
             <a href="/member/profile" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-cog"></i> <span>Settings</span>
             </a>

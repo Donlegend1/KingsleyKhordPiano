@@ -178,21 +178,20 @@ const PostList = () => {
         setPosting(true);
 
         try {
-            await axios.post("/api/member/post", data, {
+            const res = await axios.post("/api/member/post", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
 
+            // After creating a post, refetch the first page so server ordering is respected
             showMessage("Posted successfully.", "success");
 
-            setPostDetails({
-                body: "",
-                category: "",
-                subcategory: "",
-            });
+            setPostDetails({ body: "", category: "", subcategory: "" });
             setMediaFiles([]);
             setExpanded(false);
+
+            // reset pagination and fetch fresh first page
             setPosts([]);
             setPage(1);
             setHasMore(true);
@@ -209,10 +208,8 @@ const PostList = () => {
         try {
             await axios.delete(`/api/member/post/${id}`);
 
-            setPosts([]);
-            setPage(1);
-            setHasMore(true);
-            await fetchPosts();
+            // remove locally
+            setPosts((prev) => prev.filter((p) => p.id !== id));
             showMessage("Post deleted.", "success");
         } catch (error) {
             showMessage(error.response?.data?.message, "error");
@@ -243,13 +240,33 @@ const PostList = () => {
         };
 
         try {
-            await axios.post("/api/member/comment", comment, {
+            const res = await axios.post("/api/member/comment", comment, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            // await fetchPosts();
-            window.location.reload();
+
+            const created = res.data?.data || res.data;
+
+            // append comment to the right post locally
+            if (created && created.id) {
+                setPosts((prev) =>
+                    prev.map((p) =>
+                        p.id === selectedPost.id
+                            ? {
+                                  ...p,
+                                  comments: [...(p.comments || []), created],
+                              }
+                            : p
+                    )
+                );
+            } else {
+                // fallback: refetch
+                setPosts([]);
+                setPage(1);
+                setHasMore(true);
+                await fetchPosts();
+            }
 
             showMessage("Comment posted.", "success");
             setNewComment("");
@@ -260,6 +277,13 @@ const PostList = () => {
         } finally {
             setCommenting(false);
         }
+    };
+
+    // allow child to update a post (likes/comments) optimistically
+    const handleUpdatePost = (id, patch) => {
+        setPosts((prev) =>
+            prev.map((p) => (p.id === id ? { ...p, ...patch } : p))
+        );
     };
 
     return (
@@ -313,6 +337,7 @@ const PostList = () => {
                         handleCommentSubmit={handleCommentSubmit}
                         handleDeletePost={handleDeletePost}
                         commenting={commenting}
+                        onUpdatePost={handleUpdatePost}
                         // setCommenting={setCommenting}
                     />
                 ))}

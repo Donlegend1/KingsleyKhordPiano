@@ -42,5 +42,6 @@ import "./components/Members/SubCategory.jsx"
 import "./components/Members/SinglePost.jsx"
 import "./components/PremiumChat/PremiumChat.jsx"
 import "./components/PremiumChat/PremiumChatButton.jsx"
+import './components/Midi/MidiFiles.jsx';
 
 

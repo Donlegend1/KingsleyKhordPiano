@@ -63,6 +63,19 @@ const CreatePostBox = ({
                 { name: "Advance", value: "advance" },
             ],
         },
+        {
+         category: { name: "ProgressReports", value: "progress_report" },
+            subCategories: [
+                { name: "Progress Reports", value: "progress_report" },
+            ],
+        },
+
+        {
+         category: { name: "ExclusiveFeed", value: "exclusive_feed" },
+            subCategories: [
+                { name: "Exclusive Feed", value: "exclusive_feed" },
+            ],
+        },
     ];
 
     useEffect(() => {
@@ -109,7 +122,7 @@ const CreatePostBox = ({
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
                     <svg className="w-6 h-6 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
                     </svg>
                 </div>
                 <input

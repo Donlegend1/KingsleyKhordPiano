@@ -30,6 +30,7 @@ use App\Http\Controllers\PremiumChatController;
 use App\Http\Controllers\WebsiteVideoController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\BookMarkController;
+use App\Http\Controllers\MidiFileController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -185,4 +186,6 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('website-video', [WebsiteVideoController::class, 'index']);
     Route::post('website-video/{video?}', [WebsiteVideoController::class, 'saveVideo']);
     Route::post('website-video/delete/{video}', [WebsiteVideoController::class, 'destroy']);
+    Route::get('midi-file', [MidiFileController::class, 'index']);
+    
 });

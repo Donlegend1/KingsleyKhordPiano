@@ -21,6 +21,8 @@ use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\ChatMessageLikeController;
+use App\Http\Controllers\MidiFileController;
+
 
 
 /*
@@ -51,7 +53,11 @@ use App\Http\Controllers\ChatMessageLikeController;
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
         Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
-        Route::post('/courses/category/create', [CourseCategoryController::class, 'create']); 
+        Route::post('/courses/category/create', [CourseCategoryController::class, 'create']);
+        Route::post('/midi-file/create', [MidiFileController::class, 'store']);
+        Route::delete('/midi-files/{midiFile}', [MidiFileController::class, 'destroy']);
+        Route::get('/midi-files', [MidiFileController::class, 'fetchAll']);
+        Route::post('/midi-files/update/{midiFile}', [MidiFileController::class, 'update']);
     });
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {

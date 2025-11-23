@@ -117,14 +117,14 @@
                         </svg>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Intermediate</span>
                     </a>
-                    <a href="/member/community/space/advanced"
-                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/advanced') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                    <a href="/member/community/space/advance"
+                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/advance') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
                         <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 9.5l3-3 3 3"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.5v6"></path>
                         </svg>
-                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Advanced</span>
+                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">advance</span>
                     </a>
                 </div>
             </div>
@@ -181,7 +181,8 @@
                         </svg>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Dashboard</span>
                     </a>
-                    <a href="/member/shop"
+                    <a href="https://khordsounds.com/"
+                    target="blank"
                        class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700">
                         <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
@@ -242,7 +243,7 @@
                         </svg>
                         <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    <a href="/member/shop" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="https://khordsounds.com/" target="blank" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
@@ -378,7 +379,7 @@
 
                         <div class="flex flex-col">
                             <p class="text-sm text-gray-800 dark:text-gray-200">
-                                @if($data['type'] === 'comment')
+                                {{-- @if($data['type'] === 'comment')
                                     {{ $firstName }} commented on your post
                                 @elseif($data['type'] === 'reply')
                                     {{ $firstName }} replied to your comment
@@ -386,7 +387,7 @@
                                     {{ $firstName }} liked your post
                                 @else
                                     New activity
-                                @endif
+                                @endif --}}
                             </p>
                             <span class="text-xs text-gray-500">
                                 {{ $notification->created_at->diffForHumans() }}
