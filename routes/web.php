@@ -145,6 +145,11 @@ Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/community/space/pdf-downloads', [CommunityIndexController::class, 'pdfDownloads'])->name('community.pdf-downloads');
     Route::get('/community/space/audio-downloads', [CommunityIndexController::class, 'audioDownloads'])->name('community.audio-downloads');
     Route::get('/community/space/midi-downloads', [CommunityIndexController::class, 'midiDownloads'])->name('community.midi-downloads');
+    Route::get('/community/space/midi-download/{MidiFile}', [MidiFileController::class, 'single'])->name('community.midi-downloads.single');
+    Route::get('/midi-files/{midiFile}/download-midi', [MidiFileController::class, 'downloadMidi'])
+    ->name('midi.download.midi');
+    Route::get('/midi-files/{midiFile}/download-lmv', [MidiFileController::class, 'downloadLmv'])
+        ->name('midi.download.lmv');
     Route::get('/community/space/{subcategory}', [CommunityIndexController::class, 'subcategory'])->name('community.subcategory');
     Route::get('/community/space', [CommunityIndexController::class, 'space'])->name('community.space');
     Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');

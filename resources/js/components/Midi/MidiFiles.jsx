@@ -42,7 +42,6 @@ const MidiFiles = () => {
             const response = await axios.get(`/api/admin/midi-files`, {
                 headers: { "X-CSRF-TOKEN": csrfToken },
             });
-
             setMidiFiles(response.data);
         } catch (error) {
             console.error("Error fetching midi files:", error);
@@ -209,9 +208,9 @@ const MidiFiles = () => {
                                 {file.name}
                             </h3>
 
-                            <p className="text-sm text-gray-600 truncate">
+                            {/* <p className="text-sm text-gray-600 truncate">
                                 {file.video_path}
-                            </p>
+                            </p> */}
 
                             <div className="mt-4 flex justify-end gap-2">
                                 <button
@@ -283,7 +282,7 @@ const MidiFiles = () => {
                         }
                     />
 
-                    <label className="block font-medium">MKV File:</label>
+                    <label className="block font-medium">LMV File:</label>
                     <input
                         type="file"
                         onChange={(e) =>

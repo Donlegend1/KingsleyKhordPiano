@@ -15,7 +15,7 @@ class UpdateMidiFileRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'video_path' => 'sometimes|string|max:255',
+            'video_path' => 'sometimes|string',
             'video_type' => 'sometimes|in:youtube,google,local,iframe',
             'midi_file' => 'sometimes|file',
             'lmv_file' => 'sometimes|file',

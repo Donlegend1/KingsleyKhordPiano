@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('midi_files', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('video_path');
+            $table->text('video_path');
             $table->enum('video_type', ['youtube', 'google', 'local', 'iframe']);
             $table->string('midi_file_path')->nullable();
             $table->string('lmv_file_path')->nullable();

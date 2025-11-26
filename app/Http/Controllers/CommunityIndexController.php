@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\PostMedia;
 use Illuminate\Support\Str;
 use App\Models\Community;
+use App\Models\MidiFile;
 
 class CommunityIndexController extends Controller
 {
@@ -53,6 +54,8 @@ class CommunityIndexController extends Controller
 
    public function midiDownloads()
    {
-      return view('community.midi-downloads');
+      $midiFiles = MidiFile::all();
+      // dd($midiFiles);
+      return view('community.midi-files.midi-downloads', compact('midiFiles'));
    }
 }
