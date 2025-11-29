@@ -211,6 +211,73 @@ const CourseDetails = ({ course, onComplete }) => {
         }
     };
 
+    const renderVideoPlayer = () => {
+        if (!course.video_type || !course.video_url) {
+            return (
+                <div className="mb-4 text-gray-500">No video available.</div>
+            );
+        }
+
+        switch (course.video_type) {
+            case "iframe":
+                return (
+                    <div
+                        className="mb-4 w-full dark:bg-black"
+                        dangerouslySetInnerHTML={{ __html: course.video_url }}
+                    />
+                );
+
+            case "google":
+                return (
+                    <iframe
+                        width="100%"
+                        height="400"
+                        src={`https://drive.google.com/file/d/${course.video_url}/preview`}
+                        allow="autoplay"
+                        allowFullScreen
+                        className="rounded"
+                    />
+                );
+
+            case "youtube":
+                return (
+                    <iframe
+                        width="100%"
+                        height="400"
+                        src={`https://www.youtube.com/embed/${course.video_url}`}
+                        title="YouTube video"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="rounded"
+                    />
+                );
+
+            case "local":
+                return (
+                    <video
+                        controls
+                        width="100%"
+                        height="400"
+                        className="rounded"
+                    >
+                        <source
+                            src={`/uploads/videos/${course.video_url}`}
+                            type="video/mp4"
+                        />
+                        Your browser does not support HTML5 video.
+                    </video>
+                );
+
+            default:
+                return (
+                    <div className="mb-4 text-gray-500">
+                        No video available.
+                    </div>
+                );
+        }
+    };
+
     return (
         <div className="p-6 bg-white dark:bg-black rounded shadow-lg">
             <div className="flex items-center justify-between mb-6">
@@ -236,14 +303,9 @@ const CourseDetails = ({ course, onComplete }) => {
                 </button>
             </div>
 
-            {course.video_url ? (
-                <div
-                    className="mb-4 w-full dark:bg-black"
-                    dangerouslySetInnerHTML={{ __html: course.video_url }}
-                />
-            ) : (
-                <div className="mb-4 text-gray-500">No video available.</div>
-            )}
+           <div className="mb-4">
+                {renderVideoPlayer()}
+            </div>
 
             <div className="text-center mt-6">
                 <button

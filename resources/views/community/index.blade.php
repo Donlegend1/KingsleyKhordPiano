@@ -211,7 +211,7 @@
 </div>
 
         <!-- Latest Updates Card -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+        {{-- <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
             <h3 class="text-lg font-bold text-[#1F2937] dark:text-white mb-4">Latest updates</h3>
 
             <div class="space-y-4">
@@ -263,7 +263,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
   </div>
 </section>

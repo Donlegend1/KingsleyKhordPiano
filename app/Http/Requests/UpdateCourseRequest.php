@@ -30,6 +30,7 @@ class UpdateCourseRequest extends FormRequest
         
             'status' => 'nullable|in:active,inactive,draft',
             'video_url' => 'nullable|string',
+            'video_type' => 'required|string',
             'prerequisites' => 'nullable|string',
             'what_you_will_learn' => 'nullable|string',
             'published_at' => 'nullable|date',

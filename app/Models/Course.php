@@ -17,12 +17,10 @@ class Course extends Model
         'thumbnail',
         'price',
         'duration',
+        'video_type',
         'level',
         'status',
         'course_category_id',
-        // 'prerequisites',
-        // 'what_you_will_learn',
-        // 'resources',
         'requirements',
 
     ];

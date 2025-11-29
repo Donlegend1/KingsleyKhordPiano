@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CourseCategory;
+use App\Models\Course;
 
 class CourseCategoryController extends Controller
 {
@@ -22,4 +23,23 @@ class CourseCategoryController extends Controller
 
         return response()->json($courseCategory, 201);
     }   
+
+    public function delete($name)
+    {
+        $category = CourseCategory::where('category', $name)->first();
+        $existingCourse = Course::where('course_category_id', $category->id)->first();
+
+        if ($existingCourse) {
+            return response()->json([
+                'message' => 'Cannot delete category because it has courses assigned.'
+            ], 400);
+        }
+
+        // Safe to delete
+        $category->delete();
+
+        return response()->json([
+            'message' => 'Category deleted successfully'
+        ], 200);
+    }
 }

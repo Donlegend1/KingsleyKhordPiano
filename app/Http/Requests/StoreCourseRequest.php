@@ -26,6 +26,7 @@ class StoreCourseRequest extends FormRequest
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
             'video_url' => 'required|string',
+            'video_type' => 'required|string',
             'level' => 'nullable',
             'status' => 'nullable|in:active,inactive,draft',
             'rating_count' => 'nullable|integer',

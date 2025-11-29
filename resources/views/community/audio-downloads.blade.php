@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<!-- Main Content Section -->
+{{-- <!-- Main Content Section -->
 <section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-gray-900">
     <div class="max-w-7xl mx-auto">
         
@@ -444,6 +444,10 @@
         </div>
 
     </div>
-</section>
+</section> --}}
+
+<div class="flex justify-center items-center h-screen">
+    <h4 class="text-center text-2xl font-semibold">Coming Soon</h4>
+</div>
 @endsection
 

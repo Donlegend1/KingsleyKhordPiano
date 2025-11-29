@@ -164,7 +164,6 @@ const DraggableCategoryList = ({
                 level,
                 categories: items.map(([category]) => category),
             });
-            console.log("Category order persisted:", response.data);
         } catch (error) {
             console.error("Failed to persist category order:", error);
         }
@@ -198,6 +197,25 @@ const DraggableCategoryList = ({
         }
     };
 
+    const handleDeleteCategory = async (category) => {
+        try {
+            const response = await axios.delete(
+                `/api/admin/course/category/${category}/delete`,
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                    withCredentials: true,
+                }
+            );
+            fetchCourses();
+            showMessage("Course Category Deleted", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message, "error");
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <div className="mt-6">
             <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -242,13 +260,30 @@ const DraggableCategoryList = ({
                                                         className="text-lg font-medium mb-3 px-2 py-1 bg-blue-50 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center hover:bg-blue-100 dark:hover:bg-gray-600 select-none"
                                                     >
                                                         <span>{category}</span>
-                                                        <i
-                                                            className={`fa ${
-                                                                isCollapsed
-                                                                    ? "fa-chevron-down"
-                                                                    : "fa-chevron-up"
-                                                            } text-sm`}
-                                                        ></i>
+
+                                                        <div className="flex items-center gap-4">
+                                                            {/* Delete Icon */}
+                                                            <i
+                                                                className="fa fa-trash text-red-600 hover:text-red-800 text-sm cursor-pointer"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation(); // prevent toggle
+                                                                    handleDeleteCategory(
+                                                                        category
+                                                                    );
+                                                                }}
+                                                            ></i>
+
+                                                            {/* Chevron */}
+                                                            <i
+                                                                className={`fa ${
+                                                                    isCollapsed
+                                                                        ? "fa-chevron-down"
+                                                                        : "fa-chevron-up"
+                                                                } text-sm`}
+                                                            ></i>
+                                                        </div>
                                                     </h4>
 
                                                     {/* Category Content (not hidden, just collapsed visually) */}
@@ -423,6 +458,28 @@ const DraggableCategoryList = ({
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         />
+                        <div>
+                            <label
+                                htmlFor="video_type"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Video Type
+                            </label>
+
+                            <select
+                                type="text"
+                                name="video_type"
+                                value={selectedCourse?.video_type}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                            >
+                                <option value="">Select Video Type</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="google">Google</option>
+                                <option value="local">Local</option>
+                                <option value="iframe">Iframe</option>
+                            </select>
+                        </div>
                         <input
                             name="video_url"
                             placeholder="Video URL"
@@ -541,6 +598,30 @@ const DraggableCategoryList = ({
                         className="w-full px-3 py-2 border rounded-lg"
                     />
                 </div>
+
+                <div className="my-3">
+                    <label
+                        htmlFor="video_type"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Video Type
+                    </label>
+
+                    <select
+                        type="text"
+                        name="video_type"
+                        value={course?.video_type}
+                        onChange={handleChangeNewCourse}
+                        className="w-full px-3 py-2 border rounded-lg"
+                    >
+                        <option value="">Select Video Type</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="google">Google</option>
+                        <option value="local">Local</option>
+                        <option value="iframe">Iframe</option>
+                    </select>
+                </div>
+
                 <div>
                     <label
                         htmlFor="video_url"

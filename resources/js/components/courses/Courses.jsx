@@ -146,6 +146,7 @@ const Courses = () => {
                                 className="text-xl font-semibold mb-4 px-4 py-2 bg-gray-50 rounded-lg capitalize flex justify-between items-center cursor-pointer hover:bg-gray-100"
                             >
                                 <span>{level} Courses</span>
+                                
                                 <i
                                     className={`fa ${
                                         collapsedSections[level]

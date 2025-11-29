@@ -54,6 +54,7 @@ use App\Http\Controllers\MidiFileController;
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
         Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
         Route::post('/courses/category/create', [CourseCategoryController::class, 'create']);
+        Route::delete('/course/category/{name}/delete', [CourseCategoryController::class, 'delete']);
         Route::post('/midi-file/create', [MidiFileController::class, 'store']);
         Route::delete('/midi-files/{midiFile}', [MidiFileController::class, 'destroy']);
         Route::get('/midi-files', [MidiFileController::class, 'fetchAll']);

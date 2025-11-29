@@ -10,6 +10,7 @@ use App\Notifications\NewCourseCreated;
 use App\Enums\Roles\UserRoles;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use App\Helpers\VideoHelper;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -36,10 +37,29 @@ class CourseController extends Controller
      */
     public function store(StoreCourseRequest $request)
     {
-        $category =CourseCategory::where('category', $request->input('category'))->first();
+        $category = CourseCategory::where('category', $request->input('category'))->first();
 
         $validated = $request->validated();
         $validated['course_category_id'] = $category->id;
+
+        $videoType = $validated['video_type'] ?? 'iframe';
+        $videoPath = $validated['video_url'] ?? null;
+
+        if ($videoType === 'youtube') {
+            $validated['video_url'] = VideoHelper::extractYoutubeId($videoPath);
+        }
+
+        if ($videoType === 'google') {
+            $validated['video_url'] = VideoHelper::extractGoogleDriveId($videoPath);
+        }
+
+        if ($videoType === 'local') {
+            $validated['video_url'] = $videoPath;
+        }
+
+        if ($videoType === 'iframe') {
+            $validated['video_url'] = $videoPath;
+        }
 
         $course = Course::create($validated);
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -73,9 +93,40 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course)
     {
-        $course->update($request->validated());
+        $validated = $request->validated();
+
+        /* ---------------------------------------
+        |  HANDLE VIDEO TYPE & EXTRACT ID
+        ----------------------------------------*/
+        $videoType = $validated['video_type'] ?? $course->video_type; 
+        $videoPath = $validated['video_url'] ?? $course->video_url;
+
+        if ($videoType === 'youtube' && isset($validated['video_url'])) {
+            $validated['video_url'] = VideoHelper::extractYoutubeId($videoPath);
+        }
+
+        if ($videoType === 'google' && isset($validated['video_url'])) {
+            $validated['video_url'] = VideoHelper::extractGoogleDriveId($videoPath);
+        }
+
+        if ($videoType === 'local' && isset($validated['video_url'])) {
+            // Keep local filename as-is
+            $validated['video_url'] = $videoPath;
+        }
+
+        if ($videoType === 'iframe' && isset($validated['video_url'])) {
+            // Keep iframe HTML as-is
+            $validated['video_url'] = $videoPath;
+        }
+
+        /* ---------------------------------------
+        |  UPDATE COURSE
+        ----------------------------------------*/
+        $course->update($validated);
+
         return response()->json($course, 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
