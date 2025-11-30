@@ -252,7 +252,7 @@
               <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
                 <img src="{{ $course->thumbnail_url ?? '/images/featured1.jpeg' }}" alt="{{ $course->title }}" class="w-full h-32 object-cover rounded-md mb-2">
                 <h4 class="font-bold text-gray-800 mb-2 text-center">{{ $course->title }}</h4>
-                <a href="/member/course/beginner" class="text-blue-600 hover:underline">View Course</a>
+                <a href="/member/lesson/{{$course->id}}" class="text-blue-600 hover:underline">View Course</a>
               </div>
             @endforeach
           </div>
@@ -264,7 +264,7 @@
               <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
                 <img src="{{ $course->thumbnail_url ?? '/images/featured2.jpeg' }}" alt="{{ $course->title }}" class="w-full h-32 object-cover rounded-md mb-2">
                 <h4 class="font-bold text-gray-800 mb-2 text-center">{{ $course->title }}</h4>
-                <a href="/member/course/intermediate" class="text-blue-600 hover:underline">View Course</a>
+                <a href="/member/lesson/{{$course->id}}" class="text-blue-600 hover:underline">View Course</a>
               </div>
             @endforeach
           </div>
@@ -276,7 +276,7 @@
               <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
                 <img src="{{ $course->thumbnail_url ?? '/images/featured3.jpeg' }}" alt="{{ $course->title }}" class="w-full h-32 object-cover rounded-md mb-2">
                 <h4 class="font-bold text-gray-800 mb-2 text-center">{{ $course->title }}</h4>
-                <a href="/member/course/advanced" class="text-blue-600 hover:underline">View Course</a>
+                <a href="/member/lesson/{{$course->id}}" class="text-blue-600 hover:underline">View Course</a>
               </div>
             @endforeach
           </div>

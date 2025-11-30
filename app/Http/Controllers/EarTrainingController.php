@@ -64,62 +64,68 @@ class EarTrainingController extends Controller
         try {
             $thumbnail = $request->file('thumbnail');
             $mainAudio = $request->file('main_audio');
-    
+
+            // Process thumbnail
             $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-            $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
-    
-            // Save in public_html/ear_training/thumbnails
             $thumbnail->move(
                 base_path('../public_html/ear_training/thumbnails'),
                 $thumbnailName
             );
-    
-            $mainAudio->move(
-                base_path('../public_html/ear_training/main_audios'),
-                $mainAudioName
-            );
-    
+
+            // Process main audio only if provided
+            $mainAudioName = null;
+            if ($mainAudio) {
+                $mainAudioName = time() . '_' . $mainAudio->getClientOriginalName();
+                $mainAudio->move(
+                    base_path('../public_html/ear_training/main_audios'),
+                    $mainAudioName
+                );
+            }
+
+            // Create quiz record
             $quiz = Quiz::create([
                 'title'           => $request->title,
                 'description'     => $request->description,
                 'video_url'       => $request->video_url,
                 'thumbnail_path'  => "/ear_training/thumbnails/$thumbnailName",
-                'main_audio_path' => "/ear_training/main_audios/$mainAudioName",
+                'main_audio_path' => $mainAudioName 
+                                        ? "/ear_training/main_audios/$mainAudioName"
+                                        : null,
                 'category'        => $request->category,
             ]);
-    
+
+            // Process questions
             foreach ($request->questions as $q) {
                 $audio = $q['audio'];
                 $audioName = time() . '_' . $audio->getClientOriginalName();
-    
+
                 $audio->move(
                     base_path('../public_html/ear_training/question_audios'),
                     $audioName
                 );
-    
+
                 $quiz->questions()->create([
                     'audio_path'     => "/ear_training/question_audios/$audioName",
                     'correct_option' => $q['correct_option'],
                 ]);
             }
-    
+
             return response()->json([
                 'message' => 'Quiz created successfully.',
                 'quiz'    => $quiz->load('questions'),
             ], 201);
-    
+
         } catch (\Throwable $e) {
             \Log::error('Quiz creation failed: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
-    
+
             return response()->json([
                 'error'   => 'Failed to create quiz.',
                 'message' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     public function update(Request $request, Quiz $quiz)
     {

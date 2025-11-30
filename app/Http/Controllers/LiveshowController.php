@@ -41,9 +41,9 @@ class LiveShowController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Liveshow $liveshow)
+    public function show()
     {
-        //
+        return view('memberpages.premium.booking');
     }
 
     /**

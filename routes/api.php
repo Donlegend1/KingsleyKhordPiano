@@ -40,6 +40,8 @@ use App\Http\Controllers\MidiFileController;
         return $request->user();
     });
 
+    Route::get('/live-shows', [LiveShowController::class, 'list']);
+
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminController::class, 'usersList']);
         Route::put('users/{user}', [AdminController::class, 'editUser']);

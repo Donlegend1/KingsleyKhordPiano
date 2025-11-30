@@ -139,6 +139,7 @@ Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     Route::get('profile', [HomeController::class, 'profile']);
     Route::get('/shop', [ShopController::class, 'index']);
     Route::get('support', [HomeController::class, 'support']);
+    Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');

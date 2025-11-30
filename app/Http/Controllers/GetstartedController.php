@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Enums\GetStarted\GetStartedStatus;
 use  App\Models\WebsiteVideo;
 use App\Models\Course;
+use App\Models\Upload;
 
 class GetstartedController extends Controller
 {
@@ -21,9 +22,9 @@ class GetstartedController extends Controller
         $setUp = WebsiteVideo::where('video_category', 'setUp')->first()?->video_url;
         $exper = WebsiteVideo::where('video_category', 'exper')->first()?->video_url;
 
-        $beginnerCourses = Course::where('level', 'beginner')->latest()->take(3)->get();
-        $intermediateCourses = Course::where('level', 'intermediate')->latest()->take(3)->get();
-        $advancedCourses = Course::where('level', 'advanced')->latest()->take(3)->get();
+        $beginnerCourses = Upload::where('category', 'learn songs')->where('level', 'beginner')->latest()->take(3)->get();
+        $intermediateCourses = Upload::where('category', 'learn songs')->where('level', 'intermediate')->latest()->take(3)->get();
+        $advancedCourses = Upload::where('category', 'learn songs')->where('level', 'advanced')->latest()->take(3)->get();
         // dd($intermediateCourses);
 
         return view('memberpages.getstarted', [

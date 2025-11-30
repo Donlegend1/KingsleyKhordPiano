@@ -55,9 +55,24 @@ class MidiFileController extends Controller
 
         // Thumbnail upload
         if ($request->hasFile('thumbnail')) {
-            $thumbnailName = time() . '_thumbnail.' . $request->file('thumbnail')->getClientOriginalExtension();
-            $request->file('thumbnail')->move($thumbDir, $thumbnailName);
-            $data['thumbnail_path'] = 'midi-files/thumbnails/' . $thumbnailName;
+            $thumbnail = $request->file('thumbnail');
+
+            // New file name
+            $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
+
+            // Destination path in public_html
+            $destination = base_path('../public_html/midi-files/thumbnails');
+
+            // Create directory if not exists
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Move uploaded file
+            $thumbnail->move($destination, $thumbnailName);
+
+            // Save clean public path
+            $data['thumbnail_path'] = "/midi-files/thumbnails/$thumbnailName";
         }
 
         // LMV upload
@@ -117,15 +132,35 @@ class MidiFileController extends Controller
         }
 
         // Thumbnail
-        if ($request->hasFile('thumbnail')) {
-            if ($midiFile->thumbnail_path && file_exists(public_path($midiFile->thumbnail_path))) {
-                unlink(public_path($midiFile->thumbnail_path));
+       if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+
+            // Generate new name
+            $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
+
+            // Destination inside public_html
+            $destination = base_path('../public_html/midi-files/thumbnails');
+
+            // Create folder if missing
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
             }
 
-            $thumbnailName = time() . '_thumbnail.' . $request->file('thumbnail')->getClientOriginalExtension();
-            $request->file('thumbnail')->move($thumbDir, $thumbnailName);
-            $data['thumbnail_path'] = 'midi-files/thumbnails/' . $thumbnailName;
-        }
+            // Delete old thumbnail if it exists
+            if ($midiFile->thumbnail_path) {
+                $oldPath = base_path('../public_html/' . ltrim($midiFile->thumbnail_path, '/'));
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+    // Move new thumbnail
+    $thumbnail->move($destination, $thumbnailName);
+
+    // Save correct public path
+    $data['thumbnail_path'] = "/midi-files/thumbnails/$thumbnailName";
+}
+
 
         $midiFile->update($data);
 

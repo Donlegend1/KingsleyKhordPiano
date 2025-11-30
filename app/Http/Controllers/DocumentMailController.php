@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\DocumentMail;
 use Illuminate\Support\Facades\Log;
+use App\Services\VisitorService;
 
 class DocumentMailController extends Controller
 {
-    public function send(Request $request)
+    public function send(Request $request, VisitorService $visitorService)
     {
         $request->validate([
             'email' => 'required|email'
@@ -23,6 +24,9 @@ class DocumentMailController extends Controller
         }
 
         try {
+      
+            $visitorService->store($email, 'visitor_page');
+            
             Mail::to($email)->send(new DocumentMail($filePath));
             return redirect()->back()->with('success', 'Roadmap sent successfully!');
         } catch (\Throwable $e) {

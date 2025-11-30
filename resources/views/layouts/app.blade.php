@@ -153,7 +153,7 @@
                     </a>
                     <a href="https://khordsounds.com/"
                     target="blank"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2  'text-white' ">
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Shop
                     </a>
                 </div>

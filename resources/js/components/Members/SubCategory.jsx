@@ -8,7 +8,6 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
-import { FaRepublican } from "react-icons/fa6";
 import { FaCheck } from "react-icons/fa";
 
 const SubCategory = () => {
@@ -34,6 +33,22 @@ const SubCategory = () => {
         .filter((segment) => segment !== "")
         .pop();
 
+    const comingSoonSlugs = [
+        "say-hello",
+        "beginner",
+        "intermediate",
+        "advance",
+        "piano-breakdowns",
+    ];
+
+    if (comingSoonSlugs.includes(lastSegment.toLowerCase())) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center">
+                <h4 className="text-2xl font-semibold">Coming Soon</h4>
+            </div>
+        );
+    }
+
     const postCategories = [
         {
             category: { name: "GetStarted", value: "get_started" },
@@ -58,7 +73,7 @@ const SubCategory = () => {
             ],
         },
         {
-        category: { name: "ProgressReports", value: "progress_report" },
+            category: { name: "ProgressReports", value: "progress_report" },
             subCategories: [
                 { name: "Progress Reports", value: "progress_report" },
             ],
@@ -193,7 +208,7 @@ const SubCategory = () => {
                     const uniqueNewPosts = newPosts.filter(
                         (p) => !existingIds.has(p.id)
                     );
-                   
+
                     return [...prev, ...uniqueNewPosts];
                 });
 
