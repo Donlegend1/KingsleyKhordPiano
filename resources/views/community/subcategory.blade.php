@@ -39,3 +39,6 @@
     <div id="subcategory"></div>
 </div>
 @endsection
+<script>
+    window.activeSubscription = @json($activeSubscription);
+</script>

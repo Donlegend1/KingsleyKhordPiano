@@ -13,8 +13,7 @@ const PremiumChat = () => {
     const { showMessage } = useFlashMessage();
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+
     const [newComment, setNewComment] = useState("");
     const [commenting, setCommenting] = useState(false);
 
@@ -54,8 +53,8 @@ const PremiumChat = () => {
         return true;
     };
 
-    const fetchPosts = useCallback(async () => {
-        if (!hasMore || loading) return;
+    const fetchPosts = async () => {
+        if (loading) return;
         setLoading(true);
 
         try {
@@ -63,57 +62,32 @@ const PremiumChat = () => {
                 "/api/member/premium/rooms/1/messages",
                 {
                     params: {
-                        page,
                         sort: sortBy,
                     },
                 }
             );
 
             const newPosts = response.data.data;
-            const currentPage = response.data.current_page;
-            const lastPage = response.data.last_page;
 
-            setPosts((prev) => {
-                const existingIds = new Set(prev.map((p) => p.id));
-                const uniqueNewPosts = newPosts.filter(
-                    (p) => !existingIds.has(p.id)
-                );
-                return [...prev, ...uniqueNewPosts];
-            });
-
-            setHasMore(currentPage < lastPage);
+            setPosts(newPosts);
         } catch (error) {
             console.error("Error fetching posts:", error);
         } finally {
             setLoading(false);
         }
-    }, [hasMore, loading, page]);
+    };
 
     useEffect(() => {
         setPosts([]);
-        setPage(1);
-        setHasMore(true);
     }, [sortBy]);
 
     useEffect(() => {
         fetchPosts();
-    }, [page]);
+    }, []);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            if (
-                window.innerHeight + document.documentElement.scrollTop + 100 >=
-                document.documentElement.offsetHeight
-            ) {
-                if (!loading && hasMore) {
-                    setPage((prev) => prev + 1);
-                }
-            }
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [loading, hasMore]);
+    const refreshPosts = async () => {
+        await fetchPosts();
+    };
 
     const handlePost = async (data) => {
         if (!handleValidation()) return;
@@ -132,17 +106,7 @@ const PremiumChat = () => {
 
             // try to get created post from response
             const created = res.data?.data || res.data;
-
-            // prepend to local posts so UI updates immediately
-            if (created && created.id) {
-                setPosts((prev) => [created, ...prev]);
-            } else {
-                // fallback: refetch first page
-                setPosts([]);
-                setPage(1);
-                setHasMore(true);
-                await fetchPosts();
-            }
+            await refreshPosts();
 
             showMessage("Posted successfully.", "success");
 
@@ -221,8 +185,6 @@ const PremiumChat = () => {
             } else {
                 // fallback: refetch posts
                 setPosts([]);
-                setPage(1);
-                setHasMore(true);
                 await fetchPosts();
             }
 
@@ -245,7 +207,7 @@ const PremiumChat = () => {
     };
 
     // Calendar sidebar component (simple month grid with highlighted dates)
-    const CalendarSidebar = ({ events = [] }) => {
+    const CalendarSidebar = ({ events = [], upcomingLiveShow=[] }) => {
         const today = new Date();
         const year = today.getFullYear();
         const month = today.getMonth();
@@ -315,8 +277,8 @@ const PremiumChat = () => {
                 <div className="mt-4 text-sm">
                     <h5 className="font-semibold">Upcoming</h5>
                     <ul className="mt-2 space-y-2 text-xs">
-                        {events.length > 0 ? (
-                            events.slice(0, 5).map((ev, i) => (
+                        {upcomingLiveShow.length > 0 ? (
+                            upcomingLiveShow.slice(0, 5).map((ev, i) => (
                                 <li key={i} className="flex justify-between">
                                     <span>
                                         {new Date(
@@ -348,10 +310,22 @@ const PremiumChat = () => {
     };
 
     const [liveShows, setLiveShows] = useState([]);
+    const [upcomingLiveShow, setUpcomingLiveShow] = useState([]);
+
     const fetchLiveShows = async () => {
         try {
             const res = await axios.get("/api/member/live-shows");
-            setLiveShows(res.data || []);
+            const shows = res.data || [];
+
+            setLiveShows(shows);
+
+            const now = new Date();
+
+            const upcoming = shows.filter((show) => {
+                return new Date(show.start_time) > now;
+            });
+
+            setUpcomingLiveShow(upcoming);
         } catch (error) {
             console.error("Error fetching live shows:", error);
         }
@@ -390,7 +364,7 @@ const PremiumChat = () => {
                         <p className="text-center text-sm text-gray-400 mb-4">
                             No posts yet.
                         </p>
-                    ) : !loading && posts.length > 0 && !hasMore ? (
+                    ) : !loading && posts.length > 0 ? (
                         <p className="text-center text-sm text-gray-400 mb-4">
                             No more posts to load.
                         </p>
@@ -415,7 +389,7 @@ const PremiumChat = () => {
 
             {/* Right: calendar sidebar */}
             <div className=" hidden md:flex w-80">
-                <CalendarSidebar events={liveShows} />
+                <CalendarSidebar events={liveShows} upcomingLiveShow={upcomingLiveShow} />
             </div>
         </div>
     );

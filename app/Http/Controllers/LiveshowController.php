@@ -98,10 +98,7 @@ class LiveShowController extends Controller
             $query->where('start_time', '<=', Carbon::now())
                 ->orderBy('start_time', 'desc');
         } else {
-            $query->orderByRaw("
-                CASE WHEN start_time > NOW() THEN 0 ELSE 1 END, 
-                start_time ASC
-            ");
+            $query->orderBy('start_time', 'desc');
         }
 
         return response()->json($query->get());

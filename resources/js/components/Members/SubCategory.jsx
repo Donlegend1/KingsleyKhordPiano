@@ -33,6 +33,18 @@ const SubCategory = () => {
         .filter((segment) => segment !== "")
         .pop();
 
+    const activeSubscription = window.activeSubscription;
+
+    function enforceExclusiveFeedAccess() {
+        const isExclusiveFeed = lastSegment === "exclusive-feed";
+        const hasActiveSubscription = !!activeSubscription;
+
+        if (isExclusiveFeed && !hasActiveSubscription) {
+            window.location.href = "/home";
+            showMessage('This page is only mend for subscribe members', 'error')
+        }
+    }
+
     const comingSoonSlugs = [
         "say-hello",
         "beginner",
@@ -95,6 +107,12 @@ const SubCategory = () => {
         subcategory: "",
         media: [],
     });
+
+    // Run the check immediately
+
+    useEffect(() => {
+        enforceExclusiveFeedAccess();
+    }, [lastSegment]);
 
     useEffect(() => {
         let timer;
@@ -183,12 +201,6 @@ const SubCategory = () => {
             if (loading) return;
 
             setLoading(true);
-            console.log(
-                "Fetching posts for subcategory:",
-                lastSegment,
-                "page:",
-                targetPage
-            );
 
             try {
                 const response = await axios.get(`/api/member/posts`, {

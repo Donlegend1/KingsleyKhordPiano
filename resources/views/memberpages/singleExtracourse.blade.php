@@ -84,44 +84,91 @@
   </div>
 
   <!-- Sidebar -->
-  <aside class="hidden md:flex w-64 bg-white rounded-lg shadow-lg pl-4 pr-2 py-4 ml-6 flex-col gap-8">
-    <div class="flex flex-col gap-8 w-full">
-      <!-- Related Courses -->
-      <div class="border-b pb-4">
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">Related Courses</h3>
+  <aside class="hidden md:flex w-96 bg-white rounded-xl shadow-xl px-5 py-6 ml-6 flex-col gap-8">
+
+    {{-- Related Courses --}}
+    <div class="border-b pb-5">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fa fa-book text-blue-500"></i>
+            Related Courses
+        </h3>
+
         @if ($relatedUploads->isNotEmpty())
-          <ul class="space-y-2">
-            @foreach ($relatedUploads as $item)
-              <li>
-                <a href="/member/lesson/{{ $item->id }}" class="text-blue-600 hover:underline">
-                  {{ $item->title }}
-                </a>
-              </li>
-            @endforeach
-          </ul>
+            <ul class="space-y-2">
+                @foreach ($relatedUploads as $item)
+                    <li>
+                        <a
+                            href="/member/lesson/{{ $item->id }}"
+                            class="block px-3 py-2 rounded-lg text-sm text-blue-600
+                            hover:bg-blue-50 hover:underline transition"
+                        >
+                            {{ $item->title }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
         @else
-          <p class="text-gray-500 text-sm">No related course available.</p>
+            <p class="text-gray-500 text-sm italic">
+                No related courses available.
+            </p>
         @endif
-      </div>
-      <!-- Latest Comments -->
-      <div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">Latest Comments</h3>
-        <ul class="space-y-3">
-          @foreach ($comments->take(5) as $comment)
-            <li class="flex items-start space-x-3">
-              <i class="fa fa-user-circle text-gray-500 text-xl"></i>
-              <div>
-                <p class="text-gray-800 text-sm">
-                  <span class="font-semibold">{{ $comment->user->first_name }}:</span> "{{ $comment->comment }}"
-                </p>
-                <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
-              </div>
-            </li>
-          @endforeach
-        </ul>
-      </div>
     </div>
-  </aside>
+
+    {{-- Latest Comments --}}
+    <div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fa fa-comments text-green-500"></i>
+            Latest Comments
+        </h3>
+
+        <ul class="space-y-4">
+            @foreach ($comments as $comment)
+                <li>
+                    <a
+                        href="{{ $comment->url }}"
+                        class="block p-4 rounded-xl border border-gray-200
+                        hover:shadow-md hover:border-blue-300 transition group"
+                    >
+                        {{-- Course title --}}
+                        @if(!empty($comment->course_title))
+                            <p class="text-xs font-semibold text-blue-600 mb-1 uppercase tracking-wide">
+                                {{ $comment->course_title }}
+                            </p>
+                        @endif
+
+                        <div class="flex items-start gap-3">
+                            <i class="fa fa-user-circle text-gray-400 text-2xl"></i>
+
+                            <div class="flex-1">
+                                <p class="text-gray-800 text-sm leading-snug">
+                                    <span class="font-semibold">
+                                        {{ $comment->user->first_name }} 
+                                    </span>
+                                    <span>commented in</span>
+                                    <span class="text-gray-600 font-semibold">
+                                        {{ $comment->course->title }}
+                                    </span>
+                                </p>
+
+                                <div class="mt-1 flex items-center justify-between">
+                                    <span class="text-xs text-gray-400">
+                                        {{ $comment->created_at->diffForHumans() }}
+                                    </span>
+
+                                    <span class="text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition">
+                                        View →
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+
+</aside>
+
 </section>
 
 <script>

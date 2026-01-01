@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\course_video_comment_replies;
+use App\Models\CourseVideoCommentReply;
 use Illuminate\Auth\Access\Response;
 
 class CourseVideoCommentRepliesPolicy
@@ -19,7 +19,7 @@ class CourseVideoCommentRepliesPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, course_video_comment_replies $courseVideoCommentReplies): bool
+    public function view(User $user, CourseVideoCommentReply $courseVideoCommentReplies): bool
     {
         //
     }
@@ -35,7 +35,7 @@ class CourseVideoCommentRepliesPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, course_video_comment_replies $courseVideoCommentReplies): bool
+    public function update(User $user, CourseVideoCommentReply $courseVideoCommentReplies): bool
     {
         //
     }
@@ -43,7 +43,7 @@ class CourseVideoCommentRepliesPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, course_video_comment_replies $courseVideoCommentReplies): bool
+    public function delete(User $user, CourseVideoCommentReply $courseVideoCommentReplies): bool
     {
         //
     }
@@ -51,7 +51,7 @@ class CourseVideoCommentRepliesPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, course_video_comment_replies $courseVideoCommentReplies): bool
+    public function restore(User $user, CourseVideoCommentReply $courseVideoCommentReplies): bool
     {
         //
     }
@@ -59,7 +59,7 @@ class CourseVideoCommentRepliesPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, course_video_comment_replies $courseVideoCommentReplies): bool
+    public function forceDelete(User $user, CourseVideoCommentReply $courseVideoCommentReplies): bool
     {
         //
     }

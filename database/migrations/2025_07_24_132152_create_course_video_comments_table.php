@@ -26,6 +26,6 @@ class CreateCourseVideoCommentsTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('course_video_comments');
+        Schema::dropIfExists('CourseVideoComment');
     }
 }

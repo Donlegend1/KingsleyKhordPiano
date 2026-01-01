@@ -108,4 +108,19 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function messages() { return $this->hasMany(ChatMessage::class); }
     public function likes() { return $this->hasMany(Like::class); }
+
+
+    public function hasActiveSubscription()
+    {
+        // Stripe
+        if ($this->subscribed('default')) {
+            return true;
+        }
+
+        // Manual
+        return $this->payments()
+            ->where('status', 'successful')
+            ->where('ends_at', '>', now())
+            ->exists();
+    }
 }

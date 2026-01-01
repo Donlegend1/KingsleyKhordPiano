@@ -71,6 +71,7 @@ const CourseComment = ({ course, group }) => {
                     comment: comment,
                     category: group, // Assuming category is quiz for this context
                     course_id: course.id,
+                    url: `/member/course/${course.level}?course_id=${course.id}`
                 },
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },

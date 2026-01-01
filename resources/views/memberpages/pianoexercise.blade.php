@@ -1,8 +1,8 @@
 @extends('layouts.member')
 
 @section('content')
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4">
-  <div class="max-w-7xl mx-auto space-y-3">
+<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-4">
+  <div class="max-w-7xl mx-auto space-y-1">
 
     <!-- Breadcrumb & User -->
     <div class="flex justify-between items-center">
@@ -12,6 +12,27 @@
         <a href="/member/piano-exercise" class="hover:text-blue-600 font-semibold">Piano Exercises</a>
       </div>
       <div class="flex items-center space-x-2">
+         <form method="GET" action="{{ route('piano.exercise') }}" class="mb-2 flex justify-end">
+        <div class="relative w-full max-w-xs">
+          <!-- Input Field -->
+          <input 
+            type="text" 
+            name="search" 
+            id="name" 
+            value="{{ request('search') }}" 
+            class="w-full border border-gray-300 rounded-full pl-4 pr-12 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            placeholder="Search..."
+          >
+
+          <!-- Search Button with Icon -->
+          <button 
+            type="submit" 
+            class="absolute my-4 right-1 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          >
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+    </form>
         <i class="fa fa-user-circle text-xl"></i>
       </div>
     </div>
@@ -19,36 +40,12 @@
     <div>
       <h1 class="text-xl font-bold">Piano Exercises</h1>
     </div>
-   <form method="GET" action="{{ route('piano.exercise') }}" class="mb-8 flex justify-end">
-  <div class="relative w-full max-w-xs">
-    <!-- Input Field -->
-    <input 
-      type="text" 
-      name="search" 
-      id="name" 
-      value="{{ request('search') }}" 
-      class="w-full border border-gray-300 rounded-full pl-4 pr-12 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-      placeholder="Search..."
-    >
-
-    <!-- Search Button with Icon -->
-    <button 
-      type="submit" 
-      class="absolute my-4 right-1 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-    >
-      <i class="fa fa-search"></i>
-    </button>
-  </div>
-</form>
-
-
   </div>
 </section>
 
 <section class="bg-gray-100 py-10">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
 
-    <!-- Mobile Filters -->
     <div class="block sm:hidden mb-6 space-y-4">
 
       <!-- Category Dropdown -->
@@ -80,11 +77,76 @@
 
         <!-- Desktop Tabs -->
         <div class="hidden sm:flex flex-wrap gap-3 border-b pb-2 mb-8">
-          <a href="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}" class="py-2 px-4 border-b-2 {{ is_null($level) ? 'border-blue-500 text-blue-500 font-semibold' : 'text-gray-600 hover:text-blue-500' }}">All</a>
+
+          {{-- All --}}
+          <a
+              href="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}"
+              class="relative group flex items-center gap-2 py-2 px-4 border-b-2
+              {{ is_null($level)
+                  ? 'border-blue-500 text-blue-500 font-semibold'
+                  : 'text-gray-600 hover:text-blue-500' }}"
+          >
+              <i class="fa fa-layer-group text-sm"></i>
+              <span>All</span>
+      
+              {{-- Tooltip --}}
+              <span
+                  class="absolute -bottom-9 left-1/2 -translate-x-1/2
+                  whitespace-nowrap rounded-md bg-gray-900 text-white text-xs
+                  px-3 py-1 opacity-0 group-hover:opacity-100 transition
+                  pointer-events-none shadow-lg z-50"
+              >
+                  Shows all piano exercises
+              </span>
+          </a>
+      
           @foreach ($levels as $tab)
-            <a href="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" class="py-2 px-4 border-b-2 {{ strtolower($level) === strtolower($tab) ? 'border-blue-500 text-blue-500 font-semibold' : 'text-gray-600 hover:text-blue-500' }}">{{ ucfirst($tab) }}</a>
+              @php
+                  $iconMap = [
+                      'independence' => 'fa-user-check',
+                      'coordination' => 'fa-arrows-spin',
+                      'flexibility'  => 'fa-arrows-left-right',
+                      'strength'     => 'fa-dumbbell',
+                      'dexterity'    => 'fa-hands',
+                  ];
+      
+                  $tooltipMap = [
+                      'independence' => 'Train each hand to play independently',
+                      'coordination' => 'Improve hand synchronization',
+                      'flexibility'  => 'Increase finger and wrist flexibility',
+                      'strength'     => 'Build finger strength and control',
+                      'dexterity'    => 'Improve speed, accuracy, and agility',
+                  ];
+      
+                  $key = strtolower($tab);
+                  $icon = $iconMap[$key] ?? 'fa-music';
+                  $tooltip = $tooltipMap[$key] ?? 'Piano exercise';
+              @endphp
+      
+              <a
+                  href="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}"
+                  class="relative group flex items-center gap-2 py-2 px-4 border-b-2
+                  {{ strtolower($level) === $key
+                      ? 'border-blue-500 text-blue-500 font-semibold'
+                      : 'text-gray-600 hover:text-blue-500' }}"
+              >
+                  <i class="fa {{ $icon }} text-sm"></i>
+                  <span>{{ ucfirst($tab) }}</span>
+      
+                  {{-- Tooltip --}}
+                  <span
+                      class="absolute -bottom-9 left-1/2 -translate-x-1/2
+                      whitespace-nowrap rounded-md bg-gray-900 text-white text-xs
+                      px-3 py-1 opacity-0 group-hover:opacity-100 transition
+                      pointer-events-none shadow-lg z-50"
+                  >
+                      {{ $tooltip }}
+                  </span>
+              </a>
           @endforeach
-        </div>
+      </div>
+      
+      
 
         <!-- Exercise Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

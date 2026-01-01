@@ -76,8 +76,8 @@ use App\Http\Controllers\MidiFileController;
         Route::post('course/{course}/exercise/submit', [CourseController::class, 'submitExercise']);
         Route::post('course/{course}/video-comment', [CourseVideoCommentsController::class, 'store']);
         Route::get('comments/course', [CourseVideoCommentsController::class, 'index']);
-        Route::put('comment/{course_video_comments}', [CourseVideoCommentsController::class, 'update']);
-        Route::delete('comment/{course_video_comments}', [CourseVideoCommentsController::class, 'destroy']);
+        Route::put('comment/{CourseVideoComment}', [CourseVideoCommentsController::class, 'update']);
+        Route::delete('comment/{CourseVideoComment}', [CourseVideoCommentsController::class, 'destroy']);
 
         Route::post('comment/{comment}/reply', [CourseVideoCommentRepliesController::class, 'store']);
          

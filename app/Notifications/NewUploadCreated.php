@@ -27,6 +27,7 @@ class NewUploadCreated extends Notification
         return [
             'post_id' => $this->post->id,
             'title'   => $this->post->title,
+            'url' => "/member/lesson/{$this->post->id}",
             'message' => "New video posted added in {$this->post->category}: {$this->post->title}",
             'body'    => $this->post->body,
         ];

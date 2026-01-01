@@ -75,8 +75,6 @@ const [lesson, setLesson] = useState(null);
     const handleSubmitComment = async (e) => {
         e.preventDefault();
 
-        console.log("Submitting comment:", lesson);
-
 
         setCommentSubmitting(true);
         try {
@@ -86,6 +84,7 @@ const [lesson, setLesson] = useState(null);
                     comment: comment,
                     category: 'others', // Assuming category is quiz for this context
                     course_id: lastSegment,
+                    url: `/member/lesson/${lastSegment}`
                 },
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },

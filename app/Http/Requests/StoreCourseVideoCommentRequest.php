@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class Storecourse_video_comment_repliesRequest extends FormRequest
+class StoreCourseVideoCommentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,10 @@ class Storecourse_video_comment_repliesRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'category' => 'required|string|in:course,quiz,others',
+            'course_id' => 'required|integer',
             'comment' => 'required|string',
+            'url' => 'required|string'
         ];
     }
 }

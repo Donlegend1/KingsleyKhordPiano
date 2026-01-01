@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class Updatecourse_video_comment_repliesRequest extends FormRequest
+class UpdateCourseVideoCommentReplyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

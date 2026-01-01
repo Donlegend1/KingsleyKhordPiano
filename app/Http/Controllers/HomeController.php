@@ -250,69 +250,63 @@ class HomeController extends Controller
     }
 
     public function update(Request $request)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'new_password_input' => 'nullable|string|min:4|confirmed',
-            'passport' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // 5MB
-            'country' => 'nullable|string|max:500',
-            'phone_number' => 'nullable|string|max:20',
-            'skill_level' => 'nullable|in:beginner,intermediate,advanced',
-            'biography' => 'nullable|string|max:1000',
-            'instagram' => 'nullable|url|max:255',
-            'youtube' => 'nullable|url|max:255',
-            'facebook' => 'nullable|url|max:255',
-            'tiktok' => 'nullable|url|max:255',
-        ]);
+    $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        'password' => 'nullable|string|min:8|confirmed',
+        'passport' => 'nullable|image|mimes:jpeg,png,jpg',
+        'country' => 'nullable|string|max:500',
+    ]);
 
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
-        $user->email = $request->email;
-        $user->country = $request->country;
-        $user->phone_number = $request->phone_number;
-        $user->skill_level = $request->skill_level;
-        $user->biography = $request->biography;
-        $user->instagram = $request->instagram;
-        $user->youtube = $request->youtube;
-        $user->facebook = $request->facebook;
-        $user->tiktok = $request->tiktok;
+    $user->first_name = $request->first_name;
+    $user->last_name = $request->last_name;
+    $user->email = $request->email;
+    $user->country = $request->country;
 
-        if ($request->filled('new_password')) {
-            $user->password = Hash::make($request->new_password);
-        }
-
-        if ($request->hasFile('passport')) {
-            // Delete old file if exists
-            if ($user->passport) {
-                $oldPath = public_path($user->passport);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
-                }
-            }
-
-            $file = $request->file('passport');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $destinationPath = public_path('passports');
-
-            // Ensure the directory exists
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-
-            $file->move($destinationPath, $filename);
-
-            // Save full relative path
-            $user->passport = '/passports/' . $filename;
-        }
-
-        $user->save();
-
-        return redirect('/home')->with('success', 'Profile updated.');
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
     }
+
+    /** ------------------------------------
+     * PASSPORT UPLOAD → public_html/passports
+     * ------------------------------------*/
+    if ($request->hasFile('passport')) {
+
+        // Delete old passport if exists
+        if ($user->passport) {
+            $oldPath = base_path('../public_html' . $user->passport);
+            if (file_exists($oldPath)) {
+                @unlink($oldPath);
+            }
+        }
+
+        $file = $request->file('passport');
+        $filename = time() . '_' . $file->getClientOriginalName();
+
+        // Full path to public_html/passports
+        $destinationPath = base_path('../public_html/passports');
+
+        // Create folder if not exists
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+
+        // Move file to public_html
+        $file->move($destinationPath, $filename);
+
+        // Save path relative to public_html
+        $user->passport = '/passports/' . $filename;
+    }
+
+    $user->save();
+
+    return redirect('/home')->with('success', 'Profile updated.');
+}
+
 
     public function destroy()
     {

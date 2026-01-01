@@ -32,10 +32,18 @@ class CommunityIndexController extends Controller
        return view('community.single');
     }
 
-    public function subcategory( $subcategory)
-    {
-       return view('community.subcategory', compact('subcategory'));
-    }
+   public function subcategory($subcategory)
+   {
+      $user = auth()->user();
+
+      // Get active subscription (Stripe or manual)
+      $activeSubscription = $user->hasActiveSubscription();
+
+      return view('community.subcategory', compact(
+         'subcategory',
+         'activeSubscription'
+      ));
+   }
 
    public function singlePost(Post $post)
    {

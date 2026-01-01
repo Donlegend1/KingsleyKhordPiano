@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\course_video_comment_replies;
-use App\Models\Course_video_comments;
-use App\Http\Requests\Storecourse_video_comment_repliesRequest;
-use App\Http\Requests\Updatecourse_video_comment_repliesRequest;
+use App\Models\CourseVideoCommentReply;
+use App\Models\CourseVideoComment;
+use App\Http\Requests\StoreCourseVideoCommentReplyRequest;
+use App\Http\Requests\UpdateCourseVideoCommentReplyRequest;
 
 class CourseVideoCommentRepliesController extends Controller
 {
@@ -28,7 +28,7 @@ class CourseVideoCommentRepliesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Storecourse_video_comment_repliesRequest $request, Course_video_comments $comment)
+    public function store(StoreCourseVideoCommentReplyRequest $request, CourseVideoComment $comment)
     {
 
         $reply = $comment->replies()->create([
@@ -45,7 +45,7 @@ class CourseVideoCommentRepliesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(course_video_comment_replies $course_video_comment_replies)
+    public function show(CourseVideoCommentReply $CourseVideoCommentReply)
     {
         //
     }
@@ -53,7 +53,7 @@ class CourseVideoCommentRepliesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(course_video_comment_replies $course_video_comment_replies)
+    public function edit(CourseVideoCommentReply $CourseVideoCommentReply)
     {
         //
     }
@@ -61,7 +61,7 @@ class CourseVideoCommentRepliesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Updatecourse_video_comment_repliesRequest $request, course_video_comment_replies $course_video_comment_replies)
+    public function update(UpdateCourseVideoCommentReplyRequest $request, CourseVideoCommentReply $CourseVideoCommentReply)
     {
         //
     }
@@ -69,7 +69,7 @@ class CourseVideoCommentRepliesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(course_video_comment_replies $course_video_comment_replies)
+    public function destroy(CourseVideoCommentReply $CourseVideoCommentReply)
     {
         //
     }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course_video_comments;
-use App\Http\Requests\StoreCourse_video_commentsRequest;
-use App\Http\Requests\UpdateCourse_video_commentsRequest;
+use App\Models\CourseVideoComment;
+use App\Http\Requests\StoreCourseVideoCommentRequest;
+use App\Http\Requests\UpdateCourseVideoCommentRequest;
 use App\Http\Requests\IndexCourseVideoCommentsRequest;
 use App\Models\Upload;
 use App\Models\Course;
@@ -18,7 +18,7 @@ class CourseVideoCommentsController extends Controller
      */
     public function index(IndexCourseVideoCommentsRequest $request)
     {
-        $comments = Course_video_comments::query()
+        $comments = CourseVideoComment::query()
             ->when($request->filled('category'), function ($query) use ($request) {
                 $query->where('category', $request->category);
             })
@@ -46,13 +46,14 @@ class CourseVideoCommentsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCourse_video_commentsRequest $request)
+    public function store(StoreCourseVideoCommentRequest $request)
     {
-        $courseVideoComment = Course_video_comments::create([
+        $courseVideoComment = CourseVideoComment::create([
             'user_id' => Auth::user()->id,
             'category' => $request->category,
             'course_id' => $request->course_id,
             'comment' => $request->comment,
+            'url' => $request->url,
         ]);
 
         return response()->json([
@@ -64,7 +65,7 @@ class CourseVideoCommentsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Course_video_comments $course_video_comments)
+    public function show(CourseVideoComment $CourseVideoComment)
     {
         //
     }
@@ -72,7 +73,7 @@ class CourseVideoCommentsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Course_video_comments $course_video_comments)
+    public function edit(CourseVideoComment $CourseVideoComment)
     {
         //
     }
@@ -80,26 +81,26 @@ class CourseVideoCommentsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCourse_video_commentsRequest $request, Course_video_comments $course_video_comments)
+    public function update(UpdateCourseVideoCommentRequest $request, CourseVideoComment $CourseVideoComment)
     {
-        $course_video_comments->update([
+        $CourseVideoComment->update([
             'comment' => $request->comment,
         ]);
 
         return response()->json([
             'message' => 'Comment updated successfully',
-            'data' => $course_video_comments
+            'data' => $CourseVideoComment
         ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(Course_video_comments $course_video_comments)
+   public function destroy(CourseVideoComment $CourseVideoComment)
     {
-        $course_video_comments->replies()->delete();
+        $CourseVideoComment->replies()->delete();
 
-        $course_video_comments->delete();
+        $CourseVideoComment->delete();
 
         return response()->json([
             'message' => 'Comment deleted successfully'

@@ -1,231 +1,87 @@
-import React, { useEffect, useRef } from "react";
-import { capitaliseAndRemoveHyphen } from "../../utils/formatRelativeTime";
+import React, { useState, useRef, useEffect } from "react";
+import EmojiPicker from "emoji-picker-react";
+import { MessageCirclePlusIcon, Smile } from "lucide-react";
 
-const CreatePostBox = ({
-    handlePost,
-    postDetails,
-    setPostDetails,
-    posting,
-    expanded,
-    setExpanded,
-    mediaFiles,
-    setMediaFiles,
-    subcategory,
-}) => {
-    const imageInputRef = useRef(null);
-    const videoInputRef = useRef(null);
+const CreatePostBox = ({ handlePost, postDetails, setPostDetails, posting }) => {
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const inputRef = useRef(null);
 
-    const handleFocus = () => setExpanded(true);
-
-    const handleClose = () => {
-        setExpanded(false);
-        setPostDetails({ body: "", category: "", subcategory: "" });
-        setMediaFiles([]);
+    // Auto-resize textarea
+    const handleInput = (e) => {
+        const el = e.target;
+        el.style.height = "auto"; // reset height
+        el.style.height = el.scrollHeight + "px"; // set new height
+        setPostDetails({ ...postDetails, body: el.value });
     };
 
-    const handleMediaSelect = (e) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length === 0) return;
-        setMediaFiles((prev) => [...prev, ...files]);
+    const handleEmojiClick = (emojiObject) => {
+        const el = inputRef.current;
+        const cursorPos = el.selectionStart;
+        const text = postDetails.body || "";
+        const newText =
+            text.slice(0, cursorPos) + emojiObject.emoji + text.slice(cursorPos);
+        setPostDetails({ ...postDetails, body: newText });
+
+        // Move cursor after emoji
+        setTimeout(() => {
+            el.selectionStart = cursorPos + emojiObject.emoji.length;
+            el.selectionEnd = cursorPos + emojiObject.emoji.length;
+            el.focus();
+        }, 0);
+
+        // Resize after adding emoji
+        el.style.height = "auto";
+        el.style.height = el.scrollHeight + "px";
     };
-
-    const handleRemoveMedia = (index) => {
-        setMediaFiles((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const triggerImageSelect = () => imageInputRef.current?.click();
-    const triggerVideoSelect = () => videoInputRef.current?.click();
-
-    const postCategories = [
-        {
-            category: { name: "GetStarted", value: "get_started" },
-            subCategories: [
-                { name: "Say Hello", value: "say_hello" },
-                { name: "Ask Question", value: "ask_question" },
-            ],
-        },
-        {
-            category: { name: "Others", value: "others" },
-            subCategories: [
-                { name: "Post Progress", value: "post_progress" },
-                { name: "Lessons", value: "lessons" },
-            ],
-        },
-        {
-            category: { name: "Forum", value: "forum" },
-            subCategories: [
-                { name: "Beginner", value: "beginner" },
-                { name: "Intermediate", value: "intermediate" },
-                { name: "Advance", value: "advance" },
-            ],
-        },
-    ];
-
-    useEffect(() => {
-        if (subcategory !== undefined && subcategory !== null) {
-            const formattedSubcategory = subcategory.replace(/-/g, "_");
-
-            const foundCategory = postCategories.find((cat) =>
-                cat.subCategories.some(
-                    (sub) => sub.value === formattedSubcategory
-                )
-            );
-
-            const categoryValue = foundCategory
-                ? foundCategory.category.value
-                : null;
-
-            setPostDetails((prev) => ({
-                ...prev,
-                subcategory: formattedSubcategory,
-                category: categoryValue,
-            }));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [subcategory]);
 
     const submitPost = () => {
-        const formData = new FormData();
-        formData.append("body", postDetails.body || "");
-
-        mediaFiles.forEach((file) => formData.append("media[]", file));
-
-        handlePost(formData);
+        if (!postDetails.body) return;
+        handlePost({ body: postDetails.body });
+        setPostDetails({ body: "" });
+        setShowEmojiPicker(false);
+        if (inputRef.current) inputRef.current.style.height = "auto"; // reset height
     };
 
     return (
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-3 shadow-lg transition-all duration-200 mx-5 mt-5">
-            <div className="flex items-start gap-3">
-                <img
-                    src="/avatar1.jpg"
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover shadow"
-                />
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-2 flex items-center gap-2 shadow-lg mx-5 mt-5 relative">
+            {/* Emoji Button */}
+            <button
+                type="button"
+                onClick={() => setShowEmojiPicker((prev) => !prev)}
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+                <Smile className="w-5 h-5 text-yellow-500" />
+            </button>
 
-                <div className="flex-1">
-                    <textarea
-                        rows={expanded ? 3 : 1}
-                        placeholder="Share something with the group..."
-                        onFocus={handleFocus}
-                        value={postDetails.body}
-                        onChange={(e) =>
-                            setPostDetails({
-                                ...postDetails,
-                                body: e.target.value,
-                            })
-                        }
-                        className="w-full resize-none px-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-[#FFD736] placeholder-gray-400"
+            {/* Emoji Picker */}
+            {showEmojiPicker && (
+                <div className="absolute bottom-12 left-2 z-50">
+                    <EmojiPicker
+                        onEmojiClick={handleEmojiClick}
+                        height={300}
+                        width={280}
                     />
-
-                    {/* thumbnails when expanded */}
-                    {expanded && mediaFiles.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-3">
-                            {mediaFiles.map((file, index) => (
-                                <div
-                                    key={index}
-                                    className="relative w-28 h-20 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"
-                                >
-                                    {file.type &&
-                                    file.type.startsWith("image/") ? (
-                                        <img
-                                            src={URL.createObjectURL(file)}
-                                            alt="preview"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <video
-                                            src={URL.createObjectURL(file)}
-                                            className="w-full h-full object-cover"
-                                            controls
-                                        />
-                                    )}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveMedia(index)}
-                                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full px-1"
-                                    >
-                                        ✕
-                                    </button>
-                                    <div className="absolute left-1 bottom-1 text-[11px] bg-black/40 text-white px-2 rounded">
-                                        {file.type &&
-                                        file.type.startsWith("image/")
-                                            ? "Image"
-                                            : "Video"}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    <div className="mt-3 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                ref={imageInputRef}
-                                onChange={handleMediaSelect}
-                                className="hidden"
-                            />
-                            <input
-                                type="file"
-                                accept="video/*"
-                                ref={videoInputRef}
-                                onChange={handleMediaSelect}
-                                className="hidden"
-                            />
-
-                            <button
-                                type="button"
-                                onClick={triggerImageSelect}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                                <i className="fas fa-image text-green-500"></i>
-                                <span className="text-xs text-gray-600 dark:text-gray-300">
-                                    Photo
-                                </span>
-                            </button>
-
-                            {/* <button
-                                type="button"
-                                onClick={triggerVideoSelect}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                                <i className="fas fa-video text-red-500"></i>
-                                <span className="text-xs text-gray-600 dark:text-gray-300">
-                                    Video
-                                </span>
-                            </button> */}
-
-                            {/* <button
-                                type="button"
-                                onClick={() => setExpanded((s) => !s)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                                <i className="fas fa-smile text-yellow-500"></i>
-                                <span className="text-xs text-gray-600 dark:text-gray-300">
-                                    Emoji
-                                </span>
-                            </button> */}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            {/* <button
-                                onClick={handleClose}
-                                className="text-xs text-gray-500"
-                            >
-                                Cancel
-                            </button> */}
-                            <button
-                                disabled={posting}
-                                onClick={submitPost}
-                                className="px-4 py-2 rounded-lg bg-[#FFD736] text-black font-semibold shadow"
-                            >
-                                {posting ? "Posting..." : "Post"}
-                            </button>
-                        </div>
-                    </div>
                 </div>
-            </div>
+            )}
+
+            {/* Auto-resizing textarea */}
+            <textarea
+                ref={inputRef}
+                rows={1}
+                placeholder="Type a message..."
+                value={postDetails.body || ""}
+                onInput={handleInput}
+                className="flex-1 resize-none px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none placeholder-gray-400 max-h-40 overflow-y-auto"
+            />
+
+            {/* Send Button */}
+            <button
+                disabled={posting}
+                onClick={submitPost}
+                className="p-3 bg-[#FFD736] rounded-full text-black shadow flex items-center justify-center"
+            >
+                <MessageCirclePlusIcon className="w-5 h-5" />
+            </button>
         </div>
     );
 };

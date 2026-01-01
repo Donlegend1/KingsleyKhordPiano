@@ -28,6 +28,8 @@ class NewCourseCreated extends Notification
             'course_id' => $this->course->id,
             'message' => "New course added: {$this->course->title}",
             'title' => $this->course->title,
+            'url'      => "member/course/{$this->course->level}?selected_course={$this->course->id}",
+            'category' => $this->course->category,
             'body'    => $this->course->body,
         ];
     }

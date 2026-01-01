@@ -529,6 +529,8 @@ const CourseDetails = ({ course, onComplete }) => {
 };
 
 const CoursesPage = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const selectedCourseId = searchParams.get("selected_course");
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [expandedCategories, setExpandedCategories] = useState({});
@@ -718,6 +720,30 @@ const CoursesPage = () => {
             );
         }
     };
+
+    useEffect(() => {
+        if (!selectedCourseId || courses.length === 0) return;
+    
+        // Find the course across all categories
+        for (const categoryObj of courses) {
+            const found = categoryObj.courses?.find(
+                (course) => String(course.id) === String(selectedCourseId)
+            );
+    
+            if (found) {
+                setSelectedCourse(found);
+    
+                // auto-expand the category
+                setExpandedCategories((prev) => ({
+                    ...prev,
+                    [categoryObj.category]: true,
+                }));
+    
+                break;
+            }
+        }
+    }, [courses, selectedCourseId]);
+    
 
     return (
         <>

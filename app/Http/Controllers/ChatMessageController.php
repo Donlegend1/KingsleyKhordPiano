@@ -20,7 +20,6 @@ class ChatMessageController extends Controller
         $messages = $room->messages()
             ->whereNull('parent_id')
             ->with(['user', 'replies.user', 'likes', 'media'])
-            ->latest()
             ->paginate(30);
 
         return response()->json($messages);
@@ -69,9 +68,9 @@ class ChatMessageController extends Controller
             ->where('id', '!=', $user->id)
             ->get();
 
-        foreach ($recipients as $recipient) {
-            $recipient->notify(new NewChatMessageNotification($message, $user));
-        }
+        // foreach ($recipients as $recipient) {
+        //     $recipient->notify(new NewChatMessageNotification($message, $user));
+        // }
 
         DB::commit();
 

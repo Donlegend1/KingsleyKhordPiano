@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Upload;
 use App\Models\Bookmark;
-use App\Models\Course_video_comments;
+use App\Models\CourseVideoComment;
 
 class CoursesController extends Controller
 {
@@ -57,10 +57,11 @@ class CoursesController extends Controller
     {
         $lesson = Upload::findOrFail($id);
 
-        $comments = Course_video_comments::where('category', 'course')
-            ->with(['user', 'replies.user'])
+        $comments = CourseVideoComment::where('category', 'others')
+            ->whereNot('course_id', $id)
+            ->with(['user', 'replies.user', 'course'])
             ->latest()
-            ->take(3)
+            ->take(5)
             ->get();
 
         $relatedUploads = collect();
