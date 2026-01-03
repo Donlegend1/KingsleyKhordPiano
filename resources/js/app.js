@@ -44,5 +44,7 @@ import "./components/PremiumChat/PremiumChat.jsx"
 import "./components/PremiumChat/PremiumChatButton.jsx"
 import './components/Midi/MidiFiles.jsx';
 import "./components/Calls/CallCard.jsx"
+import "./components/EmailCampaign/Index.jsx"
+import "./components/EmailCampaign/Create.jsx"
 
 

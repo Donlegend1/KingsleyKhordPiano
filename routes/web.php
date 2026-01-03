@@ -31,6 +31,7 @@ use App\Http\Controllers\WebsiteVideoController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\BookMarkController;
 use App\Http\Controllers\MidiFileController;
+use App\Http\Controllers\EmailCampaignController;
 
 use Illuminate\Support\Facades\Artisan;
 
@@ -193,5 +194,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::post('website-video/{video?}', [WebsiteVideoController::class, 'saveVideo']);
     Route::post('website-video/delete/{video}', [WebsiteVideoController::class, 'destroy']);
     Route::get('midi-file', [MidiFileController::class, 'index']);
+    Route::get('email-campaign', [EmailCampaignController::class, 'index']);
+    Route::get('email-campaign/create', [EmailCampaignController::class, 'create']);
     
 });

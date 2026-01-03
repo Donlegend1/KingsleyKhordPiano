@@ -310,15 +310,15 @@ const CourseDetails = ({ course, onComplete }) => {
             <div className="text-center mt-6">
                 <button
                     onClick={handleMarkAsCompleted}
-                    disabled={loading || course.completed}
+                    disabled={loading || course.progress?.course_id}
                     className={`px-6 py-2 rounded-full text-sm font-semibold shadow-md transition duration-300 ${
-                        course.completed
+                        course.progress?.course_id
                             ? "bg-green-500 text-white cursor-not-allowed"
                             : "bg-gradient-to-r from-black to-gray-900 text-white hover:from-yellow-500 hover:to-yellow-400 hover:text-black"
                     }`}
                 >
                     <span className="fa fa-check mr-2"></span>
-                    {course.completed ? "Completed" : "Mark as Completed"}
+                    {course.progress?.course_id ? "Completed" : "Mark as Completed"}
                 </button>
             </div>
 
@@ -602,7 +602,7 @@ const CoursesPage = () => {
 
             updatedCourses[category] = updatedCourses[category].map((course) =>
                 course.id === completedCourse.id
-                    ? { ...course, completed: !course.completed }
+                    ? { ...course, completed: !course.progress }
                     : course
             );
 
@@ -669,7 +669,7 @@ const CoursesPage = () => {
                                                 {course.title}
                                             </span>
                                         </div>
-                                        {course.completed && (
+                                        {course.progress?.course_id && (
                                             <i className="fa fa-check-circle text-green-500 text-xs"></i>
                                         )}
                                     </div>

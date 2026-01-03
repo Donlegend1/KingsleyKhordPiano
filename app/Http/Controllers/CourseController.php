@@ -185,11 +185,16 @@ class CourseController extends Controller
     }
     public function membershowAPI($level)
     {
-        // Get all course categories for this level (even if they have no courses)
+        $userId = auth()->id();
+
         $categories = \App\Models\CourseCategory::with([
-            'courses' => function ($query) use ($level) {
+            'courses' => function ($query) use ($level, $userId) {
                 $query->where('level', $level)
-                    ->with('progress')
+                    ->with([
+                        'progress' => function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        }
+                    ])
                     ->orderBy('position');
             }
         ])
@@ -201,13 +206,11 @@ class CourseController extends Controller
             return response()->json(['message' => 'No categories found for this level'], 404);
         }
 
-        // Fetch user's bookmarked courses
-        $bookmarkedIds = Bookmark::where('user_id', auth()->id())
+        $bookmarkedIds = Bookmark::where('user_id', $userId)
             ->where('source', 'courses')
             ->pluck('video_id')
             ->toArray();
 
-        // Add bookmark info to each course
         $categories->each(function ($category) use ($bookmarkedIds) {
             $category->courses->transform(function ($course) use ($bookmarkedIds) {
                 $course->isBookmarked = in_array($course->id, $bookmarkedIds);

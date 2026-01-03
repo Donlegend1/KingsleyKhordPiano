@@ -22,7 +22,7 @@ use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\ChatMessageLikeController;
 use App\Http\Controllers\MidiFileController;
-
+use App\Http\Controllers\EmailCampaignController;
 
 
 /*
@@ -61,6 +61,9 @@ use App\Http\Controllers\MidiFileController;
         Route::delete('/midi-files/{midiFile}', [MidiFileController::class, 'destroy']);
         Route::get('/midi-files', [MidiFileController::class, 'fetchAll']);
         Route::post('/midi-files/update/{midiFile}', [MidiFileController::class, 'update']);
+        Route::post('/email-campaign', [EmailCampaignController::class, 'store']);
+        Route::get('/email-campaigns', [EmailCampaignController::class, 'listEmailCampaign']);
+        Route::post('/email-campaign-resend/{emailCampaign}', [EmailCampaignController::class, 'resend']);
     });
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
