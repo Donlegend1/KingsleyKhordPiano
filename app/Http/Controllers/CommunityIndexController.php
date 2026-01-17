@@ -2,12 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\Post;
-use App\Models\PostMedia;
-use Illuminate\Support\Str;
-use App\Models\Community;
 use App\Models\MidiFile;
 
 class CommunityIndexController extends Controller

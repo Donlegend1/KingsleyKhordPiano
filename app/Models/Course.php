@@ -43,4 +43,9 @@ class Course extends Model
     {
         return $this->belongsTo(CourseCategory::class, 'course_category_id');
     }
+
+    public function bookmarks()
+    {
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
+    }
 }

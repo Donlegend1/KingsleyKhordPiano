@@ -5,6 +5,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
+import { Bookmark, BookmarkMinus, } from "lucide-react";
 
 const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
@@ -38,8 +39,8 @@ const CourseDetails = ({ course, onComplete }) => {
             await axios.post(
                 `/member/bookmark/toggle`,
                 {
-                    video_id: course.id,
-                    source: "courses",
+                    bookmarkable_id: course.id,
+                    bookmarkable_type: "courses",
                 },
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },
@@ -276,7 +277,9 @@ const CourseDetails = ({ course, onComplete }) => {
                     </div>
                 );
         }
-    };
+    };    
+
+    // console.log(lastSegment, 'lastSegment')
 
     return (
         <div className="p-6 bg-white dark:bg-black rounded shadow-lg">
@@ -287,6 +290,7 @@ const CourseDetails = ({ course, onComplete }) => {
                 </h2>
 
                 {/* Bookmark Button */}
+
                 <button
                     onClick={toggleBookmark}
                     className={`px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-md transition duration-300 ${
@@ -296,16 +300,15 @@ const CourseDetails = ({ course, onComplete }) => {
                     }`}
                 >
                     {isBookmarked ? (
-                        <i className="fa fa-bookmark-o" aria-hidden="true"></i>
+                        <Bookmark className="w-4 h-4" />
                     ) : (
-                        <i className="fa fa-bookmark" aria-hidden="true"></i>
+                        <BookmarkMinus className="w-4 h-4" />
                     )}
+                    <span>{isBookmarked ? "Bookmarked" : "Bookmark"}</span>
                 </button>
             </div>
 
-           <div className="mb-4">
-                {renderVideoPlayer()}
-            </div>
+            <div className="mb-4">{renderVideoPlayer()}</div>
 
             <div className="text-center mt-6">
                 <button
@@ -318,7 +321,9 @@ const CourseDetails = ({ course, onComplete }) => {
                     }`}
                 >
                     <span className="fa fa-check mr-2"></span>
-                    {course.progress?.course_id ? "Completed" : "Mark as Completed"}
+                    {course.progress?.course_id
+                        ? "Completed"
+                        : "Mark as Completed"}
                 </button>
             </div>
 
@@ -723,27 +728,32 @@ const CoursesPage = () => {
 
     useEffect(() => {
         if (!selectedCourseId || courses.length === 0) return;
-    
+
         // Find the course across all categories
         for (const categoryObj of courses) {
             const found = categoryObj.courses?.find(
                 (course) => String(course.id) === String(selectedCourseId)
             );
-    
+
             if (found) {
                 setSelectedCourse(found);
-    
+
                 // auto-expand the category
                 setExpandedCategories((prev) => ({
                     ...prev,
                     [categoryObj.category]: true,
                 }));
-    
+
                 break;
             }
         }
     }, [courses, selectedCourseId]);
-    
+
+    useEffect(() => {
+   
+    }, [])
+
+    console.log(selectedCourse)
 
     return (
         <>

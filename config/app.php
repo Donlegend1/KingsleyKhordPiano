@@ -29,6 +29,7 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+    'wip_mode' => env('APP_WIP_MODE', false),
 
     /*
     |--------------------------------------------------------------------------

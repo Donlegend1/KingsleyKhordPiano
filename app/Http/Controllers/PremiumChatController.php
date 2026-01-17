@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Notifications\NewChatMessageNotification;
+use App\Models\ChatMessage;
 
 class PremiumChatController extends Controller
 {
@@ -20,11 +21,11 @@ class PremiumChatController extends Controller
         ]);
 
         $message = ChatMessage::create([
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(),
             'body' => $validated['body'],
         ]);
 
-        $sender = Auth::user();
+        $sender = auth()->user();
         $recipients = User::where('is_premium', true)
             ->where('id', '!=', $sender->id)
             ->get();

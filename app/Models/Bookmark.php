@@ -10,22 +10,31 @@ use App\Models\Course;
 class Bookmark extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'video_id', 'source'];
+    protected $fillable = [
+        'user_id',
+        'bookmarkable_id',
+        'bookmarkable_type',
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function resolveVideo()
+    public function bookmarkable()
     {
-        switch ($this->source) {
-            case 'uploads':
-                return Upload::find($this->video_id);
-            case 'courses':
-                return Course::find($this->video_id);
-            default:
-                return null;
-        }
+        return $this->morphTo();
     }
+
+    // public function resolveVideo()
+    // {
+    //     switch ($this->source) {
+    //         case 'uploads':
+    //             return Upload::find($this->video_id);
+    //         case 'courses':
+    //             return Course::find($this->video_id);
+    //         default:
+    //             return null;
+    //     }
+    // }
 }

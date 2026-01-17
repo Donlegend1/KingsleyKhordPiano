@@ -50,11 +50,12 @@ class AdminController extends Controller
     public function editUser(Request $request, User $user)
     {
         $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'email' => 'nullable|email',
             'payment_status' => 'nullable|in:successful,pending',
             'premium' => 'nullable|boolean',
+            'verified' => 'nullable|boolean',
         ]);
 
         $user->update($validated);

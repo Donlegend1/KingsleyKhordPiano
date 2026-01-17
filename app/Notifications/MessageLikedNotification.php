@@ -32,7 +32,7 @@ class MessageLikedNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject("{$liker} liked your message")
-            ->view('emails.chat.notification', [
+            ->view('emails.chat.notifications', [
                 'subject' => "{$liker} liked your message",
                 'userName' => $notifiable->first_name,
                 'senderName' => $liker,

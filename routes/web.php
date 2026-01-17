@@ -32,7 +32,7 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\BookMarkController;
 use App\Http\Controllers\MidiFileController;
 use App\Http\Controllers\EmailCampaignController;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
 
 

@@ -27,7 +27,9 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://js.paystack.co/v2/inline.js"></script>
      <script src="https://js.stripe.com/v3/"></script>
-       <script src="/build/manifest.json"></script>
+       {{-- <script src="/build/manifest.json"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+
 
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js']) 
@@ -74,13 +76,13 @@
                         </svg>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Activity Feed</span>
                     </a>
-                    <a href="/member/community/space/say-hello"
+                    {{-- <a href="/member/community/space/say-hello"
                        class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/say-hello') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
                         <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6v2.5l6.5-2.5-6.5-2.5z"></path>
                         </svg>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Say Hello</span>
-                    </a>
+                    </a> --}}
                     <a href="/member/community/space/progress-report"
                        class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/progress-report') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
                         <svg class="w-5 h-5 text-[#6B7280] dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,7 +101,7 @@
         </div>
 
             <!-- Forums Section -->
-            <div class="mb-6">
+            {{-- <div class="mb-6">
                 <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-[1px] mb-2">FORUMS</h3>
                 <div class="space-y-1">
                     <a href="/member/community/space/beginner"
@@ -127,7 +129,7 @@
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">advance</span>
                     </a>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Members Only Section -->
             <div class="mb-6">
@@ -161,11 +163,11 @@
                         </svg>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Midi Files</span>
                     </a>
-                    <a href="/member/community/space/piano-breakdowns"
+                    {{-- <a href="/member/community/space/piano-breakdowns"
                        class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/piano-breakdowns') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
                         <span class="text-lg">🎹</span>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Piano Breakdowns</span>
-                    </a>
+                    </a> --}}
                     </div>
             </div>
 
@@ -447,7 +449,8 @@
 
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-
+<script>
+    window.authUser = @json(Auth::user());
+</script>
 </body>
 </html>

@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('bookmarks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->unsignedBigInteger('video_id');
-            $table->string('source');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            
+            // Polymorphic
+            $table->unsignedBigInteger('bookmarkable_id');
+            $table->string('bookmarkable_type'); // Video::class, Post::class
+
             $table->timestamps();
 
-            $table->unique(['user_id', 'video_id', 'source']);
+            $table->unique(['user_id', 'bookmarkable_id', 'bookmarkable_type'], 'unique_user_bookmark');
         });
     }
 

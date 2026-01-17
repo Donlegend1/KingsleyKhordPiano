@@ -10,18 +10,18 @@
 
     // Check each field
     $hasProfilePhoto = !empty($user->passport);
-    $hasBiography = !empty($user->biography);
+    // $hasBiography = !empty($user->biography);
     $hasSocialMedia = !empty($user->instagram) || !empty($user->youtube) || !empty($user->facebook) || !empty($user->tiktok);
     $hasSkillLevel = !empty($user->skill_level);
-    $hasPhoneNumber = !empty($user->phone_number);
+    // $hasPhoneNumber = !empty($user->phone_number);
     $hasCountry = !empty($user->country);
 
     // Count completed fields
     if ($hasProfilePhoto) $completedFields++;
-    if ($hasBiography) $completedFields++;
+    // if ($hasBiography) $completedFields++;
     if ($hasSocialMedia) $completedFields++;
     if ($hasSkillLevel) $completedFields++;
-    if ($hasPhoneNumber) $completedFields++;
+    // if ($hasPhoneNumber) $completedFields++;
     if ($hasCountry) $completedFields++;
 
     // Calculate percentage
@@ -114,7 +114,7 @@
                 </div>
 
                 <!-- Biography -->
-                <div class="flex items-center justify-between">
+                {{-- <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         @if($hasBiography)
                             <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
@@ -130,7 +130,7 @@
                             <span class="text-sm text-[#6B7280]">Biography</span>
                         @endif
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Social Media Links -->
                 <div class="flex items-center justify-between">
@@ -171,7 +171,7 @@
                 </div>
 
                 <!-- Phone Number -->
-                <div class="flex items-center justify-between">
+                {{-- <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         @if($hasPhoneNumber)
                             <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
@@ -187,7 +187,7 @@
                             <span class="text-sm text-[#6B7280]">Phone Number</span>
                         @endif
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Location / Country -->
                 <div class="flex items-center justify-between">

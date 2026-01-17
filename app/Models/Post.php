@@ -36,4 +36,9 @@ class Post extends Model
     {
         return $this->hasMany(PostMedia::class);
     }
+
+    public function bookmarks()
+    {
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
+    }
 }

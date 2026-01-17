@@ -34,5 +34,8 @@ class Upload extends Model
         return $this->thumbnail ? asset($this->thumbnail) : null;
     }
 
- 
+    public function bookmarks()
+    {
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
+    }
 }

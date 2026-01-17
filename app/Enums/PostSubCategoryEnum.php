@@ -12,5 +12,5 @@ enum PostSubCategoryEnum: string
     case ADVANCE = 'advance';
     case LESSONS = 'lessons';
     case PROGRESSREPORTS = 'progress_report';
-    case EXCLUSIVEFEED = 'exclusive_feed';
+    case ACTIVITYEFEED = 'activity_feed';
 }

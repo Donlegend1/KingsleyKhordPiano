@@ -3,46 +3,56 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Bookmark;
+use App\Services\BookmarkService;
+
 
 class BookMarkController extends Controller
 {
-    public function bookmark()
+    public function bookmark(BookmarkService $service)
     {
-        $bookmarks = Bookmark::where('user_id', auth()->id())
-        ->latest()
-        ->get()
-        ->map(function ($bookmark) {
-            $bookmark->video = $bookmark->resolveVideo();
-            return $bookmark;
-        });
+        $bookmarks = $service->getUserBookmarks();
+        // dd($bookmarks);
         
         return view('memberpages.bookmark.index', compact('bookmarks'));
     }
 
-    public function toggle(Request $request)
+    public function toggle(Request $request, BookmarkService $service)
     {
-        $request->validate([
-            'video_id' => 'required|integer',
-            'source'   => 'required|string',
+        $data = $request->validate([
+            'bookmarkable_id'   => 'required|integer',
+            'bookmarkable_type' => 'required|string',
         ]);
-
-        $bookmark = Bookmark::where('user_id', auth()->id())
-            ->where('video_id', $request->video_id)
-            ->where('source', $request->source)
-            ->first();
-
-        if ($bookmark) {
-            $bookmark->delete();
-            return response()->json(['status' => 'removed']);
+    
+        // Resolve the model class
+        $modelClass = $this->resolveModel($data['bookmarkable_type']);
+        if (!$modelClass) {
+            return response()->json(['error' => 'Invalid type'], 400);
         }
-
-        Bookmark::create([
-            'user_id'  => auth()->id(),
-            'video_id' => $request->video_id,
-            'source'   => $request->source,
+    
+        // Fetch the model instance
+        $bookmarkable = $modelClass::find($data['bookmarkable_id']);
+        if (!$bookmarkable) {
+            return response()->json(['error' => 'Item not found'], 404);
+        }
+    
+        // Toggle bookmark
+        $added = $service->toggle($bookmarkable);
+    
+        return response()->json([
+            'status' => $added ? 'added' : 'removed',
         ]);
-
-        return response()->json(['status' => 'added']);
     }
-}
+    
+    /**
+     * Resolve string to model class
+     */
+    protected function resolveModel(string $type)
+    {
+        return match ($type) {
+            'uploads' => \App\Models\Upload::class,
+            'courses' => \App\Models\Course::class,
+            'posts'   => \App\Models\Post::class,
+            default   => null,
+        };
+    }
+}    

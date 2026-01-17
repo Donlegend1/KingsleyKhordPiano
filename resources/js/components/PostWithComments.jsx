@@ -10,6 +10,8 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "./Alert/FlashMessageContext";
+import { Trash2, Bookmark, Heart, MessageCircle } from "lucide-react";
+import AuthorNameWithVerification from "./User/AuthorNameWithVerification";
 
 const getInitials = (firstName, lastName) => {
     return `${firstName?.charAt(0) || ""}${
@@ -91,6 +93,10 @@ const PostWithComments = ({
             console.error("Error toggling like:", error);
         }
     };
+
+    const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute("content");
 
     const handleEditComment = (comment) => {
         setNewComment(comment.body);
@@ -177,6 +183,25 @@ const PostWithComments = ({
         setComments(post.comments || []);
     }, [post.comments]);
 
+    const toggleBookmark = async (id) => {
+        try {
+            await axios.post(
+                `/member/bookmark/toggle`,
+                {
+                    bookmarkable_id: id,
+                    bookmarkable_type: "posts",
+                },
+                {
+                    headers: { "X-CSRF-TOKEN": csrfToken },
+                    withCredentials: true,
+                }
+            );
+            showMessage("Added to bookmarks!", "success");
+        } catch (err) {
+            console.error("Bookmark toggle failed:", err);
+            showMessage("Error toggling bookmark", "error");
+        }
+    };
     return (
         <div
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 mb-5"
@@ -201,9 +226,8 @@ const PostWithComments = ({
 
                     {/* Author Info */}
                     <div>
-                        <h3 className="text-sm font-semibold text-[#1F2937] dark:text-white">
-                            {author.first_name} {author.last_name}
-                        </h3>
+                        <AuthorNameWithVerification author={author} />
+
                         <div className="flex items-center gap-1">
                             <span className="text-xs text-[#6B7280] dark:text-gray-300">
                                 posted an update
@@ -243,16 +267,28 @@ const PostWithComments = ({
                     </button>
 
                     {showPostAction && (
-                        <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-30">
+                        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg z-30 overflow-hidden">
                             <button
-                                className="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900 text-red-600"
                                 onClick={() => {
                                     if (!confirm("Delete this post?")) return;
                                     handleDeletePost(post.id);
                                     setShowPostAction(false);
                                 }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
                             >
-                                Delete post
+                                <Trash2 className="w-4 h-4" />
+                                <span>Delete post</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    toggleBookmark(post.id);
+                                    setShowPostAction(false);
+                                }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                            >
+                                <Bookmark className="w-4 h-4" />
+                                <span>Save post</span>
                             </button>
                         </div>
                     )}
@@ -359,49 +395,40 @@ const PostWithComments = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
                 <div className="flex">
+                    {/* Like */}
                     <button
                         onClick={toggleLike}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-4 text-[#6B7280] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors active:scale-[0.98]"
                     >
-                        <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                            ></path>
-                        </svg>
+                        <Heart
+                            className={`w-4 h-4 ${
+                                likes.length > 0
+                                    ? "fill-red-500 text-red-500"
+                                    : ""
+                            }`}
+                        />
+
                         <span className="font-medium">
-                            Love ({likes.length})
+                            Love
+                            <span className="ml-0.5 text-[11px] sm:text-xs text-gray-400">
+                                ({likes.length})
+                            </span>
                         </span>
                     </button>
+
+                    {/* Comment */}
                     <button
                         onClick={() => {
                             setCommentsVisible(!commentsVisible);
                             setSelectedPost(post);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-4 text-[#6B7280] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors active:scale-[0.98]"
                     >
-                        <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                            ></path>
-                        </svg>
+                        <MessageCircle className="w-4 h-4" />
+
                         <span className="font-medium">Comment</span>
                     </button>
                 </div>

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Upload;
-use App\Models\Bookmark;
+use App\Services\BookmarkService;
 use App\Models\CourseVideoComment;
 
 class CoursesController extends Controller
@@ -53,7 +53,7 @@ class CoursesController extends Controller
         return view('memberpages.extracources', compact('all', 'beginner', 'intermediate', 'advanced'));
     }
 
-    public function singleCourse($id) 
+    public function singleCourse($id, BookmarkService $service) 
     {
         $lesson = Upload::findOrFail($id);
 
@@ -69,10 +69,7 @@ class CoursesController extends Controller
             $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
         }
 
-        $isBookmarked = Bookmark::where('user_id', auth()->id())
-            ->where('video_id', $lesson->id)
-            ->where('source', 'uploads') 
-            ->exists();
+        $isBookmarked = $service->isBookmarked($lesson);
 
         return view('memberpages.singleExtracourse', compact(
             'lesson',

@@ -47,7 +47,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'instagram',
         'youtube',
         'facebook',
-        'tiktok'
+        'tiktok',
+        'verified'
     ];
 
     /**
@@ -122,5 +123,10 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('status', 'successful')
             ->where('ends_at', '>', now())
             ->exists();
+    }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
     }
 }

@@ -10,4 +10,5 @@ enum PostCategoryEnum: string
     case PROGRESSREPORTS = 'progress_report';
     case LESSONS = 'lessons';
     case EXCLUSIVEFEED = 'exclusive_feed';
+    case GENERAL = 'general';
 }

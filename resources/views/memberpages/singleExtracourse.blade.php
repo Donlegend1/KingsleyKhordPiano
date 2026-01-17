@@ -52,14 +52,15 @@
       <!-- Bookmark Toggle -->
       <form action="{{ route('bookmark.toggle') }}" method="POST" class="inline bookmark-form">
         @csrf
-        <input type="hidden" name="video_id" value="{{ $lesson->id }}">
-        <input type="hidden" name="source" value="uploads">
+        <input type="hidden" name="bookmarkable_id" value="{{ $lesson->id }}">
+        <input type="hidden" name="bookmarkable_type" value="uploads">
 
         <button type="submit" 
           class="bookmark-btn flex items-center px-3 py-1.5 border rounded-lg text-sm 
                  {{ $isBookmarked ? 'bg-yellow-100 border-yellow-500 text-yellow-600' : 'bg-gray-100 border-gray-300 text-gray-600' }}">
           <i class="fa fa-bookmark mr-2"></i>
           {{ $isBookmarked ? 'Bookmarked' : 'Bookmark' }}
+
         </button>
       </form>
     </div>

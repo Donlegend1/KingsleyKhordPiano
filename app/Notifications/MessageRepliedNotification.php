@@ -30,7 +30,7 @@ class MessageRepliedNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject("New Reply from {$sender}")
-            ->view('emails.chat.notification', [
+            ->view('emails.chat.notifications', [
                 'subject' => "New Reply from {$sender}",
                 'userName' => $notifiable->first_name,
                 'senderName' => $sender,

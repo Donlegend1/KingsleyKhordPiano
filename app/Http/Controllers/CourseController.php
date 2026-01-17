@@ -193,6 +193,9 @@ class CourseController extends Controller
                     ->with([
                         'progress' => function ($q) use ($userId) {
                             $q->where('user_id', $userId);
+                        },
+                        'bookmarks' => function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
                         }
                     ])
                     ->orderBy('position');
@@ -206,14 +209,11 @@ class CourseController extends Controller
             return response()->json(['message' => 'No categories found for this level'], 404);
         }
 
-        $bookmarkedIds = Bookmark::where('user_id', $userId)
-            ->where('source', 'courses')
-            ->pluck('video_id')
-            ->toArray();
-
-        $categories->each(function ($category) use ($bookmarkedIds) {
-            $category->courses->transform(function ($course) use ($bookmarkedIds) {
-                $course->isBookmarked = in_array($course->id, $bookmarkedIds);
+        // Add `isBookmarked` flag to each course
+        $categories->each(function ($category) {
+            $category->courses->transform(function ($course) {
+                $course->isBookmarked = $course->bookmarks->isNotEmpty();
+                unset($course->bookmarks); // optional, remove bookmarks relation to clean response
                 return $course;
             });
         });

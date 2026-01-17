@@ -17,6 +17,10 @@ const CreatePostBox = ({
 
     const handleFocus = () => setExpanded(true);
 
+    const isAdmin = Boolean(
+        window.authUser?.email == "kingsleykhord@gmail.com"
+    );
+
     const handleClose = () => {
         setExpanded(false);
         setPostDetails({ body: "", category: "", subcategory: "" });
@@ -64,16 +68,23 @@ const CreatePostBox = ({
             ],
         },
         {
-         category: { name: "ProgressReports", value: "progress_report" },
+            category: { name: "ProgressReports", value: "progress_report" },
             subCategories: [
                 { name: "Progress Reports", value: "progress_report" },
             ],
         },
 
         {
-         category: { name: "ExclusiveFeed", value: "exclusive_feed" },
+            category: { name: "ExclusiveFeed", value: "exclusive_feed" },
             subCategories: [
                 { name: "Exclusive Feed", value: "exclusive_feed" },
+            ],
+        },
+
+        {
+            category: { name: "General", value: "general" },
+            subCategories: [
+                { name: "Activity Feed", value: "activity_feed" },
             ],
         },
     ];
@@ -96,6 +107,13 @@ const CreatePostBox = ({
                 ...prev,
                 subcategory: formattedSubcategory,
                 category: categoryValue,
+            }));
+        }
+        else {
+            setPostDetails((prev) => ({
+                ...prev,
+                subcategory: 'activity_feed',
+                category: 'general',
             }));
         }
     }, [subcategory]);
@@ -121,8 +139,16 @@ const CreatePostBox = ({
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
+                    <svg
+                        className="w-6 h-6 text-gray-500 dark:text-gray-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clipRule="evenodd"
+                        ></path>
                     </svg>
                 </div>
                 <input
@@ -172,8 +198,6 @@ const CreatePostBox = ({
                         </div>
                     )}
 
-                   
-
                     <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300 mt-10">
                         <div className="flex space-x-4">
                             {/* Hidden inputs for file selection */}
@@ -192,26 +216,28 @@ const CreatePostBox = ({
                                 className="hidden"
                             />
 
-                            <button
-                                type="button"
-                                onClick={triggerImageSelect}
-                                className="flex items-center space-x-1 hover:text-[#FFD736]"
-                            >
-                                <i className="fas fa-image text-green-500"></i>
-                            </button>
-                            <button
+                            {isAdmin && (
+                                <button
+                                    type="button"
+                                    onClick={triggerImageSelect}
+                                    className="flex items-center space-x-1 hover:text-[#FFD736]"
+                                >
+                                    <i className="fas fa-image text-green-500"></i>
+                                </button>
+                            )}
+                            {/* <button
                                 type="button"
                                 onClick={triggerVideoSelect}
                                 className="flex items-center space-x-1 hover:text-[#FFD736]"
                             >
                                 <i className="fas fa-video text-red-500"></i>
-                            </button>
-                            <button className="flex items-center space-x-1 hover:text-[#FFD736]">
+                            </button> */}
+                            {/* <button className="flex items-center space-x-1 hover:text-[#FFD736]">
                                 <i className="fas fa-poll text-blue-500"></i>
-                            </button>
+                            </button> */}
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-gray-500 dark:text-gray-400 font-medium">
+                            {/* <span className="text-gray-500 dark:text-gray-400 font-medium">
                                 Post in:
                             </span>
                             {subcategory !== null && (
@@ -267,7 +293,7 @@ const CreatePostBox = ({
                                         </React.Fragment>
                                     ))}
                                 </select>
-                            )}
+                            )} */}
                             <button
                                 disabled={posting}
                                 className="bg-black dark:bg-gray-800 text-white px-4 py-1 rounded hover:brightness-90 transition text-sm"
