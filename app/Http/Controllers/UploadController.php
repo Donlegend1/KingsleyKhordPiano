@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\NewUploadCreated;
 use App\Enums\Roles\UserRoles;
 use Illuminate\Http\Request;
+use App\Helpers\VideoHelper;
 
 class UploadController extends Controller
 {
@@ -55,39 +56,60 @@ class UploadController extends Controller
      */
     public function store(StoreUploadRequest $request)
     {
-        $data = $request->only([
-            'title',
-            'category',
-            'description',
-            'video_url',
-            'level',
-            'skill_level',
-            'status',
-            'tags',
-        ]);
+        $validated = $request->validated();
 
-        // Handle file upload manually using move()
-    if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
+        $videoType = $validated['video_type'] ?? 'iframe';
+        $videoPath = $validated['video_url'] ?? null;
+
+        switch ($videoType) {
+            case 'youtube':
+                $validated['video_url'] = VideoHelper::extractYoutubeId($videoPath);
+                break;
+
+            case 'google':
+                $validated['video_url'] = VideoHelper::extractGoogleDriveId($videoPath);
+                break;
+
+            case 'local':
+                // assume file already uploaded elsewhere
+                $validated['video_url'] = $videoPath;
+                break;
+
+            case 'iframe':
+            default:
+                $validated['video_url'] = $videoPath;
+                break;
+        }
+
+        if ($request->hasFile('thumbnail')) {
             $thumbnail = $request->file('thumbnail');
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
-        
-            // Point directly to public_html/uploads/thumbnails
+
             $destination = base_path('../public_html/uploads/thumbnails');
-        
-            // Ensure destination exists
+
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
             }
-        
+
             $thumbnail->move($destination, $filename);
 
-            $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
+            $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
         }
 
+        $upload = Upload::create([
+            'title'        => $validated['title'],
+            'category'     => $validated['category'],
+            'description'  => $validated['description'],
+            'video_type'   => $videoType,
+            'video_url'    => $validated['video_url'],
+            'level'        => $validated['level'],
+            'skill_level'  => $validated['skill_level'] ?? null,
+            'status'       => $validated['status'],
+            'tags'         => $validated['tags'] ?? null,
+            'thumbnail'    => $validated['thumbnail'] ?? null,
+        ]);
 
-        $upload = Upload::create($data);
-
-         $members = User::where('role', UserRoles::MEMBER->value)->get();
+        $members = User::where('role', UserRoles::MEMBER->value)->get();
 
         foreach ($members as $member) {
             $member->notify(new NewUploadCreated($upload));
@@ -95,6 +117,7 @@ class UploadController extends Controller
 
         return response()->json($upload, 200);
     }
+
 
     /**
      * Display the specified resource.
@@ -118,33 +141,76 @@ class UploadController extends Controller
 
     public function update(UpdateUploadRequest $request, Upload $upload)
     {
-        $data = $request->validated();
+        $validated = $request->validated();
+         logger()->info(['vedoe' => $validated]);
 
-        if ($request->hasFile('thumbnail') && $request->file('thumbnail') !== null) {
+        if (isset($validated['video_type'])) {
+            $videoType = $validated['video_type'];
+            $videoPath = $validated['video_url'] ?? null;
+
+            switch ($videoType) {
+                case 'youtube':
+                    $validated['video_url'] = VideoHelper::extractYoutubeId($videoPath);
+                    break;
+
+                case 'google':
+                    $validated['video_url'] = VideoHelper::extractGoogleDriveId($videoPath);
+                    break;
+
+                case 'local':
+                    $validated['video_url'] = $videoPath;
+                    break;
+
+                case 'iframe':
+                default:
+                    $validated['video_url'] = $videoPath;
+                    break;
+            }
+        }
+
+        /* ---------------- THUMBNAIL UPLOAD ---------------- */
+
+        if ($request->hasFile('thumbnail')) {
             $thumbnail = $request->file('thumbnail');
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
-             $destination = base_path('../public_html/uploads/thumbnails');
 
-            // Ensure destination exists
+            $destination = base_path('../public_html/uploads/thumbnails');
+
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
             }
 
-            // Optionally delete old thumbnail
+            // Delete old thumbnail if it exists
             if ($upload->thumbnail && file_exists(public_path($upload->thumbnail))) {
                 unlink(public_path($upload->thumbnail));
             }
 
             $thumbnail->move($destination, $filename);
-            $data['thumbnail'] = 'uploads/thumbnails/' . $filename;
+            $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
         }
 
-        $upload->update($data);
+        /* ---------------- UPDATE MODEL ---------------- */
 
+        $upload->update([
+            'title'        => $validated['title'] ?? $upload->title,
+            'category'     => $validated['category'] ?? $upload->category,
+            'description'  => $validated['description'] ?? $upload->description,
+            'video_type'   => $validated['video_type'] ?? $upload->video_type,
+            'video_url'    => $validated['video_url'] ?? $upload->video_url,
+            'level'        => $validated['level'] ?? $upload->level,
+            'skill_level'  => $validated['skill_level'] ?? $upload->skill_level,
+            'status'       => $validated['status'] ?? $upload->status,
+            'tags'         => $validated['tags'] ?? $upload->tags,
+            'thumbnail'    => $validated['thumbnail'] ?? $upload->thumbnail,
+        ]);
+        logger()->info(['video' => $validated['video_type']]);
+        
         return response()->json([
-            'message' => 'upload updated successfully',
-            'upload' => $upload,
-            'thumbnail_url' => $upload->thumbnail ? asset($upload->thumbnail) : null,
+            'message' => 'Upload updated successfully',
+            'upload' => $upload->fresh(),
+            'thumbnail_url' => $upload->thumbnail
+                ? asset($upload->thumbnail)
+                : null,
         ], 200);
     }
 

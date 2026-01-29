@@ -14,7 +14,8 @@ class Post extends Model
     'body',
     'category',
     'subcategory',
-    'user_id'
+    'user_id',
+    'is_pinned'
    ];
     
     public function user()
@@ -40,5 +41,10 @@ class Post extends Model
     public function bookmarks()
     {
         return $this->morphMany(Bookmark::class, 'bookmarkable');
+    }
+
+    public function blocks()
+    {
+        return $this->hasMany(PostBlock::class);
     }
 }

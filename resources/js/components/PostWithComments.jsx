@@ -10,8 +10,9 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "./Alert/FlashMessageContext";
-import { Trash2, Bookmark, Heart, MessageCircle } from "lucide-react";
+import { Trash2, Bookmark, Heart, MessageCircle, PinIcon } from "lucide-react";
 import AuthorNameWithVerification from "./User/AuthorNameWithVerification";
+import LinkEmbeds from "./LinkEmbeds";
 
 const getInitials = (firstName, lastName) => {
     return `${firstName?.charAt(0) || ""}${
@@ -51,6 +52,7 @@ const PostWithComments = ({
     handleDeletePost,
     commenting,
     onUpdatePost,
+    togglePinPost
 }) => {
     const [comments, setComments] = useState(post.comments || []);
     const [showPostAction, setShowPostAction] = useState(false);
@@ -79,7 +81,7 @@ const PostWithComments = ({
 
             setLikes(updatedLikes);
             const nowLiked = updatedLikes.some(
-                (like) => like.user?.id === window.authUser?.id
+                (like) => like.user?.id === window.authUser?.id,
             );
             setLiked(nowLiked);
 
@@ -95,8 +97,8 @@ const PostWithComments = ({
     };
 
     const csrfToken = document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content");
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
 
     const handleEditComment = (comment) => {
         setNewComment(comment.body);
@@ -116,7 +118,7 @@ const PostWithComments = ({
             if (typeof onUpdatePost === "function") {
                 onUpdatePost(post.id, {
                     comments: (comments || []).filter(
-                        (c) => c.id !== commentId
+                        (c) => c.id !== commentId,
                     ),
                 });
             }
@@ -132,7 +134,7 @@ const PostWithComments = ({
 
     const handleShowCommentAction = (commentId) => {
         setShowCommentActionId((prevId) =>
-            prevId === commentId ? null : commentId
+            prevId === commentId ? null : commentId,
         );
     };
 
@@ -146,7 +148,7 @@ const PostWithComments = ({
                 `/api/member/comment/reply/${commentId}`,
                 {
                     body: newReply,
-                }
+                },
             );
             const created = res.data?.data || res.data;
 
@@ -155,8 +157,8 @@ const PostWithComments = ({
                 prev.map((c) =>
                     c.id === commentId
                         ? { ...c, replies: [...(c.replies || []), created] }
-                        : c
-                )
+                        : c,
+                ),
             );
 
             // notify parent
@@ -165,7 +167,7 @@ const PostWithComments = ({
                     comments: (comments || []).map((c) =>
                         c.id === commentId
                             ? { ...c, replies: [...(c.replies || []), created] }
-                            : c
+                            : c,
                     ),
                 });
             }
@@ -194,7 +196,7 @@ const PostWithComments = ({
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },
                     withCredentials: true,
-                }
+                },
             );
             showMessage("Added to bookmarks!", "success");
         } catch (err) {
@@ -202,6 +204,8 @@ const PostWithComments = ({
             showMessage("Error toggling bookmark", "error");
         }
     };
+
+    
     return (
         <div
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 mb-5"
@@ -290,93 +294,98 @@ const PostWithComments = ({
                                 <Bookmark className="w-4 h-4" />
                                 <span>Save post</span>
                             </button>
+                            <button
+                                onClick={() => {
+                                    togglePinPost(post.id);
+                                    setShowPostAction(false);
+                                }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                            >
+                                <PinIcon className="w-4 h-4" />
+                                <span>Pin Post</span>
+                            </button>
                         </div>
                     )}
                 </div>
             </div>
 
             {/* Post Content: media (video/audio/image) or text/link */}
-            <div className="mb-3">
-                {post.media && post.media.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-2">
-                        {post.media.map((file, idx) => {
-                            const src = file.file_path
-                                ? `/${file.file_path}`
-                                : file.url || file.path || "";
-                            const type = (file.type || "").toLowerCase();
 
-                            if (
-                                type.includes("video") ||
-                                src.match(/\.(mp4|webm|ogg)(\?|$)/i)
-                            ) {
-                                return (
-                                    <video
-                                        key={idx}
-                                        controls
-                                        className="w-full rounded-lg bg-black"
-                                    >
-                                        <source src={src} />
-                                        Your browser does not support the video
-                                        tag.
-                                    </video>
-                                );
-                            }
+            {post.blocks.map((block, idx) => {
+                switch (block.type) {
+                    case "text":
+                        return (
+                            <p key={idx} className="whitespace-pre-wrap">
+                                {renderTextWithLinks(block.content)}
+                            </p>
+                        );
 
-                            if (
-                                type.includes("audio") ||
-                                src.match(/\.(mp3|wav|ogg)(\?|$)/i)
-                            ) {
-                                return (
-                                    <audio
-                                        key={idx}
-                                        controls
-                                        className="w-full"
-                                    >
-                                        <source src={src} />
-                                        Your browser does not support the audio
-                                        element.
-                                    </audio>
-                                );
-                            }
+                    case "image":
+                        return (
+                            <img
+                                key={idx}
+                                src={`/${block.content}`}
+                                className="rounded-lg w-full"
+                            />
+                        );
 
-                            if (
-                                type.includes("image") ||
-                                src.match(/\.(jpe?g|png|gif|webp)(\?|$)/i)
-                            ) {
-                                return (
-                                    <img
-                                        key={idx}
-                                        src={src}
-                                        alt={`media-${idx}`}
-                                        className="w-full h-auto object-cover rounded-lg"
-                                    />
-                                );
-                            }
+                    case "video":
+                        return (
+                            <video
+                                key={idx}
+                                controls
+                                className="w-full rounded-lg"
+                            >
+                                <source src={`/${block.content}`} />
+                            </video>
+                        );
 
-                            // fallback: if media is a link
-                            return (
+                    case "audio":
+                        return (
+                            <audio key={idx} controls>
+                                <source src={`/${block.content}`} />
+                            </audio>
+                        );
+
+                    case "link":
+                        return block.content ? (
+                            <div
+                                key={idx}
+                                className="relative aspect-video rounded-lg overflow-hidden"
+                            >
+                                <iframe
+                                    src={block.embed_url}
+                                    className="w-full h-full"
+                                    allowFullScreen
+                                />
+                                {/* Overlay clickable layer */}
                                 <a
-                                    key={idx}
-                                    href={src}
+                                    href={block.content}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-indigo-600"
-                                >
-                                    {src}
-                                </a>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    // render body with clickable links
-                    <div className="text-sm whitespace-pre-wrap leading-relaxed text-gray-800 dark:text-gray-100">
-                        {renderTextWithLinks(post.body)}
-                    </div>
-                )}
-            </div>
+                                    className="absolute inset-0"
+                                    title="Open in new tab"
+                                />
+                            </div>
+                        ) : (
+                            <a
+                                key={idx}
+                                href={block.content}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-indigo-600 underline break-all"
+                            >
+                                {block.content}
+                            </a>
+                        );
+
+                    default:
+                        return null;
+                }
+            })}
 
             {/* Engagement Section */}
-            <div className="flex justify-between items-center mb-3">
+            {/* <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-2">
                     <svg
                         className="w-5 h-5 text-red-500"
@@ -392,11 +401,11 @@ const PostWithComments = ({
                 <span className="text-sm text-[#6B7280] dark:text-gray-300">
                     {comments.length} Comments
                 </span>
-            </div>
+            </div> */}
 
             {/* Action Buttons */}
 
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
                 <div className="flex">
                     {/* Like */}
                     <button
@@ -459,7 +468,7 @@ const PostWithComments = ({
                                             </div>
                                             <div className="text-xs text-gray-400">
                                                 {formatRelativeTime(
-                                                    comment.created_at
+                                                    comment.created_at,
                                                 )}
                                             </div>
                                         </div>
@@ -467,7 +476,7 @@ const PostWithComments = ({
                                             <button
                                                 onClick={() =>
                                                     handleToggleReply(
-                                                        comment.id
+                                                        comment.id,
                                                     )
                                                 }
                                                 className="text-xs text-teal-600"
@@ -478,12 +487,12 @@ const PostWithComments = ({
                                                 onClick={() => {
                                                     if (
                                                         !confirm(
-                                                            "Delete this comment?"
+                                                            "Delete this comment?",
                                                         )
                                                     )
                                                         return;
                                                     handleDeleteComment(
-                                                        comment.id
+                                                        comment.id,
                                                     );
                                                 }}
                                                 className="text-xs text-red-500"
@@ -512,12 +521,12 @@ const PostWithComments = ({
                                                         </div>
                                                         <div className="text-xs text-gray-400">
                                                             {formatRelativeTime(
-                                                                r.created_at
+                                                                r.created_at,
                                                             )}
                                                         </div>
                                                         <div className="mt-1">
                                                             {renderTextWithLinks(
-                                                                r.body
+                                                                r.body,
                                                             )}
                                                         </div>
                                                     </div>

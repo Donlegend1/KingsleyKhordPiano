@@ -21,6 +21,7 @@ import './components/plans/PlanSwitchAndCurrencySelect';
 import './components/ZoomMeetingBooking';
 import './components/uploads/Uploads';
 import './components/uploads/Create';
+import './components/uploads/Single.jsx';
 import './components/EarTraining/Index';
 import './components/EarTraining/Create'
 import './components/EarTraining/Show'
@@ -46,5 +47,7 @@ import './components/Midi/MidiFiles.jsx';
 import "./components/Calls/CallCard.jsx"
 import "./components/EmailCampaign/Index.jsx"
 import "./components/EmailCampaign/Create.jsx"
+import './components/PDFDownload/AudioFiles.jsx';
+import './components/AudioDownload/PDFFiles.jsx';
 
 

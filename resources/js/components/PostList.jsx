@@ -22,8 +22,10 @@ const PostList = () => {
     const [posting, setPosting] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [selectedPost, setSelectedPost] = useState({});
+    const [blocks, setBlocks] = useState([]);
 
     const [postDetails, setPostDetails] = useState({
+        blocks: [],
         body: "",
         category: "",
         subcategory: "",
@@ -42,6 +44,10 @@ const PostList = () => {
         const num = Number(segment);
         return isNaN(num) ? null : num;
     })();
+
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
 
     useEffect(() => {
         let timer;
@@ -65,10 +71,6 @@ const PostList = () => {
     };
 
     const handleValidation = () => {
-        if (!postDetails.body.trim()) {
-            showMessage("Post content cannot be empty.", "error");
-            return false;
-        }
         if (!postDetails.subcategory) {
             showMessage("Please select a category.", "error");
             return false;
@@ -95,7 +97,7 @@ const PostList = () => {
             setPosts((prev) => {
                 const existingIds = new Set(prev.map((p) => p.id));
                 const uniqueNewPosts = newPosts.filter(
-                    (p) => !existingIds.has(p.id)
+                    (p) => !existingIds.has(p.id),
                 );
                 return [...prev, ...uniqueNewPosts];
             });
@@ -120,7 +122,7 @@ const PostList = () => {
                         page,
                         sort: sortBy,
                     },
-                }
+                },
             );
 
             const newPosts = response.data.data;
@@ -130,7 +132,7 @@ const PostList = () => {
             setPosts((prev) => {
                 const existingIds = new Set(prev.map((p) => p.id));
                 const uniqueNewPosts = newPosts.filter(
-                    (p) => !existingIds.has(p.id)
+                    (p) => !existingIds.has(p.id),
                 );
                 return [...prev, ...uniqueNewPosts];
             });
@@ -183,11 +185,10 @@ const PostList = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-
-            // After creating a post, refetch the first page so server ordering is respected
             showMessage("Posted successfully.", "success");
 
-            setPostDetails({ body: "", category: "", subcategory: "" });
+            // setPostDetails({ category: "", subcategory: "" });
+            setBlocks([]);
             setMediaFiles([]);
             setExpanded(false);
 
@@ -257,8 +258,8 @@ const PostList = () => {
                                   ...p,
                                   comments: [...(p.comments || []), created],
                               }
-                            : p
-                    )
+                            : p,
+                    ),
                 );
             } else {
                 // fallback: refetch
@@ -282,8 +283,32 @@ const PostList = () => {
     // allow child to update a post (likes/comments) optimistically
     const handleUpdatePost = (id, patch) => {
         setPosts((prev) =>
-            prev.map((p) => (p.id === id ? { ...p, ...patch } : p))
+            prev.map((p) => (p.id === id ? { ...p, ...patch } : p)),
         );
+    };
+
+    const togglePinPost = async (id) => {
+        try {
+            await axios.post(`/api/member/posts/${id}/pin`, {
+                headers: { "X-CSRF-TOKEN": csrfToken },
+                withCredentials: true,
+            });
+
+            // Reset pagination and refetch to show pinned post at top
+            setPosts([]);
+            setPage(1);
+            setHasMore(true);
+
+            if (lastSegment) {
+                await fetchPostsByMember();
+            } else {
+                await fetchPosts();
+            }
+            showMessage("Pinned to the top", "success");
+        } catch (err) {
+            console.error("Pin toggle failed:", err);
+            showMessage(err.response?.data?.message, "error");
+        }
     };
 
     return (
@@ -298,6 +323,8 @@ const PostList = () => {
                     setExpanded={setExpanded}
                     mediaFiles={mediaFiles}
                     setMediaFiles={setMediaFiles}
+                    blocks={blocks}
+                    setBlocks={setBlocks}
                 />
             </div>
 
@@ -339,6 +366,7 @@ const PostList = () => {
                         commenting={commenting}
                         onUpdatePost={handleUpdatePost}
                         // setCommenting={setCommenting}
+                        togglePinPost={togglePinPost}
                     />
                 ))}
 
@@ -372,6 +400,6 @@ if (document.getElementById("post-list")) {
             <FlashMessageProvider>
                 <PostList />
             </FlashMessageProvider>
-        </React.StrictMode>
+        </React.StrictMode>,
     );
 }

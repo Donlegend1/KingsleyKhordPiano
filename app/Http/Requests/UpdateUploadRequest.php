@@ -29,6 +29,7 @@ class UpdateUploadRequest extends FormRequest
             'thumbnail' => 'nullable',
             'status' => 'nullable|in:active,inactive,draft',
             'video_url' => 'nullable|string',
+            'video_type' => 'nullable|string',
             'skill_level' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
         ];

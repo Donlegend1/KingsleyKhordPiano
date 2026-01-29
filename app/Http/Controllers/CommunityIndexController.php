@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\MidiFile;
+use App\Models\PDFDownload;
+use App\Models\AudioDownload;
 
 class CommunityIndexController extends Controller
 {
@@ -47,12 +49,19 @@ class CommunityIndexController extends Controller
 
    public function pdfDownloads()
    {
-      return view('community.pdf-downloads');
+      $beginners = PDFDownload::where('category', 'beginners')->get();
+      $intermediate = PDFDownload::where('category', 'intermediate')->get();
+      $advanced = PDFDownload::where('category', 'advanced')->get();
+
+      return view('community.pdf-downloads', compact('beginners', 'intermediate', 'advanced'));
    }
 
    public function audioDownloads()
    {
-      return view('community.audio-downloads');
+      $tracksAndLoops = AudioDownload::where('category', 'tracks_loops')->get();
+      $pianoPlays = AudioDownload::where('category', 'piano_plays')->get();
+
+      return view('community.audio-downloads', compact('tracksAndLoops', 'pianoPlays'));
    }
 
    public function midiDownloads()

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->text('body');
+            $table->text('body')->nullable();
             $table->enum('category', ['get_started', 'others', 'forum']);
             $table->enum('subcategory', ['say_hello', 'ask_question', 'post_progress', 'beginner', 'intermediate', 'advance', 'lessons']);
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

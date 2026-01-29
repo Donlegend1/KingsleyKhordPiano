@@ -9,18 +9,24 @@ use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Community;
+use App\Helpers\VideoHelper;
+use App\Models\PostBlock;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 class PostController extends Controller
 {
 
     public function index(Request $request)
     {
-        $query = Post::with([
+        $query = Post::where('subcategory', '!=', 'exclusive_feed')->with([
             'comments.user',
             'comments.replies.user',
             'likes.user',
             'user',
-            'media'
+            'media',
+            'blocks'
         ]);
 
         if ($request->filled('subcategory')) {
@@ -31,6 +37,8 @@ class PostController extends Controller
          if ($request->filled('post_id')) {
             $query->where('id', $request->post_id);
         }
+
+        $query->orderByDesc('is_pinned');
 
         // Sorting logic
         switch ($request->get('sort')) {
@@ -45,7 +53,7 @@ class PostController extends Controller
                 break;
             case 'latest':
             default:
-                $query->latest();
+                $query->orderByDesc('updated_at');
         }
 
         return response()->json($query->paginate(5));
@@ -64,40 +72,49 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $userId = auth()->id() ?? 1;
-
+        DB::transaction(function () use ($request) {
         $post = Post::create([
             'title' => $request->title,
-            'body' => $request->body,
+            'user_id' => auth()->id(),
             'category' => $request->category,
             'subcategory' => $request->subcategory,
-            'user_id' => $userId,
         ]);
+        logger()->info(['blocks' => $request->blocks]);
 
-        if ($request->hasFile('media')) {
-            foreach ($request->file('media') as $file) {
-                $extension = strtolower($file->getClientOriginalExtension());
-                $type = in_array($extension, ['mp4', 'mov', 'avi']) ? 'video' : 'image';
+       foreach ($request->blocks as $index => $block) {
+            $data = [
+                'post_id' => $post->id,
+                'type' => $block['type'],
+                'position' => $index,
+            ];
 
-                // Generate unique file name
-                $fileName = Str::uuid() . '.' . $extension;
-
-                // Move file to public/uploads/posts
-                $file->move(public_path('uploads/posts'), $fileName);
-
-                // Save in post_media table
-                PostMedia::create([
-                    'post_id' => $post->id,
-                    'file_path' => 'uploads/posts/' . $fileName,
-                    'type' => $type,
-                ]);
+            if ($block['type'] === 'text') {
+                $data['content'] = $block['content'];
             }
+
+            if ($block['type'] === 'link') {
+                $data['content'] = $block['content'];
+                // Convert YouTube/Vimeo links to embed URL
+                $data['embed_url'] = VideoHelper::linkToEmbed($block['content']);
+            }
+
+            if (in_array($block['type'], ['image', 'video', 'audio'])) {
+                if ($request->hasFile($block['content'])) {
+                    $file = $request->file($block['content']);
+                    $path = $file->store('posts', 'public');
+                    $data['content'] = $path;
+                }
+            }
+
+            PostBlock::create($data);
         }
 
+        // Return after all blocks are saved
         return response()->json([
             'message' => 'Post created successfully',
-            'post' => $post->load('media'),
-        ]);
+            'post_id' => $post->id,
+        ], 201);
+        });
     }
 
     /**
@@ -171,8 +188,11 @@ class PostController extends Controller
             'comments.replies.user',  
             'likes.user',             
             'user' ,                 
-            'media'
+            'media',
+            'blocks'
         ]);
+
+        $query->orderByDesc('is_pinned');
 
         switch ($request->get('sort')) {
             case 'old':
@@ -186,9 +206,62 @@ class PostController extends Controller
                 break;
             case 'latest':
             default:
-                $query->latest();
+                $query->orderByDesc('updated_at');
         }
 
         return response()->json($query->paginate(5));
     }
+
+    public function exclusiveField(Request $request)
+    {
+        $query = Post::where('subcategory', 'exclusive_feed')->with([
+            'comments.user',
+            'comments.replies.user',
+            'likes.user',
+            'user',
+            'media',
+            'blocks'
+        ]);
+
+        $query->orderByDesc('is_pinned');
+
+        // Sorting logic
+        switch ($request->get('sort')) {
+            case 'old':
+                $query->oldest();
+                break;
+            case 'popular':
+                $query->withCount('comments')->orderByDesc('comments_count');
+                break;
+            case 'likes':
+                $query->withCount('likes')->orderByDesc('likes_count');
+                break;
+            case 'latest':
+            default:
+                $query->orderByDesc('updated_at');
+        }
+
+        return response()->json($query->paginate(5));
+    }
+
+    public function togglePin(Post $post)
+    {
+        $user = auth()->user();
+
+        // if ($user->email !== 'kingsleykhord@gmail.com') {
+        //     return response()->json([
+        //         'message' => 'You are not authorized to pin this post'
+        //     ], 403);
+        // }
+
+        $post->update([
+            'is_pinned' => ! $post->is_pinned,
+        ]);
+
+        return response()->json([
+            'message' => $post->is_pinned ? 'Post pinned' : 'Post unpinned',
+            'is_pinned' => $post->is_pinned,
+        ]);
+    }
 }
+

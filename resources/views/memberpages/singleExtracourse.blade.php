@@ -14,6 +14,7 @@
         <a href="/member/lesson/{{ $lesson->id }}" class="hover:text-blue-600 font-semibold">
           {{ Str::title($lesson->title) }}
         </a>
+        {{-- <pre>{{$lesson}}</pre> --}}
       </div>
       <div class="flex items-center space-x-2">
         <i class="fa fa-user-circle text-xl"></i>
@@ -29,18 +30,10 @@
         <div class="w-full rounded-lg overflow-hidden">
       <div class="relative w-full pb-[75%] sm:pb-[65%] md:pb-[56.25%] h-0">
         <div class="absolute top-0 left-0 w-full h-full">
-          {!! $lesson->video_url !!}
+          <div id="uploads-single"></div>
         </div>
       </div>
     </div>
-
-  <style>
-    iframe, video {
-      width: 100% !important;
-      height: 100% !important;
-      border-radius: 0.5rem;
-    }
-  </style>
 
 
     <!-- Title + Bookmark -->
@@ -171,6 +164,9 @@
 </aside>
 
 </section>
+<script>
+    window.uploadData = @json($lesson);
+</script>
 
 <script>
   // Optional AJAX toggle

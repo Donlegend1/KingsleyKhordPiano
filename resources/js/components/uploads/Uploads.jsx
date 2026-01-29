@@ -71,6 +71,7 @@ const UploadList = () => {
         average_rating: 0,
         // resources: [],
         requirements: "",
+        video_type:""
     });
 
     const [upload, setUpload] = useState({
@@ -82,10 +83,11 @@ const UploadList = () => {
         level: "",
         skill_level: "",
         status: "active",
+        video_type:""
     });
 
     const [preview, setPreview] = useState(
-        selectedCourse?.thumbnail_url || null
+        selectedCourse?.thumbnail_url || null,
     );
     const [thumbnail, setThumbnail] = useState(null);
     const fileInputRef = useRef(null);
@@ -126,7 +128,7 @@ const UploadList = () => {
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },
                     withCredentials: true,
-                }
+                },
             );
 
             setCourses(response.data.data);
@@ -149,7 +151,7 @@ const UploadList = () => {
                         "X-CSRF-TOKEN": csrfToken,
                     },
                     withCredentials: true,
-                }
+                },
             );
             closeDeleteModal();
             showMessage("Course deleted successfully.", "success");
@@ -214,6 +216,7 @@ const UploadList = () => {
         formData.append("status", selectedCourse.status);
         formData.append("level", selectedCourse.level);
         formData.append("description", selectedCourse.description);
+        formData.append("video_type", selectedCourse.video_type);
 
         if (thumbnail instanceof File) {
             formData.append("thumbnail", thumbnail);
@@ -229,7 +232,7 @@ const UploadList = () => {
                         "Content-Type": "multipart/form-data",
                     },
                     withCredentials: true,
-                }
+                },
             );
             closeEditModal();
             showMessage("Course updated successfully.", "success");
@@ -237,7 +240,7 @@ const UploadList = () => {
         } catch (error) {
             console.error(
                 "Error updating course:",
-                error?.response?.data || error
+                error?.response?.data || error,
             );
             showMessage("Error updating course.", "error");
         } finally {
@@ -254,7 +257,7 @@ const UploadList = () => {
 
         // Upload fields
         Object.entries(upload).forEach(([key, value]) =>
-            formData.append(key, value)
+            formData.append(key, value),
         );
         selectedTags.forEach((tag, index) => {
             formData.append(`tags[${index}]`, tag.value);
@@ -451,6 +454,28 @@ const UploadList = () => {
                                     onChange={handleChange}
                                     className="w-full p-3 border rounded-lg"
                                 />
+                                <div className="my-3">
+                                <label
+                                    htmlFor="video_type"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Video Type
+                                </label>
+
+                                <select
+                                    type="text"
+                                    name="video_type"
+                                    value={selectedCourse?.video_type}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border rounded-lg"
+                                >
+                                    <option value="">Select Video Type</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="google">Google</option>
+                                    <option value="local">Local</option>
+                                    <option value="iframe">Iframe</option>
+                                </select>
+                            </div>
                                 <input
                                     name="video_url"
                                     placeholder="Video URL"
@@ -544,7 +569,9 @@ const UploadList = () => {
             </Modal>
 
             <Modal isOpen={isCreateModalOpen} onClose={closeCreateModal}>
-                <h2 className="text-lg font-bold mb-2">Add Course to {category.toLocaleUpperCase()}</h2>
+                <h2 className="text-lg font-bold mb-2">
+                    Add Course to {category.toLocaleUpperCase()}
+                </h2>
 
                 <div
                     className="
@@ -586,6 +613,28 @@ const UploadList = () => {
                                     onChange={handleChangeCreate}
                                     className="w-full p-3 border rounded-lg"
                                 />
+                            </div>
+                            <div className="my-3">
+                                <label
+                                    htmlFor="video_type"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Video Type
+                                </label>
+
+                                <select
+                                    type="text"
+                                    name="video_type"
+                                    value={upload?.video_type}
+                                    onChange={handleChangeCreate}
+                                    className="w-full px-3 py-2 border rounded-lg"
+                                >
+                                    <option value="">Select Video Type</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="google">Google</option>
+                                    <option value="local">Local</option>
+                                    <option value="iframe">Iframe</option>
+                                </select>
                             </div>
 
                             {/* Video URL */}
@@ -794,6 +843,6 @@ if (document.getElementById("uploads")) {
             <FlashMessageProvider>
                 <UploadList />
             </FlashMessageProvider>
-        </React.StrictMode>
+        </React.StrictMode>,
     );
 }

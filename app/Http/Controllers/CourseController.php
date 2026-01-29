@@ -42,7 +42,7 @@ class CourseController extends Controller
         $validated = $request->validated();
         $validated['course_category_id'] = $category->id;
 
-        $videoType = $validated['video_type'] ?? 'iframe';
+        $videoType = $validated['video_type'];
         $videoPath = $validated['video_url'] ?? null;
 
         if ($videoType === 'youtube') {
@@ -95,9 +95,7 @@ class CourseController extends Controller
     {
         $validated = $request->validated();
 
-        /* ---------------------------------------
-        |  HANDLE VIDEO TYPE & EXTRACT ID
-        ----------------------------------------*/
+       logger()->info(['vedoe' => $validated]);
         $videoType = $validated['video_type'] ?? $course->video_type; 
         $videoPath = $validated['video_url'] ?? $course->video_url;
 

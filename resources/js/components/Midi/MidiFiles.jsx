@@ -6,6 +6,7 @@ import {
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
 import Modal from "../Modal/Modal";
+import { LoaderCircleIcon } from "lucide-react";
 
 const MidiFiles = () => {
     const [midiFiles, setMidiFiles] = useState([]);
@@ -76,6 +77,7 @@ const MidiFiles = () => {
             fd.append("midi_file", form.midi_file);
         }
         try {
+            setLoading(true);
             await axios.post("/api/admin/midi-file/create", fd, {
                 headers: {
                     "X-CSRF-TOKEN": csrfToken,
@@ -85,10 +87,21 @@ const MidiFiles = () => {
 
             showMessage("MIDI file added successfully!", "success");
             setCreateModalOpen(false);
+            setForm({
+                name: "",
+                video_path: "",
+                video_type: "",
+                midi_file: null,
+                lmv_file: null,
+                thumbnail: "",
+                description: "",
+            });
             fetchMidiFiles();
         } catch (error) {
             console.error(error);
             showMessage("Failed to create file", "error");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -102,7 +115,7 @@ const MidiFiles = () => {
 
     const handleUpdate = async () => {
         const fd = new FormData();
-           fd.append("name", selectedFile.name);
+        fd.append("name", selectedFile.name);
         fd.append("video_path", selectedFile.video_path);
         fd.append("video_type", selectedFile.video_type);
         fd.append("description", selectedFile.description);
@@ -119,9 +132,8 @@ const MidiFiles = () => {
             fd.append("midi_file", selectedFile.midi_file);
         }
 
-        console.log(selectedFile, 'form data')
-
         try {
+            setLoading(true);
             await axios.post(
                 `/api/admin/midi-files/update/${selectedFile.id}`,
                 fd,
@@ -130,15 +142,18 @@ const MidiFiles = () => {
                         "X-CSRF-TOKEN": csrfToken,
                         "Content-Type": "multipart/form-data",
                     },
-                }
+                },
             );
 
             showMessage("MIDI file updated successfully!", "success");
             setEditModalOpen(false);
+            setSelectedFile({});
             fetchMidiFiles();
         } catch (error) {
             console.error(error);
             showMessage("Failed to update file", "error");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -152,6 +167,7 @@ const MidiFiles = () => {
 
     const handleDelete = async () => {
         try {
+            setLoading(true);
             await axios.delete(`/api/admin/midi-files/${selectedFile.id}`, {
                 headers: { "X-CSRF-TOKEN": csrfToken },
             });
@@ -162,6 +178,8 @@ const MidiFiles = () => {
         } catch (error) {
             console.error(error);
             showMessage("Failed to delete file", "error");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -237,83 +255,163 @@ const MidiFiles = () => {
                 isOpen={createModalOpen}
                 onClose={() => setCreateModalOpen(false)}
             >
-                <h2 className="text-xl font-bold mb-4">Add New MIDI File</h2>
+                <div className="my-5">
+                    <h2 className="text-2xl font-bold mb-3 text-gray-800">
+                        Add New MIDI File
+                    </h2>
 
-                <div className="space-y-3">
-                    <label className="block font-medium">Name:</label>
-                    <input
-                        type="text"
-                        placeholder="Name"
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setForm({ ...form, name: e.target.value })
-                        }
-                    />
+                    <div className="space-y-5">
+                        {/* Name Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                File Name *
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter file name"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                                value={form.name}
+                                onChange={(e) =>
+                                    setForm({ ...form, name: e.target.value })
+                                }
+                            />
+                        </div>
 
-                    <label className="block font-medium">Video URL:</label>
-                    <input
-                        type="text"
-                        placeholder="Video URL"
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setForm({ ...form, video_path: e.target.value })
-                        }
-                    />
+                        {/* Video URL Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Video URL *
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="https://example.com/video"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                                value={form.video_path}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        video_path: e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
 
-                    <label className="block font-medium">Video Type:</label>
-                    <select
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setForm({ ...form, video_type: e.target.value })
-                        }
-                    >
-                        <option value="">Select Video Type</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="google">Google</option>
-                        <option value="local">Local</option>
-                        <option value="iframe">Iframe</option>
-                    </select>
+                        {/* Video Type Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Video Type *
+                            </label>
+                            <select
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white"
+                                value={form.video_type}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        video_type: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value="">Select Video Type</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="google">Google</option>
+                                <option value="local">Local</option>
+                                <option value="iframe">Iframe</option>
+                            </select>
+                        </div>
 
-                    <label className="block font-medium">MIDI File:</label>
-                    <input
-                        type="file"
-                        onChange={(e) =>
-                            setForm({ ...form, midi_file: e.target.files[0] })
-                        }
-                    />
+                        {/* File Upload Fields - Two Column Grid */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    MIDI File *
+                                </label>
+                                <input
+                                    type="file"
+                                    accept=".mid,.midi"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            midi_file: e.target.files[0],
+                                        })
+                                    }
+                                />
+                            </div>
 
-                    <label className="block font-medium">LMV File:</label>
-                    <input
-                        type="file"
-                        onChange={(e) =>
-                            setForm({ ...form, lmv_file: e.target.files[0] })
-                        }
-                    />
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    LMV File *
+                                </label>
+                                <input
+                                    type="file"
+                                    accept=".lmv"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            lmv_file: e.target.files[0],
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
 
-                    <label className="block font-medium">Thumbnail:</label>
-                    <input
-                        type="file"
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setForm({ ...form, thumbnail: e.target.files[0] })
-                        }
-                    />
+                        {/* Thumbnail Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Thumbnail
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        thumbnail: e.target.files[0],
+                                    })
+                                }
+                            />
+                        </div>
 
-                    <label className="block font-medium">Description:</label>
-                    <textarea
-                        placeholder="Description"
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setForm({ ...form, description: e.target.value })
-                        }
-                    ></textarea>
+                        {/* Description Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Description
+                            </label>
+                            <textarea
+                                placeholder="Enter file description"
+                                rows="2"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition resize-none"
+                                value={form.description}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        description: e.target.value,
+                                    })
+                                }
+                            ></textarea>
+                        </div>
 
-                    <button
-                        onClick={handleCreate}
-                        className="w-full bg-black text-white py-2 rounded"
-                    >
-                        Create File
-                    </button>
+                        {/* Button */}
+                        <button
+                            onClick={handleCreate}
+                            disabled={loading}
+                            className="w-full bg-black text-white py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:bg-gray-800 transition mt-6"
+                        >
+                            {loading ? (
+                                <>
+                                    <LoaderCircleIcon
+                                        className="animate-spin"
+                                        size={18}
+                                    />
+                                    Creating...
+                                </>
+                            ) : (
+                                "Create File"
+                            )}
+                        </button>
+                    </div>
                 </div>
             </Modal>
 
@@ -322,83 +420,163 @@ const MidiFiles = () => {
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
             >
-                <h2 className="text-xl font-bold mb-4">Edit MIDI File</h2>
+                <div className="my-5">
+                    <h2 className="text-2xl font-bold mb-2 text-gray-800">
+                        Edit MIDI File
+                    </h2>
 
-                <div className="space-y-3">
-                    <label className="block font-medium">Name:</label>
-                    <input
-                        type="text"
-                        value={selectedFile.name}
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setSelectedFile({ ...selectedFile, name: e.target.value })
-                        }
-                    />
+                    <div className="space-y-5">
+                        {/* Name Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                File Name *
+                            </label>
+                            <input
+                                type="text"
+                                value={selectedFile.name || ""}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        name: e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
 
-                    <label className="block font-medium">Video URL:</label>
-                    <input
-                        type="text"
-                        value={selectedFile.video_path}
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setSelectedFile({ ...selectedFile, video_path: e.target.value })
-                        }
-                    />
+                        {/* Video URL Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Video URL *
+                            </label>
+                            <input
+                                type="text"
+                                value={selectedFile.video_path || ""}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        video_path: e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
 
-                    <label className="block font-medium">Video Type:</label>
-                    <select
-                        className="w-full border rounded p-2"
-                        value={selectedFile.video_type}
-                        onChange={(e) =>
-                            setSelectedFile({ ...selectedFile, video_type: e.target.value })
-                        }
-                    >
-                        <option value="youtube">YouTube</option>
-                        <option value="google">Google</option>
-                        <option value="local">Local</option>
-                        <option value="iframe">Iframe</option>
-                    </select>
+                        {/* Video Type Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Video Type *
+                            </label>
+                            <select
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition bg-white"
+                                value={selectedFile.video_type || ""}
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        video_type: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value="">Select Video Type</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="google">Google</option>
+                                <option value="local">Local</option>
+                                <option value="iframe">Iframe</option>
+                            </select>
+                        </div>
 
-                    <label className="block font-medium">MIDI File:</label>
-                    <input
-                        type="file"
-                        onChange={(e) =>
-                            setSelectedFile({ ...selectedFile, midi_file: e.target.files[0] })
-                        }
-                    />
+                        {/* File Upload Fields - Two Column Grid */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    MIDI File
+                                </label>
+                                <input
+                                    type="file"
+                                    accept=".mid,.midi"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                                    onChange={(e) =>
+                                        setSelectedFile({
+                                            ...selectedFile,
+                                            midi_file: e.target.files[0],
+                                        })
+                                    }
+                                />
+                            </div>
 
-                    <label className="block font-medium">LMV File:</label>
-                    <input
-                        type="file"
-                        onChange={(e) =>
-                            setSelectedFile({ ...selectedFile, lmv_file: e.target.files[0] })
-                        }
-                    />
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    LMV File
+                                </label>
+                                <input
+                                    type="file"
+                                    accept=".lmv"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                                    onChange={(e) =>
+                                        setSelectedFile({
+                                            ...selectedFile,
+                                            lmv_file: e.target.files[0],
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
 
-                    <label className="block font-medium">Thumbnail:</label>
-                    <input
-                        type="file"
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setSelectedFile({ ...selectedFile, thumbnail: e.target.files[0] })
-                        }
-                    />
+                        {/* Thumbnail Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Thumbnail
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        thumbnail: e.target.files[0],
+                                    })
+                                }
+                            />
+                        </div>
 
-                    <label className="block font-medium">Description:</label>
-                    <textarea
-                        value={selectedFile.description}
-                        className="w-full border rounded p-2"
-                        onChange={(e) =>
-                            setSelectedFile({ ...selectedFile, description: e.target.value })
-                        }
-                    ></textarea>
+                        {/* Description Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Description
+                            </label>
+                            <textarea
+                                value={selectedFile.description || ""}
+                                rows="2"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition resize-none"
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        description: e.target.value,
+                                    })
+                                }
+                            ></textarea>
+                        </div>
 
-                    <button
-                        onClick={handleUpdate}
-                        className="w-full bg-blue-600 text-white py-2 rounded"
-                    >
-                        Update File
-                    </button>
+                        {/* Button */}
+                        <button
+                            onClick={handleUpdate}
+                            disabled={loading}
+                            className="w-full bg-black text-white py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:bg-blue-700 transition mt-6"
+                        >
+                            {loading ? (
+                                <>
+                                    <LoaderCircleIcon
+                                        className="animate-spin"
+                                        size={18}
+                                    />
+                                    Updating...
+                                </>
+                            ) : (
+                                "Update File"
+                            )}
+                        </button>
+                    </div>
                 </div>
             </Modal>
 
@@ -417,16 +595,28 @@ const MidiFiles = () => {
                 <div className="flex gap-4 mt-6">
                     <button
                         onClick={() => setDeleteModalOpen(false)}
-                        className="flex-1 py-2 border rounded"
+                        disabled={loading}
+                        className="flex-1 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
                     </button>
 
                     <button
                         onClick={handleDelete}
-                        className="flex-1 py-2 bg-red-600 text-white rounded"
+                        disabled={loading}
+                        className="flex-1 py-2 bg-red-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Delete
+                        {loading ? (
+                            <>
+                                <LoaderCircleIcon
+                                    className="animate-spin"
+                                    size={18}
+                                />
+                                Deleting...
+                            </>
+                        ) : (
+                            "Delete"
+                        )}
                     </button>
                 </div>
             </Modal>
@@ -442,6 +632,6 @@ if (document.getElementById("midi-file")) {
     Index.render(
         <FlashMessageProvider>
             <MidiFiles />
-        </FlashMessageProvider>
+        </FlashMessageProvider>,
     );
 }

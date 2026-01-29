@@ -17,7 +17,8 @@ class Upload extends Model
         'status',
         'skill_level',
         'thumbnail',
-        'tags'
+        'tags',
+        'video_type'
     ];
 
     protected $casts = [

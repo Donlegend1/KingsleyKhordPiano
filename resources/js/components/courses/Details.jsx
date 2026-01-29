@@ -753,8 +753,6 @@ const CoursesPage = () => {
    
     }, [])
 
-    console.log(selectedCourse)
-
     return (
         <>
             <div className="flex flex-col md:flex-row">

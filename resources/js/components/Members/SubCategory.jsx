@@ -22,6 +22,7 @@ const SubCategory = () => {
     const [posting, setPosting] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [selectedPost, setSelectedPost] = useState({});
+    const [blocks, setBlocks] = useState([]);
 
     const [showSkeleton, setShowSkeleton] = useState(false);
     const [mediaFiles, setMediaFiles] = useState([]);
@@ -33,6 +34,10 @@ const SubCategory = () => {
         .filter((segment) => segment !== "")
         .pop();
 
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
+    
     const activeSubscription = window.activeSubscription;
 
     function enforceExclusiveFeedAccess() {
@@ -41,7 +46,10 @@ const SubCategory = () => {
 
         if (isExclusiveFeed && !hasActiveSubscription) {
             window.location.href = "/home";
-            showMessage('This page is only mend for subscribe members', 'error')
+            showMessage(
+                "This page is only mend for subscribe members",
+                "error",
+            );
         }
     }
 
@@ -88,22 +96,38 @@ const SubCategory = () => {
             category: { name: "ProgressReports", value: "progress_report" },
             subCategories: [
                 { name: "Progress Reports", value: "progress_report" },
+                { name: "Exclusive Feed", value: "exclusive_feed" },
             ],
         },
     ];
     const getCategoryFromSubcategory = (subcategory) => {
-        const categoryMap = {};
-        postCategories.forEach(({ category, subCategories }) => {
-            subCategories.forEach((subCat) => {
-                categoryMap[subCat.value] = category.value;
-            });
-        });
-        return categoryMap[subcategory] || "";
+        if (!subcategory) return null;
+
+        // normalize slug (progress-report → progress_report)
+        const normalizedSubcategory = subcategory.replace(/-/g, "_");
+
+        const found = postCategories.find((cat) =>
+            cat.subCategories.some(
+                (sub) => sub.value === normalizedSubcategory,
+            ),
+        );
+
+        return found ? found.category : null;
     };
+    //  const getCategoryFromSubcategory = (subcategory) => {
+    //     const categoryMap = {};
+    //     postCategories.forEach(({ category, subCategories }) => {
+    //         subCategories.forEach((subCat) => {
+    //             categoryMap[subCat.value] = category.value;
+    //         });
+    //     });
+    //     return categoryMap[subcategory] || "";
+    // };
 
     const [postDetails, setPostDetails] = useState({
         body: "",
-        category: getCategoryFromSubcategory(lastSegment),
+        blocks: [],
+        category: getCategoryFromSubcategory(lastSegment)?.value || "",
         subcategory: "",
         media: [],
     });
@@ -146,8 +170,6 @@ const SubCategory = () => {
 
     const fetchLatestUpdates = useCallback(async () => {
         try {
-            // This would be replaced with actual API endpoint for latest updates
-            // For now, using mock data similar to the blade template
             setLatestUpdates([
                 {
                     id: 1,
@@ -180,10 +202,6 @@ const SubCategory = () => {
     }, []);
 
     const handleValidation = () => {
-        if (!postDetails.body.trim()) {
-            showMessage("Post content cannot be empty.", "error");
-            return false;
-        }
         if (!postDetails.subcategory) {
             showMessage("Please select a category.", "error");
             return false;
@@ -201,9 +219,15 @@ const SubCategory = () => {
             if (loading) return;
 
             setLoading(true);
+            let url = "";
+            if (lastSegment === "exclusive-feed") {
+                url = `/api/member/posts/exclusive`;
+            } else {
+                url = `/api/member/posts`;
+            }
 
             try {
-                const response = await axios.get(`/api/member/posts`, {
+                const response = await axios.get(url, {
                     params: {
                         page: targetPage,
                         sort: sortBy,
@@ -218,7 +242,7 @@ const SubCategory = () => {
                 setPosts((prev) => {
                     const existingIds = new Set(prev.map((p) => p.id));
                     const uniqueNewPosts = newPosts.filter(
-                        (p) => !existingIds.has(p.id)
+                        (p) => !existingIds.has(p.id),
                     );
 
                     return [...prev, ...uniqueNewPosts];
@@ -231,7 +255,7 @@ const SubCategory = () => {
                 setLoading(false);
             }
         },
-        [sortBy, hasMore, loading, page]
+        [sortBy, hasMore, loading, page],
     );
 
     useEffect(() => {
@@ -382,7 +406,7 @@ const SubCategory = () => {
         if (hasCountry) completedFields++;
 
         const completionPercentage = Math.round(
-            (completedFields / totalFields) * 100
+            (completedFields / totalFields) * 100,
         );
         const strokeDashoffset =
             339.292 - (339.292 * completionPercentage) / 100;
@@ -401,6 +425,26 @@ const SubCategory = () => {
         };
     };
 
+    const togglePinPost = async (id) => {
+        try {
+            await axios.post(`/api/member/posts/${id}/pin`, {
+                headers: { "X-CSRF-TOKEN": csrfToken },
+                withCredentials: true,
+            });
+
+            // Reset pagination and refetch to show pinned post at top
+            setPosts([]);
+            setPage(1);
+            setHasMore(true);
+
+            await fetchPostsByCategory(1);
+            showMessage("Pinned to the top", "success");
+        } catch (err) {
+            console.error("Pin toggle failed:", err);
+            showMessage(err.response?.data?.message, "error");
+        }
+    };
+
     return (
         <>
             <div className="flex gap-6">
@@ -416,6 +460,8 @@ const SubCategory = () => {
                             mediaFiles={mediaFiles}
                             setMediaFiles={setMediaFiles}
                             subcategory={lastSegment}
+                            blocks={blocks}
+                            setBlocks={setBlocks}
                         />
                     </div>
 
@@ -457,6 +503,7 @@ const SubCategory = () => {
                                 setNewComment={setNewComment}
                                 handleCommentSubmit={handleCommentSubmit}
                                 handleDeletePost={handleDeletePost}
+                                togglePinPost={togglePinPost}
                             />
                         ))}
 
@@ -757,6 +804,6 @@ if (document.getElementById("subcategory")) {
             <FlashMessageProvider>
                 <SubCategory />
             </FlashMessageProvider>
-        </React.StrictMode>
+        </React.StrictMode>,
     );
 }

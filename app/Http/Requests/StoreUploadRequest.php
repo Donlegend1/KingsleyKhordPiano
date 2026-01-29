@@ -28,6 +28,7 @@ class StoreUploadRequest extends FormRequest
             'video_url' => 'required|string',
             'level' => 'nullable|string|max:50',
             'status' => 'required|in:active,inactive,draft',
+            'video_type' => 'nullable|string',
             // 'thumbnail' => 'sometimes|file|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ];
     }

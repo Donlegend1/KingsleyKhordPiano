@@ -18,7 +18,7 @@ class StorePostRequest extends FormRequest
     {
          return [
         'title'       => 'nullable|string|max:255',
-        'body'        => 'required|string',
+        'blocks'        => 'required|array|min:1',
         'category'    => ['required', new Enum(PostCategoryEnum::class)],
         'subcategory' => ['required', new Enum(PostSubCategoryEnum::class)],
         'media'       => 'nullable|array|max:6', // max 6 files

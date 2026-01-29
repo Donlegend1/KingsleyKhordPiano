@@ -23,6 +23,8 @@ use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\ChatMessageLikeController;
 use App\Http\Controllers\MidiFileController;
 use App\Http\Controllers\EmailCampaignController;
+use App\Http\Controllers\PDFDownloadController;
+use App\Http\Controllers\AudioDownloadController;
 
 
 /*
@@ -64,6 +66,19 @@ use App\Http\Controllers\EmailCampaignController;
         Route::post('/email-campaign', [EmailCampaignController::class, 'store']);
         Route::get('/email-campaigns', [EmailCampaignController::class, 'listEmailCampaign']);
         Route::post('/email-campaign-resend/{emailCampaign}', [EmailCampaignController::class, 'resend']);
+        Route::post('/pdf-download/store', [PDFDownloadController::class, 'store']);
+        Route::get('/pdf-downloads', [PDFDownloadController::class, 'fetchAll']);
+        Route::get('/pdf-downloads/{pDFDownload}', [PDFDownloadController::class, 'show']);
+        Route::get('/pdf-downloads/{pDFDownload}/download', [PDFDownloadController::class, 'download']);
+        Route::post('/pdf-downloads/{pDFDownload}/update', [PDFDownloadController::class, 'update']);
+        Route::delete('/pdf-downloads/{pDFDownload}', [PDFDownloadController::class, 'destroy']);
+        
+        Route::post('/audio-download/store', [AudioDownloadController::class, 'store']);
+        Route::get('/audio-downloads', [AudioDownloadController::class, 'fetchAll']);
+        Route::get('/audio-downloads/{audioDownload}', [AudioDownloadController::class, 'show']);
+        Route::get('/audio-downloads/{audioDownload}/download', [AudioDownloadController::class, 'download']);
+        Route::post('/audio-downloads/{audioDownload}/update', [AudioDownloadController::class, 'update']);
+        Route::delete('/audio-downloads/{audioDownload}', [AudioDownloadController::class, 'destroy']);
     });
 
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
@@ -87,6 +102,8 @@ use App\Http\Controllers\EmailCampaignController;
         Route::post('/post', [PostController::class, 'store'])->name('post.store');
         Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.delete');
         Route::get('/posts', [PostController::class, 'index'])->name('post.index');
+        Route::post('/posts/{post}/pin', [PostController::class, 'togglePin']);
+        Route::get('/posts/exclusive', [PostController::class, 'exclusiveField'])->name('post.exclusive');
         Route::get('/posts/member/{community}', [PostController::class, 'postByUser'])->name('post.user');
         Route::delete('/postComment/{postComment}', [PostCommentController::class, 'destroy'])->name('comment.delete');
 

@@ -32,8 +32,12 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\BookMarkController;
 use App\Http\Controllers\MidiFileController;
 use App\Http\Controllers\EmailCampaignController;
+use App\Http\Controllers\PDFDownloadController;
+use App\Http\Controllers\AudioDownloadController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\Auth\CommunityAuthController;
+use App\Http\Controllers\Auth\PaystackWebhookController;
 
 
 /*
@@ -52,6 +56,7 @@ Route::post(
     'stripe/webhook',
     [WebhookController::class, 'handleWebhook']
 )->name('cashier.webhook');
+Route::post('/webhooks/paystack', [PaystackWebhookController::class, 'handle']);
 
 Route::get('/', [IndexController::class, 'index']);
 Route::get('/about', function () {
@@ -93,6 +98,15 @@ Route::get('/member/plan', [SubscriptionController::class, 'memberplans'])->midd
 Auth::routes(
     ['verify' => true]
 );
+
+// Musician/Artist Authentication Routes
+Route::get('/community/login', [CommunityAuthController::class, 'showLoginForm'])->name('login-community')->middleware('guest');
+Route::post('/community/login', [CommunityAuthController::class, 'login'])->name('community.login.submit')->middleware('guest');
+
+Route::get('/community/register', [CommunityAuthController::class, 'showRegisterForm'])->name('register-community')->middleware('guest');
+Route::post('/community/register', [CommunityAuthController::class, 'register'])->name('community.register.submit')->middleware('guest');
+
+Route::post('/logout/community', [CommunityAuthController::class, 'logout'])->name('community.logout')->middleware('auth');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(['check.payment', 'verified']);
 Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')->middleware(['check.payment', 'verified']);
@@ -196,5 +210,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('midi-file', [MidiFileController::class, 'index']);
     Route::get('email-campaign', [EmailCampaignController::class, 'index']);
     Route::get('email-campaign/create', [EmailCampaignController::class, 'create']);
+    Route::get('pdf-download', [PDFDownloadController::class, 'index']);
+    Route::get('audio-download', [AudioDownloadController::class, 'index']);
     
 });

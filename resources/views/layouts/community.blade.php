@@ -299,123 +299,175 @@
 
                     <!-- Notifications -->
                    <div class="relative">
-    <!-- Bell Button -->
-    <button 
-        type="button"
-        onclick="document.getElementById('notificationDropdown').classList.toggle('hidden')" 
-        class="text-gray-500 dark:text-gray-300 hover:text-[#FFD736] relative"
-        aria-label="Notifications"
-    >
-        <!-- Bell Icon -->
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path 
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9" 
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-
-        <!-- Badge -->
-        @if($notifications->whereNull('read_at')->count() > 0)
-            <span 
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
-            >
-                {{ $notifications->whereNull('read_at')->count() }}
-            </span>
-        @endif
-    </button>
-
-    <!-- Dropdown -->
-    <div 
-        id="notificationDropdown" 
-        class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden z-50"
-    >
-        <div class="flex justify-between items-center px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                Notifications
-            </span>
-            @if($notifications->whereNull('read_at')->count() > 0)
-                <form method="POST" action="{{ route('notifications.markAllAsRead') }}">
-                    @csrf
+                    <!-- Bell Button -->
                     <button 
-                        type="submit" 
-                        class="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                        type="button"
+                        onclick="document.getElementById('notificationDropdown').classList.toggle('hidden')" 
+                        class="text-gray-500 dark:text-gray-300 hover:text-[#FFD736] relative"
+                        aria-label="Notifications"
                     >
-                        Mark all as read
-                    </button>
-                </form>
-            @endif
-        </div>
+                        <!-- Bell Icon -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path 
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9" 
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
 
-        <!-- Notifications list -->
-        <div class="max-h-80 overflow-y-auto">
-            @forelse($notifications as $notification)
-                @php
-                    $data = $notification->data;
-                    $firstName = $data['first_name'] ?? '';
-                    $lastName = $data['last_name'] ?? '';
-                    $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
-                    $avatar = $data['by_user_avatar'] ?? null;
-                    $isUnread = is_null($notification->read_at);
-                    $postId = $data['post_id'] ?? null;
-                @endphp
-
-                <a 
-                    href="/member/post/{{ $postId }}" 
-                    class="block hover:no-underline"
-                >
-                    <div 
-                        class="flex items-center gap-3 p-3 border-b border-gray-200 dark:border-gray-700 
-                            hover:bg-gray-50 dark:hover:bg-gray-700
-                            {{ $isUnread ? 'bg-yellow-50 dark:bg-yellow-900/30' : 'bg-transparent' }}"
-                    >
-                        @if(!empty($avatar))
-                            <img 
-                                src="{{ $avatar }}" 
-                                alt="{{ trim("$firstName $lastName") ?: 'User' }}"
-                                class="w-8 h-8 rounded-full object-cover"
+                        <!-- Badge -->
+                        @if($notifications->whereNull('read_at')->count() > 0)
+                            <span 
+                                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
                             >
-                        @else
-                            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-700">
-                                {{ $initials ?: '?' }}
-                            </div>
-                        @endif
-
-                        <div class="flex flex-col">
-                            <p class="text-sm text-gray-800 dark:text-gray-200">
-                                {{-- @if($data['type'] === 'comment')
-                                    {{ $firstName }} commented on your post
-                                @elseif($data['type'] === 'reply')
-                                    {{ $firstName }} replied to your comment
-                                @elseif($data['type'] === 'like')
-                                    {{ $firstName }} liked your post
-                                @else
-                                    New activity
-                                @endif --}}
-                            </p>
-                            <span class="text-xs text-gray-500">
-                                {{ $notification->created_at->diffForHumans() }}
-                                @if($isUnread)
-                                    <span class="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
-                                @endif
+                                {{ $notifications->whereNull('read_at')->count() }}
                             </span>
+                        @endif
+                    </button>
+
+                        <!-- Dropdown -->
+                        <div 
+                            id="notificationDropdown" 
+                            class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden z-50"
+                        >
+                            <div class="flex justify-between items-center px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                                <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                    Notifications
+                                </span>
+                                @if($notifications->whereNull('read_at')->count() > 0)
+                                    <form method="POST" action="{{ route('notifications.markAllAsRead') }}">
+                                        @csrf
+                                        <button 
+                                            type="submit" 
+                                            class="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                                        >
+                                            Mark all as read
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+
+                            <!-- Notifications list -->
+                            <div class="max-h-80 overflow-y-auto">
+                                @forelse($notifications as $notification)
+                                    @php
+                                        $data = $notification->data;
+                                        $firstName = $data['first_name'] ?? '';
+                                        $lastName = $data['last_name'] ?? '';
+                                        $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
+                                        $avatar = $data['by_user_avatar'] ?? null;
+                                        $isUnread = is_null($notification->read_at);
+                                        $postId = $data['post_id'] ?? null;
+                                    @endphp
+
+                                    <a 
+                                        href="/member/post/{{ $postId }}" 
+                                        class="block hover:no-underline"
+                                    >
+                                        <div 
+                                            class="flex items-center gap-3 p-3 border-b border-gray-200 dark:border-gray-700 
+                                                hover:bg-gray-50 dark:hover:bg-gray-700
+                                                {{ $isUnread ? 'bg-yellow-50 dark:bg-yellow-900/30' : 'bg-transparent' }}"
+                                        >
+                                            @if(!empty($avatar))
+                                                <img 
+                                                    src="{{ $avatar }}" 
+                                                    alt="{{ trim("$firstName $lastName") ?: 'User' }}"
+                                                    class="w-8 h-8 rounded-full object-cover"
+                                                >
+                                            @else
+                                                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-700">
+                                                    {{ $initials ?: '?' }}
+                                                </div>
+                                            @endif
+
+                                            <div class="flex flex-col">
+                                                <p class="text-sm text-gray-800 dark:text-gray-200">
+                                                    {{-- @if($data['type'] === 'comment')
+                                                        {{ $firstName }} commented on your post
+                                                    @elseif($data['type'] === 'reply')
+                                                        {{ $firstName }} replied to your comment
+                                                    @elseif($data['type'] === 'like')
+                                                        {{ $firstName }} liked your post
+                                                    @else
+                                                        New activity
+                                                    @endif --}}
+                                                </p>
+                                                <span class="text-xs text-gray-500">
+                                                    {{ $notification->created_at->diffForHumans() }}
+                                                    @if($isUnread)
+                                                        <span class="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="p-3 text-sm text-gray-500 dark:text-gray-300 text-center">
+                                        No new notifications
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
-                </a>
-            @empty
-                <div class="p-3 text-sm text-gray-500 dark:text-gray-300 text-center">
-                    No new notifications
-                </div>
-            @endforelse
-        </div>
-    </div>
-</div>
 
 
                     <!-- Profile Avatar -->
-                    <div class="relative">
-                        <button class="rounded-full border-2 border-gray-300 dark:text-gray-500 overflow-hidden w-8 h-8">
-                            <img src="/avatar1.jpg" alt="Profile" class="w-full h-full object-cover">
+                    <div x-data="{ open: false }" class="relative">
+                        <!-- Avatar Button -->
+                        <button
+                            @click="open = !open"
+                            class="rounded-full border-2 border-gray-300 overflow-hidden w-9 h-9
+                                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <img
+                                src="/avatar1.jpg"
+                                alt="Profile"
+                                class="w-full h-full object-cover"
+                            >
                         </button>
+
+                        <!-- Dropdown -->
+                        <div
+                            x-show="open"
+                            @click.outside="open = false"
+                            x-transition
+                            class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800
+                                border border-gray-200 dark:border-gray-700
+                                rounded-lg shadow-lg z-50"
+                        >
+                            <form method="POST" action="{{ route('community.logout') }}">
+                                @csrf
+                               <button
+                                    type="submit"
+                                    class="group flex items-center gap-3 w-full px-4 py-2.5
+                                        text-sm font-medium text-red-600 dark:text-red-400
+                                        hover:bg-red-50 dark:hover:bg-red-500/10
+                                        rounded-lg transition-all focus:outline-none
+                                        focus:ring-2 focus:ring-red-500/40"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="group-hover:translate-x-0.5 transition-transform"
+                                    >
+                                        <path d="m16 17 5-5-5-5" />
+                                        <path d="M21 12H9" />
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                    </svg>
+
+                                    <span>Logout</span>
+                                </button>
+
+                            </form>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </header>
