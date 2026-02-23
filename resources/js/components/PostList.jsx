@@ -78,14 +78,16 @@ const PostList = () => {
         return true;
     };
 
-    const fetchPosts = useCallback(async () => {
-        if (!hasMore || loading) return;
+    const fetchPosts = async (pageOverride = null) => {
+        // when pageOverride is provided (e.g. 1), ignore hasMore guard
+        if (pageOverride === null && (!hasMore || loading)) return;
         setLoading(true);
 
         try {
+            const reqPage = pageOverride ?? page;
             const response = await axios.get("/api/member/posts", {
                 params: {
-                    page,
+                    page: reqPage,
                     sort: sortBy,
                 },
             });
@@ -94,13 +96,18 @@ const PostList = () => {
             const currentPage = response.data.current_page;
             const lastPage = response.data.last_page;
 
-            setPosts((prev) => {
-                const existingIds = new Set(prev.map((p) => p.id));
-                const uniqueNewPosts = newPosts.filter(
-                    (p) => !existingIds.has(p.id),
-                );
-                return [...prev, ...uniqueNewPosts];
-            });
+            if (reqPage === 1) {
+                // replace with fresh first page
+                setPosts(newPosts);
+            } else {
+                setPosts((prev) => {
+                    const existingIds = new Set(prev.map((p) => p.id));
+                    const uniqueNewPosts = newPosts.filter(
+                        (p) => !existingIds.has(p.id),
+                    );
+                    return [...prev, ...uniqueNewPosts];
+                });
+            }
 
             setHasMore(currentPage < lastPage);
         } catch (error) {
@@ -108,42 +115,50 @@ const PostList = () => {
         } finally {
             setLoading(false);
         }
-    }, [sortBy, hasMore, loading, page]);
+    };
 
-    const fetchPostsByMember = useCallback(async () => {
-        if (!hasMore || loading) return;
-        setLoading(true);
+    const fetchPostsByMember = useCallback(
+        async (pageOverride = null) => {
+            if (pageOverride === null && (!hasMore || loading)) return;
+            setLoading(true);
 
-        try {
-            const response = await axios.get(
-                `/api/member/posts/member/${lastSegment}`,
-                {
-                    params: {
-                        page,
-                        sort: sortBy,
+            try {
+                const reqPage = pageOverride ?? page;
+                const response = await axios.get(
+                    `/api/member/posts/member/${lastSegment}`,
+                    {
+                        params: {
+                            page: reqPage,
+                            sort: sortBy,
+                        },
                     },
-                },
-            );
-
-            const newPosts = response.data.data;
-            const currentPage = response.data.current_page;
-            const lastPage = response.data.last_page;
-
-            setPosts((prev) => {
-                const existingIds = new Set(prev.map((p) => p.id));
-                const uniqueNewPosts = newPosts.filter(
-                    (p) => !existingIds.has(p.id),
                 );
-                return [...prev, ...uniqueNewPosts];
-            });
 
-            setHasMore(currentPage < lastPage);
-        } catch (error) {
-            console.error("Error fetching posts:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [sortBy, hasMore, loading, page]);
+                const newPosts = response.data.data;
+                const currentPage = response.data.current_page;
+                const lastPage = response.data.last_page;
+
+                if (reqPage === 1) {
+                    setPosts(newPosts);
+                } else {
+                    setPosts((prev) => {
+                        const existingIds = new Set(prev.map((p) => p.id));
+                        const uniqueNewPosts = newPosts.filter(
+                            (p) => !existingIds.has(p.id),
+                        );
+                        return [...prev, ...uniqueNewPosts];
+                    });
+                }
+
+                setHasMore(currentPage < lastPage);
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [sortBy, hasMore, loading, page, lastSegment],
+    );
 
     useEffect(() => {
         setPosts([]);
@@ -196,7 +211,11 @@ const PostList = () => {
             setPosts([]);
             setPage(1);
             setHasMore(true);
-            await fetchPosts();
+            if (lastSegment) {
+                await fetchPostsByMember(1);
+            } else {
+                await fetchPosts(1);
+            }
         } catch (error) {
             showMessage("Error creating post.", "error");
             console.error("Error creating post:", error);
@@ -325,6 +344,7 @@ const PostList = () => {
                     setMediaFiles={setMediaFiles}
                     blocks={blocks}
                     setBlocks={setBlocks}
+                    fetchPosts={fetchPosts}
                 />
             </div>
 

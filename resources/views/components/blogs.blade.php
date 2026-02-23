@@ -5,7 +5,8 @@
       <div class="text-center sm:text-left max-w-2xl">
         <h2 class="text-3xl sm:text-4xl font-bold mb-2">Latest Courses</h2>
         <p class="text-gray-600">
-          Explore tips, techniques, and insights to grow your gospel piano mastery and musical journey.
+          Discover powerful tips, proven techniques, and inspiring insights
+           to elevate your gospel piano skills and enrich your musical journey
         </p>
       </div>
 

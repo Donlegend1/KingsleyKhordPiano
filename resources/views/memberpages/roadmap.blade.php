@@ -11,14 +11,9 @@
        <span>/</span>
        <a href="member/roadmap" class="hover:text-blue-600 font-semibold">Roadmap</a>
      </div>
-     <div class="flex items-center space-x-2">
+     {{-- <div class="flex items-center space-x-2">
        <i class="fa fa-user-circle text-xl"></i>
-     </div>
-   </div>
-
-   <!-- Second Row -->
-   <div>
-     <h1 class="text-xl font-bold">Roadmap</h1>
+     </div> --}}
    </div>
 
  </div>

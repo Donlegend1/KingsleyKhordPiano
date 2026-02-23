@@ -61,8 +61,7 @@ class SyncStripeSubscribers extends Command
                 default => null,
             };
 
-            $plan = Plan::where('price_id', $price->id)
-                ->orWhere('product_id', $price->product)
+            $plan = Plan::where('stripe_product_id', $price->id)
                 ->first();
 
             $subscription = Subscription::updateOrCreate(

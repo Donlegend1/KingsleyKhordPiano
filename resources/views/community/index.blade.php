@@ -54,7 +54,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-bold text-[#1F2937] dark:text-white">Complete Your Profile</h3>
-                <a href="/member/profile" class="text-sm text-[#FFD736] hover:text-[#E5C634] font-medium transition-colors">
+                <a href="/member/profile" class="text-sm dark:text-white hover:text-[#09941c] font-medium transition-colors">
                     Edit Profile →
                 </a>
             </div>

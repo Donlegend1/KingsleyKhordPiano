@@ -20,6 +20,7 @@
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@mui/material": "^7.1.0",
+        "@paystack-oss/dev-cli": "^1.0.0-nightly.0",
         "dayjs": "^1.11.13",
         "emoji-picker-react": "^4.16.1",
         "lucide-react": "^0.539.0",

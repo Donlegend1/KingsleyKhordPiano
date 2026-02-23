@@ -38,7 +38,7 @@
             <img src="/icons/lessonwhite.png" alt="{{ $feature['title'] }} Icon" class="h-10 w-10">
           </div>
           <h3 class="text-lg font-semibold mb-2">{{ $feature['title'] }}</h3>
-          <p class="text-sm text-gray-300">
+          <p class=" text-gray-300">
             Enhance your piano skills effortlessly. Whether you're starting out or experienced, our lessons guide you through musical excellence at your own pace.
           </p>
         </div>

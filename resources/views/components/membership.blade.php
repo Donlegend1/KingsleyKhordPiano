@@ -16,7 +16,7 @@
           <img src="/icons/lessonwhite.png" alt="Discover Thrilling Courses">
         </div>
         <h3 class="font-semibold mb-3">Discover Thrilling Courses</h3>
-        <p class="text-sm text-[#BABABA]">Enhance your piano skills effortlessly. Whether you're starting out or experienced, our lessons guide you through musical excellence at your own pace.</p>
+        <p class=" text-[#BABABA]">Enhance your piano skills effortlessly. Whether you're starting out or experienced, our lessons guide you through musical excellence at your own pace.</p>
       </div>
 
       <!-- Card 2 -->
@@ -25,7 +25,7 @@
           <img src="/icons/timewhite.png" alt="Accessible Anytime">
         </div>
         <h3 class="font-semibold mb-3">Accessible Anytime</h3>
-        <p class="text-sm text-[#BABABA]">Our lessons are always available, letting you fit learning into your routine and improve your skills whenever it suits you best.</p>
+        <p class=" text-[#BABABA]">Our lessons are always available, letting you fit learning into your routine and improve your skills whenever it suits you best.</p>
       </div>
 
       <!-- Card 3 -->
@@ -34,7 +34,7 @@
           <img src="/icons/teacher.png" alt="Skilled Teacher">
         </div>
         <h3 class="font-semibold mb-3">Skilled Teacher</h3>
-        <p class="text-sm text-[#BABABA]">Learn from an experienced pianist who provides expert advice, personalized feedback, and essential knowledge to help you thrive.</p>
+        <p class=" text-[#BABABA]">Learn from an experienced pianist who provides expert advice, personalized feedback, and essential knowledge to help you thrive.</p>
       </div>
 
       <!-- Card 4 -->
@@ -43,7 +43,7 @@
           <img src="/icons/communitywhite.png" alt="Supportive Community">
         </div>
         <h3 class="font-semibold mb-3">Supportive Community</h3>
-        <p class="text-sm text-[#BABABA]">Join a welcoming community of musicians who offer insights, feedback, and encouragement as you grow your passion and skills.</p>
+        <p class=" text-[#BABABA]">Join a welcoming community of musicians who offer insights, feedback, and encouragement as you grow your passion and skills.</p>
       </div>
     </div>
 

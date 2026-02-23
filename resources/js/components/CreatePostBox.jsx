@@ -15,6 +15,8 @@ const CreatePostBox = ({
     subcategory,
     blocks,
     setBlocks,
+    fetchPosts
+
 }) => {
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
@@ -24,6 +26,7 @@ const CreatePostBox = ({
     const handleFocus = () => setExpanded(true);
 
     const isAdmin = window.authUser?.email === "kingsleykhord@gmail.com";
+    const auth = window.authUser || {};
 
     /* ---------------- CATEGORY LOGIC ---------------- */
     useEffect(() => {
@@ -67,7 +70,7 @@ const CreatePostBox = ({
 
     /* ---------------- SUBMIT ---------------- */
 
-    const submitPost = () => {
+    const submitPost = async () => {
         const textValue = textareaRef.current?.value.trim();
         if (!textValue) {
             showMessage("Post content cannot be empty.", "error");
@@ -83,7 +86,7 @@ const CreatePostBox = ({
         if (textValue) {
             const textBlocks = extractLinksFromText(textValue);
             setBlocks(textBlocks);
-            
+
             textBlocks.forEach((block) => {
                 formData.append(`blocks[${index}][type]`, block.type);
                 formData.append(`blocks[${index}][content]`, block.content);
@@ -106,13 +109,18 @@ const CreatePostBox = ({
         setBlocks([]);
         if (textareaRef.current) textareaRef.current.value = "";
         setPostDetails((prev) => ({ ...prev, body: "" }));
+       await fetchPosts();
     };
 
     /* ---------------- UI ---------------- */
     return (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
             <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gray-300 rounded-full" />
+                <img
+                    src={auth.passport ? auth.passport : "/default-avatar.png"}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full object-cover"
+                />
                 <textarea
                     ref={textareaRef}
                     placeholder="Share what's on your mind..."
@@ -181,7 +189,9 @@ const CreatePostBox = ({
                             hidden
                         />
                         {isAdmin && (
-                            <button onClick={() => imageInputRef.current?.click()}>
+                            <button
+                                onClick={() => imageInputRef.current?.click()}
+                            >
                                 🖼
                             </button>
                         )}

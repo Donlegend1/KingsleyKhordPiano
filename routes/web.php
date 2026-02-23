@@ -56,7 +56,7 @@ Route::post(
     'stripe/webhook',
     [WebhookController::class, 'handleWebhook']
 )->name('cashier.webhook');
-Route::post('/webhooks/paystack', [PaystackWebhookController::class, 'handle']);
+Route::post('/webhooks/paystack', [PaymentController::class, 'handlePaystackWebhook']);
 
 Route::get('/', [IndexController::class, 'index']);
 Route::get('/about', function () {
@@ -160,6 +160,10 @@ Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
     Route::get('/community/space/pdf-downloads', [CommunityIndexController::class, 'pdfDownloads'])->name('community.pdf-downloads');
     Route::get('/community/space/audio-downloads', [CommunityIndexController::class, 'audioDownloads'])->name('community.audio-downloads');
+    Route::get('/community/space/audio/downloads/{audioDownload}', [AudioDownloadController::class, 'download']);
+    Route::get('/community/space/pdf/downloads/{pDFDownload}', [PDFDownloadController::class, 'download']);
+
+
     Route::get('/community/space/midi-downloads', [CommunityIndexController::class, 'midiDownloads'])->name('community.midi-downloads');
     Route::get('/community/space/midi-download/{MidiFile}', [MidiFileController::class, 'single'])->name('community.midi-downloads.single');
     Route::get('/midi-files/{midiFile}/download-midi', [MidiFileController::class, 'downloadMidi'])

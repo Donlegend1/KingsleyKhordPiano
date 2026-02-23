@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
 import axios from "axios";
 
@@ -10,6 +10,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
+import { Heart } from "lucide-react";
 
 const getInitials = (firstName, lastName) => {
     return `${firstName?.charAt(0) || ""}${
@@ -19,15 +20,13 @@ const getInitials = (firstName, lastName) => {
 
 const ChatWithComments = ({
     post,
-    newComment,
-    setNewComment,
-    handleCommentSubmit,
-    setSelectedPost,
+    fetchPosts,
     handleDeletePost,
-    commenting,
-    onUpdatePost,
+    setSelectedPostToReply,
 }) => {
     const [comments, setComments] = useState(post.replies || []);
+    const [hovered, setHovered] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
     useEffect(() => {
         setComments(post.replies || []);
@@ -38,10 +37,10 @@ const ChatWithComments = ({
         setLiked(post.liked_by_user || false);
     }, [post.likes, post.liked_by_user]);
     const [showPostActionId, setShowPostActionId] = useState(null);
-    const [showCommentAction, setShowCommentAction] = useState(false);
     const showPostAction = showPostActionId === post.id;
     const { showMessage } = useFlashMessage();
     const [showCommentActionId, setShowCommentActionId] = useState(null);
+    const [openMenuId, setOpenMenuId] = useState(null);
 
     const [commentsVisible, setCommentsVisible] = useState(false);
     const [likes, setLikes] = useState(post.likes || []);
@@ -68,7 +67,7 @@ const ChatWithComments = ({
         } catch (error) {
             showMessage(
                 error.response?.data?.message || "Failed to delete comment",
-                "error"
+                "error",
             );
             console.error("Delete comment error:", error);
         }
@@ -81,7 +80,7 @@ const ChatWithComments = ({
 
     const handleShowCommentAction = (commentId) => {
         setShowCommentActionId((prevId) =>
-            prevId === commentId ? null : commentId
+            prevId === commentId ? null : commentId,
         );
     };
 
@@ -97,7 +96,7 @@ const ChatWithComments = ({
                 `/api/member/comment/reply/${commentId}`,
                 {
                     body: newReply,
-                }
+                },
             );
             const created = res.data?.data || res.data;
             // update local comments: find parent comment and append reply
@@ -105,8 +104,8 @@ const ChatWithComments = ({
                 prev.map((c) =>
                     c.id === commentId
                         ? { ...c, replies: [...(c.replies || []), created] }
-                        : c
-                )
+                        : c,
+                ),
             );
             setNewReply("");
             setReplySectionFor(null);
@@ -114,7 +113,7 @@ const ChatWithComments = ({
         } catch (error) {
             showMessage(
                 error.response?.data?.message || "Failed to post reply",
-                "error"
+                "error",
             );
             console.error("Post reply error:", error);
         }
@@ -125,17 +124,10 @@ const ChatWithComments = ({
         try {
             const response = await axios.post(
                 `/api/member/premium/messages/${post.id}/like`,
-                { post_id: post.id }
+                { post_id: post.id },
             );
 
-            const updatedLikes =
-                response.data?.likes || response.data?.data || [];
-
-            setLikes(updatedLikes);
-            const nowLiked = updatedLikes.some(
-                (like) => like.user?.id === window.authUser?.id
-            );
-            setLiked(nowLiked);
+            fetchPosts();
 
             if (typeof onUpdatePost === "function") {
                 onUpdatePost(post.id, {
@@ -153,9 +145,9 @@ const ChatWithComments = ({
 
     const isOwn = Boolean(
         post.user &&
-            (post.user.is_current_user ||
-                post.user.id === currentUser.id ||
-                currentUser.email === "kingsleykhord@gmail.com")
+        (post.user.is_current_user ||
+            post.user.id === currentUser.id ||
+            currentUser.email === "kingsleykhord@gmail.com"),
     );
 
     return (
@@ -182,9 +174,12 @@ const ChatWithComments = ({
 
                 {/* Bubble */}
                 <div
-                    className={`max-w-[78%] ${
-                        isOwn ? "text-right" : "text-left"
-                    }`}
+                    className="relative inline-block"
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => {
+                        setHovered(false);
+                        setShowMenu(false);
+                    }}
                 >
                     <div
                         className={`inline-block px-4 py-3 rounded-2xl ${
@@ -205,10 +200,22 @@ const ChatWithComments = ({
                                 >
                                     {author.first_name} {author.last_name}
                                 </span>
-                                <span className="text-[11px] font-normal text-gray-400 dark:text-gray-500">
+                                <span
+                                 className={`${
+                                        isOwn
+                                            ? "text-indigo-100"
+                                            : "text-gray-500 dark:text-indigo-300"
+                                        } text-[11px] font-normal`}
+                                    >
                                     {formatRelativeTime(post.created_at)}
                                 </span>
                             </div>
+                            <button
+                                onClick={() => setShowMenu((prev) => !prev)}
+                                className="ml-2 text-gray-400 hover:text-gray-600"
+                            >
+                                <i className="fa fa-chevron-down text-xs"></i>
+                            </button>
                         </div>
                         <div className="text-sm whitespace-pre-wrap leading-relaxed">
                             {post.body}
@@ -230,90 +237,89 @@ const ChatWithComments = ({
                                             controls
                                             className="rounded-md max-h-40"
                                         />
-                                    )
+                                    ),
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    {post.likes && post.likes.length > 0 && (
+                        <div className="flex my-1">
+                            <Heart fill="#f80d0d" size={16} />{" "}
+                            <span className="text-xs">{post.likes.length}</span>
+                        </div>
+                    )}
+
+                    {/* Actions row */}
+                    <div className="mt-2 flex items-center justify-between text-sm relative">
+                        {hovered && !showMenu && (
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 shadow-lg flex items-center gap-2 animate-fadeIn z-40">
+                                {["❤️"].map((emoji, i) => (
+                                    <button
+                                        key={i}
+                                        className="text-lg hover:scale-125 transition"
+                                        onClick={toggleLike}
+                                    >
+                                        {emoji}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {showMenu && (
+                            <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+                                <div className="p-2 mx-2">
+                                    <button
+                                        onClick={(e) => {
+                                            setSelectedPostToReply(post);
+                                            setShowMenu(false);
+                                        }}
+                                    >
+                                        Reply
+                                    </button>
+                                </div>
+                                {isOwn && (
+                                    <button
+                                        className="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900 text-red-600"
+                                        onClick={() => {
+                                            handleDeletePost(post.id);
+                                            setShowMenu(false);
+                                        }}
+                                    >
+                                        Delete
+                                    </button>
                                 )}
                             </div>
                         )}
                     </div>
 
-                    {/* Actions row */}
-                    <div className="mt-2 flex items-center justify-between text-sm relative">
-                        <div className="flex items-center gap-4 text-gray-600 dark:text-gray-300">
-                            <button
-                                onClick={toggleLike}
-                                className="flex items-center gap-2 hover:text-indigo-600 transition"
-                            >
-                                <i className="fa fa-heart text-red-500"></i>
-                                <span className="text-sm">{likes.length}</span>
-                            </button>
-
-                            <button
-                                onClick={() => openCommentSection(post)}
-                                className="flex items-center gap-2 hover:text-teal-600 transition"
-                            >
-                                <i className="fa fa-comment"></i>
-                                <span className="text-sm">
-                                    {comments.length}
-                                </span>
-                            </button>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            {isOwn && (
-                                <div className="relative">
-                                    <button
-                                        onClick={() =>
-                                            handleShowPostAction(post)
-                                        }
-                                        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-300"
-                                    >
-                                        •••
-                                    </button>
-                                    {showPostActionId === post.id && (
-                                        <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-30">
-                                            <button
-                                                className="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900 text-red-600"
-                                                onClick={() => {
-                                                    if (
-                                                        !confirm(
-                                                            "Delete this post?"
-                                                        )
-                                                    )
-                                                        return;
-                                                    handleDeletePost(post.id);
-                                                    setShowPostActionId(null);
-                                                }}
-                                            >
-                                                Delete post
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
                     {/* Replies */}
-                    {commentsVisible && (
-                        <div className="mt-3 space-y-3">
-                            {comments && comments.length > 0 ? (
-                                comments.map((comment) => (
+
+                    <div className="mt-3 space-y-3">
+                        {comments?.length > 0 && (
+                            <div className="space-y-4">
+                                {comments.map((comment) => (
                                     <div
                                         key={comment.id}
-                                        className="flex items-start gap-2"
+                                        className="flex gap-3"
                                     >
-                                        <img
-                                            src={
-                                                comment.user?.passport ||
-                                                "/avatar1.jpg"
-                                            }
-                                            alt={comment.user?.first_name}
-                                            className="w-7 h-7 rounded-full object-cover"
-                                        />
-                                        <div>
-                                            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg px-3 py-1.5 border border-gray-100 dark:border-gray-700">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="text-[12px] font-semibold text-indigo-700 dark:text-indigo-300">
+                                        <div className="flex-1 space-y-2">
+                                            {/* Quoted message */}
+                                            <div className="flex gap-2 rounded-lg bg-gray-100 px-3 py-2 dark:bg-gray-800">
+                                                <div className="w-1 rounded-full bg-indigo-500" />
+                                                <div className="flex-1">
+                                                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-300">
+                                                        {post.user?.first_name}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600 line-clamp-2 dark:text-gray-400">
+                                                        {post.body}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Reply bubble */}
+                                            <div className="relative rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
                                                         {
                                                             comment.user
                                                                 ?.first_name
@@ -322,118 +328,60 @@ const ChatWithComments = ({
                                                             comment.user
                                                                 ?.last_name
                                                         }
-                                                    </div>
-                                                    <div className="text-[11px] text-gray-400">
-                                                        {formatRelativeTime(
-                                                            comment.created_at
+                                                    </p>
+
+                                                    <div className="flex items-center gap-2 relative">
+                                                        <p className="text-[11px] text-gray-500">
+                                                            {formatRelativeTime(
+                                                                comment.created_at,
+                                                            )}
+                                                        </p>
+
+                                                        {/* Down icon */}
+                                                        <button
+                                                            onClick={() =>
+                                                                setOpenMenuId(
+                                                                    openMenuId ===
+                                                                        comment.id
+                                                                        ? null
+                                                                        : comment.id,
+                                                                )
+                                                            }
+                                                            className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                                                        >
+                                                            ▾
+                                                        </button>
+
+                                                        {/* Dropdown */}
+                                                        {openMenuId ===
+                                                            comment.id && (
+                                                            <div className="absolute right-0 top-6 z-10 w-24 rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800">
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleDeleteComment(
+                                                                            comment.id,
+                                                                        )
+                                                                    }
+                                                                    className="w-full px-3 py-2 text-left text-xs text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </div>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+
+                                                <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
                                                     {comment.body}
-                                                </div>
+                                                </p>
                                             </div>
-
-                                            <div className="mt-1 text-xs text-gray-500 flex items-center gap-3">
-                                                <button
-                                                    onClick={() =>
-                                                        handleToggleReply(
-                                                            comment.id
-                                                        )
-                                                    }
-                                                    className="hover:text-teal-600"
-                                                >
-                                                    Reply
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDeleteComment(
-                                                            comment.id
-                                                        )
-                                                    }
-                                                    className="text-red-500 hover:text-red-700"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-
-                                            {replySectionFor === comment.id && (
-                                                <form
-                                                    onSubmit={(e) =>
-                                                        handlePostReply(
-                                                            e,
-                                                            comment.id
-                                                        )
-                                                    }
-                                                    className="mt-2 flex items-center gap-2"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Write a reply..."
-                                                        value={newReply}
-                                                        onChange={(e) =>
-                                                            setNewReply(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className="flex-1 px-3 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                                                    />
-                                                    <button
-                                                        type="submit"
-                                                        className="px-3 py-1.5 bg-yellow-400 rounded-full text-sm font-semibold"
-                                                    >
-                                                        Send
-                                                    </button>
-                                                </form>
-                                            )}
                                         </div>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-sm text-gray-500 italic">
-                                    No comments yet.
-                                </div>
-                            )}
-
-                            {/* Add Comment Input */}
-                            <form
-                                onSubmit={handleCommentSubmit}
-                                className="flex items-center gap-2"
-                            >
-                                <input
-                                    type="text"
-                                    placeholder="Write a comment..."
-                                    className="flex-1 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-                                    value={newComment}
-                                    onChange={(e) =>
-                                        setNewComment(e.target.value)
-                                    }
-                                />
-                                <button
-                                    disabled={commenting}
-                                    type="submit"
-                                    className="px-4 py-2 bg-yellow-400 rounded-full text-sm font-semibold"
-                                >
-                                    {commenting ? "Posting..." : "Post"}
-                                </button>
-                            </form>
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-
-                {/* Avatar for own on the right */}
-                {isOwn &&
-                    (author.passport ? (
-                        <img
-                            src={author.passport}
-                            alt={author.first_name}
-                            className="w-9 h-9 rounded-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm font-bold text-white">
-                            {initials}
-                        </div>
-                    ))}
             </div>
         </div>
     );

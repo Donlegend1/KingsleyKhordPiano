@@ -23,7 +23,7 @@
                         '/member/course/' . $bookmark->bookmarkable?->level
                         . '?selected_course=' . $bookmark->bookmarkable?->id,
             
-                    'App\Models\Lesson' =>
+                    'App\Models\Upload' =>
                         '/member/lesson/' . $bookmark->bookmarkable?->id,
             
                     'App\Models\Post' =>

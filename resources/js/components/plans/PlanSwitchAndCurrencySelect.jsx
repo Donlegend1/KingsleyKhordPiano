@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 const currencySigns = {
     NGN: "₦",
@@ -6,45 +6,12 @@ const currencySigns = {
     EUR: "€",
 };
 
-const plans = [
-    {
-        id: 1,
-        type: "monthly",
-        tier: "standard",
-        amount: { EUR: 23, USD: 26, NGN: 38000 },
-        img: "/icons/icon.png",
-        bg: "",
-    },
-    {
-        id: 2,
-        type: "monthly",
-        tier: "premium",
-        amount: { EUR: 40, USD: 45, NGN: 70000 },
-        img: "/icons/price2.png",
-        bg: "/images/Background.jpg",
-    },
-    {
-        id: 3,
-        type: "yearly",
-        tier: "standard",
-        amount: { EUR: 189, USD: 215, NGN: 320000 },
-        img: "/icons/icon.png",
-        bg: "",
-    },
-    {
-        id: 4,
-        type: "yearly",
-        tier: "premium",
-        amount: { EUR: 369, USD: 420, NGN: 650000 },
-        img: "/icons/price2.png",
-        bg: "/images/Background.jpg",
-    },
-];
 
 const PlanSwitchAndCurrencySelect = () => {
     const [selectedPlan, setSelectedPlan] = useState("monthly");
     const [currency, setCurrency] = useState("EUR");
     const [modalOpen, setModalOpen] = useState(false);
+    const [plans, setPlans] = useState([]);
     const [selectedPlanDetails, setSelectedPlanDetails] = useState(null);
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
@@ -53,6 +20,19 @@ const PlanSwitchAndCurrencySelect = () => {
     const handlePlanToggle = (plan) => {
         setSelectedPlan(plan);
     };
+
+    const fetchPlans = async () => {
+        try {
+            const response = await axios.get("/api/plans");
+            setPlans(response.data);
+        } catch (error) {
+            console.error("Failed to fetch plans", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchPlans();
+    }, []);
 
     const authUser = window.authUser || null;
 
@@ -66,6 +46,21 @@ const PlanSwitchAndCurrencySelect = () => {
     };
 
     const filteredPlans = plans.filter((plan) => plan.type === selectedPlan);
+    const matchAmountToCurrency = (plan) => {
+        switch (currency) {
+            case "NGN":
+                return Number(plan.price_ngn);
+
+            case "USD":
+                return Number(plan.price_usd);
+
+            case "EUR":
+                return Number(plan.price_eur);
+
+            default:
+                return 0;
+        }
+    };
 
     return (
         <section className="container mx-auto px-5 md:px-28 bg-cover bg-white mb-20">
@@ -74,7 +69,7 @@ const PlanSwitchAndCurrencySelect = () => {
                 <p className="font-bold text-4xl my-3 text-[#BC1414]">
                     Kingsley Khord Piano Academy
                 </p>
-                <p className="text-sm text-gray-500 mx-auto max-w-lg">
+                <p className=" text-gray-500 mx-auto max-w-lg">
                     This structured hands-on piano training was created due to
                     high demand and a lack of available in-depth resources and
                     guidance.
@@ -141,10 +136,10 @@ const PlanSwitchAndCurrencySelect = () => {
                         <div
                             key={plan.id}
                             className="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full sm:w-[48%] lg:w-[32%]"
-                            style={{ backgroundImage: `url(${plan.bg})` }}
+                            style={{ backgroundImage: `url(${plan.background})` }}
                         >
                             <img
-                                src={plan.img}
+                                src={plan.image}
                                 alt=""
                                 className="mb-4 p-3 border h-16 rounded-3xl"
                             />
@@ -153,12 +148,12 @@ const PlanSwitchAndCurrencySelect = () => {
                             </h3>
                             <p className="text-2xl font-bold mb-2">
                                 {currencySigns[currency]}
-                                {plan.amount[currency].toLocaleString()}
+                                {matchAmountToCurrency(plan).toLocaleString()}
                             </p>
                             <p className="text-sm border border-gray-100 my-4"></p>
 
-                            {plan.tier == "standard" && (
-                                <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
+                            {plan.tier == "Standard" && (
+                                <ul className=" text-gray-700 mb-6 list-disc list-inside">
                                     <li>Roadmap for all skill levels</li>
                                     <li>Premium midi files</li>
                                     <li>Ear Training Quiz</li>
@@ -167,8 +162,8 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </ul>
                             )}
 
-                            {plan.tier == "premium" && (
-                                <ul className="text-sm text-gray-700 mb-6 list-disc list-inside">
+                            {plan.tier == "Premium" && (
+                                <ul className=" text-gray-700 mb-6 list-disc list-inside">
                                     <li className="text-red-500 font-sf font-semibold">
                                         Everything in the standard plan
                                     </li>
@@ -182,7 +177,7 @@ const PlanSwitchAndCurrencySelect = () => {
                             <div className="flex justify-center">
                                 <button
                                     className={`w-full px-4 py-2 rounded-lg transition ${
-                                        plan.tier === "premium"
+                                        plan.tier === "Premium"
                                             ? "bg-black text-white hover:bg-gray-700"
                                             : "bg-white text-black border border-[#C2D3DD73] hover:bg-gray-100"
                                     }`}
@@ -209,14 +204,11 @@ const PlanSwitchAndCurrencySelect = () => {
                         </h2>
                         <p className="text-center text-white mb-4">
                             {currencySigns[currency]}
-                            {selectedPlanDetails.amount[
-                                currency
-                            ].toLocaleString()}{" "}
-                            for {selectedPlanDetails.tier} Plan
+                            {matchAmountToCurrency(selectedPlanDetails)}
+                             {"for "}{ selectedPlanDetails.tier} Plan
                         </p>
 
                         <div className="flex flex-col gap-6">
-                            
                             <form action="/stripe/create" method="POST">
                                 <input
                                     type="hidden"
@@ -261,6 +253,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                     name="plan_id"
                                     value={selectedPlanDetails.id}
                                 />
+                                
                                 <input
                                     type="hidden"
                                     name="tier"
@@ -340,6 +333,6 @@ if (document.getElementById("plan-switch")) {
     Index.render(
         <React.StrictMode>
             <PlanSwitchAndCurrencySelect />
-        </React.StrictMode>
+        </React.StrictMode>,
     );
 }

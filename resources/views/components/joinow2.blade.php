@@ -11,7 +11,7 @@
         You are not alone in your learning journey! Even the best feel confused and stuck at times.
       </h1>
 
-      <p class="mb-4 font-semibold text-[#FF364A] text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
+      <p class="mb-4 font-semibold text-[#E1E1E1] text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
         Committing to this carefully restructured learning process will make you unstoppable!
       </p>
 

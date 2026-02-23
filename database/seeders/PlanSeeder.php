@@ -18,6 +18,8 @@ class PlanSeeder extends Seeder
                 'price_eur' => 23,
                 'image' => '/icons/icon.png',
                 'background' => '',
+                'paystack_product_id' => 'PLN_brzt8hexwspqu9p',
+                'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc6'
             ],
             [
                 'tier' => 'premium',
@@ -27,6 +29,8 @@ class PlanSeeder extends Seeder
                 'price_eur' => 40,
                 'image' => '/icons/price2.png',
                 'background' => '/images/Background.jpg',
+                'paystack_product_id' => 'PLN_mb88lum57cm9dyy',
+                'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc7'
             ],
             [
                 'tier' => 'standard',
@@ -36,6 +40,8 @@ class PlanSeeder extends Seeder
                 'price_eur' => 189,
                 'image' => '/icons/icon.png',
                 'background' => '',
+                'paystack_product_id' => 'PLN_l4u5qel3amq3ukh',
+                'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc8'
             ],
             [
                 'tier' => 'premium',
@@ -45,6 +51,8 @@ class PlanSeeder extends Seeder
                 'price_eur' => 369,
                 'image' => '/icons/price2.png',
                 'background' => '/images/Background.jpg',
+                'paystack_product_id' => 'PLN_x7f11lzl66061dg',
+                'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc9'
             ],
         ];
 
@@ -53,4 +61,3 @@ class PlanSeeder extends Seeder
         }
     }
 }
-

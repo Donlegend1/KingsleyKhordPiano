@@ -2,7 +2,7 @@
   <div class="text-center my-12 mx-auto">
     <p class="font-bold text-4xl">Gain Immediate Entry to </p>
     <p class="font-bold text-4xl my-3 text-[#BC1414]">Kingsley Khord Piano Academy</p>
-    <p class="text-sm text-gray-500 mx-auto max-w-lg">
+    <p class=" text-gray-500 mx-auto max-w-lg">
       This structured hands-on piano training was created due to high demand and a lack of available in-depth resources and guidance. 
     </p>
   </div>

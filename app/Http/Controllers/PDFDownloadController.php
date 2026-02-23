@@ -40,35 +40,65 @@ class PDFDownloadController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePDFDownloadRequest $request)
+     public function store(StorePDFDownloadRequest $request)
     {
         try {
             $data = $request->validated();
-
-            // Handle PDF file upload
+    
+            // ---------- PDF upload ----------
             if ($request->hasFile('file_url')) {
-                $pdfFile = $request->file('file_url');
-                $pdfFileName = time() . '_' . $pdfFile->getClientOriginalName();
-                $pdfFile->move(public_path('uploads/pdfs'), $pdfFileName);
-                $data['file_url'] = 'uploads/pdfs/' . $pdfFileName;
+    
+                $pdf = $request->file('file_url');
+    
+                // New file name
+                $pdfName = time() . '_' . $pdf->getClientOriginalName();
+    
+                // Destination
+                $pdfDestination = base_path('../public_html/uploads/pdfs');
+    
+                // Create folder if missing
+                if (!file_exists($pdfDestination)) {
+                    mkdir($pdfDestination, 0755, true);
+                }
+    
+                // Move file
+                $pdf->move($pdfDestination, $pdfName);
+    
+                // Clean public path
+                $data['file_url'] = "/uploads/pdfs/$pdfName";
             }
-
-            // Handle thumbnail upload
+    
+            // ---------- Thumbnail upload ----------
             if ($request->hasFile('thumbnail')) {
-                $thumbnailFile = $request->file('thumbnail');
-                $thumbnailFileName = time() . '_' . $thumbnailFile->getClientOriginalName();
-                $thumbnailFile->move(public_path('uploads/pdf-thumbnails'), $thumbnailFileName);
-                $data['thumbnail'] = 'uploads/pdf-thumbnails/' . $thumbnailFileName;
+    
+                $thumbnail = $request->file('thumbnail');
+    
+                // New file name
+                $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
+    
+                // Destination
+                $thumbDestination = base_path('../public_html/uploads/pdf-thumbnails');
+    
+                // Create folder if missing
+                if (!file_exists($thumbDestination)) {
+                    mkdir($thumbDestination, 0755, true);
+                }
+    
+                // Move file
+                $thumbnail->move($thumbDestination, $thumbnailName);
+    
+                // Clean public path
+                $data['thumbnail'] = "uploads/pdf-thumbnails/$thumbnailName";
             }
-
-            // Create the PDF download record
+    
+            // Create record
             PDFDownload::create($data);
-
+    
             return response()->json([
                 'success' => true,
-                'message' => 'PDF downloaded successfully created.',
+                'message' => 'PDF created successfully',
             ], 201);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -77,23 +107,20 @@ class PDFDownloadController extends Controller
         }
     }
 
+
     /**
      * Download the PDF file.
      */
     public function download(PDFDownload $pDFDownload)
     {
         try {
-            if (!$pDFDownload->file_url || !Storage::disk('public')->exists($pDFDownload->file_url)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'PDF file not found.',
-                ], 404);
-            }
 
-            $filePath = $pDFDownload->file_url;
-            $fileName = $pDFDownload->title . '.pdf';
-
-            return Storage::disk('public')->download($filePath, $fileName);
+        $filePath = $pDFDownload->file_url;
+        
+        if (file_exists($filePath)) {
+            return response()->download($filePath);
+        }
+      
 
         } catch (\Exception $e) {
             return response()->json([
@@ -111,33 +138,57 @@ class PDFDownloadController extends Controller
         try {
             $data = $request->validated();
 
-            // Handle PDF file upload
+            // ---------- PDF upload ----------
             if ($request->hasFile('file_url')) {
-                // Delete old file if exists
-                if ($pDFDownload->file_url && file_exists(public_path($pDFDownload->file_url))) {
-                    unlink(public_path($pDFDownload->file_url));
+
+                // Old PDF path
+                if ($pDFDownload->file_url) {
+                    $oldPdfPath = base_path('../public_html' . $pDFDownload->file_url);
+                    if (file_exists($oldPdfPath)) {
+                        unlink($oldPdfPath);
+                    }
                 }
 
-                $pdfFile = $request->file('file_url');
-                $pdfFileName = time() . '_' . $pdfFile->getClientOriginalName();
-                $pdfFile->move(public_path('uploads/pdfs'), $pdfFileName);
-                $data['file_url'] = 'uploads/pdfs/' . $pdfFileName;
+                $pdf = $request->file('file_url');
+                $pdfName = time() . '_' . $pdf->getClientOriginalName();
+
+                $pdfDestination = base_path('../public_html/uploads/pdfs');
+
+                if (!file_exists($pdfDestination)) {
+                    mkdir($pdfDestination, 0755, true);
+                }
+
+                $pdf->move($pdfDestination, $pdfName);
+
+                $data['file_url'] = "uploads/pdfs/$pdfName";
             }
 
-            // Handle thumbnail upload
+            // ---------- Thumbnail upload ----------
             if ($request->hasFile('thumbnail')) {
-                // Delete old thumbnail if exists
-                if ($pDFDownload->thumbnail && file_exists(public_path($pDFDownload->thumbnail))) {
-                    unlink(public_path($pDFDownload->thumbnail));
+
+                // Old thumbnail path
+                if ($pDFDownload->thumbnail) {
+                    $oldThumbPath = base_path('../public_html' . $pDFDownload->thumbnail);
+                    if (file_exists($oldThumbPath)) {
+                        unlink($oldThumbPath);
+                    }
                 }
 
-                $thumbnailFile = $request->file('thumbnail');
-                $thumbnailFileName = time() . '_' . $thumbnailFile->getClientOriginalName();
-                $thumbnailFile->move(public_path('uploads/pdf-thumbnails'), $thumbnailFileName);
-                $data['thumbnail'] = 'uploads/pdf-thumbnails/' . $thumbnailFileName;
+                $thumbnail = $request->file('thumbnail');
+                $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
+
+                $thumbDestination = base_path('../public_html/uploads/pdf-thumbnails');
+
+                if (!file_exists($thumbDestination)) {
+                    mkdir($thumbDestination, 0755, true);
+                }
+
+                $thumbnail->move($thumbDestination, $thumbnailName);
+
+                $data['thumbnail'] = "/uploads/pdf-thumbnails/$thumbnailName";
             }
 
-            // Update the PDF download record
+            // Update DB
             $pDFDownload->update($data);
 
             return response()->json([

@@ -10,7 +10,7 @@
   <!-- Text Content -->
   <div>
     <h2 class="text-2xl font-bold text-[#435065]">Student Progress</h2>
-    <p class="mt-2 text-sm text-[#5E6779]">Pick up from where you left off!</p>
+    <p class="mt-2 text-sm text-[#5E6779]"> A snapshot of learning milestones</p>
   </div>
 </div>
 
@@ -112,7 +112,7 @@
     <div class="p-4 bg-white rounded-lg shadow-md border hover:shadow-lg transition flex justify-between items-center">
       <div>
         <h4 class="font-bold text-[#435065] font-sf">Student Progress</h4>
-        <p class="text-sm text-[#5E6779] font-sf mt-2">Pick up from where you left off</p>
+        <p class="text-sm text-[#5E6779] font-sf mt-2">A snapshot of learning milestones</p>
       </div>
       <i class="fa fa-angle-right text-[#5E6779] text-sm"></i>
     </div>
@@ -121,12 +121,12 @@
 
 <!-- Modals -->
 @foreach ([
-    ['id' => 'qaModal', 'title' => 'Question & Answer', 'body' => 'You can ask questions here and get support from instructors and the community.', 'link' =>'#',
+    ['id' => 'qaModal', 'title' => 'Question & Answer', 'body' => 'You can ask questions here and get support from instructors and the community.', 'link' =>'/member/community/space/exclusive-feed',
      'text'=> 'Stock on something or just curious or just curious about a concept? Drop your question here and get thoughtful practical answers from fellow learners and instructors who have likely walked that same path. 
     Join a community of real conversations, shared struggles and helpful insight'],
-    ['id' => 'requestModal', 'title' => 'Course Request', 'body' => 'Submit your request for a new course and we’ll review it for future updates.', 'link' =>'#', 'text'=> 
+    ['id' => 'requestModal', 'title' => 'Course Request', 'body' => 'Submit your request for a new course and we’ll review it for future updates.', 'link' =>'/member/community/space/exclusive-feed', 'text'=> 
     'Have a course idea or something specific you are eager to learn? This is where you can let us know. We are always building with you in mind and your request might just be in the next lesson we create.'],
-    ['id' => 'progressModal', 'title' => 'Student Progress', 'body' => 'Track your learning journey and resume courses from where you stopped.', 'link' =>'#', 'text'=> 'Whether it is a small or a big breakthrough, share your progress here it help others see what is possible and give you the changes to get encourage,
+    ['id' => 'progressModal', 'title' => 'Student Progress', 'body' => 'Track your learning journey and resume courses from where you stopped.', 'link' =>'/member/community/space/progress-report', 'text'=> 'Whether it is a small or a big breakthrough, share your progress here it help others see what is possible and give you the changes to get encourage,
      support and honest feedback from a community that is rooting for you']
 ] as $modal)
   <div id="{{ $modal['id'] }}" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">

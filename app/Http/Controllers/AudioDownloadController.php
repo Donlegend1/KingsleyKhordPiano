@@ -18,28 +18,50 @@ class AudioDownloadController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'category' => 'required|in:tracks_loops,piano_plays',
-                'audio_file' => 'required|file|mimes:mp3,wav,m4a,aac',
-                'duration' => 'nullable|string',
-                'file_size' => 'nullable|string',
-            ]);
+{
+    try {
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'category' => 'required|in:tracks_loops,piano_plays',
+            'audio_file' => 'required|file|mimes:mp3,wav,m4a,aac',
+            'duration' => 'nullable|string',
+            'file_size' => 'nullable|string',
+        ]);
 
-            $audioFile = $request->file('audio_file');
-            $audioFileName = time() . '_' . $audioFile->getClientOriginalName();
-            $audioFile->move(public_path('uploads/audio'), $audioFileName);
-            $validated['audio_file'] = 'uploads/audio/' . $audioFileName;
+        if ($request->hasFile('audio_file')) {
+            $audio = $request->file('audio_file');
 
-            AudioDownload::create($validated);
+            // New file name
+            $audioName = time() . '_' . $audio->getClientOriginalName();
 
-            return response()->json(['message' => 'Audio uploaded successfully'], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            // Destination path in public_html
+            $destination = base_path('../public_html/uploads/audio');
+
+            // Create directory if not exists
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Move uploaded file
+            $audio->move($destination, $audioName);
+
+            // Save clean public path
+            $data['audio_file'] = "uploads/audio/$audioName";
         }
+
+        AudioDownload::create($data);
+
+        return response()->json([
+            'message' => 'Audio uploaded successfully'
+        ], 201);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     /**
      * Display the specified resource.
@@ -54,33 +76,59 @@ class AudioDownloadController extends Controller
      */
     public function update(Request $request, AudioDownload $audioDownload)
     {
-        try {
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'category' => 'required|in:tracks_loops,piano_plays',
-                'audio_file' => 'nullable|file|mimes:mp3,wav,m4a,aac',
-                'duration' => 'nullable|string',
-                'file_size' => 'nullable|string',
-            ]);
+    try {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'category' => 'required|in:tracks_loops,piano_plays',
+            'audio_file' => 'nullable|file|mimes:mp3,wav,m4a,aac',
+            'duration' => 'nullable|string',
+            'file_size' => 'nullable|string',
+        ]);
 
-            if ($request->hasFile('audio_file')) {
-                if (file_exists(public_path($audioDownload->audio_file))) {
-                    unlink(public_path($audioDownload->audio_file));
+        // If new audio uploaded
+        if ($request->hasFile('audio_file')) {
+
+            // Delete old file if exists
+            if (!empty($audioDownload->audio_file)) {
+                $oldPath = base_path('../public_html/' . ltrim($audioDownload->audio_file, '/'));
+
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
                 }
-
-                $audioFile = $request->file('audio_file');
-                $audioFileName = time() . '_' . $audioFile->getClientOriginalName();
-                $audioFile->move(public_path('uploads/audio'), $audioFileName);
-                $validated['audio_file'] = 'uploads/audio/' . $audioFileName;
             }
 
-            $audioDownload->update($validated);
+            $audio = $request->file('audio_file');
 
-            return response()->json(['message' => 'Audio updated successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            // New file name
+            $audioName = time() . '_' . $audio->getClientOriginalName();
+
+            // Destination
+            $destination = base_path('../public_html/uploads/audio');
+
+            // Create folder if missing
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Move file
+            $audio->move($destination, $audioName);
+
+            // Save clean public path
+            $validated['audio_file'] = "uploads/audio/$audioName";
         }
+
+        $audioDownload->update($validated);
+
+        return response()->json([
+            'message' => 'Audio updated successfully'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Remove the specified resource from storage.
@@ -114,7 +162,7 @@ class AudioDownloadController extends Controller
      */
     public function download(AudioDownload $audioDownload)
     {
-        $filePath = public_path($audioDownload->audio_file);
+        $filePath = $audioDownload->audio_file;
         
         if (file_exists($filePath)) {
             return response()->download($filePath);

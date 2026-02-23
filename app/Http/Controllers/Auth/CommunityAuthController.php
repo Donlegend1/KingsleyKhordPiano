@@ -60,7 +60,7 @@ class CommunityAuthController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:4', 'confirmed', Rules\Password::defaults()],
-            'g-recaptcha-response' => 'required|recaptcha',
+            'g-recaptcha-response' => ['required', 'captcha'],
         ]);
 
         $user = User::create([
@@ -74,7 +74,7 @@ class CommunityAuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('community.index')->with('success', 'Artist account created successfully! Please verify your email to access all features.');
+        return redirect()->route('community.index');
     }
 
     /**
@@ -86,6 +86,6 @@ class CommunityAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/community/login')->with('success', 'You have been logged out. See you next time!');
+        return redirect('/community/login');
     }
 }

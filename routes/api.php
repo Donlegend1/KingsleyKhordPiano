@@ -25,6 +25,7 @@ use App\Http\Controllers\MidiFileController;
 use App\Http\Controllers\EmailCampaignController;
 use App\Http\Controllers\PDFDownloadController;
 use App\Http\Controllers\AudioDownloadController;
+use App\Http\Controllers\PlanController;
 
 
 /*
@@ -43,6 +44,7 @@ use App\Http\Controllers\AudioDownloadController;
     });
 
     Route::get('/live-shows', [LiveShowController::class, 'list']);
+    Route::get('/plans', [PlanController::class, 'index']);
 
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminController::class, 'usersList']);

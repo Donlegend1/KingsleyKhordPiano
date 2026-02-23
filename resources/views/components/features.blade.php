@@ -1,7 +1,7 @@
 <section class="container mx-auto px-4 sm:px-6 md:px-10 lg:px-20 xl:px-28 bg-white">
   <div class="text-center my-12 mx-auto">
     <p class="font-bold text-3xl"> Membership Features </p>
-    <p class="text-sm text-gray-500"> Get the most value from your subscription. Courses and contents carefully crafted to make you a Piano Pro. </p>
+    {{-- <p class="text-sm text-gray-500"> Get the most value from your subscription. Courses and contents carefully crafted to make you a Piano Pro. </p> --}}
   </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div class="border border-gray-200 p-4 rounded-lg shadow-md">
@@ -11,8 +11,11 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Music Theory</h2>
-      <p class="text-sm text-gray-500">Replace your nervousness with steel-like confidence. A solid understanding of the fundamentals 
-       of music theory will expose you to the structures and systems of music.</p>
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+          Replace your nervousness with steel-like confidence. A solid understanding of the fundamentals of music theory will expose you to the structures and systems of music.
+        </p>
+      </div>
       </div>
       
     </div>
@@ -23,8 +26,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Ear Training Quiz</h2>
-      <p class="text-sm text-gray-500">Learn to expand your musical vocabulary. You'll soon be able to recognise chord progressions just by listening to their melodies. 
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+         Learn to expand your musical vocabulary. You'll soon be able to recognise chord progressions just by listening to their melodies. 
         This will, in turn, help you develop a flawless playing style..</p>
+      </div>
+      
       </div>
       
     </div>
@@ -35,8 +42,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Piano Exercises</h2>
-      <p class="text-sm text-gray-500 ">Hands-on daily exercises to strengthen your fingers. What's learning to play the piano without consistent, hands-on practice? Your 
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+        Hands-on daily exercises to strengthen your fingers. What's learning to play the piano without consistent, hands-on practice? Your 
         fingers need a lot of practical training to produce flawless rhythms..</p>
+      </div>
+      
       </div>
       
     </div>
@@ -47,8 +58,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Song Libraries</h2>
-      <p class="text-sm text-gray-500">A curated collection of songs for all skill levels—beginner, intermediate, 
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+      A curated collection of songs for all skill levels—beginner, intermediate, 
         and advanced—designed to help you expand your chord vocabulary and refine your playing skills.</p>
+      </div>
+      
       </div>
       
     </div>
@@ -59,8 +74,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Course Roadmap</h2>
-      <p class="text-sm text-gray-500">A structured video course designed for all skill levels—beginner, intermediate, and advanced.
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+      A structured video course designed for all skill levels—beginner, intermediate, and advanced.
          Learn at your own pace with step-by-step guidance tailored to your growth..</p>
+      </div>
+      
       </div>
       
     </div>
@@ -71,8 +90,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Downloadable Resources</h2>
-      <p class="text-sm text-gray-500">A collection of essential tools—plugins, audio files, MIDI files, and PDFs—designed to enhance your 
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+        A collection of essential tools—plugins, audio files, MIDI files, and PDFs—designed to enhance your 
         learning experience and support you at every stage of your musical journey..</p>
+      </div>
+      
       </div>
       
     </div>
@@ -83,8 +106,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Zoom Live Sessions</h2>
-      <p class="text-sm text-gray-500">Real-time lessons with expert instructors. 
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+       Real-time lessons with expert instructors. 
         Get direct feedback, ask questions, and accelerate your progress with interactive learning.</p>
+      </div>
+      
       </div>
       
     </div>
@@ -95,8 +122,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Student Challenges</h2>
-      <p class="text-sm text-gray-500">Engaging exercises designed to push your skills further.
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+       Engaging exercises designed to push your skills further.
          Compete, track progress, and refine your playing with structured challenges.</p>
+      </div>
+      
       </div>
       
     </div>
@@ -107,8 +138,12 @@
       </div>
       <div class="text-center">
       <h2 class="text-lg font-bold mb-2">Supportive Community</h2>
-      <p class="text-sm text-gray-500">Join a space where gospel piano enthusiasts connect, learn, and grow together. 
+      <div class="max-w-md mx-auto">
+        <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed text-left">
+        Join a space where gospel piano enthusiasts connect, learn, and grow together. 
         Offering encouragement, shared experiences, and motivation to keep improving.</p>
+      </div>
+      
       </div>
       
     </div>

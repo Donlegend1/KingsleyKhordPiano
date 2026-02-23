@@ -12,14 +12,13 @@ class StripeController extends Controller
         $request->validate([
             'tier' => 'required|string',
             'duration' => 'required|in:monthly,yearly',
+            'plan_id' => 'required|integer'
         ]);
 
-        $plan = Plan::where('tier', $request->tier)
-            ->where('type', $request->duration)
-            ->firstOrFail();
+        $plan = Plan::find($request->plan_id);
 
         return $request->user()
-            ->newSubscription('default', $plan->price_id)
+            ->newSubscription('default', $plan->stripe_product_id)
             ->allowPromotionCodes()
             ->checkout([
                 'success_url' => route('checkout.success'),

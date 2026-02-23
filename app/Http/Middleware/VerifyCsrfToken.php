@@ -13,5 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'stripe/*', // Exclude Stripe webhook from CSRF verification
+        '/webhooks/paystack/*'
     ];
 }

@@ -34,12 +34,12 @@
               </button>
             </div> 
         </form>
-        <i class="fa fa-user-circle text-xl"></i>
+        {{-- <i class="fa fa-user-circle text-xl"></i> --}}
       </div>
     </div>
 
     <div>
-      <h1 class="text-xl font-bold">Quick Lesson</h1>
+      {{-- <h1 class="text-xl font-bold">Quick Lesson</h1> --}}
     </div>
   </div>
 </section>

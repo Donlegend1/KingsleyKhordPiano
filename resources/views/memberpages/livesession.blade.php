@@ -17,9 +17,9 @@
    </div>
 
    <!-- Second Row -->
-   <div>
+   {{-- <div>
      <h1 class="text-xl font-bold">Live Session</h1>
-   </div>
+   </div> --}}
 
  </div>
 </section>

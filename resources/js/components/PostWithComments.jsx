@@ -315,7 +315,7 @@ const PostWithComments = ({
                 switch (block.type) {
                     case "text":
                         return (
-                            <p key={idx} className="whitespace-pre-wrap">
+                            <p key={idx} className="whitespace-pre-wrap dark:text-gray-300">
                                 {renderTextWithLinks(block.content)}
                             </p>
                         );

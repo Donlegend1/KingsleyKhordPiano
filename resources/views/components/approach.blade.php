@@ -1,70 +1,90 @@
-<section class="container mx-auto px-5 md:px-28 bg-cover my-10 bg-white">
-  <div class="text-center my-6 mx-auto">
-    <p class="font-bold text-2xl">Our Approach</p>
+<section class="bg-gradient-to-b from-[#0B0B0B] via-[#111827] to-[#0B0B0B] py-24 mt-10">
+  <div class="container mx-auto px-5 md:px-28">
 
-  </div>
+    <!-- Heading -->
+    <div class="text-center mb-14">
+      <p class="text-sm uppercase tracking-widest text-[#FFD736] mb-2">
+        How We Teach
+      </p>
+      <h2 class="font-bold text-3xl md:text-4xl text-white">
+        Our Approach
+      </h2>
+    </div>
 
-  <div class="flex justify-center items-center">
-    <div class="w-full md:w-4/4 lg:w-2/3 xl:w-1/2 bg-[#cbdeec40] rounded-lg p-8 md:p-12 shadow-xl">
-      <div class="flex flex-col space-y-10 relative">
+    <div class="flex justify-center">
+      <div
+        class="w-full md:w-4/4 lg:w-2/3 xl:w-1/2
+               bg-gradient-to-br from-[#FFF9E8] to-[#F4F6F8]
+               rounded-2xl p-8 md:p-12 shadow-2xl border border-white/10"
+      >
+        <div class="flex flex-col space-y-12">
 
-        <!-- 1st Item -->
-        <div class="flex items-start gap-5 relative">
-          <!-- Icon & Line -->
-          <div class="flex flex-col items-center">
-            <div class="w-6 h-6 rounded-full mt-1 bg-white border border-[#CBDBE1] flex items-center justify-center">
-              <img src="/icons/lesson.png" class="w-4 h-4" />
+          <!-- Item 1 -->
+          <div class="flex items-start gap-6">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full bg-[#FFD736]/20 border border-[#FFD736]
+                          flex items-center justify-center">
+                <img src="/icons/lesson.png" class="w-4 h-4" />
+              </div>
+              <div class="h-12 border-l border-dashed border-gray-300 mt-2"></div>
             </div>
-            <div class="h-10 border-l-2 border-dotted border-gray-400 mt-1"></div>
-          </div>
 
-          <!-- Text -->
-          <div>
-            <h2 class="text-lg font-bold flex items-center gap-2">Technique</h2>
-            <p class="text-sm text-gray-500 mt-1">
-              Developing the right technique teaches you the way to play and enhances your hand speed and independence, allowing you to tackle any piece of music!
-            </p>
-          </div>
-        </div>
-
-        <!-- 2nd Item -->
-        <div class="flex items-start gap-5 relative">
-          <!-- Icon & Line -->
-          <div class="flex flex-col items-center">
-            <div class="w-6 h-6 rounded-full mt-1 bg-white border border-[#CBDBE1] flex items-center justify-center">
-              <img src="/icons/time.png" class="w-4 h-4" />
-            </div>
-            <div class="h-10 border-l-2 border-dotted border-gray-400 mt-1"></div>
-          </div>
-
-          <!-- Text -->
-          <div>
-            <h2 class="text-lg font-bold flex items-center gap-2">Theory</h2>
-            <p class="text-sm text-gray-500 mt-1">
-              Music theory enhances our comprehension of what we are playing and grants us the freedom to explore musically.
-            </p>
-          </div>
-        </div>
-
-        <!-- 3rd Item -->
-        <div class="flex items-start gap-5 relative">
-          <!-- Icon only (no line after) -->
-          <div class="flex flex-col items-center">
-            <div class="w-6 h-6 rounded-full mt-1 bg-white border border-[#CBDBE1] flex items-center justify-center">
-              <img src="/icons/gospel.png" class="w-4 h-4" />
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">
+                Technique
+              </h3>
+              <p class=" text-gray-600 mt-2 leading-relaxed">
+                Developing the right technique teaches you the proper way to play,
+                improves hand speed and independence, and prepares you to tackle
+                any piece of music with confidence.
+              </p>
             </div>
           </div>
 
-          <!-- Text -->
-          <div>
-            <h2 class="text-lg font-bold flex items-center gap-2">Gospel Songs</h2>
-            <p class="text-sm text-gray-500 mt-1">
-              Developing a repertoire of Gospel songs allows you to grasp the essential movements, chords, progressions, and nuances that define the unique sound of Gospel music.
-            </p>
-          </div>
-        </div>
+          <!-- Item 2 -->
+          <div class="flex items-start gap-6">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full bg-[#FFD736]/20 border border-[#FFD736]
+                          flex items-center justify-center">
+                <img src="/icons/time.png" class="w-4 h-4" />
+              </div>
+              <div class="h-12 border-l border-dashed border-gray-300 mt-2"></div>
+            </div>
 
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">
+                Theory
+              </h3>
+              <p class=" text-gray-600 mt-2 leading-relaxed">
+                Music theory deepens your understanding of what you play and gives
+                you the freedom to explore creatively and intentionally.
+              </p>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="flex items-start gap-6">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full bg-[#FFD736]/20 border border-[#FFD736]
+                          flex items-center justify-center">
+                <img src="/icons/gospel.png" class="w-4 h-4" />
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">
+                Gospel Songs
+              </h3>
+              <p class=" text-gray-600 mt-2 leading-relaxed">
+                Building a Gospel repertoire helps you master movements, chords,
+                progressions, and the musical nuances that define the Gospel sound.
+              </p>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
+
   </div>
 </section>

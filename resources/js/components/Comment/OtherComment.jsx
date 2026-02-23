@@ -173,9 +173,9 @@ const [lesson, setLesson] = useState(null);
 
             {/* Comment Section */}
             <div className="mt-10">
-                <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+                {/* <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
                     Comments
-                </h3>
+                </h3> */}
 
                 <form onSubmit={handleSubmitComment} className="mb-4">
                     <textarea

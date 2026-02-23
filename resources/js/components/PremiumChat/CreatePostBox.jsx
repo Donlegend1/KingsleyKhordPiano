@@ -1,8 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import EmojiPicker from "emoji-picker-react";
-import { MessageCirclePlusIcon, Smile } from "lucide-react";
+import { SendHorizontal, Smile } from "lucide-react";
 
-const CreatePostBox = ({ handlePost, postDetails, setPostDetails, posting }) => {
+const CreatePostBox = ({
+    handlePost,
+    postDetails,
+    setPostDetails,
+    posting,
+    fetchPosts,
+    handleCommentSubmit,
+    selectedPostToReply,
+    commenting,
+}) => {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const inputRef = useRef(null);
 
@@ -19,7 +28,9 @@ const CreatePostBox = ({ handlePost, postDetails, setPostDetails, posting }) => 
         const cursorPos = el.selectionStart;
         const text = postDetails.body || "";
         const newText =
-            text.slice(0, cursorPos) + emojiObject.emoji + text.slice(cursorPos);
+            text.slice(0, cursorPos) +
+            emojiObject.emoji +
+            text.slice(cursorPos);
         setPostDetails({ ...postDetails, body: newText });
 
         // Move cursor after emoji
@@ -34,12 +45,22 @@ const CreatePostBox = ({ handlePost, postDetails, setPostDetails, posting }) => 
         el.style.height = el.scrollHeight + "px";
     };
 
-    const submitPost = () => {
-        if (!postDetails.body) return;
-        handlePost({ body: postDetails.body });
-        setPostDetails({ body: "" });
-        setShowEmojiPicker(false);
-        if (inputRef.current) inputRef.current.style.height = "auto"; // reset height
+    const submitPost = async () => {
+        if (selectedPostToReply) {
+            await handleCommentSubmit();
+            setPostDetails({ body: "" });
+            selectedPostToReply(null);
+        } else {
+            if (!postDetails.body) return;
+
+            await handlePost({ body: postDetails.body });
+            setPostDetails({ body: "" });
+            setShowEmojiPicker(false);
+
+            if (inputRef.current) inputRef.current.style.height = "auto";
+        }
+
+        await fetchPosts();
     };
 
     return (
@@ -76,11 +97,15 @@ const CreatePostBox = ({ handlePost, postDetails, setPostDetails, posting }) => 
 
             {/* Send Button */}
             <button
-                disabled={posting}
+                disabled={posting || commenting}
                 onClick={submitPost}
-                className="p-3 bg-[#FFD736] rounded-full text-black shadow flex items-center justify-center"
+                className="p-3 bg-[#FFD736] rounded-full text-black shadow flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
             >
-                <MessageCirclePlusIcon className="w-5 h-5" />
+                {posting || commenting ? (
+                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                ) : (
+                    <SendHorizontal className="w-5 h-5" />
+                )}
             </button>
         </div>
     );

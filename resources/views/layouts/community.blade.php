@@ -10,7 +10,7 @@
     <meta name="keywords" content="KingsleyKhord, service providers, local services, find services, connect with service providers">
     <meta name="author" content="LengendOSA Consultants">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#FFD736">
+    <meta name="theme-color" content="#302f2c">
     <meta name="google-site-verification" content="your-google-site-verification-code" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -19,21 +19,44 @@
    
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://js.paystack.co/v2/inline.js"></script>
-     <script src="https://js.stripe.com/v3/"></script>
-       {{-- <script src="/build/manifest.json"></script> --}}
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <!-- 🔌 Preconnects FIRST -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://js.paystack.co">
+    <link rel="preconnect" href="https://js.stripe.com">
 
+    <!-- 🎨 Fonts FIRST -->
+    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 
-    @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.js']) 
+    <!-- 🖌 Icons / CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+
+    <!-- ⚡ JS that MUST be available early -->
+    <script src="https://js.paystack.co/v2/inline.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- ⚙ JS that can wait -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js" defer></script>
+
+    <!-- 🚀 Your app LAST -->
+    @viteReactRefresh
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+    [x-cloak] { display: none !important; }
+</style>
+
 </head>
 <body x-data="{ isDark: false, showSidebar: false }" x-init class="bg-gray-100 dark:bg-gray-900 h-screen overflow-hidden">
 
@@ -163,12 +186,43 @@
                         </svg>
                         <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Midi Files</span>
                     </a>
-                    {{-- <a href="/member/community/space/piano-breakdowns"
-                       class="flex items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/piano-breakdowns') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <span class="text-lg">🎹</span>
-                        <span class="text-[#6B7280] dark:text-gray-300 text-sm font-medium">Piano Breakdowns</span>
-                    </a> --}}
+                      <div
+                         class="flex pt-10 items-center gap-3 px-2 py-3 rounded-lg transition-colors duration-200 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 {{ Request::is('member/community/space/midi-downloads') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        
+                            <form method="POST" action="{{ route('community.logout') }}">
+                                @csrf
+                               <button
+                                    type="submit"
+                                    class="group flex items-center gap-3 w-full
+                                        text-sm font-medium text-red-600 dark:text-red-400
+                                        hover:bg-red-50 dark:hover:bg-red-500/10
+                                        rounded-lg transition-all focus:outline-none
+                                        focus:ring-2 focus:ring-red-500/40"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="group-hover:translate-x-0.5 transition-transform"
+                                    >
+                                        <path d="m16 17 5-5-5-5" />
+                                        <path d="M21 12H9" />
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                    </svg>
+
+                                    <span>Logout</span>
+                                </button>
+
+                            </form>
+                        </div>
                     </div>
+                    
             </div>
 
             <!-- Quick Links - Mobile Only -->
@@ -212,7 +266,7 @@
             {{-- <div class="mt-8 fixed bottom-1 bg-gray-100 dark:bg-gray-700 rounded-md">
                 <a href="/kingsleykhord.com/home"
                    class="flex items-center space-x-2 px-4 py-2 rounded-md transition 
-                   {{ Request::is('kingsleykhord.com/home') ? 'bg-[#F0F3F5] text-[#545861] dark:text-[#E4E7EB] dark:bg-[#42464D] font-semibold' : 'hover:text-[#FFD736]' }}">
+                   {{ Request::is('kingsleykhord.com/home') ? 'bg-[#F0F3F5] text-[#545861] dark:text-[#E4E7EB] dark:bg-[#42464D] font-semibold' : 'hover:text-[#302f2c]' }}">
                     <i class="fa fa-sign-out" aria-hidden="true"></i>
                     <span>Back</span>
                     {{auth()->user()->first_name?? ""}} {{auth()->user()->last_name  ?? ''}}
@@ -227,7 +281,7 @@
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50">
             <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-              <button @click="showSidebar = !showSidebar" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-[#FFD736]">
+              <button @click="showSidebar = !showSidebar" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-[#302f2c]">
                   <i class="fa fa-bars text-xl"></i>
               </button>
                           
@@ -238,39 +292,48 @@
 
                 <!-- Center: Quick Links -->
                 <nav class="hidden lg:flex items-center space-x-16">
-                    <a href="/home" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="/home" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#0f0f0f] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
                         </svg>
-                        <span class="text-sm font-medium">Dashboard</span>
+                        <span class="text-sm font-medium hover:text-[16px]">Dashboard</span>
                     </a>
-                    <a href="https://khordsounds.com/" target="blank" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="https://khordsounds.com/" target="blank" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#302f2c] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
-                        <span class="text-sm font-medium">Shop Plugins</span>
+                        <span class="text-sm font-medium hover:text-[16px]">Shop Plugins</span>
                     </a>
-                    <a href="/member/live-session" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="/member/live-session" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#302f2c] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l2 2-2 2"></path>
                         </svg>
-                        <span class="text-sm font-medium">Live Sessions</span>
+                        <span class="text-sm font-medium hover:text-[16px]">Live Sessions</span>
                     </a>
-                    <a href="/member/support" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="/member/support" class="flex items-center space-x-1 text-gray-500 dark:text-gray-300 hover:text-[#302f2c] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <span class="text-sm font-medium">Support</span>
+                        <span class="text-sm font-medium hover:text-[16px]">Support</span>
                     </a>
                 </nav>
 
                 <!-- Right: Icons -->
                 <div class="flex items-center space-x-4">
                     <!-- Theme Toggle (Moon) -->
-                    <button @click="toggle" class="text-gray-500 dark:text-gray-300 hover:text-[#FFD736]" aria-label="Toggle Dark Mode">
-                        <svg x-show="!isDark" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor"
+                    <button @click="toggle" 
+                    class="text-gray-500 dark:text-gray-300 hover:text-[#302f2c] 
+                    hover:bg-[#302f2c]/10 
+                    dark:hover:bg-white/10
+                    p-2 rounded-full 
+                    hover:scale-105 transform
+                    transition-all duration-300"
+                        aria-label="Toggle Dark Mode"
+                        >
+                        <svg x-show="!isDark" xmlns="http://www.w3.org/2000/svg" 
+                        class="w-5 h-5" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path d="M12 3v1m0 16v1m8.66-12.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 4.95l-.71-.71M4.05 4.05l-.71-.71M12 5a7 7 0 100 14 7 7 0 000-14z"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -282,7 +345,13 @@
                         </svg>
                     </button>
 
-                    <button class="text-gray-500 dark:text-gray-300 hover:text-[#FFD736]" aria-label="Bookmarks">
+                    <button 
+                   class="text-gray-500 dark:text-gray-300 hover:text-[#302f2c] 
+                    hover:bg-[#302f2c]/10 
+                    dark:hover:bg-white/10
+                    p-2 rounded-full 
+                    hover:scale-105 transform
+                    transition-all duration-300" aria-label="Bookmarks">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
                                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -292,7 +361,6 @@
                     // Get latest 10 activities (global)
                    $notifications =  auth()->user()->notifications()
                         ->latest()
-                        ->take(5)
                         ->get(); 
                     @endphp
 
@@ -303,8 +371,13 @@
                     <button 
                         type="button"
                         onclick="document.getElementById('notificationDropdown').classList.toggle('hidden')" 
-                        class="text-gray-500 dark:text-gray-300 hover:text-[#FFD736] relative"
-                        aria-label="Notifications"
+                        class="text-gray-500 dark:text-gray-300 hover:text-[#302f2c] 
+                    hover:bg-[#302f2c]/10 
+                    dark:hover:bg-white/10
+                    p-2 rounded-full 
+                    hover:scale-105 transform
+                    transition-all duration-300"
+                    aria-label="Notifications"
                     >
                         <!-- Bell Icon -->
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -411,7 +484,7 @@
 
 
                     <!-- Profile Avatar -->
-                    <div x-data="{ open: false }" class="relative">
+                    {{-- <div x-data="{ open: false }" class="relative">
                         <!-- Avatar Button -->
                         <button
                             @click="open = !open"
@@ -466,7 +539,7 @@
 
                             </form>
                         </div>
-                    </div>
+                    </div> --}}
 
                 </div>
             </div>

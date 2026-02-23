@@ -6,7 +6,7 @@
   <div class="max-w-7xl mx-auto space-y-1">
 
     <!-- Breadcrumb & User -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center my-2">
       <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
         <a href="/home" class="hover:text-blue-600">Dashboard</a>
         <span>/</span>
@@ -38,9 +38,9 @@
       </div> --}}
     </div>
 
-    <div>
+    {{-- <div>
        <h1 class="text-xl font-bold">Ear Training</h1>
-    </div>
+    </div> --}}
   </div>
 </section>
 

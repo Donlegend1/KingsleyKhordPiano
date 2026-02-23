@@ -3,14 +3,13 @@
   style="background-image: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.2)), url('/images/banner2.jpg');">
   <!-- Content -->
   <div class="relative z-10 px-4 w-full max-w-4xl text-left sm:text-center">
-    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight sm:mb-0 mb-4">
+     <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight sm:mb-0 mb-4">
       Master Gospel Piano
-      <p class="justify-center text-3xl text-[#FFD736] italic font-playfair mb-6 mt-0">
+      <p class=" justify-center text-3xl sm:text-5xl lg:text-5xl text-[#FFD736] italic font-playfair mb-6 mt-1">
         and Play Like the Pros
-      </p>
+      </p>   
     </h1>
-
-    <p class="text-base sm:text-lg text-gray-200 font-light mb-8">
+    <p class="text-base sm:text-lg text-gray-200 font-semibold mb-8">
       Achieve Pro-Level Gospel Piano Skills—Even If You’re Starting from Scratch!
     </p>
 

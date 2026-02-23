@@ -49,6 +49,12 @@ class CommunityIndexController extends Controller
 
    public function pdfDownloads()
    {
+      $user = auth()->user();
+
+      if (!$user || !$user->hasActiveSubscription()) {
+         return redirect('/member/plan');
+      }
+
       $beginners = PDFDownload::where('category', 'beginners')->get();
       $intermediate = PDFDownload::where('category', 'intermediate')->get();
       $advanced = PDFDownload::where('category', 'advanced')->get();
@@ -58,6 +64,12 @@ class CommunityIndexController extends Controller
 
    public function audioDownloads()
    {
+      $user = auth()->user();
+
+      if (!$user || !$user->hasActiveSubscription()) {
+         return redirect('/member/plan');
+      }
+
       $tracksAndLoops = AudioDownload::where('category', 'tracks_loops')->get();
       $pianoPlays = AudioDownload::where('category', 'piano_plays')->get();
 
@@ -66,8 +78,14 @@ class CommunityIndexController extends Controller
 
    public function midiDownloads()
    {
+      $user = auth()->user();
+
+      if (!$user || !$user->hasActiveSubscription()) {
+         return redirect('/member/plan');
+      }
+
       $midiFiles = MidiFile::all();
-      // dd($midiFiles);
+
       return view('community.midi-files.midi-downloads', compact('midiFiles'));
    }
 }

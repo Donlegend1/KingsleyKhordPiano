@@ -113,7 +113,7 @@ export default function QuizCardWithModal() {
             return;
         }
         setCurrentQuestionIndex((prev) =>
-            prev < questions.length - 1 ? prev + 1 : prev
+            prev < questions.length - 1 ? prev + 1 : prev,
         );
     };
 
@@ -122,57 +122,70 @@ export default function QuizCardWithModal() {
     };
 
     const checkProgressAndRedirect = (newAnswers) => {
-    // Check if first 4 answers are provided
-    const firstFourComplete = [0, 1, 2, 3].every((i) => newAnswers[i]);
-    if (!firstFourComplete) return false;
+        // Check if first 4 answers are provided
+        const firstFourComplete = [0, 1, 2, 3].every((i) => newAnswers[i]);
+        if (!firstFourComplete) return false;
 
-    // If 4th question (index 3) is "No.", redirect to Beginner
-    if (newAnswers[3] === "No.") {
-        showMessage("You are in beginner level", "success");
-        window.location = "/member/course/beginner";
+        // If 4th question (index 3) is "No.", redirect to Beginner
+        if (newAnswers[3] === "No.") {
+            showMessage("You are in beginner level", "success");
+            window.location = "/member/course/beginner";
+            return true;
+        }
+
+        // Check if first 7 answers are provided
+        const firstSevenComplete = [0, 1, 2, 3, 4, 5, 6].every(
+            (i) => newAnswers[i],
+        );
+        if (!firstSevenComplete) return false;
+
+        // If 7th question (index 6) is "No.", redirect to Intermediate
+        if (newAnswers[6] === "No I dont.") {
+            showMessage("You are in intermediate level", "success");
+            window.location = "/member/course/intermediate";
+            return true;
+        }
+
+        // Check if all answers up to question 9 (index 8) are provided
+        const allQuestionsComplete = [0, 1, 2, 3, 4, 5, 6, 7, 8].every(
+            (i) => newAnswers[i],
+        );
+        if (!allQuestionsComplete) return false;
+
+        // If none of the above conditions matched, redirect to Advanced
+        showMessage("You are in advanced level", "success");
+        window.location = "/member/course/advanced";
+
         return true;
-    }
-
-    // Check if first 7 answers are provided
-    const firstSevenComplete = [0, 1, 2, 3, 4, 5, 6].every((i) => newAnswers[i]);
-    if (!firstSevenComplete) return false;
-
-    // If 7th question (index 6) is "No.", redirect to Intermediate
-    if (newAnswers[6] === "No I dont.") {
-        showMessage("You are in intermediate level", "success");
-        window.location = "/member/course/intermediate";
-        return true;
-    }
-
-    // Check if all answers up to question 9 (index 8) are provided
-    const allQuestionsComplete = [0, 1, 2, 3, 4, 5, 6, 7, 8].every((i) => newAnswers[i]);
-    if (!allQuestionsComplete) return false;
-
-    // If none of the above conditions matched, redirect to Advanced
-    showMessage("You are in advanced level", "success");
-    window.location = "/member/course/advanced";
-
-    return true;
-};
-
+    };
 
     return (
-        <div className="flex flex-col items-center justify-center p-4 bg-white border border-gray-300 rounded-lg w-full min-h-[200px]">
-            <div className="text-center my-5 mx-4 sm:mx-10">
-                <p className="text-gray-800 font-bold mb-2 text-base sm:text-lg">
-                    Take a Quick Quiz
-                </p>
-                <p className="text-gray-500 text-sm sm:text-base">
-                    This quick quiz will help us customize your learning
-                    experience and determine your skill level.
-                </p>
+        <div className="w-full bg-[#F6F7F8] border border-gray-200 rounded-2xl shadow-sm p-8 my-5 flex flex-col items-center text-center min-h-[260px]">
+            {/* Icons */}
+            <div className="flex items-center gap-4 mb-5 text-gray-700">
+                <i className="fa fa-music text-xl"></i>
+                <i className="fa fa-clipboard-list text-xl"></i>
             </div>
+
+            {/* Title */}
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Discover Your Level
+            </h3>
+
+            {/* Description */}
+            <p className="text-gray-600 text-sm leading-relaxed max-w-xs mb-8">
+                Find your perfect starting point and get a custom plan in under
+                2 minutes.
+            </p>
+
+            {/* CTA */}
             <button
                 onClick={openModal}
-                className="px-4 sm:px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
+                className="mt-auto px-6 py-2.5 bg-[#2F343A] text-white text-sm rounded-full
+                   hover:bg-black transition inline-flex items-center gap-2"
             >
                 Start Quiz
-                <i className="fa fa-angle-right ml-2" aria-hidden="true"></i>
+                <i className="fa fa-angle-right"></i>
             </button>
 
             {isModalOpen && (
@@ -259,7 +272,7 @@ export default function QuizCardWithModal() {
                                             {answer}
                                         </span>
                                     </label>
-                                )
+                                ),
                             )}
                         </div>
                     </div>
@@ -296,7 +309,7 @@ export default function QuizCardWithModal() {
 
 if (document.getElementById("getStartedQuiz")) {
     const Index = ReactDOM.createRoot(
-        document.getElementById("getStartedQuiz")
+        document.getElementById("getStartedQuiz"),
     );
 
     Index.render(
@@ -304,6 +317,6 @@ if (document.getElementById("getStartedQuiz")) {
             <FlashMessageProvider>
                 <QuizCardWithModal />
             </FlashMessageProvider>
-        </React.StrictMode>
+        </React.StrictMode>,
     );
 }

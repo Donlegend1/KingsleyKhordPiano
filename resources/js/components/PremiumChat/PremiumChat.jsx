@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom/client";
 import axios from "axios";
 import ChatWithComments from "./ChatWithComments.jsx";
@@ -16,11 +16,17 @@ const PremiumChat = () => {
 
     const [newComment, setNewComment] = useState("");
     const [commenting, setCommenting] = useState(false);
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    }, [posts]);
 
     const [sortBy, setSortBy] = useState("latest");
     const [posting, setPosting] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [selectedPost, setSelectedPost] = useState({});
+    const [selectedPostToReply, setSelectedPostToReply] = useState(null);
 
     const [postDetails, setPostDetails] = useState({
         body: "",
@@ -64,7 +70,7 @@ const PremiumChat = () => {
                     params: {
                         sort: sortBy,
                     },
-                }
+                },
             );
 
             const newPosts = response.data.data;
@@ -85,10 +91,6 @@ const PremiumChat = () => {
         fetchPosts();
     }, []);
 
-    const refreshPosts = async () => {
-        await fetchPosts();
-    };
-
     const handlePost = async (data) => {
         if (!handleValidation()) return;
         setPosting(true);
@@ -101,12 +103,12 @@ const PremiumChat = () => {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
-                }
+                },
             );
 
             // try to get created post from response
             const created = res.data?.data || res.data;
-            await refreshPosts();
+            fetchPosts();
 
             showMessage("Posted successfully.", "success");
 
@@ -115,6 +117,7 @@ const PremiumChat = () => {
             });
             setMediaFiles([]);
             setExpanded(false);
+            fetchPosts();
         } catch (error) {
             showMessage("Error creating post.", "error");
             console.error("Error creating post:", error);
@@ -141,15 +144,14 @@ const PremiumChat = () => {
         }
     };
 
-    const handleCommentSubmit = async (e) => {
-        e.preventDefault();
+    const handleCommentSubmit = async () => {
 
-        if (!newComment.trim()) {
+        if (!postDetails.body) {
             showMessage("Please add a comment", "error");
             return;
         }
 
-        if (!selectedPost?.id) {
+        if (!selectedPostToReply?.id) {
             showMessage("No post selected for comment", "error");
             return;
         }
@@ -157,36 +159,22 @@ const PremiumChat = () => {
         setCommenting(true);
 
         const comment = {
-            body: newComment,
+            body: postDetails.body,
         };
 
         try {
             const res = await axios.post(
-                `/api/member/premium/messages/${selectedPost.id}/reply`,
+                `/api/member/premium/messages/${selectedPostToReply.id}/reply`,
                 comment,
                 {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
-                }
+                },
             );
+            setSelectedPostToReply(null)
 
-            const created = res.data?.data || res.data;
-
-            // update the specific post's replies locally so UI updates
-            if (created && created.id) {
-                setPosts((prev) =>
-                    prev.map((p) =>
-                        p.id === selectedPost.id
-                            ? { ...p, replies: [...(p.replies || []), created] }
-                            : p
-                    )
-                );
-            } else {
-                // fallback: refetch posts
-                setPosts([]);
-                await fetchPosts();
-            }
+            fetchPosts();
 
             showMessage("Comment posted.", "success");
             setNewComment("");
@@ -199,15 +187,8 @@ const PremiumChat = () => {
         }
     };
 
-    // allow child components to apply small updates to a post (e.g. likes)
-    const handleUpdatePost = (id, patch) => {
-        setPosts((prev) =>
-            prev.map((p) => (p.id === id ? { ...p, ...patch } : p))
-        );
-    };
-
     // Calendar sidebar component (simple month grid with highlighted dates)
-    const CalendarSidebar = ({ events = [], upcomingLiveShow=[] }) => {
+    const CalendarSidebar = ({ events = [], upcomingLiveShow = [] }) => {
         const today = new Date();
         const year = today.getFullYear();
         const month = today.getMonth();
@@ -224,7 +205,7 @@ const PremiumChat = () => {
                 } catch (err) {
                     return null;
                 }
-            })
+            }),
         );
 
         const weeks = [];
@@ -274,7 +255,7 @@ const PremiumChat = () => {
                 </div>
 
                 {/* Upcoming section */}
-                <div className="mt-4 text-sm">
+                <div className="mt-7 text-sm">
                     <h5 className="font-semibold">Upcoming</h5>
                     <ul className="mt-2 space-y-2 text-xs">
                         {upcomingLiveShow.length > 0 ? (
@@ -282,11 +263,11 @@ const PremiumChat = () => {
                                 <li key={i} className="flex justify-between">
                                     <span>
                                         {new Date(
-                                            ev.start_time
+                                            ev.start_time,
                                         ).toLocaleDateString()}{" "}
                                         —{" "}
                                         {new Date(
-                                            ev.start_time
+                                            ev.start_time,
                                         ).toLocaleTimeString([], {
                                             hour: "2-digit",
                                             minute: "2-digit",
@@ -338,21 +319,20 @@ const PremiumChat = () => {
     return (
         <div className="flex gap-6">
             {/* Left: Chat area */}
-            <div className="flex-1 flex flex-col h-[70vh] bg-transparent">
-                <div className="flex-1 overflow-y-auto p-2 space-y-3 my-5">
+            <div className="h-full flex flex-col bg-[#f3f1ed] my-3 dark:bg-gray-900">
+                {/* Messages area */}
+                <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
                     {posts.map((post) => (
                         <ChatWithComments
                             key={post.id}
-                            setSelectedPost={setSelectedPost}
                             post={post}
-                            newComment={newComment}
-                            setNewComment={setNewComment}
-                            handleCommentSubmit={handleCommentSubmit}
+                            fetchPosts={fetchPosts}
                             handleDeletePost={handleDeletePost}
-                            commenting={commenting}
-                            onUpdatePost={handleUpdatePost}
+                            setSelectedPostToReply={setSelectedPostToReply}
                         />
                     ))}
+
+                    <div ref={messagesEndRef} />
 
                     {loading && showSkeleton && posts.length > 0 ? (
                         <div>
@@ -372,24 +352,51 @@ const PremiumChat = () => {
                 </div>
 
                 {/* Sticky / bottom input area */}
-                <div className="mt-2">
+                <div className="mt-2 mx-5">
+                    {selectedPostToReply && (
+                        <div className="relative mb-3 flex gap-3 rounded-xl bg-gray-50 px-4 py-3 dark:bg-gray-800">
+                            {/* Close button */}
+                            <button
+                                onClick={() => setSelectedPostToReply(null)}
+                                className="absolute right-2 top-2 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                            >
+                                ✕
+                            </button>
+
+                            {/* Accent bar */}
+                            <div className="w-1 rounded-full bg-blue-500" />
+
+                            <div className="flex-1 pr-6">
+                                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    {selectedPostToReply.user.first_name}
+                                </p>
+
+                                <p className="mt-1 text-sm text-gray-600 line-clamp-2 dark:text-gray-400">
+                                    {selectedPostToReply.body}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <CreatePostBox
                         handlePost={handlePost}
                         postDetails={postDetails}
                         setPostDetails={setPostDetails}
                         posting={posting}
-                        expanded={expanded}
-                        setExpanded={setExpanded}
-                        mediaFiles={mediaFiles}
-                        setMediaFiles={setMediaFiles}
-                        subcategory={null}
+                        fetchPosts={fetchPosts}
+                        handleCommentSubmit={handleCommentSubmit}
+                        selectedPostToReply={selectedPostToReply}
+                        commenting ={commenting}
                     />
                 </div>
             </div>
 
             {/* Right: calendar sidebar */}
-            <div className=" hidden md:flex w-80">
-                <CalendarSidebar events={liveShows} upcomingLiveShow={upcomingLiveShow} />
+            <div className=" hidden md:flex w-80 max-h-60">
+                <CalendarSidebar
+                    events={liveShows}
+                    upcomingLiveShow={upcomingLiveShow}
+                />
             </div>
         </div>
     );
@@ -405,6 +412,6 @@ if (document.getElementById("premium-chat")) {
             <FlashMessageProvider>
                 <PremiumChat />
             </FlashMessageProvider>
-        </React.StrictMode>
+        </React.StrictMode>,
     );
 }

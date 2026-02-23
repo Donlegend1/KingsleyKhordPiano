@@ -140,28 +140,32 @@
   </div>
 </section>
 
-<section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
- <div class="font-bold mb-5 text-[22px]">
-  <p>
-   Step 2 - Find your Best Path & Choose your Skill Level
-  </p>
- </div>
- <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 items-center justify-center">
-  <!-- Card 1 -->
- <div id="getStartedQuiz">
-
- </div>
-
-  <!-- Center "OR" -->
-  <div class="flex items-center justify-center h-full">
-    <p class="text-gray-500 font-semibold mx-4">OR</p>
+<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-12 pb-8 px-5 md:px-12 md:mx-auto md:max-w-6xl">
+  <!-- Section Title -->
+  <div class="font-bold mb-6 text-2xl md:text-3xl text-center md:text-left">
+    Step 2 - Find your Best Path & Choose your Skill Level
   </div>
 
-  <!-- Card 2 -->
-<div id="free-call"></div>
-<!-- Calendly inline widget end -->
-</div>
+  <!-- Cards Container with single border and gray background -->
+  <div class="flex flex-col md:flex-row items-center justify-center bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-6 space-y-4 md:space-y-0 md:space-x-6">
+    
+    <!-- Card 1 -->
+    <div id="getStartedQuiz" class="flex-1  dark:bg-gray-900 rounded-lg p-6  hover:shadow-md transition-shadow duration-300">
+      
+    </div>
+
+    <!-- Center "OR" -->
+    <div class="flex items-center justify-center">
+      <p class="text-gray-500 font-semibold mx-4 text-lg">OR</p>
+    </div>
+
+    <!-- Card 2 -->
+    <div id="free-call" class="flex-1  dark:bg-gray-900 rounded-lg p-6  hover:shadow-md transition-shadow duration-300">
+      
+
+  </div>
 </section>
+
 
   <section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-10 pb-5 px-5 md:px-12">
     <div class="font-bold mb-5 text-[22px]">

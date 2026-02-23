@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Unicodeveloper\Paystack\Facades\Paystack;
+use App\Services\Paystack\PaystackSubscriptionService;
 use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use Illuminate\Support\Facades\Http;
@@ -14,120 +14,118 @@ use App\Models\Plan;
 use App\Models\User;
 use App\Models\Subscription;
 use App\Http\Requests\ManualPaymentRequest;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
-    
+
     public function initialize(Request $request)
     {
-        $user = Auth::user(); 
-    
-        if (!$user) {
-            return redirect('register');
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return redirect('register');
+            }
+            
+            $reference = Str::uuid()->toString();
+            $plan =Plan::find($request->plan_id);
+            Subscription::create([
+                'user_id' => Auth::id(),
+                'status' => 'pending',
+                'type' => 'default',
+                'stripe_status' => 'pending',
+                'payment_method' => 'paystack',
+
+            ]);
+
+            $payload = [
+                'email' => $user->email,
+                'plan' => $plan->paystack_product_id,
+                'reference' => $reference,
+                "amount"=> $plan->price_ngn *100, 
+                'callback_url' => route('payment.verify'),
+                'metadata' => [
+                    'user_id' => $user->id,
+                ],
+            ];
+
+            $response = Http::withToken(config('services.paystack.secret_key'))
+                ->acceptJson()
+                ->post('https://api.paystack.co/transaction/initialize', $payload);
+
+            if (!$response->successful()) {
+                Log::error('Paystack initialize failed', [
+                    'user_id' => $user->id,
+                    'payload' => $payload,
+                    'status' => $response->status(),
+                    'response' => $response->json(),
+                ]);
+
+                return response()->json([
+                    'error' => 'Unable to initialize subscription',
+                ], 500);
+            }
+
+            $data = $response->json();
+
+            if (!($data['status'] ?? false) || empty($data['data']['authorization_url'])) {
+                Log::warning('Paystack returned invalid initialize response', [
+                    'user_id' => $user->id,
+                    'response' => $data,
+                ]);
+
+                return response()->json([
+                    'error' => 'Invalid payment response',
+                ], 500);
+            }
+
+            return redirect()->away($data['data']['authorization_url']);
+
+        } catch (\Throwable $e) {
+
+            Log::critical('Paystack subscription initialization exception', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'error' => 'Unable to initialize subscription',
+            ], 500);
         }
-    
-        $reference = Str::uuid()->toString(); 
-
-        $plan = Plan::where('type', $request->duration)->where('tier', $request->tier)->first();
-        // dd($plan);
-       
-        DB::table('payments')->insert([
-            'user_id' => $user->id,
-            'reference' => $reference,
-            'amount' => $plan->price_ngn,
-            'metadata' => json_encode($request->all()),
-            'payment_method' =>'paystack',
-            'starts_at' => now(),
-            'notified_at' => null,
-            'ends_at' =>  $request->duration ==="monthly" ? now()->addMonth(1) : now()->addYear(),
-            'status' => 'pending',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $user = Auth::user();
-        $user->metadata = $request->all();
-        $user->premium = $request->tier === 'premium';
-        $user->payment_method ='paystack';
-        $user->last_payment_reference = $reference;
-        $user->last_payment_amount = $plan->price_ngn;
-        $user->last_payment_at = now();
-        $user->save();
-    
-        $fields = [
-            'email' => $user->email,
-            'amount' => $plan->price_ngn * 100,
-            'reference' => $reference,
-            'metadata' => json_encode(['user_id' => $user->id, 'payload' => $request->all()]),
-            'callback_url' => route('payment.verify'), 
-        ];
-    
-        $fields_string = http_build_query($fields);
-    
-        $ch = curl_init();
-    
-        curl_setopt($ch, CURLOPT_URL, "https://api.paystack.co/transaction/initialize");
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Authorization: Bearer " . config('services.paystack.secret_key'),
-            "Cache-Control: no-cache",
-        ]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    
-        $result = curl_exec($ch);
-        curl_close($ch);
-    
-        $response = json_decode($result, true);
-
-        // dd($response);
-        if ($response['status'] && isset($response['data']['authorization_url'])) {
-            return redirect()->away($response['data']['authorization_url']);
-        }
-    
-        return response()->json(['error' => 'Unable to initialize payment'], 500);
     }
 
-    public function handlePaystackCallback(Request $request)
+    public function handlePaystackCallback(Request $request, PaystackSubscriptionService $service)
     {
         $reference = $request->query('reference');
-    
+
         if (!$reference) {
             return response()->json(['error' => 'No transaction reference supplied'], 400);
         }
-    
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . config('services.paystack.secret_key'),
-            'Cache-Control' => 'no-cache',
-        ])->get("https://api.paystack.co/transaction/verify/{$reference}");
-    
-        if ($response->successful()) {
-            $data = $response->json();
-    
-            if ($data['data']['status'] === 'success') {
-                DB::table('payments')->where('reference', $reference)->update([
-                    'status' => 'successful',
-                    'updated_at' => now(),
-                ]);
-                $user = Auth::user();
-                $user->payment_status = 'successful';
-                $user->save();
-    
-                return redirect()->route('home')->with('success', 'Payment verified successfully');
-            } else {
 
-                DB::table('payments')->where('reference', $reference)->update([
-                    'status' => 'failed',
-                    'updated_at' => now(),
-                ]);
-    
-                return redirect()->route('home')->with('success', 'Payment not successfully');
-            }
+        $response = Http::withToken(config('services.paystack.secret_key'))
+            ->get("https://api.paystack.co/transaction/verify/{$reference}");
+
+        if (!$response->successful()) {
+            return response()->json(['error' => 'Verification failed'], 500);
         }
-    
-        return response()->json(['error' => 'Verification failed'], 500);
+
+        $data = $response->json()['data'];
+
+        if ($data['status'] !== 'success') {
+            // Mark subscription as failed
+            Subscription::where('user_id', $data['metadata']['user_id'])
+                ->update(['status' => 'failed']);
+
+            return redirect()->route('home')->with('error', 'Payment failed');
+        }
+
+        $user =User::where('email', $data['email'])->first();
+        $service->store($user, $data);
+
+        return redirect()->route('home')->with('success', 'Subscription activated');
     }
-      
 
     public function redirectToStripe(Request $request)
     {
@@ -228,6 +226,116 @@ class PaymentController extends Controller
                 'message' => 'Manual payment failed. ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function handlePaystackWebhook(Request $request)
+    {
+        $payload = $request->getContent();
+        $signature = $request->header('x-paystack-signature');
+
+        if (!$signature) {
+            return response()->json(['message' => 'Missing signature'], 400);
+        }
+
+        if ($signature !== hash_hmac('sha512', $payload, config('services.paystack.secret_key'))) {
+            return response()->json(['message' => 'Invalid signature'], 401);
+        }
+
+        $event = $request->event;
+        $data  = $request->data;
+
+        try {
+            switch ($event) {
+
+                case 'subscription.create':
+                    $this->onSubscriptionCreated($data);
+                    break;
+
+                case 'invoice.payment_success':
+                    $this->onInvoicePaymentSuccess($data);
+                    break;
+
+                case 'invoice.payment_failed':
+                    $this->onInvoicePaymentFailed($data);
+                    break;
+
+                case 'subscription.disable':
+                    $this->onSubscriptionDisabled($data);
+                    break;
+            }
+
+            return response()->json(['status' => 'success']);
+
+        } catch (\Throwable $e) {
+            logger()->error('Paystack Webhook Error', [
+                'event' => $event,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Paystack expects 200 to stop retries
+            return response()->json(['status' => 'error'], 200);
+        }
+    }
+
+    protected function onSubscriptionCreated(array $data)
+    {
+        logger()->info(['web hook data' => $data]);
+        $user = User::where('email', $data['email'])->first();
+        Subscription::updateOrCreate(
+            ['user_id' => $user->id ,],
+            [
+                'subscription_code' => $data['subscription_code'],
+                'plan_code' => $data['plan']['plan_code'],
+                'email_token' => $data['email_token'],
+                'ends_at' => $data['period_end'],
+                'status' => 'active',
+            ]
+        );
+    }
+
+    protected function onInvoicePaymentSuccess(array $data)
+    {
+        $subscriptionCode = $data['subscription']['subscription_code'];
+
+        $subscription = Subscription::where('subscription_code', $subscriptionCode)->first();
+
+        if (!$subscription) {
+            return;
+        }
+
+        $subscription->update(['status' => 'active']);
+
+    }
+
+    protected function onInvoicePaymentFailed(array $data)
+    {
+        $subscriptionCode = $data['subscription']['subscription_code'];
+
+        $subscription = Subscription::where('subscription_code', $subscriptionCode)->first();
+
+        if (!$subscription) {
+            return;
+        }
+
+        $subscription->update(['status' => 'past_due']);
+
+        $subscription->user->update([
+            'payment_status' => 'past_due',
+        ]);
+    }
+
+    protected function onSubscriptionDisabled(array $data)
+    {
+        $subscriptionCode = $data['subscription_code'];
+
+        $subscription = Subscription::where('subscription_code', $subscriptionCode)->first();
+
+        if (!$subscription) {
+            return;
+        }
+
+        $subscription->update(['status' => 'cancelled']);
+
     }
 
 }

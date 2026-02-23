@@ -1,14 +1,16 @@
 @extends("layouts.app")
 
 @section("content")
-@include("components.pricebanner")
+{{-- @include("components.pricebanner") --}}
+@include("components.youtube")
+
 
 @include("components.features")
-@include("components.youtube")
 
 @include("components.approach")
 @include("components.membership")
 @include("components.practise")
+@include("components.services")
 {{-- @include("components.price") --}}
 <div>
 <div id="plan-switch" >

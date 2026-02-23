@@ -37,7 +37,7 @@ const SubCategory = () => {
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
-    
+
     const activeSubscription = window.activeSubscription;
 
     function enforceExclusiveFeedAccess() {
@@ -168,39 +168,6 @@ const SubCategory = () => {
         }
     }, []);
 
-    const fetchLatestUpdates = useCallback(async () => {
-        try {
-            setLatestUpdates([
-                {
-                    id: 1,
-                    user: "John",
-                    action: "posted an update",
-                    time: "4 years ago",
-                },
-                {
-                    id: 2,
-                    user: "Adele",
-                    action: "posted an update",
-                    time: "4 years ago",
-                },
-                {
-                    id: 3,
-                    user: "John",
-                    action: "posted an update",
-                    time: "5 years ago",
-                },
-                {
-                    id: 4,
-                    user: "John",
-                    action: "posted an update in the group Coffee Addicts",
-                    time: "5 years ago",
-                },
-            ]);
-        } catch (error) {
-            console.error("Error fetching latest updates:", error);
-        }
-    }, []);
-
     const handleValidation = () => {
         if (!postDetails.subcategory) {
             showMessage("Please select a category.", "error");
@@ -210,53 +177,50 @@ const SubCategory = () => {
     };
 
     // Accept an optional pageArg so callers can force a specific page (useful after create/delete)
-    const fetchPostsByCategory = useCallback(
-        async (pageArg) => {
-            // if pageArg is provided use it, otherwise fall back to state `page`
-            const targetPage = typeof pageArg !== "undefined" ? pageArg : page;
+    const fetchPostsByCategory = useCallback(async (pageArg) => {
+        // if pageArg is provided use it, otherwise fall back to state `page`
+        const targetPage = typeof pageArg !== "undefined" ? pageArg : page;
 
-            if (!hasMore && typeof pageArg === "undefined") return;
-            if (loading) return;
+        if (!hasMore && typeof pageArg === "undefined") return;
+        if (loading) return;
 
-            setLoading(true);
-            let url = "";
-            if (lastSegment === "exclusive-feed") {
-                url = `/api/member/posts/exclusive`;
-            } else {
-                url = `/api/member/posts`;
-            }
+        setLoading(true);
+        let url = "";
+        if (lastSegment === "exclusive-feed") {
+            url = `/api/member/posts/exclusive`;
+        } else {
+            url = `/api/member/posts`;
+        }
 
-            try {
-                const response = await axios.get(url, {
-                    params: {
-                        page: targetPage,
-                        sort: sortBy,
-                        subcategory: lastSegment,
-                    },
-                });
+        try {
+            const response = await axios.get(url, {
+                params: {
+                    page: targetPage,
+                    sort: sortBy,
+                    subcategory: lastSegment,
+                },
+            });
 
-                const newPosts = response.data.data;
-                const currentPage = response.data.current_page;
-                const lastPage = response.data.last_page;
+            const newPosts = response.data.data;
+            const currentPage = response.data.current_page;
+            const lastPage = response.data.last_page;
 
-                setPosts((prev) => {
-                    const existingIds = new Set(prev.map((p) => p.id));
-                    const uniqueNewPosts = newPosts.filter(
-                        (p) => !existingIds.has(p.id),
-                    );
+            setPosts((prev) => {
+                const existingIds = new Set(prev.map((p) => p.id));
+                const uniqueNewPosts = newPosts.filter(
+                    (p) => !existingIds.has(p.id),
+                );
 
-                    return [...prev, ...uniqueNewPosts];
-                });
+                return [...prev, ...uniqueNewPosts];
+            });
 
-                setHasMore(currentPage < lastPage);
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            } finally {
-                setLoading(false);
-            }
-        },
-        [sortBy, hasMore, loading, page],
-    );
+            setHasMore(currentPage < lastPage);
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         setPosts([]);
@@ -286,8 +250,7 @@ const SubCategory = () => {
 
     useEffect(() => {
         fetchUserProfile();
-        fetchLatestUpdates();
-    }, [fetchUserProfile, fetchLatestUpdates]);
+    }, [fetchUserProfile]);
 
     const handlePost = async (data) => {
         if (!handleValidation()) return;
@@ -312,8 +275,7 @@ const SubCategory = () => {
             setPosts([]);
             setPage(1);
             setHasMore(true);
-            // Force refetch the first page so the newly created post appears according to server ordering
-            await fetchPostsByCategory(1);
+            window.location.reload();
         } catch (error) {
             showMessage("Error creating post.", "error");
             console.error("Error creating post:", error);
@@ -383,11 +345,11 @@ const SubCategory = () => {
     const getProfileCompletionData = () => {
         if (!userProfile) return { completionPercentage: 0, fields: {} };
 
-        const totalFields = 6;
-        let completedFields = 0;
+        const totalFields = 4;
+        let completedFields = 1;
 
         const hasProfilePhoto = !!userProfile.passport;
-        const hasBiography = !!userProfile.biography;
+        // const hasBiography = !!userProfile.biography;
         const hasSocialMedia = !!(
             userProfile.instagram ||
             userProfile.youtube ||
@@ -395,19 +357,20 @@ const SubCategory = () => {
             userProfile.tiktok
         );
         const hasSkillLevel = !!userProfile.skill_level;
-        const hasPhoneNumber = !!userProfile.phone_number;
+        // const hasPhoneNumber = !!userProfile.phone_number;
         const hasCountry = !!userProfile.country;
 
         if (hasProfilePhoto) completedFields++;
-        if (hasBiography) completedFields++;
+        // if (hasBiography) completedFields++;
         if (hasSocialMedia) completedFields++;
         if (hasSkillLevel) completedFields++;
-        if (hasPhoneNumber) completedFields++;
+        // if (hasPhoneNumber) completedFields++;
         if (hasCountry) completedFields++;
 
         const completionPercentage = Math.round(
             (completedFields / totalFields) * 100,
         );
+
         const strokeDashoffset =
             339.292 - (339.292 * completionPercentage) / 100;
 
@@ -416,10 +379,10 @@ const SubCategory = () => {
             strokeDashoffset,
             fields: {
                 hasProfilePhoto,
-                hasBiography,
+                // hasBiography,
                 hasSocialMedia,
                 hasSkillLevel,
-                hasPhoneNumber,
+                // hasPhoneNumber,
                 hasCountry,
             },
         };
@@ -534,7 +497,7 @@ const SubCategory = () => {
                             </h3>
                             <a
                                 href="/member/profile"
-                                className="text-sm text-yellow-500 hover:text-yellow-600 font-medium transition-colors"
+                                className="text-sm text-green-500 dark:text-white hover:text-[#09941c] font-medium transition-colors"
                             >
                                 Edit Profile →
                             </a>
@@ -577,6 +540,7 @@ const SubCategory = () => {
                                             getProfileCompletionData()
                                                 .completionPercentage
                                         }
+                                        {/* {getProfileCompletionData().completionPercentage} */}
                                     </span>
                                     <span className="text-base text-gray-500">
                                         %
@@ -617,7 +581,7 @@ const SubCategory = () => {
                             </div>
 
                             {/* Biography */}
-                            <div className="flex items-center justify-between">
+                            {/* <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     {getProfileCompletionData().fields
                                         .hasBiography ? (
@@ -640,7 +604,7 @@ const SubCategory = () => {
                                         </>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Social Media Links */}
                             <div className="flex items-center justify-between">
@@ -695,7 +659,7 @@ const SubCategory = () => {
                             </div>
 
                             {/* Phone Number */}
-                            <div className="flex items-center justify-between">
+                            {/* <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     {getProfileCompletionData().fields
                                         .hasPhoneNumber ? (
@@ -718,7 +682,7 @@ const SubCategory = () => {
                                         </>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Location / Country */}
                             <div className="flex items-center justify-between">
@@ -755,37 +719,45 @@ const SubCategory = () => {
                         </h3>
 
                         <div className="space-y-4">
-                            {latestUpdates.map((update) => (
-                                <div
-                                    key={update.id}
-                                    className="flex items-start gap-3"
-                                >
-                                    <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                                        <svg
-                                            className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                                clipRule="evenodd"
-                                            ></path>
-                                        </svg>
+                            {posts
+                                .filter((post) => post.blocks?.[0]?.content) // only posts with content
+                                .slice(0, 5)
+                                .map((update, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-start gap-3"
+                                    >
+                                        <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                                            <svg
+                                                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-sm text-gray-800 dark:text-gray-200">
+                                                <span className="font-semibold">
+                                                    {update.user?.first_name}
+                                                </span>{" "}
+                                                Posted{" "}
+                                                {update.blocks?.[0]?.content}
+                                            </p>
+
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                {new Date(
+                                                    update.created_at,
+                                                ).toLocaleString()}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-gray-800 dark:text-gray-200">
-                                            <span className="font-semibold">
-                                                {update.user}
-                                            </span>{" "}
-                                            {update.action}
-                                        </p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            {update.time}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </div>
                 </div>
