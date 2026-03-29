@@ -68,9 +68,9 @@ class ChatMessageController extends Controller
             ->where('id', '!=', $user->id)
             ->get();
 
-        // foreach ($recipients as $recipient) {
-        //     $recipient->notify(new NewChatMessageNotification($message, $user));
-        // }
+        foreach ($recipients as $recipient) {
+            $recipient->notify(new NewChatMessageNotification($message, $user));
+        }
 
         DB::commit();
 

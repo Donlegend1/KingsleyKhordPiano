@@ -5,17 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\PDFDownload;
 use App\Http\Requests\StorePDFDownloadRequest;
 use App\Http\Requests\UpdatePDFDownloadRequest;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PDFDownloadController extends Controller
 {
+    /**
+     * Resolve full server path from stored relative path
+     */
+    private function resolveFullPath(string $relativePath): string
+    {
+        return base_path('../public_html/' . ltrim($relativePath, '/'));
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-
         return view('admin.pdf-download.index');
     }
 
@@ -25,10 +30,7 @@ class PDFDownloadController extends Controller
     public function fetchAll()
     {
         try {
-            $pdfs = PDFDownload::all();
-
-            return response()->json($pdfs);
-
+            return response()->json(PDFDownload::all());
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -40,65 +42,50 @@ class PDFDownloadController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-     public function store(StorePDFDownloadRequest $request)
+    public function store(StorePDFDownloadRequest $request)
     {
         try {
             $data = $request->validated();
-    
+
             // ---------- PDF upload ----------
             if ($request->hasFile('file_url')) {
-    
                 $pdf = $request->file('file_url');
-    
-                // New file name
                 $pdfName = time() . '_' . $pdf->getClientOriginalName();
-    
-                // Destination
                 $pdfDestination = base_path('../public_html/uploads/pdfs');
-    
-                // Create folder if missing
+
                 if (!file_exists($pdfDestination)) {
                     mkdir($pdfDestination, 0755, true);
                 }
-    
-                // Move file
+
                 $pdf->move($pdfDestination, $pdfName);
-    
-                // Clean public path
-                $data['file_url'] = "/uploads/pdfs/$pdfName";
+
+                // Consistent: no leading slash
+                $data['file_url'] = "uploads/pdfs/$pdfName";
             }
-    
+
             // ---------- Thumbnail upload ----------
             if ($request->hasFile('thumbnail')) {
-    
                 $thumbnail = $request->file('thumbnail');
-    
-                // New file name
                 $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-    
-                // Destination
                 $thumbDestination = base_path('../public_html/uploads/pdf-thumbnails');
-    
-                // Create folder if missing
+
                 if (!file_exists($thumbDestination)) {
                     mkdir($thumbDestination, 0755, true);
                 }
-    
-                // Move file
+
                 $thumbnail->move($thumbDestination, $thumbnailName);
-    
-                // Clean public path
+
+                // Consistent: no leading slash
                 $data['thumbnail'] = "uploads/pdf-thumbnails/$thumbnailName";
             }
-    
-            // Create record
+
             PDFDownload::create($data);
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'PDF created successfully',
             ], 201);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -107,20 +94,22 @@ class PDFDownloadController extends Controller
         }
     }
 
-
     /**
      * Download the PDF file.
      */
     public function download(PDFDownload $pDFDownload)
     {
         try {
+            $fullPath = $this->resolveFullPath($pDFDownload->file_url);
 
-        $filePath = $pDFDownload->file_url;
-        
-        if (file_exists($filePath)) {
-            return response()->download($filePath);
-        }
-      
+            if (file_exists($fullPath)) {
+                return response()->download($fullPath);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'File not found',
+            ], 404);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -141,17 +130,16 @@ class PDFDownloadController extends Controller
             // ---------- PDF upload ----------
             if ($request->hasFile('file_url')) {
 
-                // Old PDF path
+                // Delete old file
                 if ($pDFDownload->file_url) {
-                    $oldPdfPath = base_path('../public_html' . $pDFDownload->file_url);
-                    if (file_exists($oldPdfPath)) {
-                        unlink($oldPdfPath);
+                    $oldPath = $this->resolveFullPath($pDFDownload->file_url);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
                     }
                 }
 
                 $pdf = $request->file('file_url');
                 $pdfName = time() . '_' . $pdf->getClientOriginalName();
-
                 $pdfDestination = base_path('../public_html/uploads/pdfs');
 
                 if (!file_exists($pdfDestination)) {
@@ -160,15 +148,16 @@ class PDFDownloadController extends Controller
 
                 $pdf->move($pdfDestination, $pdfName);
 
+                // Consistent: no leading slash
                 $data['file_url'] = "uploads/pdfs/$pdfName";
             }
 
             // ---------- Thumbnail upload ----------
             if ($request->hasFile('thumbnail')) {
 
-                // Old thumbnail path
+                // Delete old thumbnail
                 if ($pDFDownload->thumbnail) {
-                    $oldThumbPath = base_path('../public_html' . $pDFDownload->thumbnail);
+                    $oldThumbPath = $this->resolveFullPath($pDFDownload->thumbnail);
                     if (file_exists($oldThumbPath)) {
                         unlink($oldThumbPath);
                     }
@@ -176,7 +165,6 @@ class PDFDownloadController extends Controller
 
                 $thumbnail = $request->file('thumbnail');
                 $thumbnailName = time() . '_' . $thumbnail->getClientOriginalName();
-
                 $thumbDestination = base_path('../public_html/uploads/pdf-thumbnails');
 
                 if (!file_exists($thumbDestination)) {
@@ -185,10 +173,10 @@ class PDFDownloadController extends Controller
 
                 $thumbnail->move($thumbDestination, $thumbnailName);
 
-                $data['thumbnail'] = "/uploads/pdf-thumbnails/$thumbnailName";
+                // Consistent: no leading slash
+                $data['thumbnail'] = "uploads/pdf-thumbnails/$thumbnailName";
             }
 
-            // Update DB
             $pDFDownload->update($data);
 
             return response()->json([
@@ -211,17 +199,20 @@ class PDFDownloadController extends Controller
     public function destroy(PDFDownload $pDFDownload)
     {
         try {
-            // Delete the PDF file
-            if ($pDFDownload->file_url && file_exists(public_path($pDFDownload->file_url))) {
-                unlink(public_path($pDFDownload->file_url));
+            if ($pDFDownload->file_url) {
+                $pdfPath = $this->resolveFullPath($pDFDownload->file_url);
+                if (file_exists($pdfPath)) {
+                    unlink($pdfPath);
+                }
             }
 
-            // Delete the thumbnail file
-            if ($pDFDownload->thumbnail && file_exists(public_path($pDFDownload->thumbnail))) {
-                unlink(public_path($pDFDownload->thumbnail));
+            if ($pDFDownload->thumbnail) {
+                $thumbPath = $this->resolveFullPath($pDFDownload->thumbnail);
+                if (file_exists($thumbPath)) {
+                    unlink($thumbPath);
+                }
             }
 
-            // Delete the database record
             $pDFDownload->delete();
 
             return response()->json([

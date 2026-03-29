@@ -133,20 +133,20 @@ class AudioDownloadController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AudioDownload $audioDownload)
-    {
-        try {
-            if (file_exists(public_path($audioDownload->audio_file))) {
-                unlink(public_path($audioDownload->audio_file));
-            }
+    // public function destroy(AudioDownload $audioDownload)
+    // {
+    //     try {
+    //         if (file_exists(public_path($audioDownload->audio_file))) {
+    //             unlink(public_path($audioDownload->audio_file));
+    //         }
 
-            $audioDownload->delete();
+    //         $audioDownload->delete();
 
-            return response()->json(['message' => 'Audio deleted successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
+    //         return response()->json(['message' => 'Audio deleted successfully']);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
 
     /**
      * Get all audio downloads
@@ -160,14 +160,45 @@ class AudioDownloadController extends Controller
     /**
      * Download audio file
      */
-    public function download(AudioDownload $audioDownload)
-    {
-        $filePath = $audioDownload->audio_file;
-        
-        if (file_exists($filePath)) {
-            return response()->download($filePath);
+   /**
+ * Helper to resolve full server path from stored relative path
+ */
+private function resolveFullPath(string $relativePath): string
+{
+    return base_path('../public_html/' . ltrim($relativePath, '/'));
+}
+
+/**
+ * Remove the specified resource from storage.
+ */
+public function destroy(AudioDownload $audioDownload)
+{
+    try {
+        $fullPath = $this->resolveFullPath($audioDownload->audio_file);
+
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
         }
 
-        return response()->json(['error' => 'File not found'], 404);
+        $audioDownload->delete();
+
+        return response()->json(['message' => 'Audio deleted successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
+/**
+ * Download audio file
+ */
+public function download(AudioDownload $audioDownload)
+{
+    $fullPath = $this->resolveFullPath($audioDownload->audio_file);
+
+    if (file_exists($fullPath)) {
+        return response()->download($fullPath);
+    }
+
+    return response()->json(['error' => 'File not found'], 404);
+}
 }

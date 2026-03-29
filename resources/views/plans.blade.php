@@ -13,6 +13,7 @@
 @include("components.services")
 {{-- @include("components.price") --}}
 <div>
+    <div id="pricing" class="mt-10"></div>
 <div id="plan-switch" >
    
 </div>

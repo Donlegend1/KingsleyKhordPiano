@@ -17,15 +17,17 @@ class ResendEmailCampaignService
 
     public function resend(EmailCampaign $emailCampaign): EmailCampaign
     {
-        return DB::transaction(function () use ($emailCampaign) {
+        DB::transaction(function () use ($emailCampaign) {
 
-            $emailCampaign->status = 'sent';
-            $emailCampaign->sent_at = Carbon::now();
-            $emailCampaign->save();
-
-            $this->emailService->dispatchEmails($emailCampaign);
-
-            return $emailCampaign;
+            $emailCampaign->update([
+                'status' => 'sent',
+                'sent_at' => Carbon::now(),
+            ]);
         });
+
+        // Dispatch emails AFTER transaction commits
+        $this->emailService->dispatchEmails($emailCampaign);
+
+        return $emailCampaign->fresh();
     }
 }

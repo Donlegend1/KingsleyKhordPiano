@@ -72,7 +72,7 @@ class MidiFileController extends Controller
             $thumbnail->move($destination, $thumbnailName);
 
             // Save clean public path
-            $data['thumbnail_path'] = "/midi-files/thumbnails/$thumbnailName";
+            $data['thumbnail_path'] = "midi-files/thumbnails/$thumbnailName";
         }
 
         // LMV upload
@@ -154,12 +154,12 @@ class MidiFileController extends Controller
                 }
             }
 
-    // Move new thumbnail
-    $thumbnail->move($destination, $thumbnailName);
+        // Move new thumbnail
+        $thumbnail->move($destination, $thumbnailName);
 
-    // Save correct public path
-    $data['thumbnail_path'] = "/midi-files/thumbnails/$thumbnailName";
-}
+        // Save correct public path
+        $data['thumbnail_path'] = "midi-files/thumbnails/$thumbnailName";
+    }
 
 
         $midiFile->update($data);

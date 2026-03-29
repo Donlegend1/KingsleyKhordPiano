@@ -15,62 +15,59 @@ class CreateEmailCampaignService
 {
     public function create(StoreEmailCampaignRequest $request): EmailCampaign
     {
-        return DB::transaction(function () use ($request) {
+        $campaign = DB::transaction(function () use ($request) {
 
-            $campaign = EmailCampaign::create([
+            return EmailCampaign::create([
                 'subject' => $request->subject,
                 'body' => $request->body,
                 'targets' => $request->targets,
                 'status' => $request->status,
                 'sent_at' => $request->status === 'sent' ? Carbon::now() : null,
             ]);
-
-            if ($request->status === 'sent') {
-                $this->dispatchEmails($campaign);
-            }
-
-            return $campaign;
         });
+
+        // Dispatch emails AFTER transaction commits
+        if ($request->status === 'sent') {
+            $this->dispatchEmails($campaign);
+        }
+
+        return $campaign;
     }
 
     public function dispatchEmails(EmailCampaign $campaign): void
     {
-     
-     $emails = collect([
-         'shedrackogwuche5@gmail.com',
-     ]);
-        // $emails = collect();
+        $emails = collect();
 
-        // if (in_array('premium', $campaign->targets)) {
-        //     $emails = $emails->merge(
-        //         User::where('premium', true)->pluck('email')
-        //     );
-        // }
+        if (in_array('premium', $campaign->targets)) {
+            $emails = $emails->merge(
+                User::where('premium', true)->pluck('email')
+            );
+        }
 
-        // if (in_array('standard', $campaign->targets)) {
-        //     $emails = $emails->merge(
-        //         User::where('premium', false)->pluck('email')
-        //     );
-        // }
+        if (in_array('standard', $campaign->targets)) {
+            $emails = $emails->merge(
+                User::where('premium', false)->pluck('email')
+            );
+        }
 
-        // if (in_array('visitor', $campaign->targets)) {
-        //     $emails = $emails->merge(
-        //      Visitor::pluck('email')
-        //     );
-        // }
+        if (in_array('visitor', $campaign->targets)) {
+            $emails = $emails->merge(
+                Visitor::pluck('email')
+            );
+        }
 
-        $emails
-            ->unique()
-            ->chunk(50)
-            ->each(function ($chunk) use ($campaign) {
-                foreach ($chunk as $email) {
-                    Mail::to($email)->queue(
-                        new AdminBroadcastMail(
-                            $campaign->subject,
-                            $campaign->body
-                        )
-                    );
-                }
-            });
+        $emails = $emails->unique()->values();
+
+        $emails->each(function ($email, $index) use ($campaign) {
+
+            Mail::to($email)->later(
+                now()->addSeconds($index * 2),
+                new AdminBroadcastMail(
+                    $campaign->subject,
+                    $campaign->body
+                )
+            );
+
+        });
     }
 }

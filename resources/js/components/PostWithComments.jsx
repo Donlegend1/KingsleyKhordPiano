@@ -12,7 +12,7 @@ import {
 } from "./Alert/FlashMessageContext";
 import { Trash2, Bookmark, Heart, MessageCircle, PinIcon } from "lucide-react";
 import AuthorNameWithVerification from "./User/AuthorNameWithVerification";
-import LinkEmbeds from "./LinkEmbeds";
+import PostBlocks from "./PostBlocks";
 
 const getInitials = (firstName, lastName) => {
     return `${firstName?.charAt(0) || ""}${
@@ -311,78 +311,7 @@ const PostWithComments = ({
 
             {/* Post Content: media (video/audio/image) or text/link */}
 
-            {post.blocks.map((block, idx) => {
-                switch (block.type) {
-                    case "text":
-                        return (
-                            <p key={idx} className="whitespace-pre-wrap dark:text-gray-300">
-                                {renderTextWithLinks(block.content)}
-                            </p>
-                        );
-
-                    case "image":
-                        return (
-                            <img
-                                key={idx}
-                                src={`/${block.content}`}
-                                className="rounded-lg w-full"
-                            />
-                        );
-
-                    case "video":
-                        return (
-                            <video
-                                key={idx}
-                                controls
-                                className="w-full rounded-lg"
-                            >
-                                <source src={`/${block.content}`} />
-                            </video>
-                        );
-
-                    case "audio":
-                        return (
-                            <audio key={idx} controls>
-                                <source src={`/${block.content}`} />
-                            </audio>
-                        );
-
-                    case "link":
-                        return block.content ? (
-                            <div
-                                key={idx}
-                                className="relative aspect-video rounded-lg overflow-hidden"
-                            >
-                                <iframe
-                                    src={block.embed_url}
-                                    className="w-full h-full"
-                                    allowFullScreen
-                                />
-                                {/* Overlay clickable layer */}
-                                <a
-                                    href={block.content}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="absolute inset-0"
-                                    title="Open in new tab"
-                                />
-                            </div>
-                        ) : (
-                            <a
-                                key={idx}
-                                href={block.content}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-indigo-600 underline break-all"
-                            >
-                                {block.content}
-                            </a>
-                        );
-
-                    default:
-                        return null;
-                }
-            })}
+            <PostBlocks post={post} />
 
             {/* Engagement Section */}
             {/* <div className="flex justify-between items-center mb-3">
@@ -438,7 +367,9 @@ const PostWithComments = ({
                     >
                         <MessageCircle className="w-4 h-4" />
 
-                        <span className="font-medium">Comment</span>
+                        <span className="font-medium">
+                            Comment({comments.length})
+                        </span>
                     </button>
                 </div>
             </div>

@@ -94,7 +94,7 @@
               @php
                   $iconMap = [
                       'independence' => 'fa-user-check',
-                      'coordination' => 'fa-arrows-spin',
+                      'technique' => 'fa-arrows-spin',
                       'flexibility'  => 'fa-arrows-left-right',
                       'strength'     => 'fa-dumbbell',
                       'dexterity'    => 'fa-hands',
@@ -102,7 +102,7 @@
       
                   $tooltipMap = [
                       'independence' => 'Train each hand to play independently',
-                      'coordination' => 'Improve hand synchronization',
+                      'technique' => 'Improve hand synchronization',
                       'flexibility'  => 'Increase finger and wrist flexibility',
                       'strength'     => 'Build finger strength and control',
                       'dexterity'    => 'Improve speed, accuracy, and agility',

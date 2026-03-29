@@ -34,7 +34,7 @@ class ExerciseController extends Controller
 
         $exercises = $query->latest()->paginate(12);
 
-        $levels = ['independence', 'coordination', 'flexibility', 'strength', 'dexterity'];
+        $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
         $skillLevels = ['Basic', 'Competent', 'Challenging'];
 
         return view('memberpages.pianoexercise', compact('exercises', 'level', 'skillLevel', 'search', 'levels', 'skillLevels'));

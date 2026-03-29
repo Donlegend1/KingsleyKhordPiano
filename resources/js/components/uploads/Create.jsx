@@ -44,7 +44,7 @@ const UploadForm = () => {
     const levels = ["Beginner", "Intermediate", "Advanced"];
     const pianoLevels = [
         "Independence",
-        "Coordination",
+        "Technique",
         "Flexibility",
         "Strength",
         "Dexterity",

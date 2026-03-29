@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\PostMedia;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Http\Request;
@@ -12,7 +11,9 @@ use App\Models\Community;
 use App\Helpers\VideoHelper;
 use App\Models\PostBlock;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\NewPostNotification;
+use App\Models\User;
 
 
 class PostController extends Controller
@@ -70,51 +71,61 @@ class PostController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(StorePostRequest $request)
+   public function store(StorePostRequest $request)
     {
-        DB::transaction(function () use ($request) {
-        $post = Post::create([
-            'title' => $request->title,
-            'user_id' => auth()->id(),
-            'category' => $request->category,
-            'subcategory' => $request->subcategory,
-        ]);
-        logger()->info(['blocks' => $request->blocks]);
+        $result = DB::transaction(function () use ($request) {
+            $post = Post::create([
+                'title'       => $request->title,
+                'user_id'     => auth()->id(),
+                'category'    => $request->category,
+                'subcategory' => $request->subcategory,
+            ]);
 
-       foreach ($request->blocks as $index => $block) {
-            $data = [
-                'post_id' => $post->id,
-                'type' => $block['type'],
-                'position' => $index,
-            ];
+            foreach ($request->blocks as $index => $block) {
+                $data = [
+                    'post_id'  => $post->id,
+                    'type'     => $block['type'],
+                    'position' => $index,
+                ];
 
-            if ($block['type'] === 'text') {
-                $data['content'] = $block['content'];
+                if ($block['type'] === 'text') {
+                    $data['content'] = $block['content'];
+                }
+
+                if ($block['type'] === 'link') {
+                    $data['content']   = $block['content'];
+                    $data['embed_url'] = VideoHelper::linkToEmbed($block['content']);
+                    $data['link_type'] = VideoHelper::getLinkType($block['content']); // 'embed' | 'video' | 'audio' | 'iframe'
+                }
+
+                if (in_array($block['type'], ['image', 'video', 'audio'])) {
+                    if ($request->hasFile($block['content'])) {
+                        $file = $request->file($block['content']);
+                        $path = $file->store('posts', 'public');
+                        $data['content'] = $path;
+                    }
+                }
+
+                PostBlock::create($data);
             }
 
-            if ($block['type'] === 'link') {
-                $data['content'] = $block['content'];
-                // Convert YouTube/Vimeo links to embed URL
-                $data['embed_url'] = VideoHelper::linkToEmbed($block['content']);
-            }
+            $user = $post->user;
 
-            if (in_array($block['type'], ['image', 'video', 'audio'])) {
-                if ($request->hasFile($block['content'])) {
-                    $file = $request->file($block['content']);
-                    $path = $file->store('posts', 'public');
-                    $data['content'] = $path;
+            if ($user) {
+                $others = User::where('id', '!=', $user->id)->get();
+
+                foreach ($others as $other) {
+                    Notification::send($other, new NewPostNotification($post));
                 }
             }
 
-            PostBlock::create($data);
-        }
+            return $post->id; 
+        });
 
-        // Return after all blocks are saved
         return response()->json([
             'message' => 'Post created successfully',
-            'post_id' => $post->id,
+            'post_id' => $result,
         ], 201);
-        });
     }
 
     /**
