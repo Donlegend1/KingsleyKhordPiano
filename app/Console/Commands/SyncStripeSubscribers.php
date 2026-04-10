@@ -80,7 +80,7 @@ class SyncStripeSubscribers extends Command
             $user->update([
                 'payment_status' => $status === 'active' ? 'successful' : 'failed',
                 'amount' => $amount,
-                'premium' => $plan?->tier === 'premium' ? 1 : 0,
+                'premium' => $plan?->tier === 'Premium' ? 1 : 0,
                 'plan_id' => $plan?->id,
             ]);
 

@@ -444,7 +444,7 @@ const PostWithComments = ({
                                                 {comment.replies.map((r) => (
                                                     <div
                                                         key={r.id}
-                                                        className="text-sm bg-gray-50 dark:bg-gray-900 rounded px-3 py-2"
+                                                        className="text-sm bg-gray-50 dark:bg-gray-900 rounded px-3 py-2 dark:text-gray-200"
                                                     >
                                                         <div className="text-[13px] font-semibold">
                                                             {r.user?.first_name}{" "}
@@ -481,7 +481,7 @@ const PostWithComments = ({
                                                     setNewReply(e.target.value)
                                                 }
                                                 placeholder="Write a reply..."
-                                                className="flex-1 px-3 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                                                className="flex-1 px-3 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm dark:text-gray-200"
                                             />
                                             <button
                                                 type="submit"
@@ -508,7 +508,7 @@ const PostWithComments = ({
                         <input
                             type="text"
                             placeholder="Write a comment..."
-                            className="flex-1 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                            className="flex-1 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm dark:text-gray-200"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                         />

@@ -121,6 +121,23 @@
                 class="text-lg font-semibold px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-[#FFD736] hover:text-black shadow transition duration-200">
                 Login
             </a>
+            <div x-data="{ open: false }" class="relative inline-block" @mouseenter="open = true" @mouseleave="open = false">
+                <button class="text-white hover:text-[#FFD736] transition duration-200 focus:outline-none p-2">
+                    <i class="fa-solid fa-ellipsis-vertical text-xl"></i>
+                </button>
+                <div x-show="open" 
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                     x-cloak>
+                    <a href="/community/login" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Community Login</a>
+                    <a href="/community/register" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Community Register</a>
+                </div>
+            </div>
         </div>
 
 
@@ -167,6 +184,18 @@
                         class="text-sm font-semibold px-4 py-2 rounded-md border border-[#FFD736] text-[#FFD736] hover:bg-[#FFD736] hover:text-white transition text-center">
                         Login
                     </a>
+                    <div x-data="{ open: false }" class="relative flex justify-center mt-2">
+                        <button @click="open = !open" class="text-white hover:text-[#FFD736] transition duration-200 focus:outline-none p-2">
+                            <i class="fa-solid fa-ellipsis-vertical text-xl"></i>
+                        </button>
+                        <div x-show="open" 
+                             @click.away="open = false"
+                             class="absolute bottom-full mb-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                             x-cloak>
+                            <a href="/community/login" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Community Login</a>
+                            <a href="/community/register" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Community Register</a>
+                        </div>
+                    </div>
                 </div>
             </div>
     </header>

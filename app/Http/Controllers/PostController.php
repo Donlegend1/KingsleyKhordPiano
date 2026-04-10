@@ -57,7 +57,7 @@ class PostController extends Controller
                 $query->orderByDesc('updated_at');
         }
 
-        return response()->json($query->paginate(5));
+        return response()->json($query->paginate(10));
     }
     /**
      * Show the form for creating a new resource.
@@ -252,7 +252,7 @@ class PostController extends Controller
                 $query->orderByDesc('updated_at');
         }
 
-        return response()->json($query->paginate(5));
+        return response()->json($query->paginate(10));
     }
 
     public function togglePin(Post $post)

@@ -62,6 +62,11 @@ class VideoHelper
             return "https://drive.google.com/file/d/{$m[1]}/preview";
         }
 
+        // Instagram
+        if (preg_match('/instagram\.com\/(p|reel)\/([^\/?&]+)/', $url, $m)) {
+            return "https://www.instagram.com/{$m[1]}/{$m[2]}/embed";
+        }
+
         // Direct video file — no embed needed, flag it
         if (preg_match('/\.(mp4|webm|ogg|mov)(\?.*)?$/i', $url)) {
             return $url; // will render as <video> tag in frontend
@@ -73,7 +78,7 @@ class VideoHelper
 
     public static function getLinkType(string $url): string
     {
-        if (preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos/', $url)) {
+        if (preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos|instagram\.com/', $url)) {
             return 'embed'; // use <iframe>
         }
 

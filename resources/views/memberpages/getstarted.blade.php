@@ -142,7 +142,7 @@
 
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-12 pb-8 px-5 md:px-12 md:mx-auto md:max-w-6xl">
   <!-- Section Title -->
-  <div class="font-bold mb-6 text-2xl md:text-3xl text-center md:text-left">
+  <div class="font-bold mb-6 text-xl md:text-2xl text-center md:text-left">
     Step 2 - Find your Best Path & Choose your Skill Level
   </div>
 

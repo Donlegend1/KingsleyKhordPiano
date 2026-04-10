@@ -41,7 +41,7 @@
     </style>
 </head>
 
-<body x-data="{ isDark: false, showSidebar: false }" x-init class="bg-gray-100 dark:bg-gray-900 h-screen overflow-hidden">
+<body class="bg-gray-100 dark:bg-gray-900 h-screen overflow-hidden">
 
 <div class="flex h-screen">
 
@@ -385,11 +385,15 @@
 <script>
     function themeToggle() {
         return {
-            isDark: false,
+            isDark: true,
             showSidebar: false,
             init() {
-                this.isDark = localStorage.getItem('theme') === 'dark'
-                    || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                const setting = localStorage.getItem('theme');
+                if (setting) {
+                    this.isDark = setting === 'dark';
+                } else {
+                    this.isDark = true;
+                }
                 this.applyTheme();
             },
             toggle() {

@@ -21,10 +21,18 @@
     <div class="max-w-7xl mx-auto">
         
         <!-- Tabs Navigation -->
-        <div class="mb-8" x-data="{ activeTab: 'beginners' }">
+        <div class="mb-8" x-data="{ activeTab: 'intermediate' }">
             
             <!-- Tab Buttons - Spread out on Desktop, Stacked on Mobile -->
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+                  <button 
+                    @click="activeTab = 'intermediate'"
+                    :class="activeTab === 'intermediate' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                    class="flex-1 px-8 py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm"
+                >
+                    Piano Plays
+                </button>
+                
                 <button 
                     @click="activeTab = 'beginners'"
                     :class="activeTab === 'beginners' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
@@ -33,14 +41,7 @@
                     Track & Loops
                 </button>
                 
-                <button 
-                    @click="activeTab = 'intermediate'"
-                    :class="activeTab === 'intermediate' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
-                    class="flex-1 px-8 py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm"
-                >
-                    Piano Plays
-                </button>
-                
+              
                
             </div>
 

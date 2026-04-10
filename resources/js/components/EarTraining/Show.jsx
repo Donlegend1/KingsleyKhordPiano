@@ -89,7 +89,7 @@ const ShowEartraining = () => {
         "Maj7b5",
         "minMaj7",
     ];
-    const SEVENDEGREECHORDEGENERAL = [
+    const SEVENDEGREECHORDGENERAL = [
         "Diminished 7th",
         "Dominant 7th",
         "Minor 7b5",
@@ -255,11 +255,11 @@ const ShowEartraining = () => {
                 return BASICTRIADS;
             case "7th Degree Chords (Basic)":
                 return SEVENDEGREECHORD;
-            case "7th Degree Chords (Gecondary)":
+            case "7th Degree Chords (Secondary)":
                 return SEVENDEGREECHORDSECONDARY;
             case "7th Degree Chords (General)":
-                return SEVENDEGREECHORDEGENERAL;
-            case "9th degree Chords (Basic)":
+                return SEVENDEGREECHORDGENERAL;
+            case "9th Degree Chords (Basic)":
                 return NINEDEGREECHORD;
             case "9th Degree Chords (Secondary)":
                 return NINEDEGREECHORDSECONDARY;

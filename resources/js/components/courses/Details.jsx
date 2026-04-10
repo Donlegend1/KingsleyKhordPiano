@@ -842,7 +842,7 @@ const CoursesPage = () => {
                                 </div>
                                 <div className="w-full bg-gray-300 rounded-full h-2">
                                     <div
-                                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                        className="bg-black h-2 rounded-full transition-all duration-300"
                                         style={{ width: `${generalProgress}%` }}
                                     ></div>
                                 </div>
