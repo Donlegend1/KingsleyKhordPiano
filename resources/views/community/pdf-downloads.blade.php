@@ -59,7 +59,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($beginners as $pdf)
                         <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
-                            <div class="relative h-60 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#4F8DF7,_#3267D6)] flex items-center justify-center overflow-hidden">
+                            <div class="relative aspect-[16/10] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#4F8DF7,_#3267D6)] flex items-center justify-center overflow-hidden">
                                 @if($pdf->thumbnail)
                                     <img src="/{{ $pdf->thumbnail }}" alt="{{ $pdf->title }}" class="w-full h-full object-cover">
                                 @else
@@ -72,7 +72,7 @@
                                     </div>
                                     <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(17,24,39,0.14),transparent_28%),linear-gradient(135deg,transparent_0,transparent_45%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.08)_55%,transparent_55%,transparent_100%)]"></div>
                                 @endif
-                                <div class="absolute left-4 top-4 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm">
+                                <div class="absolute left-4 top-4 inline-flex items-center rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-900 shadow-lg">
                                     PDF Resource
                                 </div>
                             </div>
@@ -110,7 +110,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($intermediate as $pdf)
                         <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
-                            <div class="relative h-60 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#F79A4F,_#D96A22)] flex items-center justify-center overflow-hidden">
+                            <div class="relative aspect-[16/10] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#F79A4F,_#D96A22)] flex items-center justify-center overflow-hidden">
                                 @if($pdf->thumbnail)
                                     <img src="/{{ $pdf->thumbnail }}" alt="{{ $pdf->title }}" class="w-full h-full object-cover">
                                 @else
@@ -123,7 +123,7 @@
                                     </div>
                                     <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(17,24,39,0.14),transparent_28%),linear-gradient(135deg,transparent_0,transparent_45%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.08)_55%,transparent_55%,transparent_100%)]"></div>
                                 @endif
-                                <div class="absolute left-4 top-4 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm">
+                                <div class="absolute left-4 top-4 inline-flex items-center rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-900 shadow-lg">
                                     PDF Resource
                                 </div>
                             </div>
@@ -162,7 +162,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             @foreach($advanced as $pdf)
                             <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
-                                <div class="relative h-60 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#F56565,_#C53030)] flex items-center justify-center overflow-hidden">
+                                <div class="relative aspect-[16/10] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#F56565,_#C53030)] flex items-center justify-center overflow-hidden">
                                     @if($pdf->thumbnail)
                                         <img src="/{{ $pdf->thumbnail }}" alt="{{ $pdf->title }}" class="w-full h-full object-cover">
                                     @else
@@ -175,7 +175,7 @@
                                         </div>
                                         <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(17,24,39,0.14),transparent_28%),linear-gradient(135deg,transparent_0,transparent_45%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.08)_55%,transparent_55%,transparent_100%)]"></div>
                                     @endif
-                                    <div class="absolute left-4 top-4 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm">
+                                    <div class="absolute left-4 top-4 inline-flex items-center rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-900 shadow-lg">
                                         PDF Resource
                                     </div>
                                 </div>

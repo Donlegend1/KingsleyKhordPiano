@@ -38,7 +38,8 @@ class DatabaseSeeder extends Seeder
             CourseCategorySeeder::class
         ]);
         $this->call([
-        ChatRoomSeeder::class,
-    ]);
+            ChatRoomSeeder::class,
+            MidiFileSeeder::class,
+        ]);
     }
 }
