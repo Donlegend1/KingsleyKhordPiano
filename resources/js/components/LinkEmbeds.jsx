@@ -13,7 +13,7 @@ const LinkEmbeds = ({ links = [] }) => {
                             src={link.embed_url}
                             className="absolute inset-0 w-full h-full"
                             frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
                             allowFullScreen
                         />
                     </div>
