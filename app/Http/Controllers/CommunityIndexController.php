@@ -55,7 +55,7 @@ class CommunityIndexController extends Controller
          return redirect('/member/plan');
       }
 
-      $beginners = PDFDownload::where('category', 'beginners')->get();
+      $beginners = PDFDownload::where('category', 'beginner')->get();
       $intermediate = PDFDownload::where('category', 'intermediate')->get();
       $advanced = PDFDownload::where('category', 'advanced')->get();
 
