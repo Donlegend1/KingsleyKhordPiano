@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('category');
+            $table->string('category')->nullable();
+            $table->foreignId('course_category_id')->nullable();
             $table->text('description');
             $table->text('video_url');
             $table->string('level')->default('beginner');

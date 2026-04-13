@@ -8,23 +8,37 @@ return new class extends Migration
 {
     public function up()
     {
+        if (! Schema::hasTable('courses')) {
+            return;
+        }
+
         Schema::table('courses', function (Blueprint $table) {
-            // Make category nullable
-            $table->string('category')->nullable()->change();
-            
-            // Add foreign key
-            $table->foreignId('course_category_id')
-                  ->nullable()
-                  ->after('category');
+            if (Schema::hasColumn('courses', 'category')) {
+                $table->string('category')->nullable()->change();
+            }
+
+            if (! Schema::hasColumn('courses', 'course_category_id')) {
+                $table->foreignId('course_category_id')
+                    ->nullable()
+                    ->after('category');
+            }
         });
     }
 
     public function down()
     {
+        if (! Schema::hasTable('courses')) {
+            return;
+        }
+
         Schema::table('courses', function (Blueprint $table) {
-            $table->string('category')->nullable(false)->change();
-            $table->dropForeign(['course_category_id']);
-            $table->dropColumn('course_category_id');
+            if (Schema::hasColumn('courses', 'category')) {
+                $table->string('category')->nullable(false)->change();
+            }
+
+            if (Schema::hasColumn('courses', 'course_category_id')) {
+                $table->dropColumn('course_category_id');
+            }
         });
     }
 };

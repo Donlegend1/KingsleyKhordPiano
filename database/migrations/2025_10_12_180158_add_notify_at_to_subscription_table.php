@@ -11,7 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('subscription', function (Blueprint $table) {
+        if (! Schema::hasTable('subscriptions') || Schema::hasColumn('subscriptions', 'notified_at')) {
+            return;
+        }
+
+        Schema::table('subscriptions', function (Blueprint $table) {
             $table->timestamp('notified_at')->nullable()->after('ends_at');
         });
     }
@@ -21,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('subscription', function (Blueprint $table) {
-            //
+        if (! Schema::hasTable('subscriptions') || ! Schema::hasColumn('subscriptions', 'notified_at')) {
+            return;
+        }
+
+        Schema::table('subscriptions', function (Blueprint $table) {
+            $table->dropColumn('notified_at');
         });
     }
 };
