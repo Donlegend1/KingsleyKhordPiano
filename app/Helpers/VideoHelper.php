@@ -6,6 +6,12 @@ class VideoHelper
 {
     public static function linkToEmbed(string $url): ?string
     {
+        $googleDriveFileId = self::extractGoogleDriveFileId($url);
+
+        if ($googleDriveFileId) {
+            return "https://drive.google.com/file/d/{$googleDriveFileId}/preview";
+        }
+
         // YouTube
         // if (preg_match('/youtu\.be\/([^\?]+)|youtube\.com\/watch\?v=([^\&]+)/', $url, $m)) {
         //     $id = $m[1] ?? $m[2];
@@ -57,11 +63,6 @@ class VideoHelper
             return "https://www.tiktok.com/embed/v2/{$m[1]}";
         }
 
-        // Google Drive
-        if (preg_match('/drive\.google\.com\/file\/d\/([^\/]+)/', $url, $m)) {
-            return "https://drive.google.com/file/d/{$m[1]}/preview";
-        }
-
         // Direct video file — no embed needed, flag it
         if (preg_match('/\.(mp4|webm|ogg|mov)(\?.*)?$/i', $url)) {
             return $url; // will render as <video> tag in frontend
@@ -73,7 +74,10 @@ class VideoHelper
 
     public static function getLinkType(string $url): string
     {
-        if (preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos/', $url)) {
+        if (
+            self::extractGoogleDriveFileId($url) ||
+            preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos/', $url)
+        ) {
             return 'embed'; // use <iframe>
         }
 
@@ -86,5 +90,26 @@ class VideoHelper
         }
 
         return 'iframe'; // generic iframe or modal
+    }
+
+    private static function extractGoogleDriveFileId(string $url): ?string
+    {
+        if (!str_contains($url, 'drive.google.com')) {
+            return null;
+        }
+
+        if (preg_match('/drive\.google\.com\/(?:u\/\d+\/)?file\/d\/([^\/\?\&]+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        $query = parse_url($url, PHP_URL_QUERY);
+
+        if (!$query) {
+            return null;
+        }
+
+        parse_str($query, $params);
+
+        return $params['id'] ?? null;
     }
 }
