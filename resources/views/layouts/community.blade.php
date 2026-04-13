@@ -89,6 +89,13 @@
                         </svg>
                         Lessons
                     </a>
+                    <a href="/member/community/leaderboard"
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/leaderboard') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8M12 17v4M7 4h10l-1 5a4 4 0 01-4 3H9a4 4 0 01-4-3L4 4h3zm0 0V3m10 1V3"/>
+                        </svg>
+                        Leaderboards
+                    </a>
                 </div>
             </div>
 
