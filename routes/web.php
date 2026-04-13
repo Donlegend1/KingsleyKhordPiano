@@ -162,6 +162,7 @@ Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/community/space/audio-downloads', [CommunityIndexController::class, 'audioDownloads'])->name('community.audio-downloads');
     Route::get('/community/space/audio/downloads/{audioDownload}', [AudioDownloadController::class, 'download']);
     Route::get('/community/space/pdf/downloads/{pDFDownload}', [PDFDownloadController::class, 'download']);
+    Route::get('/community/space/pdf/view/{pDFDownload}', [PDFDownloadController::class, 'view'])->name('community.pdf-view');
 
 
     Route::get('/community/space/midi-downloads', [CommunityIndexController::class, 'midiDownloads'])->name('community.midi-downloads');
