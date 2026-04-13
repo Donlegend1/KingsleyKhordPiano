@@ -146,9 +146,9 @@ class CommunityIndexController extends Controller
          ->selectRaw('COALESCE(reply_totals.replies_count, 0) as replies_count')
          ->selectRaw('COALESCE(like_totals.likes_count, 0) as likes_count')
          ->selectRaw('
-            (COALESCE(post_totals.posts_count, 0) * 10) +
-            (COALESCE(comment_totals.comments_count, 0) * 5) +
-            (COALESCE(reply_totals.replies_count, 0) * 3) +
+            (COALESCE(post_totals.posts_count, 0) * 5) +
+            (COALESCE(comment_totals.comments_count, 0) * 3) +
+            (COALESCE(reply_totals.replies_count, 0) * 2) +
             (COALESCE(like_totals.likes_count, 0) * 1) as total_points
          ')
          ->orderByDesc('total_points')
