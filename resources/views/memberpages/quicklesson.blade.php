@@ -6,35 +6,11 @@
   <div class="max-w-7xl mx-auto space-y-1">
 
     <!-- Breadcrumb & User -->
-    <div class="flex justify-between items-center">
+    <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
         <a href="/home" class="hover:text-blue-600">Dashboard</a>
         <span>/</span>
         <a href="/member/quick-lessons" class="hover:text-blue-600 font-semibold">Quick Lesson</a>
-      </div>
-      <div class="flex items-center space-x-2">
-          <form method="GET" action="{{ route('quick.lession') }}" class="mb-2 flex justify-end">
-          <div class="relative w-full max-w-xs">
-              <!-- Input Field -->
-              <input 
-                type="text" 
-                name="search" 
-                id="name" 
-                value="{{ request('search') }}" 
-                class="w-full border border-gray-300 rounded-full pl-4 pr-12 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                placeholder="Search..."
-              >
-
-              <!-- Search Button with Icon -->
-              <button 
-                type="submit" 
-                class="absolute my-4 right-1 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              >
-                <i class="fa fa-search"></i>
-              </button>
-            </div> 
-        </form>
-        {{-- <i class="fa fa-user-circle text-xl"></i> --}}
       </div>
     </div>
 
@@ -46,6 +22,28 @@
 
 <section class="bg-gray-100 py-10 px-4 sm:px-6 lg:px-8 xl:px-10">
   <div class="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-6" x-data="{ activeTab: '{{ request('tab', 'all') }}' }"">
+
+    <div class="mb-6">
+      <form method="GET" action="{{ route('quick.lession') }}" class="w-full">
+        <div class="relative w-full max-w-md">
+          <input 
+            type="text" 
+            name="search" 
+            id="name" 
+            value="{{ request('search') }}" 
+            class="w-full rounded-full border border-gray-300 bg-white py-3 pl-4 pr-16 text-sm text-gray-700 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            placeholder="Search..."
+          >
+
+          <button 
+            type="submit" 
+            class="absolute inset-y-0 right-1 my-1 flex aspect-square items-center justify-center rounded-full bg-blue-500 text-white transition hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
 
     <!-- Mobile Dropdown -->
    <div class="block lg:hidden mb-6">
