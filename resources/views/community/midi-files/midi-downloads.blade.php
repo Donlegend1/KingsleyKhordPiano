@@ -39,12 +39,12 @@
         $g = $gradients[$index % count($gradients)];  
     @endphp
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+    <div class="flex h-full flex-col overflow-hidden rounded-xl bg-white shadow-md transition-shadow duration-300 hover:shadow-xl dark:bg-gray-800">
 
         {{-- Header Visual --}}
         @if ($midiFile->thumbnail_path)
             {{-- SHOW IMAGE IF AVAILABLE --}}
-            <div class="relative h-32 overflow-hidden">
+            <div class="relative h-44 overflow-hidden">
                 <img 
                     src="/{{$midiFile->thumbnail_path}}" 
                     alt="{{ $midiFile->name }}" 
@@ -53,7 +53,7 @@
             </div>
         @else
             {{-- USE ALTERNATING COLORS --}}
-            <div class="relative h-32 bg-gradient-to-br {{ $g['from'] }} {{ $g['to'] }} flex items-center justify-center p-4">
+            <div class="relative h-44 bg-gradient-to-br {{ $g['from'] }} {{ $g['to'] }} flex items-center justify-center p-4">
                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.23 12.004a2.236 2.236 0 0 1 2.235 2.236A2.236 2.236 0 0 1 14.23 16.476a2.236 2.236 0 0 1-2.235-2.236 2.236 2.236 0 0 1 2.235-2.236zm2.648-10.69c.366 0 .662.297.662.662v3.34c1.154.28 2.01 1.32 2.01 2.585a2.67 2.67 0 0 1-2.667 2.667h-4.666a2.67 2.67 0 0 1-2.667-2.667c0-1.265.856-2.305 2.01-2.585V1.976c0-.365.296-.662.662-.662h2.326zm-.662 4.666c-.735 0-1.333.598-1.333 1.333 0 .735.598 1.333 1.333 1.333h4.666c.735 0 1.333-.598 1.333-1.333 0-.735-.598-1.333-1.333-1.333h-4.666z"/>
                 </svg>
@@ -62,13 +62,13 @@
         @endif
 
         {{-- Body --}}
-        <div class="p-5">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+        <div class="flex flex-1 flex-col p-5">
+            <h3 class="mb-2 line-clamp-2 overflow-hidden text-ellipsis text-lg font-semibold text-gray-800 dark:text-white">
                 {{ $midiFile->name }}
             </h3>
 
             <a href="{{ url('member/community/space/midi-download/' . $midiFile->id) }}"
-               class="w-full bg-[#FF6B35] hover:bg-[#E55A2B] text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+               class="mt-auto flex w-full items-center justify-center gap-2 rounded-lg bg-[#FF6B35] px-4 py-2.5 font-medium text-white transition-colors duration-200 hover:bg-[#E55A2B]">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>

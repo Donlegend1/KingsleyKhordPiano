@@ -54,7 +54,7 @@
                             @foreach($tracksAndLoops as $audio)
                             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                                 <!-- Waveform Visual -->
-                                <div class="relative h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center p-4">
+                                <div class="relative h-44 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center p-4">
                                     <svg class="w-full h-full" viewBox="0 0 200 60" preserveAspectRatio="none">
                                         <path d="M0,30 L5,25 L10,35 L15,20 L20,40 L25,15 L30,45 L35,10 L40,50 L45,5 L50,55 L55,8 L60,52 L65,12 L70,48 L75,18 L80,42 L85,22 L90,38 L95,28 L100,32 L105,26 L110,36 L115,24 L120,34 L125,30 L130,28 L135,32 L140,26 L145,34 L150,30 L155,28 L160,32 L165,30 L170,28 L175,32 L180,30 L185,28 L190,32 L195,30 L200,30" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
                                     </svg>
@@ -109,7 +109,7 @@
                             @foreach($pianoPlays as $audio)
                             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                                 <!-- Waveform Visual -->
-                                <div class="relative h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center p-4">
+                                <div class="relative h-44 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center p-4">
                                     <svg class="w-full h-full" viewBox="0 0 200 60" preserveAspectRatio="none">
                                         <path d="M0,30 L5,20 L10,40 L15,15 L20,45 L25,10 L30,50 L35,5 L40,55 L45,8 L50,52 L55,12 L60,48 L65,16 L70,44 L75,20 L80,40 L85,25 L90,35 L95,28 L100,32 L105,26 L110,34 L115,30 L120,28 L125,32 L130,26 L135,34 L140,30 L145,28 L150,32 L155,30 L160,28 L165,32 L170,30 L175,28 L180,32 L185,30 L190,28 L195,32 L200,30" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
                                     </svg>
@@ -165,4 +165,3 @@
 </section>
 
 @endsection
-
