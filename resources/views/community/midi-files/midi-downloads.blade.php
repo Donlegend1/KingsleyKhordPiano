@@ -44,7 +44,7 @@
         {{-- Header Visual --}}
         @if ($midiFile->thumbnail_path)
             {{-- SHOW IMAGE IF AVAILABLE --}}
-            <div class="relative h-32 overflow-hidden">
+            <div class="relative h-44 overflow-hidden">
                 <img 
                     src="/{{$midiFile->thumbnail_path}}" 
                     alt="{{ $midiFile->name }}" 
@@ -53,7 +53,7 @@
             </div>
         @else
             {{-- USE ALTERNATING COLORS --}}
-            <div class="relative h-32 bg-gradient-to-br {{ $g['from'] }} {{ $g['to'] }} flex items-center justify-center p-4">
+            <div class="relative h-44 bg-gradient-to-br {{ $g['from'] }} {{ $g['to'] }} flex items-center justify-center p-4">
                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.23 12.004a2.236 2.236 0 0 1 2.235 2.236A2.236 2.236 0 0 1 14.23 16.476a2.236 2.236 0 0 1-2.235-2.236 2.236 2.236 0 0 1 2.235-2.236zm2.648-10.69c.366 0 .662.297.662.662v3.34c1.154.28 2.01 1.32 2.01 2.585a2.67 2.67 0 0 1-2.667 2.667h-4.666a2.67 2.67 0 0 1-2.667-2.667c0-1.265.856-2.305 2.01-2.585V1.976c0-.365.296-.662.662-.662h2.326zm-.662 4.666c-.735 0-1.333.598-1.333 1.333 0 .735.598 1.333 1.333 1.333h4.666c.735 0 1.333-.598 1.333-1.333 0-.735-.598-1.333-1.333-1.333h-4.666z"/>
                 </svg>
