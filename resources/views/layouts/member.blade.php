@@ -242,12 +242,33 @@
         </div>
 
         {{-- Mobile Sidebar --}}
-        <div x-show="openMobileNav" x-cloak class="fixed inset-0 z-50 flex" x-transition>
-            <div class="fixed inset-0 bg-black/60" @click="openMobileNav = false"></div>
-            <div class="relative bg-black text-white w-72 max-w-full h-full overflow-y-auto p-5 flex flex-col gap-6">
+        <div x-show="openMobileNav" x-cloak class="fixed inset-0 z-50">
+            <div
+                x-show="openMobileNav"
+                x-transition:enter="transition-opacity duration-300 ease-out"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity duration-200 ease-in"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="absolute inset-0 bg-slate-950/72 backdrop-blur-[2px]"
+                @click="openMobileNav = false"
+            ></div>
+
+            <div class="absolute inset-y-0 right-0 flex max-w-full">
+                <div
+                    x-show="openMobileNav"
+                    x-transition:enter="transform transition duration-300 ease-[cubic-bezier(.22,1,.36,1)]"
+                    x-transition:enter-start="translate-x-full opacity-0"
+                    x-transition:enter-end="translate-x-0 opacity-100"
+                    x-transition:leave="transform transition duration-200 ease-in"
+                    x-transition:leave-start="translate-x-0 opacity-100"
+                    x-transition:leave-end="translate-x-full opacity-0"
+                    class="relative ml-auto flex h-full w-72 max-w-full overflow-y-auto bg-black p-5 text-white flex-col gap-6"
+                >
                 <div class="flex justify-end">
                     <button @click="openMobileNav = false" class="text-white">
-                        <i class="fa fa-times text-xl"></i>
+                        <i class="fa fa-times text-lg"></i>
                     </button>
                 </div>
 
@@ -286,6 +307,7 @@
                     class="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition w-fit">
                     <i class="fa fa-sign-out"></i> Logout
                 </button>
+            </div>
             </div>
         </div>
 
