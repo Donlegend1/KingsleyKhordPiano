@@ -91,6 +91,8 @@ export default function PostBlocks({ post }) {
                                 <iframe
                                     src={block.embed_url}
                                     className="w-full h-full pointer-events-none"
+                                    frameBorder="0"
+                                    allow="autoplay; fullscreen; picture-in-picture"
                                     allowFullScreen
                                 />
                                 {/* Overlay to intercept clicks */}

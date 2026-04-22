@@ -1,6 +1,6 @@
 "use client";
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import { Alert, Snackbar } from "@mui/material";
+import React, { createContext, useContext, ReactNode } from "react";
+import { Toaster, toast } from "sonner";
 
 type MessageType = "success" | "error";
 
@@ -13,46 +13,28 @@ const FlashMessageContext = createContext<FlashMessageContextType | undefined>(
 );
 
 export const FlashMessageProvider = ({ children }: { children: ReactNode }) => {
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState<MessageType>("success");
-
   const showMessage = (msg: string, type: MessageType = "success") => {
-    setMessage(msg);
-    setSeverity(type);
-    setOpen(true);
-  };
+    if (type === "error") {
+      toast.error(msg, {
+        duration: 5000,
+      });
+      return;
+    }
 
-  const handleClose = () => {
-    setOpen(false);
-    setMessage("");
+    toast.success(msg, {
+      duration: 5000,
+      style: {
+        backgroundColor: "#000",
+        color: "#fff",
+        border: "1px solid rgba(255,255,255,0.08)",
+      },
+    });
   };
 
   return (
     <FlashMessageContext.Provider value={{ showMessage }}>
       {children}
-      <Snackbar
-        open={open}
-        autoHideDuration={5000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleClose}
-          severity={severity}
-          variant="filled"
-          sx={
-            severity === "success"
-              ? {
-                  backgroundColor: "#000",
-                  color: "#fff",
-                }
-              : {}
-          }
-        >
-          {message}
-        </Alert>
-      </Snackbar>
+      <Toaster richColors position="top-right" closeButton />
     </FlashMessageContext.Provider>
   );
 };

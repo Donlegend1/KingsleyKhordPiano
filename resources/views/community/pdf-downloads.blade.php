@@ -58,21 +58,36 @@
                 @if($beginners->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($beginners as $pdf)
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                            <div class="relative h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
+                        <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
+                            <div class="relative h-52 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#4F8DF7,_#3267D6)] flex items-center justify-center overflow-hidden">
                                 @if($pdf->thumbnail)
                                     <img src="/{{ $pdf->thumbnail }}" alt="{{ $pdf->title }}" class="w-full h-full object-cover">
                                 @else
-                                    <div class="flex items-center justify-center w-full h-full bg-blue-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                    <div class="h-full w-full bg-white">
+                                        <canvas
+                                            class="pdf-preview-canvas h-full w-full"
+                                            data-pdf-preview="{{ route('community.pdf-view', $pdf) }}"
+                                            data-pdf-title="{{ $pdf->title }}"
+                                        ></canvas>
                                     </div>
+                                    <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(17,24,39,0.14),transparent_28%),linear-gradient(135deg,transparent_0,transparent_45%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.08)_55%,transparent_55%,transparent_100%)]"></div>
                                 @endif
+                                <div class="absolute left-4 top-4 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm">
+                                    PDF Resource
+                                </div>
                             </div>
-                            <div class="p-5 flex flex-col">
-                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 text-center line-clamp-2">{{ $pdf->title }}</h3>
+                            <div class="p-5 flex flex-col gap-4">
+                                <div class="space-y-2">
+                                    <h3 class="text-xl font-semibold leading-tight text-gray-900 dark:text-white line-clamp-2">{{ $pdf->title }}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Preview in-browser or download a copy for practice.</p>
+                                </div>
                                 
-                                <div class="flex gap-2 mt-auto">
-                                    <a href="/member/community/space/pdf/downloads/{{ $pdf->id }}" class="flex-1 bg-[#FF6B35] hover:bg-[#E55A2B] text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                                <div class="grid grid-cols-2 gap-3 mt-auto">
+                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-100/90 dark:bg-gray-700/80 px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 transition-all duration-200 hover:border-gray-400 hover:bg-white dark:hover:bg-gray-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        View
+                                    </a>
+                                    <a href="/member/community/space/pdf/downloads/{{ $pdf->id }}" class="flex items-center justify-center gap-2 rounded-2xl bg-[#FF6B35] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E55A2B]">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path></svg>
                                         Download
                                     </a>
@@ -94,21 +109,36 @@
                 @if($intermediate->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($intermediate as $pdf)
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                            <div class="relative h-64 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center overflow-hidden">
+                        <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
+                            <div class="relative h-52 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#F79A4F,_#D96A22)] flex items-center justify-center overflow-hidden">
                                 @if($pdf->thumbnail)
                                     <img src="/{{ $pdf->thumbnail }}" alt="{{ $pdf->title }}" class="w-full h-full object-cover">
                                 @else
-                                    <div class="flex items-center justify-center w-full h-full bg-orange-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                    <div class="h-full w-full bg-white">
+                                        <canvas
+                                            class="pdf-preview-canvas h-full w-full"
+                                            data-pdf-preview="{{ route('community.pdf-view', $pdf) }}"
+                                            data-pdf-title="{{ $pdf->title }}"
+                                        ></canvas>
                                     </div>
+                                    <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(17,24,39,0.14),transparent_28%),linear-gradient(135deg,transparent_0,transparent_45%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.08)_55%,transparent_55%,transparent_100%)]"></div>
                                 @endif
+                                <div class="absolute left-4 top-4 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm">
+                                    PDF Resource
+                                </div>
                             </div>
-                            <div class="p-5 flex flex-col">
-                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 text-center line-clamp-2">{{ $pdf->title }}</h3>
+                            <div class="p-5 flex flex-col gap-4">
+                                <div class="space-y-2">
+                                    <h3 class="text-xl font-semibold leading-tight text-gray-900 dark:text-white line-clamp-2">{{ $pdf->title }}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Preview in-browser or download a copy for practice.</p>
+                                </div>
                                 
-                                <div class="flex gap-2 mt-auto">
-                                    <a href="/member/community/space/pdf/downloads/{{ $pdf->id }}" class="flex-1 bg-[#FF6B35] hover:bg-[#E55A2B] text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                                <div class="grid grid-cols-2 gap-3 mt-auto">
+                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-100/90 dark:bg-gray-700/80 px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 transition-all duration-200 hover:border-gray-400 hover:bg-white dark:hover:bg-gray-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        View
+                                    </a>
+                                    <a href="/member/community/space/pdf/downloads/{{ $pdf->id }}" class="flex items-center justify-center gap-2 rounded-2xl bg-[#FF6B35] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E55A2B]">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path></svg>
                                         Download
                                     </a>
@@ -131,21 +161,36 @@
                     @if($advanced->count() > 0)
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             @foreach($advanced as $pdf)
-                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                                <div class="relative h-64 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center overflow-hidden">
+                            <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
+                                <div class="relative h-52 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#F56565,_#C53030)] flex items-center justify-center overflow-hidden">
                                     @if($pdf->thumbnail)
                                         <img src="/{{ $pdf->thumbnail }}" alt="{{ $pdf->title }}" class="w-full h-full object-cover">
                                     @else
-                                        <div class="flex items-center justify-center w-full h-full bg-red-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        <div class="h-full w-full bg-white">
+                                            <canvas
+                                                class="pdf-preview-canvas h-full w-full"
+                                                data-pdf-preview="{{ route('community.pdf-view', $pdf) }}"
+                                                data-pdf-title="{{ $pdf->title }}"
+                                            ></canvas>
                                         </div>
+                                        <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(17,24,39,0.14),transparent_28%),linear-gradient(135deg,transparent_0,transparent_45%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.08)_55%,transparent_55%,transparent_100%)]"></div>
                                     @endif
+                                    <div class="absolute left-4 top-4 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm">
+                                        PDF Resource
+                                    </div>
                                 </div>
-                                <div class="p-5 flex flex-col">
-                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 text-center line-clamp-2">{{ $pdf->title }}</h3>
+                                <div class="p-5 flex flex-col gap-4">
+                                    <div class="space-y-2">
+                                        <h3 class="text-xl font-semibold leading-tight text-gray-900 dark:text-white line-clamp-2">{{ $pdf->title }}</h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Preview in-browser or download a copy for practice.</p>
+                                    </div>
                                     
-                                    <div class="flex gap-2 mt-auto">
-                                        <a href="/member/community/space/pdf/downloads/{{ $pdf->id }}" class="flex-1 bg-[#FF6B35] hover:bg-[#E55A2B] text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                                    <div class="grid grid-cols-2 gap-3 mt-auto">
+                                        <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-100/90 dark:bg-gray-700/80 px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 transition-all duration-200 hover:border-gray-400 hover:bg-white dark:hover:bg-gray-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                            View
+                                        </a>
+                                        <a href="/member/community/space/pdf/downloads/{{ $pdf->id }}" class="flex items-center justify-center gap-2 rounded-2xl bg-[#FF6B35] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E55A2B]">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path></svg>
                                             Download
                                         </a>
@@ -169,5 +214,57 @@
     </div>
 </section>
 
-@endsection
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs" type="module"></script>
+<script type="module">
+    import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs";
 
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.worker.min.mjs";
+
+    const canvases = document.querySelectorAll(".pdf-preview-canvas");
+
+    const renderPreview = async (canvas) => {
+        const url = canvas.dataset.pdfPreview;
+
+        if (!url) {
+            return;
+        }
+
+        try {
+            const loadingTask = pdfjsLib.getDocument(url);
+            const pdf = await loadingTask.promise;
+            const page = await pdf.getPage(1);
+
+            const unscaledViewport = page.getViewport({ scale: 1 });
+            const cssWidth = canvas.clientWidth || 320;
+            const cssHeight = canvas.clientHeight || 208;
+            const scale = Math.max(cssWidth / unscaledViewport.width, cssHeight / unscaledViewport.height);
+            const viewport = page.getViewport({ scale });
+            const context = canvas.getContext("2d");
+
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            await page.render({
+                canvasContext: context,
+                viewport,
+            }).promise;
+        } catch (error) {
+            canvas.replaceWith(document.createTextNode("Preview unavailable"));
+        }
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (!entry.isIntersecting) {
+                continue;
+            }
+
+            renderPreview(entry.target);
+            observer.unobserve(entry.target);
+        }
+    }, { rootMargin: "120px" });
+
+    canvases.forEach((canvas) => observer.observe(canvas));
+</script>
+
+@endsection
