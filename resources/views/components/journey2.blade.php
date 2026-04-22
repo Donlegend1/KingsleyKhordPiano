@@ -1,27 +1,4 @@
-<section class="bg-[#F7F8F8]">
-
-  {{-- Banner Image --}}
-  <div class="w-full">
-    <img
-      src="{{ asset('images/testimonials.jpeg') }}"
-      alt="Join Our Private WhatsApp Group"
-      class="w-full object-cover"
-    />
-  </div>
-
-  {{-- Find Out More Button --}}
-  <div class="flex justify-center py-10">
-   <a 
-      href="/plans"
-      class="bg-[#FFD736] hover:bg-[#c2ab39] transition-colors duration-200 text-black text-[14px] md:text-xl font-semibold px-5 py-2 rounded-full"
-    >
-      Find out more
-    </a>
-  </div>
-
-</section>
-
-{{-- <section class=" bg-[#F7F8F8] ">
+<section class=" bg-[#F7F8F8] ">
   <div class="text-center my-10">
     <p class="font-bold text-[#2C2C2C] text-[28px] md:text-3xl pt-10"> A Glimpse Into Student's Journey </p>
   </div>
@@ -103,4 +80,4 @@
     </div>
   </div>
   </div>
-</section> --}}
+</section>

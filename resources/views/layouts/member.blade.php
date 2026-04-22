@@ -99,7 +99,7 @@
                     <a href="/member/community" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-users"></i> Community
                     </a>
-                    <a href="https://khordsounds.com/" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-shopping-bag"></i> Shop
                     </a>
                     <a href="/member/support" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
@@ -110,10 +110,17 @@
                     </a>
                 </nav>
 
-                {{-- Notifications --}}
+                {{-- Notifications (excluding community-section notifications) --}}
                 @php
-                    $unreadNotifications = auth()->user()?->unreadNotifications()->count() ?? 0;
-                    $recentNotifications = auth()->user()?->notifications()->latest()->get() ?? collect();
+                    $communitySection = \App\Enums\Notification\NotificationSectionEnum::COMMUNITY->value;
+                    $recentNotifications = auth()->user()?->notifications()
+                        ->latest()
+                        ->get()
+                        ->filter(function ($n) use ($communitySection) {
+                            $section = $n->data['data']['section'] ?? null;
+                            return $section !== $communitySection;
+                        }) ?? collect();
+                    $unreadNotifications = $recentNotifications->whereNull('read_at')->count();
                 @endphp
 
                 <div x-data="{ openNotif: false }" class="relative">
@@ -274,7 +281,7 @@
                     <a href="/member/profile" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-user-circle w-4"></i> My Account
                     </a>
-                    <a href="https://khordsounds.com/" target="_blank" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-shopping-bag w-4"></i> Shop
                     </a>
                     <a href="/member/support" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">

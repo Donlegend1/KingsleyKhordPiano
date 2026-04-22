@@ -10,8 +10,11 @@
 @include("components.memberarea.stats")
 @include("components.memberarea.liveshow")
 @include("components.memberarea.latest-courses")
+
 {{-- <div id="zoomMeetingBooking"></div> --}}
 {{-- @include("components.memberarea.schedule") --}}
+
+<div id="whatsappGroupModalRoot"></div>
 
 
 @endsection

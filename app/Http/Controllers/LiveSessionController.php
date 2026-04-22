@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class LiveSessionController extends Controller
 {
     public function __construct()
@@ -15,7 +13,8 @@ class LiveSessionController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    function liveSession() {
+    function liveSession() 
+    {
         return view('memberpages.livesession');
     }
 }

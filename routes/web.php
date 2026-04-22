@@ -93,7 +93,7 @@ Route::post('/notifications/{id}/mark-read', function ($id) {
 Route::post('/send-document', [DocumentMailController::class, 'send'])->name('subscribe');
 
 Route::get('/plans', [SubscriptionController::class, 'index']);
-Route::get('/member/plan', [SubscriptionController::class, 'memberplans'])->middleware(['auth', 'verified'])->name('subscription.page');
+Route::get('/member/plan', [SubscriptionController::class, 'memberplans'])->middleware(['auth'])->name('subscription.page');
 
 Auth::routes(
     ['verify' => true]
@@ -113,6 +113,7 @@ Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')-
 
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
+Route::get('/member/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->middleware(['auth', 'verified'])->name('notifications.index');
 
 Route::post('/stripe/create', [StripeController::class, 'checkout'])->name('stripe.create');
 Route::get('/stripe/success', [StripeController::class, 'checkoutSuccess'])->name('checkout.success');
@@ -152,6 +153,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
 
 Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     Route::get('profile', [HomeController::class, 'profile']);
+    Route::post('whatsapp-preference', [HomeController::class, 'updateWhatsappPreference']);
     Route::get('/shop', [ShopController::class, 'index']);
     Route::get('support', [HomeController::class, 'support']);
     Route::get('/premium-booking', [LiveShowController::class, 'show']);

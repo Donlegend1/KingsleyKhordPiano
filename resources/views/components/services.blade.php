@@ -1,3 +1,9 @@
+<section class="bg-[#f5f3ec]">
+    <div class="text-center py-5">
+        <h1 class="text-4xl font-bold text-black mb-6">Our Services Include</h1>
+    </div>
+</section>
+
 <section class="bg-[#f5f3ec] py-10">
     <div class="container mx-auto px-6 lg:px-16">
         <div class="grid grid-cols-1 lg:grid-cols-[35%_65%] gap-12 items-center">

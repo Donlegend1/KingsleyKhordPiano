@@ -32,11 +32,9 @@ class PaymentController extends Controller
             $plan =Plan::find($request->plan_id);
             Subscription::create([
                 'user_id' => Auth::id(),
-                'status' => 'pending',
                 'type' => 'default',
                 'stripe_status' => 'pending',
                 'payment_method' => 'paystack',
-
             ]);
 
             $payload = [
@@ -116,7 +114,7 @@ class PaymentController extends Controller
         if ($data['status'] !== 'success') {
             // Mark subscription as failed
             Subscription::where('user_id', $data['metadata']['user_id'])
-                ->update(['status' => 'failed']);
+                ->update(['stripe_status' => 'past_due']);
 
             return redirect()->route('home')->with('error', 'Payment failed');
         }
@@ -280,62 +278,66 @@ class PaymentController extends Controller
     protected function onSubscriptionCreated(array $data)
     {
         logger()->info(['web hook data' => $data]);
-        $user = User::where('email', $data['email'])->first();
-        Subscription::updateOrCreate(
-            ['user_id' => $user->id ,],
-            [
-                'subscription_code' => $data['subscription_code'],
-                'plan_code' => $data['plan']['plan_code'],
-                'email_token' => $data['email_token'],
-                'ends_at' => $data['period_end'],
-                'status' => 'active',
-            ]
-        );
+        $email = $data['customer']['email'] ?? $data['email'] ?? null;
+        $user = User::where('email', $email)->first();
+        
+        if ($user) {
+            Subscription::updateOrCreate(
+                ['user_id' => $user->id, 'type' => 'default'],
+                [
+                    'stripe_id' => 'ps_' . $data['subscription_code'],
+                    'subscription_code' => $data['subscription_code'],
+                    'plan_code' => $data['plan']['plan_code'] ?? null,
+                    'email_token' => $data['email_token'] ?? null,
+                    'ends_at' => \Carbon\Carbon::parse($data['next_payment_date'] ?? '+1 month'),
+                    'stripe_status' => 'active',
+                    'payment_method' => 'paystack',
+                ]
+            );
+        }
     }
 
     protected function onInvoicePaymentSuccess(array $data)
     {
-        $subscriptionCode = $data['subscription']['subscription_code'];
+        $subscriptionCode = $data['subscription']['subscription_code'] ?? $data['subscription_code'] ?? null;
+        if (!$subscriptionCode) return;
 
         $subscription = Subscription::where('subscription_code', $subscriptionCode)->first();
 
-        if (!$subscription) {
-            return;
+        if ($subscription) {
+            $subscription->update([
+                'stripe_status' => 'active',
+                'ends_at' => \Carbon\Carbon::parse($data['period_end'] ?? '+1 month')
+            ]);
         }
-
-        $subscription->update(['status' => 'active']);
-
     }
 
     protected function onInvoicePaymentFailed(array $data)
     {
-        $subscriptionCode = $data['subscription']['subscription_code'];
+        $subscriptionCode = $data['subscription']['subscription_code'] ?? $data['subscription_code'] ?? null;
+        if (!$subscriptionCode) return;
 
         $subscription = Subscription::where('subscription_code', $subscriptionCode)->first();
 
-        if (!$subscription) {
-            return;
+        if ($subscription) {
+            $subscription->update(['stripe_status' => 'past_due']);
+
+            $subscription->user->update([
+                'payment_status' => 'past_due',
+            ]);
         }
-
-        $subscription->update(['status' => 'past_due']);
-
-        $subscription->user->update([
-            'payment_status' => 'past_due',
-        ]);
     }
 
     protected function onSubscriptionDisabled(array $data)
     {
-        $subscriptionCode = $data['subscription_code'];
+        $subscriptionCode = $data['subscription_code'] ?? null;
+        if (!$subscriptionCode) return;
 
         $subscription = Subscription::where('subscription_code', $subscriptionCode)->first();
 
-        if (!$subscription) {
-            return;
+        if ($subscription) {
+            $subscription->update(['stripe_status' => 'canceled']);
         }
-
-        $subscription->update(['status' => 'cancelled']);
-
     }
 
 }

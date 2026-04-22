@@ -18,6 +18,11 @@ class Subscription extends Model
     'quantity',
     'trial_ends_at',
     'ends_at',
+    'plan_code',
+    'subscription_code',
+    'email_token',
+    'authorization_code',
+    'payment_method',
     ];
 
     public function item()

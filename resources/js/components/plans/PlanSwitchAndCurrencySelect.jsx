@@ -205,7 +205,7 @@ const PlanSwitchAndCurrencySelect = () => {
                         <p className="text-center text-white mb-4">
                             {currencySigns[currency]}
                             {matchAmountToCurrency(selectedPlanDetails)}
-                             {"for "}{ selectedPlanDetails.tier} Plan
+                             {" for "}{ selectedPlanDetails.tier} Plan
                         </p>
 
                         <div className="flex flex-col gap-6">

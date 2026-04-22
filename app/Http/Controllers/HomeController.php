@@ -328,4 +328,35 @@ class HomeController extends Controller
         $user->save();
         return redirect()->back();
     }
+
+    public function updateWhatsappPreference(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $metadata = is_array($user->metadata) ? $user->metadata : [];
+        
+        $action = $request->action;
+        
+        if ($action === 'join') {
+            $metadata['whatsapp_joined'] = true;
+        } elseif ($action === 'remind') {
+            $duration = $request->duration;
+            $remindAt = match($duration) {
+                '1h' => now()->addHour(),
+                '3h' => now()->addHours(3),
+                '6h' => now()->addHours(6),
+                'tomorrow' => now()->addDay()->startOfDay()->addHours(9),
+                '3d' => now()->addDays(3),
+                '1w' => now()->addWeek(),
+                default => now()->addHour(),
+            };
+            $metadata['whatsapp_remind_at'] = $remindAt->toDateTimeString();
+        } elseif ($action === 'dismiss') {
+            $metadata['whatsapp_remind_at'] = now()->addWeek()->toDateTimeString();
+        }
+        
+        $user->metadata = $metadata;
+        $user->save();
+        
+        return response()->json(['success' => true]);
+    }
 }

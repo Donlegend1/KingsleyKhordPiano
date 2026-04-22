@@ -114,7 +114,7 @@
       
                   $tooltipMap = [
                       'independence' => 'Train each hand to play independently',
-                      'technique' => 'Improve hand synchronization',
+                      'technique' => 'Be more skilled and accurate',
                       'flexibility'  => 'Increase finger and wrist flexibility',
                       'strength'     => 'Build finger strength and control',
                       'dexterity'    => 'Improve speed, accuracy, and agility',
