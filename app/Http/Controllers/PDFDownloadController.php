@@ -13,7 +13,14 @@ class PDFDownloadController extends Controller
      */
     private function resolveFullPath(string $relativePath): string
     {
-        return base_path('../public_html/' . ltrim($relativePath, '/'));
+        $normalizedPath = ltrim($relativePath, '/');
+        $localPublicPath = public_path($normalizedPath);
+
+        if (file_exists($localPublicPath)) {
+            return $localPublicPath;
+        }
+
+        return base_path('../public_html/' . $normalizedPath);
     }
 
     /**
@@ -115,6 +122,33 @@ class PDFDownloadController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error downloading PDF: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * View the PDF inline in the browser.
+     */
+    public function view(PDFDownload $pDFDownload)
+    {
+        try {
+            $fullPath = $this->resolveFullPath($pDFDownload->file_url);
+
+            if (! file_exists($fullPath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File not found',
+                ], 404);
+            }
+
+            return response()->file($fullPath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . basename($fullPath) . '"',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error viewing PDF: ' . $e->getMessage(),
             ], 500);
         }
     }

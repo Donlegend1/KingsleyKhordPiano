@@ -1,50 +1,219 @@
-import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom/client";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import {
-    useFlashMessage,
-    FlashMessageProvider,
-} from "../Alert/FlashMessageContext";
+import { EllipsisVertical, MessageSquare, Pencil, Reply, Send, Trash2 } from "lucide-react";
 
+import {
+    FlashMessageProvider,
+    useFlashMessage,
+} from "../Alert/FlashMessageContext";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+
+const buttonBase =
+    "inline-flex items-center justify-center rounded-md text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:pointer-events-none disabled:opacity-50";
+const primaryButton = `${buttonBase} bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200`;
+const secondaryButton = `${buttonBase} border border-slate-200 bg-white px-3 py-2 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800`;
+const ghostButton = `${buttonBase} px-2.5 py-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white`;
+
+function formatTimestamp(value) {
+    if (!value) return "";
+
+    try {
+        return new Date(value).toLocaleString();
+    } catch {
+        return "";
+    }
+}
+
+function CommentCard({
+    comment,
+    activeMenuId,
+    editingCommentId,
+    editedComment,
+    activeReplyId,
+    replyValue,
+    onToggleMenu,
+    onEditStart,
+    onEditCancel,
+    onEditChange,
+    onUpdateComment,
+    onDeleteComment,
+    onToggleReply,
+    onReplyChange,
+    onReplySubmit,
+}) {
+    const isEditing = editingCommentId === comment.id;
+    const isReplying = activeReplyId === comment.id;
+    const menuOpen = activeMenuId === comment.id;
+
+    return (
+        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                    <img
+                        src={comment.user?.passport || "/avatar1.jpg"}
+                        alt="Avatar"
+                        className="h-11 w-11 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                    />
+                    <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                            {comment.user?.first_name} {comment.user?.last_name}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {formatTimestamp(comment.created_at)}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="relative shrink-0">
+                    <button
+                        type="button"
+                        onClick={() => onToggleMenu(comment.id)}
+                        className={ghostButton}
+                    >
+                        <EllipsisVertical className="h-4 w-4" />
+                    </button>
+
+                    {menuOpen && (
+                        <div className="absolute right-0 z-10 mt-2 w-32 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+                            <button
+                                type="button"
+                                onClick={() => onEditStart(comment)}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                            >
+                                <Pencil className="h-4 w-4" />
+                                Edit
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onDeleteComment(comment.id)}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-600 transition hover:bg-red-50 dark:hover:bg-red-950/40"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                                Delete
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {isEditing ? (
+                <div className="mt-4 space-y-3">
+                    <Textarea
+                        className="min-h-[96px]"
+                        value={editedComment}
+                        onChange={(event) => onEditChange(event.target.value)}
+                    />
+                    <div className="flex flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => onUpdateComment(comment.id)}
+                            className={primaryButton}
+                        >
+                            Save changes
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onEditCancel}
+                            className={secondaryButton}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <p className="mt-4 text-sm leading-6 text-slate-700 dark:text-slate-200">
+                    {comment.comment}
+                </p>
+            )}
+
+            {comment.replies?.length > 0 && (
+                <div className="mt-4 space-y-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+                    {comment.replies.map((reply) => (
+                        <div
+                            key={reply.id}
+                            className="rounded-xl bg-slate-50 px-3 py-3 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                        >
+                            <span className="font-semibold text-slate-900 dark:text-white">
+                                {reply.user?.first_name}:
+                            </span>{" "}
+                            {reply.reply}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <div className="mt-4">
+                <button
+                    type="button"
+                    onClick={() => onToggleReply(comment.id)}
+                    className="inline-flex items-center gap-2 text-xs font-medium text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                    <Reply className="h-3.5 w-3.5" />
+                    {isReplying ? "Cancel reply" : "Reply"}
+                </button>
+
+                {isReplying && (
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                        <Input
+                            type="text"
+                            value={replyValue}
+                            onChange={(event) => onReplyChange(comment.id, event.target.value)}
+                            placeholder="Write a reply..."
+                            className="h-10 flex-1"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => onReplySubmit(comment.id)}
+                            className={`${primaryButton} gap-2 px-4 py-2`}
+                        >
+                            <Send className="h-4 w-4" />
+                            Submit
+                        </button>
+                    </div>
+                )}
+            </div>
+        </article>
+    );
+}
 
 const CourseComment = ({ course, group }) => {
-
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
     const [commentSubmitting, setCommentSubmitting] = useState(false);
-    const csrfToken = document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute("content");
-    const { showMessage } = useFlashMessage();
-
     const [activeMenuId, setActiveMenuId] = useState(null);
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editedComment, setEditedComment] = useState("");
     const [replyText, setReplyText] = useState({});
     const [activeReplyId, setActiveReplyId] = useState(null);
 
-    const handleMenuToggle = (commentId) => {
-        setActiveMenuId(activeMenuId === commentId ? null : commentId);
-    };
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
 
-    const handleReplyChange = (commentId, text) => {
-        setReplyText((prev) => ({
-            ...prev,
-            [commentId]: text,
-        }));
-    };
+    const { showMessage } = useFlashMessage();
 
-    const toggleReplyInput = (commentId) => {
-        setActiveReplyId((prev) => (prev === commentId ? null : commentId));
-    };
+    const resolvedCourse = useMemo(() => {
+        if (course) return course;
+        if (typeof window !== "undefined" && window.uploadData) return window.uploadData;
+        return null;
+    }, [course]);
+
+    const resolvedGroup = group || "course";
 
     useEffect(() => {
-        fetchComments();
-    }, []);
+        if (resolvedCourse?.id) {
+            fetchComments();
+        }
+    }, [resolvedCourse?.id, resolvedGroup]);
 
     const fetchComments = async () => {
+        if (!resolvedCourse?.id) return;
+
         try {
             const response = await axios.get(
-                `/api/member/comments/course?category=${group}&course_id=${course.id}`,
+                `/api/member/comments/course?category=${resolvedGroup}&course_id=${resolvedCourse.id}`,
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
@@ -58,20 +227,34 @@ const CourseComment = ({ course, group }) => {
         }
     };
 
+    const handleMenuToggle = (commentId) => {
+        setActiveMenuId((current) => (current === commentId ? null : commentId));
+    };
 
-    const handleSubmitComment = async (e) => {
-        e.preventDefault();
-        if (!comment.trim()) return;
+    const handleReplyChange = (commentId, text) => {
+        setReplyText((prev) => ({
+            ...prev,
+            [commentId]: text,
+        }));
+    };
+
+    const toggleReplyInput = (commentId) => {
+        setActiveReplyId((prev) => (prev === commentId ? null : commentId));
+    };
+
+    const handleSubmitComment = async (event) => {
+        event.preventDefault();
+        if (!comment.trim() || !resolvedCourse?.id) return;
 
         setCommentSubmitting(true);
         try {
-            const response = await axios.post(
-                `/api/member/course/${course.id}/video-comment`,
+            await axios.post(
+                `/api/member/course/${resolvedCourse.id}/video-comment`,
                 {
-                    comment: comment,
-                    category: group, // Assuming category is quiz for this context
-                    course_id: course.id,
-                    url: `/member/course/${course.level}?course_id=${course.id}`
+                    comment,
+                    category: resolvedGroup,
+                    course_id: resolvedCourse.id,
+                    url: `/member/course/${resolvedCourse.level}?course_id=${resolvedCourse.id}`,
                 },
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },
@@ -90,10 +273,10 @@ const CourseComment = ({ course, group }) => {
         }
     };
 
-    const handleEdit = (comment) => {
-        setEditingCommentId(comment.id);
-        setEditedComment(comment.comment);
-        setActiveMenuId(null); // Close menu
+    const handleEdit = (selectedComment) => {
+        setEditingCommentId(selectedComment.id);
+        setEditedComment(selectedComment.comment);
+        setActiveMenuId(null);
     };
 
     const handleUpdateComment = async (id) => {
@@ -102,10 +285,11 @@ const CourseComment = ({ course, group }) => {
                 comment: editedComment,
             });
             setEditingCommentId(null);
+            setEditedComment("");
             showMessage("Comment updated!", "success");
             fetchComments();
-        } catch (err) {
-            console.error("Failed to update comment:", err);
+        } catch (error) {
+            console.error("Failed to update comment:", error);
             showMessage("Error updating comment!", "error");
         }
     };
@@ -114,37 +298,23 @@ const CourseComment = ({ course, group }) => {
         try {
             await axios.delete(`/api/member/comment/${commentId}`);
             setEditingCommentId(null);
+            setActiveMenuId(null);
             showMessage("Comment deleted!", "success");
             fetchComments();
-        } catch (err) {
-            console.error("Failed to update comment:", err);
+        } catch (error) {
+            console.error("Failed to delete comment:", error);
             showMessage("Error deleting comment!", "error");
         }
     };
 
     const submitReply = async (commentId) => {
-        if (!replyText[commentId]) return;
+        if (!replyText[commentId]?.trim()) return;
 
         try {
-            const res = await axios.post(
-                `/api/member/comment/${commentId}/reply`,
-                {
-                    comment: replyText[commentId],
-                }
-            );
-
-            // Optional: Update UI
-            const updated = comments.map((c) => {
-                if (c.id === commentId) {
-                    return {
-                        ...c,
-                        replies: [...(c.replies || []), res.data],
-                    };
-                }
-                return c;
+            await axios.post(`/api/member/comment/${commentId}/reply`, {
+                comment: replyText[commentId],
             });
 
-            setComments(updated);
             setReplyText((prev) => ({ ...prev, [commentId]: "" }));
             setActiveReplyId(null);
             showMessage("Reply submitted!", "success");
@@ -155,221 +325,88 @@ const CourseComment = ({ course, group }) => {
         }
     };
 
+    if (!resolvedCourse?.id) {
+        return null;
+    }
+
     return (
-        <div className="p-6 bg-white dark:bg-black rounded shadow-lg">
-
-            {/* Comment Section */}
-            <div className="mt-10">
-                {/* <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
-                    Comments
-                </h3> */}
-
-                <form onSubmit={handleSubmitComment} className="mb-4">
-                    <textarea
-                        className="w-full p-2 border rounded shadow-sm focus:outline-none focus:ring 
-                       bg-white text-gray-900 dark:bg-gray-900 dark:text-white 
-                       dark:border-gray-700"
-                        rows="3"
-                        placeholder="Write a comment..."
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                    ></textarea>
-                    <button
-                        type="submit"
-                        disabled={commentSubmitting}
-                        className="mt-2 px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        <span className="fa fa-paper-plane mr-2"></span>
-                        Post Comment
-                    </button>
-                </form>
-
-                <div className="space-y-4">
-                    {comments.length === 0 ? (
-                        <div className="text-center text-gray-500 dark:text-gray-400">
-                            <i className="fa fa-comments fa-2x mb-2"></i>
-                            <p>No comments yet.</p>
-                        </div>
-                    ) : (
-                        comments.map((c) => (
-                            <div
-                                key={c.id}
-                                className="border p-3 rounded shadow-sm relative 
-                               bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-100 
-                               dark:border-gray-700"
-                            >
-                                {/* Header */}
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <img
-                                            src={
-                                                c.user?.passport ||
-                                                "/avatar1.jpg"
-                                            }
-                                            alt="Avatar"
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <div>
-                                            <div className="font-semibold">
-                                                {c.user?.first_name}{" "}
-                                                {c.user?.last_name}
-                                            </div>
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                {new Date(
-                                                    c.created_at
-                                                ).toLocaleString()}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Menu */}
-                                    <div className="relative">
-                                        <button
-                                            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
-                                            onClick={() =>
-                                                handleMenuToggle(c.id)
-                                            }
-                                        >
-                                            <i className="fa fa-ellipsis-v"></i>
-                                        </button>
-
-                                        {activeMenuId === c.id && (
-                                            <div
-                                                className="absolute right-0 mt-2 bg-white dark:bg-gray-900 
-                                                border dark:border-gray-700 rounded shadow-md z-10 w-32"
-                                            >
-                                                <button
-                                                    onClick={() =>
-                                                        handleEdit(c)
-                                                    }
-                                                    className="block w-full px-4 py-2 text-left text-sm 
-                                                   hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(c.id)
-                                                    }
-                                                    className="block w-full px-4 py-2 text-left text-sm 
-                                                   text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Comment Text or Edit */}
-                                {editingCommentId === c.id ? (
-                                    <div className="mt-2 space-y-2">
-                                        <textarea
-                                            className="w-full border px-2 py-1 text-sm rounded 
-                                           bg-white dark:bg-gray-900 
-                                           text-gray-900 dark:text-white 
-                                           dark:border-gray-700"
-                                            value={editedComment}
-                                            onChange={(e) =>
-                                                setEditedComment(e.target.value)
-                                            }
-                                        />
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() =>
-                                                    handleUpdateComment(c.id)
-                                                }
-                                                className="text-blue-600 text-sm"
-                                            >
-                                                Save
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    setEditingCommentId(null)
-                                                }
-                                                className="text-gray-500 dark:text-gray-300 text-sm"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="mt-2 text-sm text-gray-700 dark:text-gray-200">
-                                        {c.comment}
-                                    </div>
-                                )}
-
-                                {/* Replies */}
-                                {c.replies && c.replies.length > 0 && (
-                                    <div className="mt-4 border-t pt-2 space-y-2 pl-5 dark:border-gray-700">
-                                        {c.replies.map((reply) => (
-                                            <div
-                                                key={reply.id}
-                                                className="text-sm text-gray-600 dark:text-gray-300"
-                                            >
-                                                <strong>
-                                                    {reply.user?.first_name}:
-                                                </strong>{" "}
-                                                {reply.reply}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Reply input */}
-                                <div className="pl-5 mt-2">
-                                    <button
-                                        className="text-xs text-blue-600"
-                                        onClick={() => toggleReplyInput(c.id)}
-                                    >
-                                        {activeReplyId === c.id
-                                            ? "Cancel"
-                                            : "Reply"}
-                                    </button>
-
-                                    {activeReplyId === c.id && (
-                                        <div className="mt-2 space-y-2">
-                                            <input
-                                                type="text"
-                                                value={replyText[c.id] || ""}
-                                                onChange={(e) =>
-                                                    handleReplyChange(
-                                                        c.id,
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Write a reply..."
-                                                className="w-full border rounded px-2 py-1 text-sm 
-                                               bg-white dark:bg-gray-900 
-                                               text-gray-900 dark:text-white 
-                                               dark:border-gray-700"
-                                            />
-                                            <button
-                                                onClick={() =>
-                                                    submitReply(c.id)
-                                                }
-                                                className="text-sm text-white bg-blue-500 px-3 py-1 rounded"
-                                            >
-                                                Submit
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))
-                    )}
+        <section className="mt-10 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-black sm:p-6">
+            <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                    <MessageSquare className="h-5 w-5" />
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Comments</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Share your thoughts, questions, and follow-up replies.
+                    </p>
                 </div>
             </div>
-        </div>
+
+            <form onSubmit={handleSubmitComment} className="mt-6 space-y-3">
+                <Textarea
+                    className="min-h-[120px]"
+                    rows="4"
+                    placeholder="Write a comment..."
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                />
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={commentSubmitting || !comment.trim()}
+                        className={`${primaryButton} gap-2 px-4 py-2`}
+                    >
+                        <Send className="h-4 w-4" />
+                        {commentSubmitting ? "Posting..." : "Post Comment"}
+                    </button>
+                </div>
+            </form>
+
+            <div className="mt-8 space-y-4">
+                {comments.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-950">
+                        <MessageSquare className="mx-auto h-10 w-10 text-slate-400 dark:text-slate-500" />
+                        <p className="mt-3 text-sm font-medium text-slate-600 dark:text-slate-300">
+                            No comments yet.
+                        </p>
+                    </div>
+                ) : (
+                    comments.map((entry) => (
+                        <CommentCard
+                            key={entry.id}
+                            comment={entry}
+                            activeMenuId={activeMenuId}
+                            editingCommentId={editingCommentId}
+                            editedComment={editedComment}
+                            activeReplyId={activeReplyId}
+                            replyValue={replyText[entry.id] || ""}
+                            onToggleMenu={handleMenuToggle}
+                            onEditStart={handleEdit}
+                            onEditCancel={() => {
+                                setEditingCommentId(null);
+                                setEditedComment("");
+                            }}
+                            onEditChange={setEditedComment}
+                            onUpdateComment={handleUpdateComment}
+                            onDeleteComment={handleDelete}
+                            onToggleReply={toggleReplyInput}
+                            onReplyChange={handleReplyChange}
+                            onReplySubmit={submitReply}
+                        />
+                    ))
+                )}
+            </div>
+        </section>
     );
 };
 
 export default CourseComment;
 
 if (document.getElementById("comments")) {
-    const Index = ReactDOM.createRoot(document.getElementById("comments"));
+    const root = ReactDOM.createRoot(document.getElementById("comments"));
 
-    Index.render(
+    root.render(
         <React.StrictMode>
             <FlashMessageProvider>
                 <CourseComment />

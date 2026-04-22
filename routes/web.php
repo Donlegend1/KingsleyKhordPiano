@@ -157,11 +157,13 @@ Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
+    Route::get('/community/leaderboard', [CommunityIndexController::class, 'leaderboard'])->name('community.leaderboard');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
     Route::get('/community/space/pdf-downloads', [CommunityIndexController::class, 'pdfDownloads'])->name('community.pdf-downloads');
     Route::get('/community/space/audio-downloads', [CommunityIndexController::class, 'audioDownloads'])->name('community.audio-downloads');
     Route::get('/community/space/audio/downloads/{audioDownload}', [AudioDownloadController::class, 'download']);
     Route::get('/community/space/pdf/downloads/{pDFDownload}', [PDFDownloadController::class, 'download']);
+    Route::get('/community/space/pdf/view/{pDFDownload}', [PDFDownloadController::class, 'view'])->name('community.pdf-view');
 
 
     Route::get('/community/space/midi-downloads', [CommunityIndexController::class, 'midiDownloads'])->name('community.midi-downloads');
