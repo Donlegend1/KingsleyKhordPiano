@@ -36,28 +36,52 @@
 <section class="bg-gray-100 py-10">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
 
-    <div class="block sm:hidden mb-6 space-y-4">
+    <div class="block sm:hidden mb-6">
+      <div class="space-y-4 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
 
-      <!-- Category Dropdown -->
-      <select onchange="window.location.href = this.value" class="w-full border-gray-300 rounded p-2 text-sm">
-        <option value="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}" {{ is_null($level) ? 'selected' : '' }}>All Categories</option>
-        @foreach ($levels as $tab)
-          <option value="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" {{ strtolower($level) === strtolower($tab) ? 'selected' : '' }}>
-            {{ ucfirst($tab) }}
-          </option>
-        @endforeach
-      </select>
+        <div>
+          <label for="pianoexercise-category-filter" class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">
+            Filter Category
+          </label>
+          <div class="relative">
+            <select id="pianoexercise-category-filter" onchange="window.location.href = this.value" class="w-full appearance-none rounded-xl border border-slate-300 bg-white py-3.5 pl-4 pr-12 text-base font-bold text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: none;">
+              <option value="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}" {{ is_null($level) ? 'selected' : '' }}>All Categories</option>
+              @foreach ($levels as $tab)
+                <option value="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" {{ strtolower($level) === strtolower($tab) ? 'selected' : '' }}>
+                  {{ ucfirst($tab) }}
+                </option>
+              @endforeach
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">
+              <svg class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
 
-      <!-- Skill Level Dropdown -->
-      <select onchange="window.location.href = this.value" class="w-full border-gray-300 rounded p-2 text-sm">
-        <option value="{{ route('piano.exercise', array_filter(['level' => $level])) }}" {{ is_null($skillLevel) ? 'selected' : '' }}>All Skill Levels</option>
-        @foreach ($skillLevels as $sl)
-          <option value="{{ route('piano.exercise', array_filter(['level' => $level, 'skill_level' => $sl])) }}" {{ strtolower($skillLevel) === strtolower($sl) ? 'selected' : '' }}>
-            {{ ucfirst($sl) }}
-          </option>
-        @endforeach
-      </select>
+        <div>
+          <label for="pianoexercise-skill-filter" class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">
+            Filter Skill Level
+          </label>
+          <div class="relative">
+            <select id="pianoexercise-skill-filter" onchange="window.location.href = this.value" class="w-full appearance-none rounded-xl border border-slate-300 bg-white py-3.5 pl-4 pr-12 text-base font-bold text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: none;">
+              <option value="{{ route('piano.exercise', array_filter(['level' => $level])) }}" {{ is_null($skillLevel) ? 'selected' : '' }}>All Skill Levels</option>
+              @foreach ($skillLevels as $sl)
+                <option value="{{ route('piano.exercise', array_filter(['level' => $level, 'skill_level' => $sl])) }}" {{ strtolower($skillLevel) === strtolower($sl) ? 'selected' : '' }}>
+                  {{ ucfirst($sl) }}
+                </option>
+              @endforeach
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">
+              <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
 
+      </div>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-8">
