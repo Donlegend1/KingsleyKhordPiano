@@ -49,15 +49,29 @@
 
     <!-- Mobile Dropdown -->
     <div class="block lg:hidden mb-6">
-      <select 
-        x-model="activeTab" 
-        class="w-full p-3 rounded-lg border border-gray-300 text-gray-700"
-      >
-        <option value="all">All</option>
-        <option value="beginner">Beginner</option>
-        <option value="intermediate">Intermediate</option>
-        <option value="advanced">Advanced</option>
-      </select>
+      <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
+        <label for="learnsongs-mobile-filter" class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">
+          Filter Lessons
+        </label>
+        <div class="relative">
+          <select
+            id="learnsongs-mobile-filter"
+            x-model="activeTab"
+            class="w-full appearance-none rounded-xl border border-slate-300 bg-white py-3.5 pl-4 pr-12 text-base font-bold text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100"
+            style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: none;"
+          >
+            <option value="all" class="font-bold">All</option>
+            <option value="beginner" class="font-bold">Beginner</option>
+            <option value="intermediate" class="font-bold">Intermediate</option>
+            <option value="advanced" class="font-bold">Advanced</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">
+            <svg class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Desktop Tabs -->
