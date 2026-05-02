@@ -10,6 +10,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
+import { calculateCountdown, formatLocalTime } from "@/utils/formatRelativeTime";
 
 const LiveShowCard = () => {
     const [shows, setShows] = useState([]);
@@ -61,24 +62,6 @@ const LiveShowCard = () => {
         return () => clearInterval(interval);
     }, [shows]);
 
-    const calculateCountdown = (startTime) => {
-        const now = dayjs();
-        const eventTime = dayjs(startTime);
-        const diff = eventTime.diff(now);
-
-        if (diff <= 0) {
-            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-        }
-
-        const dur = dayjs.duration(diff);
-        return {
-            days: Math.floor(dur.asDays()),
-            hours: dur.hours(),
-            minutes: dur.minutes(),
-            seconds: dur.seconds(),
-        };
-    };
-
     const handleRestrictedClick = (e) => {
         e.preventDefault();
         showMessage(
@@ -86,6 +69,7 @@ const LiveShowCard = () => {
             "error"
         );
     };
+
 
     return (
         <section className="max-w-7xl mx-auto px-6 py-16">
@@ -95,7 +79,7 @@ const LiveShowCard = () => {
                         const date = dayjs(show.start_time);
                         const isRestricted = show.access_type === "premium" && !isPremium;
                         const countdown = countdowns[show.id] || { days: 0, hours: 0, minutes: 0, seconds: 0 };
-
+                        const { localDate, localTime, tzLabel } = formatLocalTime(show.start_time); 
                         return (
                             <div
                                 key={show.id}
@@ -134,11 +118,11 @@ const LiveShowCard = () => {
                                         <div className="flex items-center gap-4 text-white/70 text-sm font-medium">
                                             <div className="flex items-center gap-1.5">
                                                 <i className="fa-regular fa-calendar text-[#FFD736]"></i>
-                                                {date.format("MMM DD, YYYY")}
+                                                {localDate}
                                             </div>
                                             <div className="flex items-center gap-1.5">
                                                 <i className="fa-regular fa-clock text-[#FFD736]"></i>
-                                                {date.format("HH:mm")}
+                                                {localTime} {tzLabel}
                                             </div>
                                         </div>
                                     </div>

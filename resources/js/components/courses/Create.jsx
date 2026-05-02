@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Select from "react-select";
 import {
     useFlashMessage,
     FlashMessageProvider,
@@ -12,28 +13,52 @@ const CourseForm = () => {
         category: "",
         description: "",
         video_url: "",
-        // image_path: '',
+        video_type: "youtube",
         level: "beginner",
         enrollment_count: 0,
         status: "active",
         prerequisites: "",
-        // what_you_will_learn: '',
-
         rating_count: 0,
         average_rating: 0,
-        // resources: [],
-        // requirements: '',
         likes: 0,
         dislikes: 0,
+        related_courses: [],
     });
 
+    const [allCourses, setAllCourses] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const { showMessage } = useFlashMessage();
 
+    useEffect(() => {
+        const fetchAllCourses = async () => {
+            try {
+                const response = await axios.get("/api/admin/all-courses");
+                setAllCourses(
+                    response.data.map((c) => ({
+                        value: c.id,
+                        label: `${c.title} (${c.level})`,
+                    }))
+                );
+            } catch (error) {
+                console.error("Error fetching courses:", error);
+            }
+        };
+        fetchAllCourses();
+    }, []);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCourse({ ...course, [name]: value });
+    };
+
+    const handleRelatedCoursesChange = (selectedOptions) => {
+        setCourse({
+            ...course,
+            related_courses: selectedOptions
+                ? selectedOptions.map((opt) => opt.value)
+                : [],
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -50,19 +75,16 @@ const CourseForm = () => {
                 category: "",
                 description: "",
                 video_url: "",
-                // image_path: '',
+                video_type: "youtube",
                 level: "beginner",
                 enrollment_count: 0,
                 status: "active",
                 prerequisites: "",
-                // what_you_will_learn: '',
-
                 rating_count: 0,
                 average_rating: 0,
-                // resources: [],
-                // requirements: '',
                 likes: 0,
                 dislikes: 0,
+                related_courses: [],
             });
         } catch (error) {
             showMessage("Error creating course", "error");
@@ -78,7 +100,7 @@ const CourseForm = () => {
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                    <div className="col-span-1 sm:col-span-2">
                         <label
                             htmlFor="title"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -90,7 +112,8 @@ const CourseForm = () => {
                             name="title"
                             value={course.title}
                             onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            required
                         />
                     </div>
 
@@ -106,8 +129,50 @@ const CourseForm = () => {
                             name="category"
                             value={course.category}
                             onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            required
                         />
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="level"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Level
+                        </label>
+                        <select
+                            id="level"
+                            name="level"
+                            value={course.level}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        >
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="video_type"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Video Type
+                        </label>
+                        <select
+                            id="video_type"
+                            name="video_type"
+                            value={course.video_type}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        >
+                            <option value="youtube">YouTube</option>
+                            <option value="google">Google Drive</option>
+                            <option value="local">Local</option>
+                            <option value="iframe">Iframe</option>
+                        </select>
                     </div>
 
                     <div>
@@ -115,14 +180,15 @@ const CourseForm = () => {
                             htmlFor="video_url"
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                            Video URL
+                            Video URL / ID
                         </label>
                         <input
                             id="video_url"
                             name="video_url"
                             value={course.video_url}
                             onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            required
                         />
                     </div>
 
@@ -138,7 +204,7 @@ const CourseForm = () => {
                             name="status"
                             value={course.status}
                             onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                         >
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
@@ -146,24 +212,21 @@ const CourseForm = () => {
                         </select>
                     </div>
 
-                    <div>
+                <div className="col-span-1 sm:col-span-2">
                         <label
-                            htmlFor="level"
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                            Level
+                            Related Courses
                         </label>
-                        <select
-                            id="level"
-                            name="level"
-                            value={course.level}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg"
-                        >
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
+                        <Select
+                            isMulti
+                            options={allCourses}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            onChange={handleRelatedCoursesChange}
+                            value={allCourses.filter(opt => course.related_courses.includes(opt.value))}
+                            placeholder="Select related courses..."
+                        />
                     </div>
                 </div>
 
@@ -179,7 +242,7 @@ const CourseForm = () => {
                         name="description"
                         value={course.description}
                         onChange={handleChange}
-                        className="w-full p-3 border rounded-lg"
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                         rows="4"
                     ></textarea>
                 </div>
@@ -187,13 +250,14 @@ const CourseForm = () => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-black text-white rounded-lg hover:bg-blue-600 hover:text-black transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
                 >
                     {loading ? (
-                        <span className="fa fa-spinner fa-spin"></span>
+                        <span className="fa fa-spinner fa-spin mr-2"></span>
                     ) : (
-                        "Save Course"
+                        <span className="fa fa-save mr-2"></span>
                     )}
+                    {loading ? "Saving..." : "Save Course"}
                 </button>
             </form>
         </div>

@@ -40,10 +40,12 @@ class MidiFileController extends Controller
         // Ensure directories exist
         $midiDir = public_path('midi-files/midi');
         $lmvDir = public_path('midi-files/lmv');
+        $lmsDir = public_path('midi-files/lms');
         $thumbDir = public_path('midi-files/thumbnails');
 
         if (!is_dir($midiDir)) mkdir($midiDir, 0777, true);
         if (!is_dir($lmvDir)) mkdir($lmvDir, 0777, true);
+        if (!is_dir($lmsDir)) mkdir($lmsDir, 0777, true);
         if (!is_dir($thumbDir)) mkdir($thumbDir, 0777, true);
 
         // MIDI upload
@@ -82,6 +84,13 @@ class MidiFileController extends Controller
             $data['lmv_file_path'] = 'midi-files/lmv/' . $lmvName;
         }
 
+        // LMS upload
+        if ($request->hasFile('lms_file')) {
+            $lmsName = time() . '_lms.' . $request->file('lms_file')->getClientOriginalExtension();
+            $request->file('lms_file')->move($lmsDir, $lmsName);
+            $data['lms_file_path'] = 'midi-files/lms/' . $lmsName;
+        }
+
         return MidiFile::create($data);
     }
     /**
@@ -103,10 +112,12 @@ class MidiFileController extends Controller
 
         $midiDir = public_path('midi-files/midi');
         $lmvDir = public_path('midi-files/lmv');
+        $lmsDir = public_path('midi-files/lms');
         $thumbDir = public_path('midi-files/thumbnails');
 
         if (!is_dir($midiDir)) mkdir($midiDir, 0777, true);
         if (!is_dir($lmvDir)) mkdir($lmvDir, 0777, true);
+        if (!is_dir($lmsDir)) mkdir($lmsDir, 0777, true);
         if (!is_dir($thumbDir)) mkdir($thumbDir, 0777, true);
 
         // Delete + Replace MIDI file
@@ -129,6 +140,17 @@ class MidiFileController extends Controller
             $lmvName = time() . '_lmv.' . $request->file('lmv_file')->getClientOriginalExtension();
             $request->file('lmv_file')->move($lmvDir, $lmvName);
             $data['lmv_file_path'] = 'midi-files/lmv/' . $lmvName;
+        }
+
+        // LMS
+        if ($request->hasFile('lms_file')) {
+            if ($midiFile->lms_file_path && file_exists(public_path($midiFile->lms_file_path))) {
+                unlink(public_path($midiFile->lms_file_path));
+            }
+
+            $lmsName = time() . '_lms.' . $request->file('lms_file')->getClientOriginalExtension();
+            $request->file('lms_file')->move($lmsDir, $lmsName);
+            $data['lms_file_path'] = 'midi-files/lms/' . $lmsName;
         }
 
         // Thumbnail
@@ -183,6 +205,11 @@ class MidiFileController extends Controller
             unlink(public_path($midiFile->lmv_file_path));
         }
 
+        // Delete LMS file
+        if ($midiFile->lms_file_path && file_exists(public_path($midiFile->lms_file_path))) {
+            unlink(public_path($midiFile->lms_file_path));
+        }
+
         // Thumbnail (if stored in public)
         if ($midiFile->thumbnail_path && file_exists(public_path($midiFile->thumbnail_path))) {
             unlink(public_path($midiFile->thumbnail_path));
@@ -220,10 +247,21 @@ class MidiFileController extends Controller
     {
         $filePath = public_path($midiFile->lmv_file_path);
 
-        if (!File::exists($filePath)) {
+        if (!$midiFile->lmv_file_path || !File::exists($filePath)) {
             abort(404, 'LMV file not found.');
         }
 
         return response()->download($filePath, $midiFile->name . '.lmv');
+    }
+
+    public function downloadLms(MidiFile $midiFile)
+    {
+        $filePath = public_path($midiFile->lms_file_path);
+
+        if (!$midiFile->lms_file_path || !File::exists($filePath)) {
+            abort(404, 'LMS file not found.');
+        }
+
+        return response()->download($filePath, $midiFile->name . '.lms');
     }
 }

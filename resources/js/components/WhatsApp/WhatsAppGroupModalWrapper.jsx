@@ -8,7 +8,7 @@ export default function WhatsAppGroupModalWrapper() {
     useEffect(() => {
         // Check global user object metadata injected in layout
         const user = window.authUser;
-        if (user.premium && user.metadata) {
+        if (user.metadata) {
             if (user.metadata.whatsapp_joined) return;
             if (user.metadata.whatsapp_remind_at) {
                 const remindAt = new Date(user.metadata.whatsapp_remind_at);

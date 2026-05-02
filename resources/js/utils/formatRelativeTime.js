@@ -37,3 +37,51 @@ export const formatRelativeTime = (dateString) => {
             ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             ?.join(" ");
     };
+
+
+    export const calculateCountdown = (startTime) => {
+        const now = dayjs();
+        const eventTime = dayjs(startTime);
+        const diff = eventTime.diff(now);
+
+        if (diff <= 0) {
+            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        }
+
+        const dur = dayjs.duration(diff);
+        return {
+            days: Math.floor(dur.asDays()),
+            hours: dur.hours(),
+            minutes: dur.minutes(),
+            seconds: dur.seconds(),
+        };
+    };
+
+// Add this helper
+export const formatLocalTime = (startTime) => {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    const date = new Date(startTime);
+    
+    const localDate = new Intl.DateTimeFormat('en-US', {
+        timeZone: userTimezone,
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+    }).format(date);
+
+    const localTime = new Intl.DateTimeFormat('en-US', {
+        timeZone: userTimezone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    }).format(date);
+
+    // Get short timezone label e.g. "WAT", "EST", "GMT+1"
+    const tzLabel = new Intl.DateTimeFormat('en-US', {
+        timeZone: userTimezone,
+        timeZoneName: 'short',
+    }).formatToParts(date).find(p => p.type === 'timeZoneName')?.value;
+
+    return { localDate, localTime, tzLabel };
+};

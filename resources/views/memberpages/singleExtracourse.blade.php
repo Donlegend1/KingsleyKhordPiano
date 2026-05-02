@@ -124,11 +124,6 @@
                         hover:shadow-md hover:border-blue-300 transition group"
                     >
                         {{-- Course title --}}
-                        @if(!empty($comment->course_title))
-                            <p class="text-xs font-semibold text-blue-600 mb-1 uppercase tracking-wide">
-                                {{ $comment->course_title }}
-                            </p>
-                        @endif
 
                         <div class="flex items-start gap-3">
                             <i class="fa fa-user-circle text-gray-400 text-2xl"></i>
@@ -138,9 +133,8 @@
                                     <span class="font-semibold">
                                         {{ $comment->user->first_name }} 
                                     </span>
-                                    <span>commented in</span>
-                                    <span class="text-gray-600 font-semibold">
-                                        {{ $comment->course->title }}
+                                    <span class="text-gray-600 italic">
+                                        "{{ $comment->comment }}"
                                     </span>
                                 </p>
 

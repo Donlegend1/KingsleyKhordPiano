@@ -113,7 +113,7 @@ Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')-
 
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
-Route::get('/member/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->middleware(['auth', 'verified'])->name('notifications.index');
+Route::get('/member/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->middleware(['auth', 'check.payment', 'verified'])->name('notifications.index');
 
 Route::post('/stripe/create', [StripeController::class, 'checkout'])->name('stripe.create');
 Route::get('/stripe/success', [StripeController::class, 'checkoutSuccess'])->name('checkout.success');
@@ -151,7 +151,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
 });
 
-Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('profile', [HomeController::class, 'profile']);
     Route::post('whatsapp-preference', [HomeController::class, 'updateWhatsappPreference']);
     Route::get('/shop', [ShopController::class, 'index']);
@@ -174,6 +174,8 @@ Route::prefix('member')->middleware(['auth', 'verified'])->group(function () {
     ->name('midi.download.midi');
     Route::get('/midi-files/{midiFile}/download-lmv', [MidiFileController::class, 'downloadLmv'])
         ->name('midi.download.lmv');
+    Route::get('/midi-files/{midiFile}/download-lms', [MidiFileController::class, 'downloadLms'])
+        ->name('midi.download.lms');
     Route::get('/community/space/{subcategory}', [CommunityIndexController::class, 'subcategory'])->name('community.subcategory');
     Route::get('/community/space', [CommunityIndexController::class, 'space'])->name('community.space');
     Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');

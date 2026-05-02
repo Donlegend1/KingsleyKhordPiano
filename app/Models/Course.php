@@ -22,7 +22,11 @@ class Course extends Model
         'status',
         'course_category_id',
         'requirements',
+        'related_courses',
+    ];
 
+    protected $casts = [
+        'related_courses' => 'array',
     ];
 
     public function completedByUsers()

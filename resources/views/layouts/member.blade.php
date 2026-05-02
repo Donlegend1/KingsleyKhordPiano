@@ -61,7 +61,7 @@
                 </span>
 
                 {{-- Live Show Badge --}}
-                @php
+               @php
                     use App\Models\Liveshow;
                     $liveshow = Liveshow::where('start_time', '>=', now())->orderBy('start_time')->first();
                 @endphp
@@ -78,7 +78,13 @@
                                 <i class="fa fa-times text-sm"></i>
                             </button>
                             <h3 class="text-sm font-semibold text-gray-800">{{ $liveshow->title }}</h3>
-                            <p class="text-xs text-gray-500 mt-1">{{ \Carbon\Carbon::parse($liveshow->start_time)->format('M d, Y h:i A') }}</p>
+                            <p 
+                                class="text-xs text-gray-500 mt-1" 
+                                id="liveshow-local-time"
+                                data-utc="{{ \Carbon\Carbon::parse($liveshow->start_time)->utc()->toISOString() }}"
+                            >
+                                {{ \Carbon\Carbon::parse($liveshow->start_time)->format('M d, Y h:i A') }}
+                            </p>
                             <a href="/member/live-session"
                                 class="mt-3 block text-center bg-red-600 text-white text-xs py-1.5 rounded hover:bg-red-700 transition">
                                 Join Live Show
@@ -86,7 +92,7 @@
                         </div>
                     </div>
                 @endif
-            </div>
+                </div>
 
             {{-- Right: Desktop Links + Notifications + Logout --}}
             <div class="flex items-center gap-4">
@@ -353,6 +359,40 @@
 <script>
     window.authUser = @json(auth()->user());
 </script>
+
+ <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const el = document.getElementById('liveshow-local-time');
+            if (!el) return;
+
+            const utcTime = el.getAttribute('data-utc');
+            if (!utcTime) return;
+
+            const date = new Date(utcTime);
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const localDate = new Intl.DateTimeFormat('en-US', {
+                timeZone: userTimezone,
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric',
+            }).format(date);
+
+            const localTime = new Intl.DateTimeFormat('en-US', {
+                timeZone: userTimezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            }).format(date);
+
+            const tzLabel = new Intl.DateTimeFormat('en-US', {
+                timeZone: userTimezone,
+                timeZoneName: 'short',
+            }).formatToParts(date).find(p => p.type === 'timeZoneName')?.value;
+
+            el.textContent = `${localDate} ${localTime} (${tzLabel})`;
+        });
+    </script>
 
 </body>
 </html>

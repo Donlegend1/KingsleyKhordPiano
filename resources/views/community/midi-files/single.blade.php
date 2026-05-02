@@ -75,15 +75,26 @@
     ============================ --}}
     <div class="flex items-center justify-center gap-6 mt-8">
         
+        @if($MidiFile->midi_file_path)
         <a href="{{ route('midi.download.midi', $MidiFile->id) }}"
             class="bg-gray-800 text-white px-6 py-2 rounded shadow hover:bg-gray-900">
             Download Midi File
         </a>
+        @endif
 
+        @if($MidiFile->lmv_file_path)
         <a href="{{ route('midi.download.lmv', $MidiFile->id) }}"
             class="bg-red-600 text-white px-6 py-2 rounded shadow hover:bg-red-700">
             Download LMV File
         </a>
+        @endif
+
+        @if($MidiFile->lms_file_path)
+        <a href="{{ route('midi.download.lms', $MidiFile->id) }}"
+            class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">
+            Download LMS File
+        </a>
+        @endif
 
     </div>
 

@@ -25,7 +25,6 @@ class GetstartedController extends Controller
         $beginnerCourses = Upload::where('category', 'learn songs')->where('level', 'beginner')->latest()->take(3)->get();
         $intermediateCourses = Upload::where('category', 'learn songs')->where('level', 'intermediate')->latest()->take(3)->get();
         $advancedCourses = Upload::where('category', 'learn songs')->where('level', 'advanced')->latest()->take(3)->get();
-        // dd($intermediateCourses);
 
         return view('memberpages.getstarted', [
             'tour' => $tour,

@@ -14,7 +14,9 @@
 {{-- <div id="zoomMeetingBooking"></div> --}}
 {{-- @include("components.memberarea.schedule") --}}
 
+@if(auth()->user()->subscribed('default'))
 <div id="whatsappGroupModalRoot"></div>
+@endif
 
 
 @endsection

@@ -33,7 +33,7 @@
         <div class="aspect-video w-full overflow-hidden rounded-xl">
           <iframe
             class="w-full h-full"
-            src="https://www.youtube.com/embed/2v1X0g3q4aE"
+            src="https://drive.google.com/file/d/1x50L7apFJg2CAxBxnqn0Fqe1w0uvdcf4/preview"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

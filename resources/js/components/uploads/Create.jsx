@@ -31,6 +31,7 @@ const UploadForm = () => {
         level: "",
         skill_level: "",
         status: "active",
+        series: "",
     });
     const [saving, setSaving] = useState(false);
 
@@ -113,6 +114,7 @@ const UploadForm = () => {
                 level: "",
                 skill_level: "",
                 status: "active",
+                series: "",
             });
             setSelectedTags([]);
         } catch (error) {
@@ -314,6 +316,24 @@ const UploadForm = () => {
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
+                    </div>
+
+                    {/* Series */}
+                    <div>
+                        <label
+                            htmlFor="series"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Series Name (for stacking)
+                        </label>
+                        <input
+                            id="series"
+                            name="series"
+                            placeholder="e.g. Drop 1 Triads"
+                            value={upload.series}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        />
                     </div>
                 </div>
 

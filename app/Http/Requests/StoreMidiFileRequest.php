@@ -25,8 +25,9 @@ class StoreMidiFileRequest extends FormRequest
             'name' => 'required|string|max:255',
             'video_path' => 'required|string',
             'video_type' => 'required|in:youtube,google,local,iframe',
-            'midi_file' => 'required|file|mimetypes:audio/midi,audio/x-midi',
-            'lmv_file' => 'required|file',
+            'midi_file' => 'nullable|file|mimetypes:audio/midi,audio/x-midi',
+            'lmv_file' => 'nullable|file',
+            'lms_file' => 'nullable|file',
             'thumbnail' => 'nullable|file',
             'description' => 'nullable|string',
         ];

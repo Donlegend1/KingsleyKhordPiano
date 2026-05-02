@@ -38,10 +38,15 @@
       </div>
     </div>
 
-    {{-- <div>
-      <h1 class="text-xl font-bold">Extra Courses</h1>
-    </div> --}}
-       
+    @if ($series)
+    <div class="mb-4">
+        <a href="{{ route('piano.exercise') }}" class="text-blue-500 hover:underline flex items-center gap-2">
+            <i class="fa fa-arrow-left text-sm"></i> 
+            <span class="font-medium">Back to All Piano Exercises</span>
+        </a>
+        <h2 class="text-2xl font-bold mt-4 text-gray-800">Series: {{ $series }}</h2>
+    </div>
+    @endif
   </div>
 </section>
 
@@ -153,16 +158,36 @@
         <!-- Exercise Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           @forelse ($exercises as $exercise)
-            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-              <a href="/member/lesson/{{ $exercise->id }}">
-              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
-              </a>
-              <h3 class="font-bold text-gray-800 text-center">{{ $exercise->title }}</h3>
-              <p class="text-sm text-gray-500 capitalize">{{ $exercise->level }} | {{ $exercise->skill_level }}</p>
-              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
-                Watch Now
-              </a>
-            </div>
+            @if (!$series && $exercise->series)
+              <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4 relative group">
+                <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="w-full relative">
+                  <div class="relative z-10">
+                    <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md border-2 border-white shadow-sm">
+                  </div>
+                  <!-- Stack visual effect -->
+                  <div class="absolute top-1 left-1 w-full h-56 bg-gray-200 rounded-md border border-gray-300 -z-0 translate-x-1 translate-y-1"></div>
+                  <div class="absolute top-2 left-2 w-full h-56 bg-gray-100 rounded-md border border-gray-200 -z-10 translate-x-2 translate-y-2"></div>
+                </a>
+                <div class="text-center w-full pt-2">
+                  <h3 class="font-bold text-gray-800 text-lg">{{ $exercise->series }}</h3>
+                  <p class="text-sm text-blue-600 font-medium">{{ $exercise->item_count }} Exercises in this series</p>
+                </div>
+                <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center w-full font-semibold">
+                  View Series
+                </a>
+              </div>
+            @else
+              <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+                <a href="/member/lesson/{{ $exercise->id }}">
+                <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
+                </a>
+                <h3 class="font-bold text-gray-800 text-center">{{ $exercise->title }}</h3>
+                <p class="text-sm text-gray-500 capitalize">{{ $exercise->level }} | {{ $exercise->skill_level }}</p>
+                <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+                  Watch Now
+                </a>
+              </div>
+            @endif
           @empty
             <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
               <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
