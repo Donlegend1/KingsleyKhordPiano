@@ -7,28 +7,7 @@ import {
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
 import Select from "react-select";
-
-const Modal = ({ isOpen, onClose, children }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="relative bg-white rounded-lg shadow-lg max-w-3xl w-full mx-4 p-6">
-                {/* Close Button (X) */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
-                    aria-label="Close"
-                >
-                    &times;
-                </button>
-
-                {/* Modal Content */}
-                <div className="mt-2">{children}</div>
-            </div>
-        </div>
-    );
-};
+import Modal from "../Modal/Modal";
 
 const UploadList = () => {
     const [courses, setCourses] = useState([]);
@@ -71,7 +50,8 @@ const UploadList = () => {
         average_rating: 0,
         // resources: [],
         requirements: "",
-        video_type:""
+        video_type:"",
+        series: "",
     });
 
     const [upload, setUpload] = useState({
@@ -83,7 +63,8 @@ const UploadList = () => {
         level: "",
         skill_level: "",
         status: "active",
-        video_type:""
+        video_type:"",
+        series: "",
     });
 
     const [preview, setPreview] = useState(
@@ -217,6 +198,7 @@ const UploadList = () => {
         formData.append("level", selectedCourse.level);
         formData.append("description", selectedCourse.description);
         formData.append("video_type", selectedCourse.video_type);
+        formData.append("series", selectedCourse.series || "");
 
         if (thumbnail instanceof File) {
             formData.append("thumbnail", thumbnail);
@@ -278,6 +260,7 @@ const UploadList = () => {
                 level: "",
                 skill_level: "",
                 status: "active",
+                series: "",
             });
             setSelectedTags([]);
             fetchCourses();
@@ -509,6 +492,14 @@ const UploadList = () => {
                                 </option>
                                 <option value="advanced">Advanced</option>
                             </select>
+
+                            <input
+                                name="series"
+                                placeholder="Series Name"
+                                defaultValue={selectedCourse?.series}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                            />
                         </div>
 
                         {/* Description Field */}
@@ -767,11 +758,27 @@ const UploadList = () => {
                                     onChange={handleChangeCreate}
                                     className="w-full p-3 border rounded-lg"
                                 >
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
-                            </div>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
                         </div>
+                        <div>
+                            <label
+                                htmlFor="series"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Series Name (for stacking)
+                            </label>
+                            <input
+                                id="series"
+                                name="series"
+                                placeholder="e.g. Drop 1 Triads"
+                                value={upload.series}
+                                onChange={handleChangeCreate}
+                                className="w-full p-3 border rounded-lg"
+                            />
+                        </div>
+                    </div>
 
                         {/* Description */}
                         <div>

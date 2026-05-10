@@ -1,4 +1,10 @@
-<section class="bg-[#f5f3ec] py-14 lg:py-20 overflow-hidden">
+<section class="bg-[#f5f3ec]">
+    <div class="text-center py-5">
+        <h1 class="text-4xl font-bold text-black mb-6">Our Services Include</h1>
+    </div>
+</section>
+
+<section class="bg-[#f5f3ec] py-10">
     <div class="container mx-auto px-6 lg:px-16">
         <div class="grid grid-cols-1 lg:grid-cols-[42%_58%] gap-10 lg:gap-16 items-center">
 

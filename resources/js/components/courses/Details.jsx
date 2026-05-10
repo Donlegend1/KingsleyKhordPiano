@@ -11,7 +11,7 @@ const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
     .getAttribute("content");
 
-const CourseDetails = ({ course, onComplete }) => {
+const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
     const [loading, setLoading] = useState(false);
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
@@ -529,6 +529,52 @@ const CourseDetails = ({ course, onComplete }) => {
                     )}
                 </div>
             </div>
+
+
+            {/* Related Courses Section */}
+            {course.related && course.related.length > 0 && (
+                <div className="mt-12 border-t pt-8">
+                    <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
+                        <i className="fa fa-link text-blue-500"></i>
+                        Related Courses
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {course.related.map((related) => (
+                            <div
+                                key={related.id}
+                                onClick={() => onSelectCourse(related)}
+                                className="group cursor-pointer bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300"
+                            >
+                                <div className="aspect-video relative overflow-hidden bg-gray-200 dark:bg-gray-700">
+                                    {related.thumbnail ? (
+                                        <img
+                                            src={related.thumbnail}
+                                            alt={related.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            <i className="fa fa-play-circle fa-3x"></i>
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
+                                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 text-white text-[10px] rounded uppercase font-bold">
+                                        {related.level}
+                                    </div>
+                                </div>
+                                <div className="p-4">
+                                    <h4 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                        {related.title}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {related.category}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -582,6 +628,8 @@ const CoursesPage = () => {
                         withCredentials: true,
                     }
                 );
+
+                console.log(response.data);
                 setCourses(response.data);
             } catch (error) {
                 console.error("Error fetching courses:", error);
@@ -842,7 +890,7 @@ const CoursesPage = () => {
                                 </div>
                                 <div className="w-full bg-gray-300 rounded-full h-2">
                                     <div
-                                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                        className="bg-black h-2 rounded-full transition-all duration-300"
                                         style={{ width: `${generalProgress}%` }}
                                     ></div>
                                 </div>
@@ -904,6 +952,7 @@ const CoursesPage = () => {
                             <CourseDetails
                                 course={selectedCourse}
                                 onComplete={handleCourseCompletion}
+                                onSelectCourse={setSelectedCourse}
                             />
                         </>
                     ) : (

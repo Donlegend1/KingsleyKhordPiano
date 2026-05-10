@@ -15,6 +15,7 @@ class MidiFile extends Model
         'video_type',
         'midi_file_path',
         'lmv_file_path',
+        'lms_file_path',
         'thumbnail_path',
         'description',
     ];

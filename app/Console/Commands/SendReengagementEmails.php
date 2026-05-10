@@ -14,7 +14,7 @@ class SendReengagementEmails extends Command
 
     public function handle()
     {
-        $users = User::where('last_login_at', '<=', now()->subDays(7))
+        $users = User::where('last_login_at', '<=', now()->subWeeks(3))
                      ->orWhereNull('last_login_at')
                      ->get();
 

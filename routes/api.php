@@ -48,6 +48,7 @@ use App\Http\Controllers\PlanController;
 
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminController::class, 'usersList']);
+        Route::get('all-courses', [CourseController::class, 'allCourses']);
         Route::put('users/{user}', [AdminController::class, 'editUser']);
         Route::delete('user/{user}', [AdminController::class, 'destroy']);
         Route::get('courses', [CourseController::class, 'coursesList']);

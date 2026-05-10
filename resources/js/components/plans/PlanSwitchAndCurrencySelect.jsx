@@ -155,10 +155,11 @@ const PlanSwitchAndCurrencySelect = () => {
                             {plan.tier == "Standard" && (
                                 <ul className=" text-gray-700 mb-6 list-disc list-inside">
                                     <li>Roadmap for all skill levels</li>
-                                    <li>Premium midi files</li>
                                     <li>Ear Training Quiz</li>
-                                    <li>Practice Routine</li>
-                                    <li>Supportive Community</li>
+                                    <li>Songs and midi transcriptions</li>
+                                    <li>Downloadable resources</li>
+                                    <li>Monthly live sessions</li>
+                                    <li>Supportive community</li>
                                 </ul>
                             )}
 
@@ -167,10 +168,11 @@ const PlanSwitchAndCurrencySelect = () => {
                                     <li className="text-red-500 font-sf font-semibold">
                                         Everything in the standard plan
                                     </li>
-                                    <li>Personalized roadmap course</li>
-                                    <li>Weekly live sessions</li>
-                                    <li>Structured Accountability plan</li>
-                                    <li>In-Depth Master classes</li>
+                                    <li>Personalized practice plan</li>
+                                    <li>Feedback on your playing</li>
+                                    <li>Accountability framework</li>
+                                    <li>1v1 piano coaching</li>
+                                    <li>In-Depth master classes</li>
                                 </ul>
                             )}
 
@@ -205,7 +207,7 @@ const PlanSwitchAndCurrencySelect = () => {
                         <p className="text-center text-white mb-4">
                             {currencySigns[currency]}
                             {matchAmountToCurrency(selectedPlanDetails)}
-                             {"for "}{ selectedPlanDetails.tier} Plan
+                             {" for "}{ selectedPlanDetails.tier} Plan
                         </p>
 
                         <div className="flex flex-col gap-6">

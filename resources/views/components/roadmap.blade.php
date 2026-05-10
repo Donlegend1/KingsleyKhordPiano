@@ -12,21 +12,22 @@
   <!-- Feature Grid -->
 @php
   $features = [
-    ['image' => 'musictheory', 'title' => 'Music Theory'],
-    ['image' => 'roadmap', 'title' => 'Road Map'],
-    ['image' => 'eartraining', 'title' => 'Ear Training'],
-    ['image' => 'pianoexercise', 'title' => 'Piano Exercise'],
+    ['image' => 'musictheory', 'title' => 'Music Theory', 'bg' =>"#000", 'description' => ''],
+    ['image' => 'roadmap', 'title' => 'Road Map', 'bg' => "#FF0011", 'description' => ''],
+    ['image' => 'eartraining', 'title' => 'Ear Training', 'bg' =>"#023", 'description' => ''],
+    ['image' => 'pianoexercise', 'title' => 'Piano Exercise', 'bg' => "#FFD736", 'description' => ''],
   ];
 @endphp
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
   @foreach ($features as $feature)
-    <div class="relative rounded-xl overflow-hidden shadow-lg group">
+    <div class="relative rounded-xl overflow-hidden shadow-lg group" 
+    style="background-color: {{ $feature['bg'] }};">
       <!-- Background Image -->
-      <div 
+      {{-- <div 
         class="absolute inset-0 bg-cover bg-center" 
         style="background-image: url('/images/{{ $feature['image'] }}.png');">
-      </div>
+      </div> --}}
 
       <!-- Overlay -->
       <div class="absolute inset-0 bg-black/60 transition-opacity group-hover:bg-black/70"></div>

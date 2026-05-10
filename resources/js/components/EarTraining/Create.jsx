@@ -17,7 +17,7 @@ const getOptionsByCategory = (category) => {
         "7th Degree Chords (Basic)": ["Diminished 7th", "Dominant 7th", "Minor 7b5", "Major 7th", "Minor 7th"],
         "7th Degree Chords (Secondary)": ["Dim (Maj7)", "Dom7#5", "Dom7b5", "Maj7#5", "Maj7b5", "minMaj7"],
         "7th Degree Chords (General)": ["Diminished 7th", "Dominant 7th", "Minor 7b5", "Major 7th", "Minor 7th", "Dim (Maj7)", "Dom7#5", "Dom7b5", "Maj7#5", "Maj7b5", "minMaj7"],
-        "9th degree Chords (Basic)": ["Dim7 (9)", "Dom9", "Dom7 (b9)", "Maj 6/9", "min 6/9", "min9", "min9 (b5)"],
+        "9th Degree Chords (Basic)": ["Dim7 (9)", "Dom9", "Dom7 (b9)", "Maj 6/9", "min 6/9", "min9", "min9 (b5)"],
         "9th Degree Chords (Secondary)": ["DimMaj7 (9)", "Dom9 (b5)", "Dom9 (#5)", "Maj9 (b5)", "Maj9 (#5)", "min (Maj9)"],
         "9th Degree Chords (General)": ["DimMaj7 (9)", "Dom9 (b5)", "Dom9 (#5)", "Maj9 (b5)", "Maj9 (#5)", "min (Maj9)", "Dim7 (9)", "Dom9", "Dom7 (b9)", "Maj 6/9", "min 6/9", "min9", "min9 (b5)"],
         "11th Degree Chords": ["6/9 (#11)", "Dom9 (#11)", "Dom7 (b9#11)", "Maj9 (#11)", "min6/9 (11)", "min 9 (11)"],
@@ -30,7 +30,7 @@ const getOptionsByCategory = (category) => {
 const categories = [
     "Relative Pitch", "Di-tone Pitch", "Diatonic Intervals", "Non-diatonic Intervals",
     "Intervals", "Basic Triad", "7th Degree Chords (Basic)", "7th Degree Chords (Secondary)",
-    "7th Degree Chords (General)", "9th degree Chords (Basic)", "9th Degree Chords (Secondary)",
+    "7th Degree Chords (General)", "9th Degree Chords (Basic)", "9th Degree Chords (Secondary)",
     "9th Degree Chords (General)", "11th Degree Chords", "13th Degree Chords", "Others",
 ];
 

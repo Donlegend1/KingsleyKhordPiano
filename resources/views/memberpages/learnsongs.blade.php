@@ -38,10 +38,16 @@
       </div>
     </div>
 
-    {{-- <div>
-      <h1 class="text-xl font-bold">Learn Songs</h1>
-    </div> --}}
-    
+    @if ($series)
+    <div class="mb-4 px-4">
+        <a href="{{ route('learn.songs') }}" class="text-blue-500 hover:underline flex items-center gap-2">
+            <i class="fa fa-arrow-left text-sm"></i> 
+            <span class="font-medium">Back to All Songs</span>
+        </a>
+        <h2 class="text-2xl font-bold mt-4 text-gray-800">Series: {{ $series }}</h2>
+    </div>
+    @endif
+  </div>
 </section>
 
 <section class="bg-gray-100 py-10 px-4 sm:px-6 lg:px-8 xl:px-10">
@@ -105,17 +111,35 @@
       <!-- All Tab -->
       <div x-show="activeTab === 'all'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($all as $exercise)
-          <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-
-            <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
-            </a>
-            <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
-            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-            <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
-              Watch Now
-            </a>
-          </div>
+          @if (!$series && $exercise->series)
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4 relative group">
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="w-full relative">
+                <div class="relative z-10">
+                   <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md border-2 border-white shadow-sm">
+                </div>
+                <div class="absolute top-1 left-1 w-full h-48 bg-gray-200 rounded-md border border-gray-300 -z-0 translate-x-1 translate-y-1"></div>
+                <div class="absolute top-2 left-2 w-full h-48 bg-gray-100 rounded-md border border-gray-200 -z-10 translate-x-2 translate-y-2"></div>
+              </a>
+              <div class="text-center w-full pt-2">
+                <h3 class="font-bold text-gray-800 text-lg">{{ $exercise->series }}</h3>
+                <p class="text-sm text-blue-600 font-medium">{{ $exercise->item_count }} Songs in this series</p>
+              </div>
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center w-full font-semibold">
+                View Series
+              </a>
+            </div>
+          @else
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+              <a href="/member/lesson/{{ $exercise->id }}">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+              </a>
+              <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+              <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
+              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+                Watch Now
+              </a>
+            </div>
+          @endif
         @empty
           <div class="col-span-full text-center text-gray-500 py-12">
             No exercises found for this category.
@@ -131,16 +155,35 @@
       <!-- Beginner Tab -->
       <div x-show="activeTab === 'beginner'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($beginner as $exercise)
-          <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-            <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
-            </a>
-            <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
-            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-            <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
-              Watch Now
-            </a>
-          </div>
+          @if (!$series && $exercise->series)
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4 relative group">
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="w-full relative">
+                <div class="relative z-10">
+                   <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md border-2 border-white shadow-sm">
+                </div>
+                <div class="absolute top-1 left-1 w-full h-48 bg-gray-200 rounded-md border border-gray-300 -z-0 translate-x-1 translate-y-1"></div>
+                <div class="absolute top-2 left-2 w-full h-48 bg-gray-100 rounded-md border border-gray-200 -z-10 translate-x-2 translate-y-2"></div>
+              </a>
+              <div class="text-center w-full pt-2">
+                <h3 class="font-bold text-gray-800 text-lg">{{ $exercise->series }}</h3>
+                <p class="text-sm text-blue-600 font-medium">{{ $exercise->item_count }} Songs in this series</p>
+              </div>
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center w-full font-semibold">
+                View Series
+              </a>
+            </div>
+          @else
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+              <a href="/member/lesson/{{ $exercise->id }}">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+              </a>
+              <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+              <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
+              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+                Watch Now
+              </a>
+            </div>
+          @endif
         @empty
           <div class="col-span-full text-center text-gray-500 py-12">
             No exercises found for this category.
@@ -157,16 +200,35 @@
       <!-- Intermediate Tab -->
       <div x-show="activeTab === 'intermediate'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($intermediate as $exercise)
-          <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-            <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
-            </a>
-            <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
-            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-            <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
-              Watch Now
-            </a>
-          </div>
+          @if (!$series && $exercise->series)
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4 relative group">
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="w-full relative">
+                <div class="relative z-10">
+                   <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md border-2 border-white shadow-sm">
+                </div>
+                <div class="absolute top-1 left-1 w-full h-48 bg-gray-200 rounded-md border border-gray-300 -z-0 translate-x-1 translate-y-1"></div>
+                <div class="absolute top-2 left-2 w-full h-48 bg-gray-100 rounded-md border border-gray-200 -z-10 translate-x-2 translate-y-2"></div>
+              </a>
+              <div class="text-center w-full pt-2">
+                <h3 class="font-bold text-gray-800 text-lg">{{ $exercise->series }}</h3>
+                <p class="text-sm text-blue-600 font-medium">{{ $exercise->item_count }} Songs in this series</p>
+              </div>
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center w-full font-semibold">
+                View Series
+              </a>
+            </div>
+          @else
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+              <a href="/member/lesson/{{ $exercise->id }}">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+              </a>
+              <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+              <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
+              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+                Watch Now
+              </a>
+            </div>
+          @endif
         @empty
           <div class="col-span-full text-center text-gray-500 py-12">
             No exercises found for this category.
@@ -183,16 +245,35 @@
       <!-- Advanced Tab -->
       <div x-show="activeTab === 'advanced'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($advanced as $exercise)
-          <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-            <a href="/member/lesson/{{ $exercise->id }}">
-            <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
-            </a>
-            <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
-            <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-            <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
-              Watch Now
-            </a>
-          </div>
+          @if (!$series && $exercise->series)
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4 relative group">
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="w-full relative">
+                <div class="relative z-10">
+                   <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md border-2 border-white shadow-sm">
+                </div>
+                <div class="absolute top-1 left-1 w-full h-48 bg-gray-200 rounded-md border border-gray-300 -z-0 translate-x-1 translate-y-1"></div>
+                <div class="absolute top-2 left-2 w-full h-48 bg-gray-100 rounded-md border border-gray-200 -z-10 translate-x-2 translate-y-2"></div>
+              </a>
+              <div class="text-center w-full pt-2">
+                <h3 class="font-bold text-gray-800 text-lg">{{ $exercise->series }}</h3>
+                <p class="text-sm text-blue-600 font-medium">{{ $exercise->item_count }} Songs in this series</p>
+              </div>
+              <a href="{{ request()->fullUrlWithQuery(['series' => $exercise->series]) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center w-full font-semibold">
+                View Series
+              </a>
+            </div>
+          @else
+            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
+              <a href="/member/lesson/{{ $exercise->id }}">
+              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full  object-cover rounded-md">
+              </a>
+              <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
+              <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
+              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+                Watch Now
+              </a>
+            </div>
+          @endif
         @empty
           <div class="col-span-full text-center text-gray-500 py-12">
             No exercises found for this category.

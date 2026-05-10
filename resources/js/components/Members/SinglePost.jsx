@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import ReactDOM from "react-dom/client";
 import axios from "axios";
 import PostWithComments from "../PostWithComments.jsx";
@@ -113,19 +113,28 @@ const SinglePost = () => {
     }, [page, sortBy]);
 
     useEffect(() => {
-        const handleScroll = () => {
-            if (
-                window.innerHeight + document.documentElement.scrollTop + 100 >=
-                document.documentElement.offsetHeight
-            ) {
-                if (!loading && hasMore) {
-                    setPage((prev) => prev + 1);
-                }
+        if (!hasMore || loading) return;
+
+        const handleObserver = (entries) => {
+            const target = entries[0];
+            if (target.isIntersecting && hasMore && !loading) {
+                setPage((prev) => prev + 1);
             }
         };
 
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        const observer = new IntersectionObserver(handleObserver, {
+            root: null,
+            rootMargin: "200px",
+            threshold: 0.1,
+        });
+
+        const sentinel = document.getElementById("scroll-sentinel");
+        if (sentinel) observer.observe(sentinel);
+
+        return () => {
+            if (sentinel) observer.unobserve(sentinel);
+            observer.disconnect();
+        };
     }, [loading, hasMore]);
 
     const handleDeletePost = async (id) => {
@@ -199,6 +208,8 @@ const SinglePost = () => {
                     />
                 ))}
 
+                {/* Sentinel for IntersectionObserver */}
+                <div id="scroll-sentinel" className="h-10"></div>
             </div>
         </>
     );

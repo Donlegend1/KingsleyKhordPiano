@@ -32,6 +32,7 @@ class UpdateUploadRequest extends FormRequest
             'video_type' => 'nullable|string',
             'skill_level' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
+            'series' => 'nullable|string|max:255',
         ];
     }
 }

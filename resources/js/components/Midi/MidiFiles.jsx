@@ -24,6 +24,7 @@ const MidiFiles = () => {
         video_type: "",
         midi_file: null,
         lmv_file: null,
+        lms_file: null,
         thumbnail: "",
         description: "",
     });
@@ -76,6 +77,10 @@ const MidiFiles = () => {
         if (form.midi_file instanceof File) {
             fd.append("midi_file", form.midi_file);
         }
+
+        if (form.lms_file instanceof File) {
+            fd.append("lms_file", form.lms_file);
+        }
         try {
             setLoading(true);
             await axios.post("/api/admin/midi-file/create", fd, {
@@ -93,6 +98,7 @@ const MidiFiles = () => {
                 video_type: "",
                 midi_file: null,
                 lmv_file: null,
+                lms_file: null,
                 thumbnail: "",
                 description: "",
             });
@@ -130,6 +136,10 @@ const MidiFiles = () => {
 
         if (selectedFile.midi_file instanceof File) {
             fd.append("midi_file", selectedFile.midi_file);
+        }
+
+        if (selectedFile.lms_file instanceof File) {
+            fd.append("lms_file", selectedFile.lms_file);
         }
 
         try {
@@ -323,7 +333,7 @@ const MidiFiles = () => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    MIDI File *
+                                    MIDI File
                                 </label>
                                 <input
                                     type="file"
@@ -340,11 +350,10 @@ const MidiFiles = () => {
 
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    LMV File *
+                                    LMV File
                                 </label>
                                 <input
                                     type="file"
-                                    accept=".lmv"
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
                                     onChange={(e) =>
                                         setForm({
@@ -354,6 +363,24 @@ const MidiFiles = () => {
                                     }
                                 />
                             </div>
+                        </div>
+
+                        {/* LMS File Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                LMS File
+                            </label>
+                            <input
+                                type="file"
+                                accept=".lms"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        lms_file: e.target.files[0],
+                                    })
+                                }
+                            />
                         </div>
 
                         {/* Thumbnail Field */}
@@ -510,7 +537,6 @@ const MidiFiles = () => {
                                 </label>
                                 <input
                                     type="file"
-                                    accept=".lmv"
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
                                     onChange={(e) =>
                                         setSelectedFile({
@@ -520,6 +546,24 @@ const MidiFiles = () => {
                                     }
                                 />
                             </div>
+                        </div>
+
+                        {/* LMS File Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                LMS File
+                            </label>
+                            <input
+                                type="file"
+                                accept=".lms"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        lms_file: e.target.files[0],
+                                    })
+                                }
+                            />
                         </div>
 
                         {/* Thumbnail Field */}

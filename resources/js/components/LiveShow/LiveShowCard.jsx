@@ -10,6 +10,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
+import { calculateCountdown, formatLocalTime } from "@/utils/formatRelativeTime";
 
 const LiveShowCard = () => {
     const [shows, setShows] = useState([]);
@@ -61,24 +62,6 @@ const LiveShowCard = () => {
         return () => clearInterval(interval);
     }, [shows]);
 
-    const calculateCountdown = (startTime) => {
-        const now = dayjs();
-        const eventTime = dayjs(startTime);
-        const diff = eventTime.diff(now);
-
-        if (diff <= 0) {
-            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-        }
-
-        const dur = dayjs.duration(diff);
-        return {
-            days: Math.floor(dur.asDays()),
-            hours: dur.hours(),
-            minutes: dur.minutes(),
-            seconds: dur.seconds(),
-        };
-    };
-
     const handleRestrictedClick = (e) => {
         e.preventDefault();
         showMessage(
@@ -87,138 +70,93 @@ const LiveShowCard = () => {
         );
     };
 
+
     return (
-        <section className="max-w-7xl mx-auto px-4 py-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <section className="max-w-7xl mx-auto px-6 py-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                 {shows && shows.length > 0 ? (
                     shows.map((show) => {
                         const date = dayjs(show.start_time);
-                        const isRestricted =
-                            show.access_type === "premium" && !isPremium;
+                        const isRestricted = show.access_type === "premium" && !isPremium;
+                        const countdown = countdowns[show.id] || { days: 0, hours: 0, minutes: 0, seconds: 0 };
+                        const { localDate, localTime, tzLabel } = formatLocalTime(show.start_time); 
                         return (
                             <div
                                 key={show.id}
-                                className="relative h-56 rounded-lg overflow-hidden shadow-lg group"
-                                style={{
-                                    backgroundImage: `url('/images/Background.jpg')`,
-                                    backgroundSize: "cover",
-                                    backgroundPosition: "center",
-                                }}
+                                className="relative group h-[400px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(255,215,54,0.15)] bg-gray-900"
                             >
-                                {/* Premium badge */}
-                                {show.access_type === "premium" && (
-                                    <div className="absolute top-2 right-2 bg-black text-white text-xs font-semibold px-2 py-1 rounded shadow-md z-20">
-                                        <div className="flex gap-2">
+                                {/* Background Image with dynamic overlay */}
+                                <div 
+                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                    style={{ backgroundImage: `url('/images/Background.jpg')` }}
+                                ></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95"></div>
 
-                                            <img
-                                                src="/icons/diamondred.png"
-                                                alt="Premium Icon"
-                                                class="w-4 h-4"
-                                            ></img>
+                                {/* Premium Badge */}
+                                {show.access_type === "premium" && (
+                                    <div className="absolute top-5 right-5 z-20">
+                                        <div className="flex items-center gap-2 bg-red-600/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-xl border border-white/20">
+                                            <img src="/icons/diamondred.png" alt="Premium" className="w-3.5 h-3.5 animate-pulse" />
+                                            Premium
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="absolute inset-0 bg-white bg-opacity-50 group-hover:bg-opacity-60 transition duration-300"></div>
-
-                                <div className="relative z-10 h-full flex flex-col justify-between p-4 text-black">
-                                    {/* Title and Time */}
-                                    <div>
-                                        <h3 className="text-md font-bold flex items-center space-x-2">
-                                            <img
-                                                src="/icons/wave.png"
-                                                alt="Music Icon"
-                                                className="w-5 h-5"
-                                            />
-                                            <span>{show.title}</span>
+                                {/* Content Container */}
+                                <div className="relative z-10 h-full flex flex-col justify-end p-8">
+                                    {/* Header Info */}
+                                    <div className="mb-6 transform transition-transform duration-500 group-hover:-translate-y-2">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="p-2 bg-[#FFD736]/20 backdrop-blur-md rounded-lg border border-[#FFD736]/30">
+                                                <img src="/icons/wave.png" alt="Icon" className="w-5 h-5 invert" />
+                                            </div>
+                                            <span className="text-yellow-400 text-xs font-bold uppercase tracking-widest bg-yellow-400/10 px-2 py-0.5 rounded">Live Event</span>
+                                        </div>
+                                        <h3 className="text-2xl font-black text-white leading-tight mb-2 tracking-tight group-hover:text-[#FFD736] transition-colors">
+                                            {show.title}
                                         </h3>
-                                        <p className="text-sm mt-1">
-                                            {date.format("DD-MM-YYYY")} |{" "}
-                                            {date.format("HH:mm")}
-                                        </p>
+                                        <div className="flex items-center gap-4 text-white/70 text-sm font-medium">
+                                            <div className="flex items-center gap-1.5">
+                                                <i className="fa-regular fa-calendar text-[#FFD736]"></i>
+                                                {localDate}
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <i className="fa-regular fa-clock text-[#FFD736]"></i>
+                                                {localTime} {tzLabel}
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    {/* Date Breakdown */}
-                                    {/* Countdown Timer */}
-                                    <div className="flex items-center justify-between font-semibold mt-4 divide-x divide-gray-300 text-center text-sm">
-                                        <div className="px-2">
-                                            <p>
-                                                {countdowns[show.id]?.days ??
-                                                    "-"}
-                                            </p>
-                                            <p className="text-gray-600">
-                                                Days
-                                            </p>
-                                        </div>
-                                        <div className="px-2">
-                                            <p>
-                                                {countdowns[show.id]?.hours ??
-                                                    "-"}
-                                            </p>
-                                            <p className="text-gray-600">
-                                                Hours
-                                            </p>
-                                        </div>
-                                        <div className="px-2">
-                                            <p>
-                                                {countdowns[show.id]?.minutes ??
-                                                    "-"}
-                                            </p>
-                                            <p className="text-gray-600">
-                                                Minutes
-                                            </p>
-                                        </div>
-                                        <div className="px-2">
-                                            <p>
-                                                {countdowns[show.id]?.seconds ??
-                                                    "-"}
-                                            </p>
-                                            <p className="text-gray-600">
-                                                Seconds
-                                            </p>
-                                        </div>
+                                    {/* Countdown Blocks */}
+                                    <div className="grid grid-cols-4 gap-2 mb-8 transform transition-all duration-500 group-hover:-translate-y-1">
+                                        {[
+                                            { label: 'Days', val: countdown.days },
+                                            { label: 'Hours', val: countdown.hours },
+                                            { label: 'Min', val: countdown.minutes },
+                                            { label: 'Sec', val: countdown.seconds }
+                                        ].map((unit, i) => (
+                                            <div key={i} className="flex flex-col items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl p-2 border border-white/10 shadow-lg">
+                                                <span className="text-xl font-black text-white tabular-nums">{unit.val ?? '-'}</span>
+                                                <span className="text-[9px] font-bold text-white/50 uppercase tracking-tighter">{unit.label}</span>
+                                            </div>
+                                        ))}
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="mt-3 flex space-x-3">
+                                    <div className="flex flex-col gap-3">
                                         <a
-                                            href={
-                                                isRestricted
-                                                    ? "#"
-                                                    : show.zoom_link
-                                            }
-                                            onClick={
-                                                isRestricted
-                                                    ? handleRestrictedClick
-                                                    : undefined
-                                            }
-                                            className="px-4 py-1 text-sm rounded-full border border-[#404348] bg-[#404348] text-white transition"
+                                            href={isRestricted ? "#" : show.zoom_link}
+                                            onClick={isRestricted ? handleRestrictedClick : undefined}
+                                            className="w-full py-3.5 rounded-xl bg-[#FFD736] text-black text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-yellow-400/20 hover:bg-white hover:scale-[1.02] active:scale-95 transition-all duration-300"
                                         >
                                             Enter Live Show
                                         </a>
                                         <a
-                                            href={
-                                                isRestricted
-                                                    ? "#"
-                                                    : `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-                                                          show.title
-                                                      )}&dates=${date.format(
-                                                          "YYYYMMDDTHHmmss"
-                                                      )}/${date
-                                                          .add(1, "hour")
-                                                          .format(
-                                                              "YYYYMMDDTHHmmss"
-                                                          )}&details=${encodeURIComponent(
-                                                          show.zoom_link
-                                                      )}`
-                                            }
-                                            onClick={
-                                                isRestricted
-                                                    ? handleRestrictedClick
-                                                    : undefined
-                                            }
-                                            className="px-4 py-1 text-sm rounded-full border border-[#404348] text-[#404348] hover:bg-[#404348] hover:text-white transition"
+                                            href={isRestricted ? "#" : `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(show.title)}&dates=${date.format("YYYYMMDDTHHmmss")}/${date.add(1, "hour").format("YYYYMMDDTHHmmss")}&details=${encodeURIComponent(show.zoom_link)}`}
+                                            onClick={isRestricted ? handleRestrictedClick : undefined}
+                                            className="w-full py-3 rounded-xl border border-white/20 bg-white/5 backdrop-blur-md text-white text-[11px] font-bold text-center uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-300"
                                         >
+                                            <i className="fa-regular fa-calendar-plus mr-2"></i>
                                             Add to Calendar
                                         </a>
                                     </div>
@@ -227,8 +165,12 @@ const LiveShowCard = () => {
                         );
                     })
                 ) : (
-                    <div className="col-span-3 text-center text-black border border-gray-500 rounded-sm bg-slate-400 my-auto p-4">
-                        No live shows available at the moment.
+                    <div className="col-span-full py-20 flex flex-col items-center justify-center bg-gray-900/50 backdrop-blur-md rounded-3xl border border-white/5 text-center">
+                        <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6 border border-white/10">
+                            <i className="fa-solid fa-microphone-slash text-3xl text-gray-600"></i>
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">No Live Shows Available</h3>
+                        <p className="text-gray-500 max-w-xs">Check back later for upcoming live sessions and workshops.</p>
                     </div>
                 )}
             </div>

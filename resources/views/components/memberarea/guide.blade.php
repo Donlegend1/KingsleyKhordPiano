@@ -44,8 +44,10 @@
   </a>
 
   <!-- Card 4 (New) -->
- <div id="premium-call-button"
+  <div id="premium-call-button"
      data-premium="{{ auth()->user()->premium ? '1' : '0' }}">
-</div>
+  </div>
+
+  
 
 </section>

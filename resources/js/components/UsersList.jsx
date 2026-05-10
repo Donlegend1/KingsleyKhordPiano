@@ -7,18 +7,7 @@ import {
 } from "./Alert/FlashMessageContext";
 import CustomPagination from "./Pagination/CustomPagination";
 import AuthorNameWithVerification from "./User/AuthorNameWithVerification";
-
-const Modal = ({ isOpen, onClose, children }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                {children}
-            </div>
-        </div>
-    );
-};
+import Modal from "./Modal/Modal";
 
 const UsersList = () => {
     const [userList, setUserList] = useState([]);
@@ -332,6 +321,14 @@ const UsersList = () => {
                                                     {user.payment_status ||
                                                         "Pending"}
                                                 </span>
+                                                <br />
+                                                <div>
+                                                    <span className="text-sm text-gray-600">Subscribed: </span>
+                                                    <span className="text-sm text-gray-600">{user.subscription?.created_at}</span>
+                                                    <br />
+                                                    <span className="text-sm text-gray-600">Expires: </span>
+                                                    <span className="text-sm text-gray-600">{user.subscription?.ends_at}</span>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Models\Upload;
 use App\Notifications\SkillAssessmentEmail;
 use Illuminate\Console\Command;
 use App\Enums\Roles\UserRoles;
@@ -14,7 +15,9 @@ class SendSkillAssessmentEmail extends Command
 
     public function handle(): int
     {
-        $users = User::where('role', UserRoles::MEMBER->value)->get();
+        $users = User::where('role', UserRoles::MEMBER->value)
+                     ->whereDate('created_at', now()->subDays(5)->toDateString())
+                     ->get();
         
         $latestCourse =Upload::latest()->take(1)->first();
 

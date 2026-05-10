@@ -1,223 +1,65 @@
 @extends('layouts.member')
 
 @section('content')
-<div class="flex justify-between items-center my-2 px-3">
+<div class="min-h-screen bg-[#F8FAFC] py-20 px-4 font-sans">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header Section -->
+        {{-- <div class="text-center mb-24">
+            <h1 class="text-4xl md:text-[44px] font-bold text-[#1E293B] mb-6 tracking-tight leading-tight">Ready to Take Your Playing<br/>to the Next Level?</h1>
+            <p class="text-[#64748B] text-[17px] max-w-2xl mx-auto leading-relaxed">Choose your path to build stronger fingers<br/>and apply your skills musically.</p>
+        </div> --}}
 
-  <!-- Breadcrumb -->
-  <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-    <a href="/home" class="hover:text-blue-600">Dashboard</a>
-    <span>/</span>
-    <a href="/member/piano-exercise" class="hover:text-blue-600 font-semibold">Piano Exercises</a>
-  </div>
+        <!-- Cards Container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-14 max-w-4xl mx-auto">
+            
+            <!-- Card 1: Finger Exercises -->
+            <div class="bg-white rounded-3xl p-6 pb-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 relative flex flex-col items-center">
+                
+                <!-- Icon Badge -->
+                <div class="absolute -top-10 bg-[#0FA9A0] text-white w-[72px] h-[72px] rounded-full flex items-center justify-center border-[6px] border-white shadow-sm z-10">
+                    <i class="fa-solid fa-hand-paper text-[28px]"></i>
+                </div>
 
-  <!-- Search + User -->
-  <div class="flex items-center space-x-3 mt-3">
+                <!-- Image -->
+                <div class="w-full h-56 rounded-2xl overflow-hidden mt-6 mb-8 shadow-sm">
+                    <img src="https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=800&auto=format&fit=crop" alt="Finger Exercises" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700">
+                </div>
 
-    <form method="GET" action="{{ route('piano.exercise') }}">
-      <div class="relative w-full max-w-xs">
-        <input 
-          type="text" 
-          name="search" 
-          value="{{ request('search') }}" 
-          class="w-full border border-gray-300 rounded-full pl-4 pr-12 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition"
-          placeholder="Search..."
-        >
+                <!-- Content -->
+                <h2 class="text-[22px] font-bold text-[#1E293B] mb-3">Finger Exercises</h2>
+                <p class="text-[#64748B] text-center mb-8 px-2 text-[15px] leading-relaxed">Build strength, independence, flexibility,<br>and control with targeted exercises.</p>
 
-        <button type="submit" class="absolute my-4 right-1 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition" > <i class="fa fa-search"></i> </button>
-      </div>
-    </form>
-    {{-- <div class="flex items-center space-x-2">
-      <i class="fa fa-user-circle text-xl"></i>
-    </div> --}}
-  </div>
+                <!-- Button -->
+               <a href="{{ route('piano.exercise.finger', ['skill_level' => 'Basic']) }}" class="mt-auto bg-[#0FA9A0] hover:bg-[#0d928a] text-white px-8 py-3.5 rounded-full font-medium transition-all duration-300 flex items-center gap-2 shadow-md shadow-[#0fa9a0]/20 hover:shadow-lg hover:shadow-[#0fa9a0]/40 w-max mx-auto hover:-translate-y-0.5">
+                    Explore <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Card 2: Musical Application -->
+            <div class="bg-white rounded-3xl p-6 pb-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 relative flex flex-col items-center">
+                
+                <!-- Icon Badge -->
+                <div class="absolute -top-10 bg-[#0FA9A0] text-white w-[72px] h-[72px] rounded-full flex items-center justify-center border-[6px] border-white shadow-sm z-10">
+                    <i class="fa-solid fa-music text-[28px]"></i>
+                </div>
+
+                <!-- Image -->
+                <div class="w-full h-56 rounded-2xl overflow-hidden mt-6 mb-8 shadow-sm bg-black">
+                    <!-- Using a dark/magical music notes image to match the mockup -->
+                    <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop" alt="Musical Application" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700 opacity-90">
+                </div>
+
+                <!-- Content -->
+                <h2 class="text-[22px] font-bold text-[#1E293B] mb-3">Musical Application</h2>
+                <p class="text-[#64748B] text-center mb-8 px-2 text-[15px] leading-relaxed">Apply your technique in real musical<br>contexts and sound great.</p>
+
+                <!-- Button -->
+                <a href="{{ route('piano.exercise.musical') }}" class="mt-auto bg-[#0FA9A0] hover:bg-[#0d928a] text-white px-8 py-3.5 rounded-full font-medium transition-all duration-300 flex items-center gap-2 shadow-md shadow-[#0fa9a0]/20 hover:shadow-lg hover:shadow-[#0fa9a0]/40 w-max mx-auto hover:-translate-y-0.5">
+                    Explore <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
 </div>
-
-
-<section class="bg-gray-100 py-10">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-
-    <div class="block sm:hidden mb-6">
-      <div class="space-y-4 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
-
-        <div>
-          <label for="pianoexercise-category-filter" class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">
-            Filter Category
-          </label>
-          <div class="relative">
-            <select id="pianoexercise-category-filter" onchange="window.location.href = this.value" class="w-full appearance-none rounded-xl border border-slate-300 bg-white py-3.5 pl-4 pr-12 text-base font-bold text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: none;">
-              <option value="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}" {{ is_null($level) ? 'selected' : '' }}>All Categories</option>
-              @foreach ($levels as $tab)
-                <option value="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}" {{ strtolower($level) === strtolower($tab) ? 'selected' : '' }}>
-                  {{ ucfirst($tab) }}
-                </option>
-              @endforeach
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">
-              <svg class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <label for="pianoexercise-skill-filter" class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-slate-500">
-            Filter Skill Level
-          </label>
-          <div class="relative">
-            <select id="pianoexercise-skill-filter" onchange="window.location.href = this.value" class="w-full appearance-none rounded-xl border border-slate-300 bg-white py-3.5 pl-4 pr-12 text-base font-bold text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: none;">
-              <option value="{{ route('piano.exercise', array_filter(['level' => $level])) }}" {{ is_null($skillLevel) ? 'selected' : '' }}>All Skill Levels</option>
-              @foreach ($skillLevels as $sl)
-                <option value="{{ route('piano.exercise', array_filter(['level' => $level, 'skill_level' => $sl])) }}" {{ strtolower($skillLevel) === strtolower($sl) ? 'selected' : '' }}>
-                  {{ ucfirst($sl) }}
-                </option>
-              @endforeach
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">
-              <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="flex flex-col lg:flex-row gap-8">
-
-      <!-- Main Content -->
-      <div class="flex-1">
-
-        <!-- Desktop Tabs -->
-        <div class="hidden sm:flex flex-wrap gap-3 border-b pb-2 mb-8">
-
-          {{-- All --}}
-          <a
-              href="{{ route('piano.exercise', array_filter(['skill_level' => $skillLevel])) }}"
-              class="relative group flex items-center gap-2 py-2 px-4 border-b-2
-              {{ is_null($level)
-                  ? 'border-blue-500 text-blue-500 font-semibold'
-                  : 'text-gray-600 hover:text-blue-500' }}"
-          >
-              <i class="fa fa-layer-group text-sm"></i>
-              <span>All</span>
-      
-              {{-- Tooltip --}}
-              <span
-                  class="absolute -bottom-9 left-1/2 -translate-x-1/2
-                  whitespace-nowrap rounded-md bg-gray-900 text-white text-xs
-                  px-3 py-1 opacity-0 group-hover:opacity-100 transition
-                  pointer-events-none shadow-lg z-50"
-              >
-                  Shows all piano exercises
-              </span>
-          </a>
-      
-          @foreach ($levels as $tab)
-              @php
-                  $iconMap = [
-                      'independence' => 'fa-user-check',
-                      'technique' => 'fa-arrows-spin',
-                      'flexibility'  => 'fa-arrows-left-right',
-                      'strength'     => 'fa-dumbbell',
-                      'dexterity'    => 'fa-hands',
-                  ];
-      
-                  $tooltipMap = [
-                      'independence' => 'Train each hand to play independently',
-                      'technique' => 'Improve hand synchronization',
-                      'flexibility'  => 'Increase finger and wrist flexibility',
-                      'strength'     => 'Build finger strength and control',
-                      'dexterity'    => 'Improve speed, accuracy, and agility',
-                  ];
-      
-                  $key = strtolower($tab);
-                  $icon = $iconMap[$key] ?? 'fa-music';
-                  $tooltip = $tooltipMap[$key] ?? 'Piano exercise';
-              @endphp
-      
-              <a
-                  href="{{ route('piano.exercise', array_filter(['level' => $tab, 'skill_level' => $skillLevel])) }}"
-                  class="relative group flex items-center gap-2 py-2 px-4 border-b-2
-                  {{ strtolower($level) === $key
-                      ? 'border-blue-500 text-blue-500 font-semibold'
-                      : 'text-gray-600 hover:text-blue-500' }}"
-              >
-                  <i class="fa {{ $icon }} text-sm"></i>
-                  <span>{{ ucfirst($tab) }}</span>
-      
-                  {{-- Tooltip --}}
-                  <span
-                      class="absolute -bottom-9 left-1/2 -translate-x-1/2
-                      whitespace-nowrap rounded-md bg-gray-900 text-white text-xs
-                      px-3 py-1 opacity-0 group-hover:opacity-100 transition
-                      pointer-events-none shadow-lg z-50"
-                  >
-                      {{ $tooltip }}
-                  </span>
-              </a>
-          @endforeach
-      </div>
-      
-      
-
-        <!-- Exercise Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          @forelse ($exercises as $exercise)
-            <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-              <a href="/member/lesson/{{ $exercise->id }}">
-              <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-56 object-cover rounded-md">
-              </a>
-              <h3 class="font-bold text-gray-800 text-center">{{ $exercise->title }}</h3>
-              <p class="text-sm text-gray-500 capitalize">{{ $exercise->level }} | {{ $exercise->skill_level }}</p>
-              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
-                Watch Now
-              </a>
-            </div>
-          @empty
-            <div class="col-span-full text-center text-gray-500 py-12 text-lg font-semibold">
-              <i class="fa fa-exclamation-circle fa-2x mb-2"></i>
-              <p>No result found.</p>
-            </div>
-          @endforelse
-
-          @if ($exercises->hasPages())
-            <div class="col-span-full flex justify-center py-8">
-              {{ $exercises->withQueryString()->links('components.pagination') }}
-            </div>
-          @endif
-
-        </div>
-      </div>
-
-      <!-- Desktop Sidebar -->
-      <aside class="hidden lg:block w-56 bg-white pl-4 pr-2 py-4 rounded-xl shadow-md h-fit mt-14 lg:mt-[72px]">
-        <h3 class="text-base font-semibold mb-2 border-b pb-1 text-gray-800">Filter by Skill Level</h3>
-        <div class="space-y-2">
-          <a href="{{ route('piano.exercise', array_filter(['level' => $level])) }}" class="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm transition hover:bg-blue-50 {{ is_null($skillLevel) ? 'bg-blue-50 border-blue-300 text-blue-600 font-medium' : 'text-gray-700' }}">
-            <i class="fas fa-layer-group text-gray-400"></i>
-            All
-          </a>
-          @foreach ($skillLevels as $sl)
-            @php
-              $url = route('piano.exercise', array_filter(['level' => $level, 'skill_level' => $sl]));
-              $icon = match(strtolower($sl)) {
-                'basic' => 'fa-star',
-                'competent' => 'fa-chart-line',
-                'challenging' => 'fa-mountain',
-                default => 'fa-circle',
-              };
-            @endphp
-            <a href="{{ $url }}" class="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm transition hover:bg-blue-50 {{ strtolower($skillLevel) === strtolower($sl) ? 'bg-blue-50 border-blue-300 text-blue-600 font-medium' : 'text-gray-700' }}">
-              <i class="fas {{ $icon }} text-gray-400"></i>
-              {{ ucfirst($sl) }}
-            </a>
-          @endforeach
-        </div>
-      </aside>
-
-    </div>
-  </div>
-</section>
 @endsection

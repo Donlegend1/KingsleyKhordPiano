@@ -26,7 +26,7 @@ class AdminController extends Controller
 
     public function usersList(Request $request)
     {
-        $query = User::with('plan', 'community');
+        $query = User::with('plan', 'community', 'subscriptions');
 
         // ==== SORTING ====
         if ($request->filled('search')) {

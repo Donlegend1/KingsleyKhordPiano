@@ -107,6 +107,7 @@ class UploadController extends Controller
             'status'       => $validated['status'],
             'tags'         => $validated['tags'] ?? null,
             'thumbnail'    => $validated['thumbnail'] ?? null,
+            'series'       => $validated['series'] ?? null,
         ]);
 
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -202,6 +203,7 @@ class UploadController extends Controller
             'status'       => $validated['status'] ?? $upload->status,
             'tags'         => $validated['tags'] ?? $upload->tags,
             'thumbnail'    => $validated['thumbnail'] ?? $upload->thumbnail,
+            'series'       => $validated['series'] ?? $upload->series,
         ]);
         logger()->info(['video' => $validated['video_type']]);
         

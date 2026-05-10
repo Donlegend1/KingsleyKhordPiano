@@ -34,6 +34,7 @@ class UpdateCourseRequest extends FormRequest
             'prerequisites' => 'nullable|string',
             'what_you_will_learn' => 'nullable|string',
             'published_at' => 'nullable|date',
+            'related_courses' => 'nullable|array',
         ];
     }
 }

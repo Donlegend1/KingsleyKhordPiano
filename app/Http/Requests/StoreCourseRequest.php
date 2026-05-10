@@ -31,6 +31,7 @@ class StoreCourseRequest extends FormRequest
             'status' => 'nullable|in:active,inactive,draft',
             'rating_count' => 'nullable|integer',
             'average_rating' => 'nullable|numeric',
+            'related_courses' => 'nullable|array',
         ];
     }
 }

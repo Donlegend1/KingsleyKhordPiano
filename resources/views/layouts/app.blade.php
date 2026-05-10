@@ -78,7 +78,8 @@
                     <div class="absolute -left-1 top-3 w-3 h-3 bg-white rotate-45 shadow-sm"></div>
 
                     <h3 class="text-sm font-semibold text-gray-800">{{ $liveshow->title }}</h3>
-                    <p class="text-xs text-gray-600">
+                   
+                    <p class="text-xs text-gray-600" id="liveshow-time" data-utc="{{ \Carbon\Carbon::parse($liveshow->start_time)->utc()->toISOString() }}">
                         {{ \Carbon\Carbon::parse($liveshow->start_time)->format('M d, Y h:i A') }}
                     </p>
                     @if($liveshow->title)
@@ -105,10 +106,15 @@
                     class="text-lg font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Contact
                 </a>
-                <a href="https://khordsounds.com/"
+                <a href="https://khordsounds.com/product-category/piano-best-sellers/"
                     target="blank"
                     class="text-lg font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Shop
+                </a>
+
+                <a href="/community/register"
+                    class="text-lg font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
+                    Community
                 </a>
             </nav>
 
@@ -121,6 +127,7 @@
                 class="text-lg font-semibold px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-[#FFD736] hover:text-black shadow transition duration-200">
                 Login
             </a>
+        
         </div>
 
 
@@ -151,11 +158,15 @@
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Contact
                     </a>
-                    <a href="https://khordsounds.com/"
+                    <a href="https://khordsounds.com/product-category/piano-best-sellers/"
                     target="blank"
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Shop
                     </a>
+                    <a href="/community/register"
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
+                        Community
+                    </a>    
                 </div>
 
                 <div class="flex flex-col space-y-2 mt-4">
@@ -218,7 +229,40 @@
                 nav.classList.toggle('hidden');
             });
         });
+
+         document.addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('liveshow-time');
+        if (!el) return;
+
+        const utcTime = el.getAttribute('data-utc');
+        if (!utcTime) return;
+
+        const date = new Date(utcTime);
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        const localDate = new Intl.DateTimeFormat('en-US', {
+            timeZone: userTimezone,
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+        }).format(date);
+
+        const localTime = new Intl.DateTimeFormat('en-US', {
+            timeZone: userTimezone,
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+        }).format(date);
+
+        const tzLabel = new Intl.DateTimeFormat('en-US', {
+            timeZone: userTimezone,
+            timeZoneName: 'short',
+        }).formatToParts(date).find(p => p.type === 'timeZoneName')?.value;
+
+        el.textContent = `${localDate} ${localTime} (${tzLabel})`;
+    });
     </script>
+    
  <script>
     const slider = document.getElementById('slider');
     const slides = slider.children;

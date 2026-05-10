@@ -42,6 +42,7 @@ class StripeController extends Controller
 
         if ($user->subscription('default')) {
             $user->subscription('default')->cancel();
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SubscriptionCanceledMail($user));
         }
 
         return back()->with('success', 'Subscription cancelled.');

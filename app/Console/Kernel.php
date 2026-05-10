@@ -12,22 +12,19 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('subscriptions:check-expired')->daily();
-        $schedule->command('email:send-roadmap')->daily();
-        $schedule->command('email:send-progress-check')->dailyAt('08:00');
-        $schedule->command('email:encouragement')->dailyAt('10:00');
-        $schedule->command('email:community-invite')->dailyAt('12:00');
-        $schedule->command('email:reengagement')->weeklyOn(1, '08:00');
-        $schedule->command('email:send-skill-assessment')->weeklyOn(2, '08:00');
-        $schedule->command('email:send-milestone')->weeklyOn(3, '08:00');
-        $schedule->command('email:send-song-breakdown')->weeklyOn(4, '08:00');
-        $schedule->command('emails:send-quick-lessons')->daily();
-        $schedule->command('emails:send-ear-training-quiz')->daily();
-        $schedule->command('email:failed-payment-reminders')->dailyAt('09:00');
+        // System / sync jobs
+        $schedule->command('subscriptions:check-expired')->dailyAt('00:00');
         $schedule->command('community:sync-users')->dailyAt('01:00');
-        $schedule->command('notifications:send-discovery-calls')->everyThreeHours();
         $schedule->command('stripe:sync-subscribers')->everyThreeMinutes();
-        
+
+        // Application Emails
+        $schedule->command('email:welcome')->dailyAt('07:00');
+        $schedule->command('email:reengagement')->dailyAt('08:00');
+        $schedule->command('email:send-skill-assessment')->dailyAt('09:00');
+        $schedule->command('email:send-song-breakdowns')->dailyAt('10:00');
+
+        // Frequent jobs
+        $schedule->command('notifications:send-discovery-calls')->everyThreeHours();
     }
 
     /**

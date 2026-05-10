@@ -68,9 +68,7 @@ class RegisterController extends Controller
 
         // 🔥 Again, ensure the event is triggered here too
         event(new Registered($user));
-
-        $user->notify(new WelcomeEmailNotification($user));
-            
+        
 
         $this->guard()->login($user);
 
@@ -106,7 +104,6 @@ class RegisterController extends Controller
         ]);
 
         event(new Registered($user)); 
-        $user->notify(new WelcomeEmailNotification($user));
 
         return $user;
     }

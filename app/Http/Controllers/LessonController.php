@@ -24,25 +24,47 @@ class LessonController extends Controller
         $intermediatePage = $request->input('intermediate_page', 1);
         $advancedPage = $request->input('advanced_page', 1);
         $search = $request->input('search');
+        $series = $request->input('series');
 
-        $allQuery = Upload::where('category', 'quick lessons')->latest();
-        $beginnerQuery = Upload::where('category', 'quick lessons')->where('level', 'Beginner')->latest();
-        $intermediateQuery = Upload::where('category', 'quick lessons')->where('level', 'Intermediate')->latest();
-        $advancedQuery = Upload::where('category', 'quick lessons')->where('level', 'Advanced')->latest();
+        $fetchQuery = function($level = null) use ($search, $series) {
+            $query = Upload::where('category', 'quick lessons');
+            
+            if ($level) {
+                $query->where('level', $level);
+            }
 
-        if ($search) {
-            $allQuery->where('title', 'like', "%{$search}%");
-            $beginnerQuery->where('title', 'like', "%{$search}%");
-            $intermediateQuery->where('title', 'like', "%{$search}%");
-            $advancedQuery->where('title', 'like', "%{$search}%");
-        }
+            if ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            }
 
-        $all = $allQuery->paginate(9, ['*'], 'all_page', $allPage);
-        $beginner = $beginnerQuery->paginate(9, ['*'], 'beginner_page', $beginnerPage);
-        $intermediate = $intermediateQuery->paginate(9, ['*'], 'intermediate_page', $intermediatePage);
-        $advanced = $advancedQuery->paginate(9, ['*'], 'advanced_page', $advancedPage);
+            if ($series) {
+                $query->where('series', $series)->orderBy('id', 'asc');
+            } else {
+                $subquery = Upload::where('category', 'quick lessons')
+                    ->when($level, fn($q) => $q->where('level', $level))
+                    ->when($search, fn($q) => $q->where('title', 'like', "%{$search}%"))
+                    ->selectRaw('MIN(id) as id')
+                    ->groupBy(\DB::raw('COALESCE(series, CAST(id AS CHAR))'));
+                
+                $query->whereIn('id', $subquery)
+                    ->select('uploads.*')
+                    ->selectSub(function($q) {
+                        $q->from('uploads as u2')
+                          ->whereRaw('COALESCE(u2.series, CAST(u2.id AS CHAR)) = COALESCE(uploads.series, CAST(uploads.id AS CHAR))')
+                          ->selectRaw('count(*)');
+                    }, 'item_count')
+                    ->latest();
+            }
 
-        return view('memberpages.quicklesson', compact('all', 'beginner', 'intermediate', 'advanced', 'search'));
+            return $query;
+        };
+
+        $all = $fetchQuery()->paginate(9, ['*'], 'all_page', $allPage);
+        $beginner = $fetchQuery('Beginner')->paginate(9, ['*'], 'beginner_page', $beginnerPage);
+        $intermediate = $fetchQuery('Intermediate')->paginate(9, ['*'], 'intermediate_page', $intermediatePage);
+        $advanced = $fetchQuery('Advanced')->paginate(9, ['*'], 'advanced_page', $advancedPage);
+
+        return view('memberpages.quicklesson', compact('all', 'beginner', 'intermediate', 'advanced', 'search', 'series'));
     }
 
     public function learnSongs(Request $request)
@@ -52,24 +74,46 @@ class LessonController extends Controller
         $intermediatePage = $request->input('intermediate_page', 1);
         $advancedPage = $request->input('advanced_page', 1);
         $search = $request->input('search');
+        $series = $request->input('series');
 
-        $allQuery = Upload::where('category', 'learn songs')->latest();
-        $beginnerQuery = Upload::where('category', 'learn songs')->where('level', 'Beginner')->latest();
-        $intermediateQuery = Upload::where('category', 'learn songs')->where('level', 'Intermediate')->latest();
-        $advancedQuery = Upload::where('category', 'learn songs')->where('level', 'Advanced')->latest();
+        $fetchQuery = function($level = null) use ($search, $series) {
+            $query = Upload::where('category', 'learn songs');
+            
+            if ($level) {
+                $query->where('level', $level);
+            }
 
-        if ($search) {
-            $allQuery->where('title', 'like', "%{$search}%");
-            $beginnerQuery->where('title', 'like', "%{$search}%");
-            $intermediateQuery->where('title', 'like', "%{$search}%");
-            $advancedQuery->where('title', 'like', "%{$search}%");
-        }
+            if ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            }
 
-        $all = $allQuery->paginate(9, ['*'], 'all_page', $allPage);
-        $beginner = $beginnerQuery->paginate(9, ['*'], 'beginner_page', $beginnerPage);
-        $intermediate = $intermediateQuery->paginate(9, ['*'], 'intermediate_page', $intermediatePage);
-        $advanced = $advancedQuery->paginate(9, ['*'], 'advanced_page', $advancedPage);
+            if ($series) {
+                $query->where('series', $series)->orderBy('id', 'asc');
+            } else {
+                $subquery = Upload::where('category', 'learn songs')
+                    ->when($level, fn($q) => $q->where('level', $level))
+                    ->when($search, fn($q) => $q->where('title', 'like', "%{$search}%"))
+                    ->selectRaw('MIN(id) as id')
+                    ->groupBy(\DB::raw('COALESCE(series, CAST(id AS CHAR))'));
+                
+                $query->whereIn('id', $subquery)
+                    ->select('uploads.*')
+                    ->selectSub(function($q) {
+                        $q->from('uploads as u2')
+                          ->whereRaw('COALESCE(u2.series, CAST(u2.id AS CHAR)) = COALESCE(uploads.series, CAST(uploads.id AS CHAR))')
+                          ->selectRaw('count(*)');
+                    }, 'item_count')
+                    ->latest();
+            }
 
-        return view('memberpages.learnsongs', compact('all', 'beginner', 'intermediate', 'advanced', 'search'));
+            return $query;
+        };
+
+        $all = $fetchQuery()->paginate(9, ['*'], 'all_page', $allPage);
+        $beginner = $fetchQuery('Beginner')->paginate(9, ['*'], 'beginner_page', $beginnerPage);
+        $intermediate = $fetchQuery('Intermediate')->paginate(9, ['*'], 'intermediate_page', $intermediatePage);
+        $advanced = $fetchQuery('Advanced')->paginate(9, ['*'], 'advanced_page', $advancedPage);
+
+        return view('memberpages.learnsongs', compact('all', 'beginner', 'intermediate', 'advanced', 'search', 'series'));
     }
 }

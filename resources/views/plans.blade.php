@@ -9,7 +9,7 @@
 
 @include("components.approach")
 @include("components.membership")
-@include("components.practise")
+{{-- @include("components.practise") --}}
 @include("components.services")
 {{-- @include("components.price") --}}
 <div>
@@ -19,7 +19,7 @@
 </div>
 </div>
 
-@include("components.journey")
+@include("components.journey2")
 
 {{-- <div id="zoomMeetingBooking"></div> --}}
 @include("components.faq")

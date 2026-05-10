@@ -12,6 +12,7 @@ use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Helpers\VideoHelper;
 use Illuminate\Http\Request;
+use  \App\Enums\Course\Categories;
 
 class CourseController extends Controller
 {
@@ -28,7 +29,7 @@ class CourseController extends Controller
      */
     public function create()
     {
-        $categories = \App\Enums\Course\Categories::cases();
+        $categories = Categories::cases();
         return view('admin.courses.create', compact('categories'));
     }
 
@@ -170,6 +171,15 @@ class CourseController extends Controller
         ]);
     }
 
+    public function allCourses(Request $request)
+    {
+        $query = Course::query();
+        if ($request->has('level')) {
+            $query->where('level', $request->level);
+        }
+        return response()->json($query->get(['id', 'title', 'level', 'category']));
+    }
+
     public function membershow($level)
     {
         // Validate the level parameter
@@ -185,7 +195,7 @@ class CourseController extends Controller
     {
         $userId = auth()->id();
 
-        $categories = \App\Models\CourseCategory::with([
+        $categories = CourseCategory::with([
             'courses' => function ($query) use ($level, $userId) {
                 $query->where('level', $level)
                     ->with([
@@ -207,11 +217,18 @@ class CourseController extends Controller
             return response()->json(['message' => 'No categories found for this level'], 404);
         }
 
-        // Add `isBookmarked` flag to each course
+        // Add `isBookmarked` flag to each course and load related courses if any
         $categories->each(function ($category) {
             $category->courses->transform(function ($course) {
                 $course->isBookmarked = $course->bookmarks->isNotEmpty();
                 unset($course->bookmarks); // optional, remove bookmarks relation to clean response
+
+                if ($course->related_courses && count($course->related_courses)) {
+                    $course->related = Course::whereIn('id', $course->related_courses)->get();
+                } else {
+                    $course->related = [];
+                }
+                
                 return $course;
             });
         });

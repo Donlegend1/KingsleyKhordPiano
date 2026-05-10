@@ -43,7 +43,11 @@ class LiveShowController extends Controller
      */
     public function show()
     {
-        return view('memberpages.premium.booking');
+        if(auth()->user()->premium === 1) {
+            return view('memberpages.premium.booking');
+        }
+
+        return redirect()->route('home')->with('error', 'You are not authorized to access this page');
     }
 
     /**

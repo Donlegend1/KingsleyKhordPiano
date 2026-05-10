@@ -39,12 +39,12 @@
         <p>This site is big!! Kingsley has created everything here from scratch. You need to know where things are</p>
       </div>
       <!-- Use json_encode and single quotes for safe embedding -->
-      <button
-        @click='video = {{ json_encode($tour ? "https://drive.google.com/file/d/{$tour}/preview" : "") }}'
+        <button
+        @click='video = "https://drive.google.com/file/d/1x50L7apFJg2CAxBxnqn0Fqe1w0uvdcf4/preview"'
         class="px-5 py-2 bg-[#404348] text-white text-sm rounded-full hover:bg-yellow-400 hover:text-black transition inline-flex items-center"
-      >
+    >
         Watch Video <i class="fa fa-play ml-2" aria-hidden="true"></i>
-      </button>
+    </button>
     </div>
 
     <!-- Card 2 -->
@@ -142,7 +142,7 @@
 
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white pt-12 pb-8 px-5 md:px-12 md:mx-auto md:max-w-6xl">
   <!-- Section Title -->
-  <div class="font-bold mb-6 text-2xl md:text-3xl text-center md:text-left">
+  <div class="font-bold mb-6 text-xl md:text-2xl text-center md:text-left">
     Step 2 - Find your Best Path & Choose your Skill Level
   </div>
 
@@ -250,7 +250,7 @@
       </div>
 
       <div class="p-3 sm:p-4 rounded-lg">
-        <div class="tab-content hidden" data-content="beginners">
+        <div class="tab-content" data-content="beginners">
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             @foreach($beginnerCourses as $course)
               <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
@@ -289,6 +289,28 @@
     </div>
   </section>
 
+<script>
+function changeTab(tabName) {
+  const contents = document.querySelectorAll('.tab-content');
+  contents.forEach(content => content.classList.add('hidden'));
+
+  const activeContent = document.querySelector(`[data-content="${tabName}"]`);
+  if (activeContent) {
+    activeContent.classList.remove('hidden');
+  }
+
+  const buttons = document.querySelectorAll('[data-tab]');
+  buttons.forEach(button => {
+    if (button.getAttribute('data-tab') === tabName) {
+      button.classList.add('bg-gray-300');
+      button.classList.remove('bg-transparent');
+    } else {
+      button.classList.remove('bg-gray-300');
+      button.classList.add('bg-transparent');
+    }
+  });
+}
+</script>
   <section class="bg-white md:mx-auto md:max-w-6xl dark:bg-gray-900 text-gray-900 dark:text-white pt-8 pb-5 px-4 sm:px-8 md:px-12">
     <div class="font-bold mb-5 text-lg sm:text-xl md:text-[22px] text-left w-full md:w-9/12">
     

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import Select from "react-select";
 import CustomPagination from "../Pagination/CustomPagination";
 import Modal from "../Modal/Modal";
 import {
@@ -40,14 +41,26 @@ const DraggableCategoryList = ({
         category: "",
         description: "",
         video_url: "",
-        // image_path: '',
+        video_type: "youtube",
         level: "beginner",
         status: "active",
+        related_courses: [],
     });
+
+    const [allCourses, setAllCourses] = useState([]);
 
     const handleChangeNewCourse = (e) => {
         const { name, value } = e.target;
         setCourse({ ...course, [name]: value });
+    };
+
+    const handleRelatedCoursesChange = (selectedOptions, isEdit = false) => {
+        const ids = selectedOptions ? selectedOptions.map((opt) => opt.value) : [];
+        if (isEdit) {
+            setSelectedCourse({ ...selectedCourse, related_courses: ids });
+        } else {
+            setCourse({ ...course, related_courses: ids });
+        }
     };
 
     const [selectedCourseLevel, setSelectedCourseLevel] = useState();
@@ -58,6 +71,23 @@ const DraggableCategoryList = ({
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
+
+    useEffect(() => {
+        const fetchAllCourses = async () => {
+            try {
+                const response = await axios.get("/api/admin/all-courses");
+                setAllCourses(
+                    response.data.map((c) => ({
+                        value: c.id,
+                        label: `${c.title} (${c.level})`,
+                    }))
+                );
+            } catch (error) {
+                console.error("Error fetching courses:", error);
+            }
+        };
+        fetchAllCourses();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -439,8 +469,10 @@ const DraggableCategoryList = ({
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
             >
-                <h2 className="text-lg font-bold mb-2">Edit Course</h2>
-                <p>Editing Course: {selectedCourse?.title}</p>
+                <div className="space-y-6">
+                    <h2 className="text-lg font-bold mb-2">Edit Course</h2>
+                    <p>Editing Course: {selectedCourse?.title}</p>
+                </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <input
@@ -510,6 +542,21 @@ const DraggableCategoryList = ({
                             <option value="intermediate">Intermediate</option>
                             <option value="advanced">Advanced</option>
                         </select>
+
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Related Courses
+                            </label>
+                            <Select
+                                isMulti
+                                options={allCourses}
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                                onChange={(opts) => handleRelatedCoursesChange(opts, true)}
+                                value={allCourses.filter(opt => selectedCourse?.related_courses?.includes(opt.value))}
+                                placeholder="Select related courses..."
+                            />
+                        </div>
                     </div>
 
                     <textarea
@@ -656,6 +703,22 @@ const DraggableCategoryList = ({
                         <option value="draft">Draft</option>
                     </select>
                 </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Related Courses
+                    </label>
+                    <Select
+                        isMulti
+                        options={allCourses}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        onChange={(opts) => handleRelatedCoursesChange(opts, false)}
+                        value={allCourses.filter(opt => course.related_courses?.includes(opt.value))}
+                        placeholder="Select related courses..."
+                    />
+                </div>
+
                 <div>
                     <label
                         htmlFor="description"

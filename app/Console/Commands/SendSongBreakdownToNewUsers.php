@@ -15,7 +15,7 @@ class SendSongBreakdownToNewUsers extends Command
     {
         $this->info('Fetching newly registered users...');
 
-        $users = User::where('created_at', '>=', now()->subDays(7)) 
+        $users = User::whereDate('created_at', now()->subWeeks(2)->toDateString()) 
                      ->get();
 
         if ($users->isEmpty()) {

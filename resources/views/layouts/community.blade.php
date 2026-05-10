@@ -41,7 +41,7 @@
     </style>
 </head>
 
-<body x-data="{ isDark: false, showSidebar: false }" x-init class="bg-gray-100 dark:bg-gray-900 h-screen overflow-hidden">
+<body class="bg-gray-100 dark:bg-gray-900 h-screen overflow-hidden">
 
 <div class="flex h-screen">
 
@@ -99,6 +99,20 @@
                 </div>
             </div>
 
+              <!-- Bookmark -->
+            <div class="mb-6  md:mt-0">
+                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-widest mb-2">BOOKMARKS</h3>
+                <div class="space-y-1">
+                   <a href="/member/bookmark"
+                class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/bookmark') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                    </svg>
+                    Bookmarks
+                </a>
+               
+                </div>
+            </div>
             <!-- MEMBERS ONLY -->
             <div class="mb-6">
                 <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-widest mb-2">MEMBERS ONLY</h3>
@@ -145,7 +159,7 @@
                         </svg>
                         Dashboard
                     </a>
-                    <a href="https://khordsounds.com/" target="_blank" class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors">
+                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
@@ -210,7 +224,7 @@
                         </svg>
                         Dashboard
                     </a>
-                    <a href="https://khordsounds.com/" target="_blank" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
@@ -222,6 +236,7 @@
                         </svg>
                         Live Sessions
                     </a>
+
                     <a href="/member/support" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -234,7 +249,7 @@
                 <div class="flex items-center gap-2">
 
                     <!-- Theme Toggle -->
-                    <button @click="toggle"
+                    {{-- <button @click="toggle"
                         class="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         aria-label="Toggle Dark Mode">
                         <svg x-show="!isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,7 +258,15 @@
                         <svg x-show="isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    </button>
+                    </button> --}}
+
+                    <a href="#"
+                        class="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        aria-label="Search">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                            </svg>
+                    </a>
 
                     <!-- Notifications -->
                     @php
@@ -392,20 +415,18 @@
 <script>
     function themeToggle() {
         return {
-            isDark: false,
+            isDark: true,
             showSidebar: false,
             init() {
-                this.isDark = localStorage.getItem('theme') === 'dark'
-                    || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                // Always dark — ignore localStorage
+                this.isDark = true;
                 this.applyTheme();
             },
             toggle() {
-                this.isDark = !this.isDark;
-                localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
-                this.applyTheme();
+                // No-op — toggle disabled
             },
             applyTheme() {
-                document.documentElement.classList.toggle('dark', this.isDark);
+                document.documentElement.classList.add('dark');
             }
         }
     }
