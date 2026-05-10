@@ -284,18 +284,20 @@
                             </p>
                         </div>
 
-                        <button 
-                            @click="openModal = true"
-                            class="text-indigo-600 hover:underline text-sm"
-                        >
-                            Manage
-                        </button>
+                        @if (auth()->user()->subscription('default') && auth()->user()->subscription('default')->active() && !auth()->user()->subscription('default')->onGracePeriod())
+                            <button 
+                                @click="openModal = true"
+                                class="text-indigo-600 hover:underline text-sm"
+                            >
+                                Manage
+                            </button>
+                        @endif
                     </div>
                 </li>
             </ul>
 
             <!-- Manage Subscription Modal -->
-           @if ($latestSubscription && $latestSubscription->stripe_status === 'active')
+           @if (auth()->user()->subscription('default') && auth()->user()->subscription('default')->active() && !auth()->user()->subscription('default')->onGracePeriod())
             {{-- Modal for managing active subscription --}}
             <div 
                 x-show="openModal"
@@ -335,6 +337,20 @@
                     </div>
                 </div>
             </div>
+            @elseif (auth()->user()->subscription('default') && auth()->user()->subscription('default')->onGracePeriod())
+                {{-- Subscription canceled but on grace period --}}
+                <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 mt-6">
+                    <p class="text-sm">
+                        Your subscription has been <strong>canceled</strong> but you still have access until <strong>{{ auth()->user()->subscription('default')->ends_at->format('M d, Y') }}</strong>. 
+                        You can renew anytime to regain access.
+                    </p>
+                    <a 
+                        href="{{ route('subscription.page') }}" 
+                        class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
+                    >
+                        View Subscription Plans
+                    </a>
+                </div>
             @elseif ($latestSubscription && $latestSubscription->stripe_status === 'canceled')
                 {{-- Subscription canceled: show renewal link --}}
                 <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 mt-6">

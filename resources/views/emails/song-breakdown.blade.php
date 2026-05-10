@@ -1,31 +1,21 @@
-@extends('layouts.email')
-
-@section('content')
-<div style="max-width: 480px; margin: 0 auto; padding: 12px; background: #fff; border-radius: 8px;">
-
-<p>Hey {{ $user->first_name }},</p>
-
-<p>Every great musician has one thing in common—a rich musical vocabulary. The more you understand the structure, techniques, and emotions behind a song, the better you become at playing, composing, and expressing yourself on the piano.</p>
-
-<p>That’s why we’ve created detailed song breakdowns for every skill level:</p>
-
-<ul>
-    <li><strong>Beginners:</strong> Learn simple melodies, rhythms, and hand coordination.</li>
-    <li><strong>Intermediate:</strong> Explore chord progressions, dynamics, and phrasing.</li>
-    <li><strong>Advanced:</strong> Dive into complex arrangements, improvisation, and stylistic nuances.</li>
-</ul>
-
-<p>
-    <a href="{{ config('app.url') }}" style="color: #3366cc;">Start exploring today →</a>
-    
-   
- {{-- <a href="{{ config('app.url') }}/song-breakdowns" style="color: #3366cc;">Start exploring today →</a> --}}
-</p>
-
-<p>Each breakdown helps you understand the "why" behind the music, making you a more confident and expressive player.</p>
-
-<p>Can’t wait to hear what you create!</p>
-
-<p>– Kingsley</p>
+<div>
+    Hey {{ $user->first_name ?? 'there' }},
+    <br><br>
+    Every great musician has one thing in common—a rich musical vocabulary. The more you understand the structure, techniques, and emotions behind a song, the better you become at playing, composing, and expressing yourself on the piano.
+    <br><br>
+    That’s why we’ve created detailed song breakdowns for every skill level: beginner, intermediate, and advanced.
+    <br><br>
+    Beginners: Learn simple melodies, rhythms, and hand coordination.<br><br>
+    Intermediate Players: Explore chord progressions, dynamics, and phrasing.<br><br>
+    Advanced Players: Dive into complex arrangements, improvisation, and stylistic nuances.
+    <br><br>
+    Find a song that matches your level and start exploring today:
+    <br><br>
+    <a href="{{ url('/member/lessons') }}">Song Breakdowns</a>
+    <br><br>
+    Each breakdown helps you understand the "why" behind the music, making you a more confident and expressive player.
+    <br><br>
+    Can’t wait to hear what you create!
+    <br><br>
+    Kingsley
 </div>
-@endsection

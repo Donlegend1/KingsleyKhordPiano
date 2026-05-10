@@ -139,6 +139,10 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
+    Route::get('piano-exercise/finger', [ExerciseController::class, 'fingerExercises'])->name('piano.exercise.finger');
+    Route::get('piano-exercise/musical-application', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
+    Route::get('piano-exercise/player', [ExerciseController::class, 'pianoExercisePlayer'])->name('piano.exercise.player');
+    Route::post('piano-exercise/comment', [ExerciseController::class, 'storeComment'])->name('piano.exercise.comment');
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
     Route::get('extra-courses', [CoursesController::class, 'extraCourses'])->name('extra.courses');
     Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
@@ -221,6 +225,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('email-campaign', [EmailCampaignController::class, 'index']);
     Route::get('email-campaign/create', [EmailCampaignController::class, 'create']);
     Route::get('pdf-download', [PDFDownloadController::class, 'index']);
-    Route::get('audio-download', [AudioDownloadController::class, 'index']);
-    
+    Route::get('audio-download', [PDFDownloadController::class, 'index']);
+    Route::get('musical-application-list', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'musicalApplicationList']);
+    Route::get('musical-application-all-courses', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'getAllCourses']);
+    Route::resource('musical-application', \App\Http\Controllers\Admin\MusicalApplicationController::class, ['as' => 'admin']);
 });

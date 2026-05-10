@@ -48,6 +48,9 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-piano-icon lucide-piano"><path d="M18.5 8c-1.4 0-2.6-.8-3.2-2A6.87 6.87 0 0 0 2 9v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8.5C22 9.6 20.4 8 18.5 8"/><path d="M2 14h20"/>
                 <path d="M6 14v4"/><path d="M10 14v4"/><path d="M14 14v4"/><path d="M18 14v4"/></svg> <span>Piano Exercise</span>
             </a>
+            <a href="/admin/musical-application" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa fa-music"></i> <span>Musical Application</span>
+            </a>
             <a href="/admin/uploads/extra-courses" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school-icon lucide-school"><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M18 5v16"/><path d="m4 6 7.106-3.79a2 2 0 0 1 1.788 0L20 6"/><path d="m6 11-3.52 2.147a1 1 0 0 0-.48.854V19a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a1 1 0 0 0-.48-.853L18 11"/>
                 <path d="M6 5v16"/><circle cx="12" cy="9" r="2"/></svg> <span>Extra Courses</span>
@@ -139,6 +142,9 @@
         </a>
         <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-television"></i> <span>Live Show</span>
+        </a>
+        <a href="/admin/musical-application" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-music"></i> <span>Musical Application</span>
         </a>
         <a href="/admin/uploads/list" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-upload"></i> <span>Others</span>

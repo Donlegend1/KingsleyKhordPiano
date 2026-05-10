@@ -20,7 +20,7 @@ class SongBreakdownEmail extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject("Let's break it down—one song at a time!")
+            ->subject("{$notifiable->first_name}, let’s break it down—one song at a time!")
             ->view('emails.song-breakdown', ['user' => $notifiable]);
     }
 

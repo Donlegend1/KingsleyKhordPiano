@@ -172,7 +172,7 @@ class StripeController extends Controller
 
     }
 
-    private function cancelSubscription()
+    public function cancelSubscription()
     {
         $user =auth()->user();
 

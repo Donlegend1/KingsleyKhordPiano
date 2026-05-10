@@ -27,17 +27,28 @@ const SingleUpload = () => {
             case "iframe":
                 return (
                     <div
-                        className="mb-4 w-full rounded overflow-hidden"
+                        className="w-full aspect-video rounded overflow-hidden shadow-lg bg-black"
                         dangerouslySetInnerHTML={{
                             __html: upload.video_url,
                         }}
                     />
                 );
 
+            case "vimeo":
+                return (
+                    <iframe
+                        className="w-full aspect-video rounded shadow-lg"
+                        src={`https://player.vimeo.com/video/${upload.video_url}?h=0&badge=0&autopause=0&player_id=0&app_id=58479`}
+                        frameBorder="0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                    />
+                );
+
             case "google":
                 return (
                     <iframe
-                        className="w-full h-[400px] rounded"
+                        className="w-full aspect-video rounded shadow-lg"
                         src={`https://drive.google.com/file/d/${upload.video_url}/preview`}
                         allow="autoplay"
                         allowFullScreen
@@ -47,7 +58,7 @@ const SingleUpload = () => {
             case "youtube":
                 return (
                     <iframe
-                        className="w-full h-[400px] rounded"
+                        className="w-full aspect-video rounded shadow-lg"
                         src={`https://www.youtube.com/embed/${upload.video_url}`}
                         title="YouTube video player"
                         frameBorder="0"
@@ -60,7 +71,7 @@ const SingleUpload = () => {
                 return (
                     <video
                         controls
-                        className="w-full h-[400px] rounded bg-black"
+                        className="w-full aspect-video rounded bg-black shadow-lg"
                     >
                         <source
                             src={`/uploads/videos/${upload.video_url}`}
@@ -72,8 +83,9 @@ const SingleUpload = () => {
 
             default:
                 return (
-                    <div className="mb-4 text-gray-500">
-                        Unsupported video type.
+                    <div className="p-10 border-2 border-dashed border-gray-200 rounded-xl text-center text-gray-500">
+                        <i className="fa fa-exclamation-circle text-2xl mb-2 block"></i>
+                        Unsupported video type: {upload.video_type}
                     </div>
                 );
         }

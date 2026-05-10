@@ -25,7 +25,7 @@ class SkillAssessmentEmail extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject("Let's find your perfect starting note!")
+            ->subject("{$notifiable->first_name}, let's find your perfect starting note!")
             ->view('emails.skill-assessment', [
                 'user' => $notifiable,
                 'assessmentLink' => $this->assessmentLink,
