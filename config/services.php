@@ -61,4 +61,8 @@ return [
         'test_mode' => env('PAYPAL_MODE', 'sandbox')
     ],
 
+    'google' => [
+        'calendar_id' => env('GOOGLE_CALENDAR_ID', 'primary'),
+    ],
+
 ];

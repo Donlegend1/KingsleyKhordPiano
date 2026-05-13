@@ -44,6 +44,9 @@
             <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-television"></i> <span>Live Show</span>
             </a>
+            <a href="{{ route('admin.guest-bookings.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa fa-calendar-check"></i> <span>Guest Bookings</span>
+            </a>
             <a href="/admin/uploads/piano-exercise" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-piano-icon lucide-piano"><path d="M18.5 8c-1.4 0-2.6-.8-3.2-2A6.87 6.87 0 0 0 2 9v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8.5C22 9.6 20.4 8 18.5 8"/><path d="M2 14h20"/>
                 <path d="M6 14v4"/><path d="M10 14v4"/><path d="M14 14v4"/><path d="M18 14v4"/></svg> <span>Piano Exercise</span>
@@ -142,6 +145,9 @@
         </a>
         <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-television"></i> <span>Live Show</span>
+        </a>
+        <a href="{{ route('admin.guest-bookings.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-calendar-check"></i> <span>Guest Bookings</span>
         </a>
         <a href="/admin/musical-application" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-music"></i> <span>Musical Application</span>
