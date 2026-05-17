@@ -75,8 +75,9 @@ class HomeController extends Controller
                     $latestCourses[$category] = $course;
                 }
             }
-            // dd( $latestCourses);
-            return view('home', compact('progress', 'levels', 'latestCourses'));
+            $latestComments = \App\Models\CourseVideoComment::with(['user', 'course'])->latest()->take(4)->get();
+
+            return view('home', compact('progress', 'levels', 'latestCourses', 'latestComments'));
         }
     }
 

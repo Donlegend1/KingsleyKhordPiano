@@ -129,6 +129,13 @@ Route::post('/zoom-meeting-booking', [ZoomMeetingController::class, 'createZoomM
 Route::get('/zoom/authorize', [ZoomMeetingController::class, 'redirectToZoom']);
 Route::get('/zoom/callback', [ZoomMeetingController::class, 'handleZoomCallback']);
 
+// Guest Booking Routes
+Route::post('/guest-booking/pay', [App\Http\Controllers\GuestBookingController::class, 'initiatePayment'])->name('guest-booking.pay');
+Route::get('/guest-booking/success/{provider}', [App\Http\Controllers\GuestBookingController::class, 'handleSuccess'])->name('guest-booking.success');
+Route::get('/guest-booking/cancel', [App\Http\Controllers\GuestBookingController::class, 'handleCancel'])->name('guest-booking.cancel');
+Route::get('/guest-booking/available-slots', [App\Http\Controllers\GuestBookingController::class, 'getAvailableSlots'])->name('guest-booking.available-slots');
+Route::get('/guest-booking/all-slots', [App\Http\Controllers\GuestBookingController::class, 'getAllAvailableSlots'])->name('guest-booking.all-slots');
+
 Route::put('profile/update', [HomeController::class, 'update']);
 Route::delete('profile/delete', [HomeController::class, 'destroy']);
 Route::post('/support/send', [ContactController::class, 'store'])->name('support.send');
@@ -229,4 +236,13 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('musical-application-list', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'musicalApplicationList']);
     Route::get('musical-application-all-courses', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'getAllCourses']);
     Route::resource('musical-application', \App\Http\Controllers\Admin\MusicalApplicationController::class, ['as' => 'admin']);
+
+    // Guest Bookings
+    Route::prefix('guest-bookings')->name('admin.guest-bookings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\GuestBookingController::class, 'index'])->name('index');
+        Route::patch('/{booking}/update-link', [\App\Http\Controllers\Admin\GuestBookingController::class, 'updateMeetingLink'])->name('update-link');
+        Route::get('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'availability'])->name('availability');
+        Route::post('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'storeAvailability'])->name('store-availability');
+        Route::delete('/availability/{availability}', [\App\Http\Controllers\Admin\GuestBookingController::class, 'destroyAvailability'])->name('destroy-availability');
+    });
 });
