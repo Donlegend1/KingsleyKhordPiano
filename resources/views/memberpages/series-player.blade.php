@@ -14,8 +14,9 @@
             }
         }
 
-        // Get next video securely using values() to reset keys
+        // Get next and previous video securely using values() to reset keys
         $nextVideo = $playlist->values()->get($currentIndex + 1);
+        $previousVideo = $currentIndex > 0 ? $playlist->values()->get($currentIndex - 1) : null;
 
         // Priority: Use explicitly linked related courses if provided, otherwise fallback to playlist neighbors
         if (isset($related_courses) && count($related_courses) > 0) {
@@ -67,9 +68,9 @@
                 <div class="flex-1 min-w-0">
 
                     {{-- Video Player --}}
-                    <div class="w-full bg-black rounded-xl overflow-hidden aspect-video mb-5 shadow">
+                    {{-- <div class="w-full bg-black rounded-xl overflow-hidden aspect-video mb-5 shadow"> --}}
                         <div id="uploads-single" class="w-full h-full"></div>
-                    </div>
+                    {{-- </div> --}}
 
                     {{-- Title + Description --}}
                     <h1 class="text-[22px] font-bold text-gray-900 mb-1">
@@ -80,13 +81,27 @@
                     </p>
 
                     {{-- Action Buttons --}}
-                    <div class="flex items-center gap-3 mb-10">
+                    <div class="flex items-center flex-wrap gap-3 mb-10">
+                        @if($previousVideo)
+                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $previousVideo->id]) }}" 
+                               class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                                <i class="fa-solid fa-arrow-left text-[14px]"></i> Previous
+                            </a>
+                        @endif
+
+                        @if($nextVideo)
+                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $nextVideo->id]) }}" 
+                               class="flex items-center gap-2 bg-[#0FA9A0]/10 hover:bg-[#0FA9A0]/20 text-[#0FA9A0] text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                                Next Lesson <i class="fa-solid fa-arrow-right text-[14px]"></i>
+                            </a>
+                        @endif
+
                         <form action="/member/course/{{ $activeVideo->id }}/complete" method="POST">
                             @csrf
                             <button type="submit"
                                 class="flex items-center gap-2 bg-[#0FA9A0] hover:bg-[#0c9088] text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 <i class="fa-regular fa-circle-check text-[15px]"></i>
-                                Mark as Complete
+                                Complete
                             </button>
                         </form>
 
@@ -100,7 +115,7 @@
                        ? 'bg-yellow-50 border-yellow-200 text-yellow-600 hover:bg-yellow-100'
                        : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50' }}">
                                 <i class="fa-regular fa-bookmark text-[15px]"></i>
-                                {{ $isBookmarked ? 'Bookmarked' : 'Bookmark Lesson' }}
+                                {{ $isBookmarked ? 'Bookmarked' : 'Bookmark' }}
                             </button>
                         </form>
                     </div>
@@ -177,7 +192,7 @@
                             <textarea name="comment" placeholder="What did you learn from this lesson?" 
                                 class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#0FA9A0] focus:border-transparent transition-all outline-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">
-                                <button type="submit" class="bg-[#0FA9A0] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#0c9088] transition-all">Post Comment</button>
+                                <button type="submit" class="bg-[#0FA9A0] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#0c9088] transition-all">Comment</button>
                             </div>
                         </form>
 
@@ -245,12 +260,18 @@
                     </div>
 
                     {{-- Next Lesson button --}}
-                    <div class="p-4 bg-white border-t border-gray-100">
+                    <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
+                        @if ($previousVideo)
+                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $previousVideo->id]) }}"
+                                class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                <i class="fa-solid fa-arrow-left text-sm"></i> Prev
+                            </a>
+                        @endif
+
                         @if ($nextVideo)
                             <a href="{{ request()->fullUrlWithQuery(['video_id' => $nextVideo->id]) }}"
-                                class="flex items-center justify-center gap-2 w-full py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
-                                Next Lesson
-                                <i class="fa-solid fa-arrow-right text-sm"></i>
+                                class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                Next <i class="fa-solid fa-arrow-right text-sm"></i>
                             </a>
                         @else
                             <button disabled

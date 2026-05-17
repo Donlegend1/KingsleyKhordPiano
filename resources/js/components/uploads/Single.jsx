@@ -1,18 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom/client";
 import {
-    useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
 
 const SingleUpload = () => {
     const [upload, setUpload] = useState(null);
+    const iframeWrapperRef = useRef(null);
 
     useEffect(() => {
         if (window.uploadData) {
             setUpload(window.uploadData);
         }
     }, []);
+
+    // After the iframe HTML is injected, force override its inline styles
+    useEffect(() => {
+        if (upload?.video_type === "iframe" && iframeWrapperRef.current) {
+            const iframe = iframeWrapperRef.current.querySelector("iframe");
+            if (iframe) {
+                iframe.style.position = "absolute";
+                iframe.style.top = "0";
+                iframe.style.left = "0";
+                iframe.style.width = "100%";
+                iframe.style.height = "100%";
+                iframe.style.border = "0";
+            }
+        }
+    }, [upload]);
 
     const renderVideoPlayer = () => {
         if (!upload?.video_type || !upload?.video_url) {
@@ -26,12 +41,15 @@ const SingleUpload = () => {
         switch (upload.video_type) {
             case "iframe":
                 return (
-                    <div
-                        className="w-full aspect-video rounded overflow-hidden shadow-lg bg-black"
-                        dangerouslySetInnerHTML={{
-                            __html: upload.video_url,
-                        }}
-                    />
+                    // Outer div establishes the 16:9 aspect ratio box
+                    <div className="relative w-full aspect-video rounded overflow-hidden shadow-lg bg-black">
+                        {/* Inner div fills the box; iframe gets injected here */}
+                        <div
+                            ref={iframeWrapperRef}
+                            className="absolute inset-0"
+                            dangerouslySetInnerHTML={{ __html: upload.video_url }}
+                        />
+                    </div>
                 );
 
             case "vimeo":
