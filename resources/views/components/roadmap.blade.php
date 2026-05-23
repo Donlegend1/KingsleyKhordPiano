@@ -12,10 +12,10 @@
   <!-- Feature Grid -->
 @php
   $features = [
-    ['image' => 'musictheory', 'title' => 'Music Theory', 'bg' =>"#000", 'description' => ''],
-    ['image' => 'roadmap', 'title' => 'Road Map', 'bg' => "#FF0011", 'description' => ''],
-    ['image' => 'eartraining', 'title' => 'Ear Training', 'bg' =>"#023", 'description' => ''],
-    ['image' => 'pianoexercise', 'title' => 'Piano Exercise', 'bg' => "#FFD736", 'description' => ''],
+    ['image' => 'musictheory', 'title' => 'Music Theory', 'desc'=>'Replace your nervousness with still-like confidence.', 'bg' =>"#000", 'description' => ''],
+    ['image' => 'roadmap', 'title' => 'Road Map', 'desc'=>'Gain a clear, structured plan of the curriculum, designed to guide you through every skill level.', 'bg' => "#FF0011", 'description' => ''],
+    ['image' => 'eartraining', 'title' => 'Ear Training', 'desc'=>'Learn to expand your musical vocabulary and repertoire.', 'bg' =>"#023", 'description' => ''],
+    ['image' => 'pianoexercise', 'title' => 'Piano Exercise', 'desc'=>'Hands-on daily piano exercises to strengthen your fingers.', 'bg' => "#FFD736", 'description' => ''],
   ];
 @endphp
 
@@ -40,7 +40,7 @@
           </div>
           <h3 class="text-lg font-semibold mb-2">{{ $feature['title'] }}</h3>
           <p class=" text-gray-300">
-            Enhance your piano skills effortlessly. Whether you're starting out or experienced, our lessons guide you through musical excellence at your own pace.
+           {{ $feature['desc'] }}
           </p>
         </div>
       </div>
