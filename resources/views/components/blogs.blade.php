@@ -16,7 +16,7 @@
     </div>
 
     <div class="bg-white p-6 sm:p-10 rounded-xl shadow-lg">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         @foreach ($extracourses as $blog)
           <div class="bg-white rounded-lg border border-gray-200 overflow-hidden group hover:shadow-lg transition">
             <div class="w-full h-48 overflow-hidden">
@@ -25,7 +25,6 @@
             </div>
             <div class="p-5">
               <h3 class="text-lg font-semibold mb-2 group-hover:text-yellow-500 transition">{{ $blog->title }}</h3>
-              <p class="text-sm text-gray-600 mb-4">{{ $blog['excerpt'] }}</p>
               <a href="member/lesson/{{$blog->id}}" class="text-sm font-medium text-yellow-600 hover:underline">View <span class="fa fa-eye"></span></a>
             </div>
           </div>

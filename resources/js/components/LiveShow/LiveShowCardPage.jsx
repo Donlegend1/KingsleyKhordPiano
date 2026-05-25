@@ -175,7 +175,7 @@ const PremiumVideoSection = () => {
                                     backgroundImage: `url('${isPast && video.thumbnail ? video.thumbnail : "/images/Background.jpg"}')` 
                                 }}
                             ></div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/20 opacity-95 transition-opacity duration-500 group-hover:opacity-100"></div>
 
                             {/* Premium Badge */}
                             {video.access_type === "premium" && (
