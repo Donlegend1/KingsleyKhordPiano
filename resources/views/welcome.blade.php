@@ -5,6 +5,7 @@
 @include("components.roadmap")
 @include("components.joinow")
 @include("components.journey")
+<div id="coach-reels"></div>
 @include("components.joinow2")
 @include("components.plansstats")
 @include("components.blogs")
