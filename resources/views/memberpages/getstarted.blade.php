@@ -4,11 +4,12 @@
 
 <div
   x-data="{ step: 1, totalSteps: 4 }"
-  class="min-h-screen bg-white dark:bg-gray-900 py-6 px-4"
+  x-init="$watch('step', () => window.scrollTo({ top: 0, behavior: 'smooth' }))"
+  class="min-h-screen bg-white dark:bg-gray-900 py-6 px-4 flex flex-col"
 >
 
   {{-- ── Header ── --}}
-  <div class="max-w-5xl mx-auto mb-6 flex items-start justify-between">
+  <div class="max-w-5xl mx-auto mb-6 w-full flex items-start justify-between">
     <div class="flex items-start space-x-3">
       <div class="text-indigo-600 mt-1">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -17,20 +18,19 @@
       </div>
       <div>
         <h1 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">Get Started</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Follow these simple steps to get the most out of your learning experience.</p>
       </div>
     </div>
     <a href="/member/dashboard" class="flex items-center space-x-1.5 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
       </svg>
-      <span>Exit Tour</span>
+      <span>Exit Setup</span>
     </a>
   </div>
 
   {{-- ── Step Progress Bar ── --}}
-  <div class="max-w-5xl mx-auto mb-8">
-    <div class="flex items-center justify-center">
+  <div class="max-w-5xl mx-auto mb-8 w-full">
+    <div class="flex items-center w-full">
       @for ($i = 1; $i <= 4; $i++)
         {{-- Step circle --}}
         <div
@@ -59,7 +59,7 @@
   </div>
 
   {{-- ── Step Cards ── --}}
-  <div class="max-w-5xl mx-auto" style="min-height:520px;">
+  <div class="max-w-5xl mx-auto w-full flex-1">
 
   {{-- STEP 1 --}}
   <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
@@ -111,105 +111,136 @@
 
   {{-- STEP 2 --}}
   <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
-    <div class="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-      <div class="flex flex-col md:flex-row" style="min-height:520px;">
 
-        {{-- Left Panel – Music Snapshot --}}
-        <div class="w-full md:w-2/5 border-r border-gray-100 p-7 flex flex-col">
-          <div class="flex items-center space-x-2 mb-6">
-            <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded">YOUR</span>
-            <span class="text-gray-500 text-xs font-bold tracking-widest uppercase">Music Snapshot</span>
-          </div>
+    {{-- Step label + heading --}}
+    <div class="text-center mb-8">
+      <p class="text-indigo-600 text-xs font-bold uppercase tracking-widest mb-2">Step 2 of 4</p>
+      <h2 class="text-3xl font-extrabold text-gray-900 leading-tight">Find Your Best Path &amp; Choose Your Skill Level</h2>
+    </div>
 
-          {{-- Circular Progress --}}
-          <div class="flex flex-col items-center mb-6">
-            <div class="relative w-36 h-36">
-              <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="8"/>
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#6d28d9" stroke-width="8"
-                  stroke-dasharray="263.9" stroke-dashoffset="71.3" stroke-linecap="round"/>
+    {{-- Two-card choice row --}}
+    <div class="flex flex-col md:flex-row items-stretch gap-0 relative">
+
+      {{-- Card 1: Discover Your Level --}}
+      <div class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm p-8 flex flex-col items-center text-center">
+
+        {{-- Icon --}}
+        <div class="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-400 -ml-2 mt-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 19V6l12-3v13M9 19a2 2 0 11-4 0 2 2 0 014 0zm12 0a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Discover Your Level</h3>
+
+        {{-- Features --}}
+        <ul class="divide-y divide-gray-100 mb-8 w-full text-left">
+          <li class="flex items-center space-x-3 py-3">
+            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+              {{-- Clock icon – "less than 2 minutes" --}}
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-3xl font-extrabold text-gray-900">72</span>
-                <span class="text-xs text-gray-400">/100</span>
-              </div>
             </div>
-            <p class="text-indigo-600 font-bold text-lg mt-3">Growing Musician</p>
-            <p class="text-gray-400 text-sm">You're building a strong foundation!</p>
-          </div>
-
-          {{-- Skill Bars --}}
-          <div class="space-y-3">
-            @foreach([['icon'=>'📖','label'=>'Fundamentals','val'=>75],['icon'=>'👂','label'=>'Ear Training','val'=>68],['icon'=>'🎹','label'=>'Chords and Harmony','val'=>80],['icon'=>'🌟','label'=>'Experience','val'=>70]] as $skill)
-            <div class="flex items-center space-x-2">
-              <span class="text-base w-5 text-center">{{ $skill['icon'] }}</span>
-              <span class="text-xs text-gray-600 w-24 flex-shrink-0">{{ $skill['label'] }}</span>
-              <div class="flex-1 bg-gray-200 rounded-full h-2">
-                <div class="bg-indigo-600 h-2 rounded-full" style="width:{{ $skill['val'] }}%"></div>
-              </div>
-              <span class="text-xs text-gray-500 w-12 text-right">{{ $skill['val'] }}/100</span>
+            <span class="text-sm text-gray-700">Takes less than 2 minutes</span>
+          </li>
+          <li class="flex items-center space-x-3 py-3">
+            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+              {{-- Lightning bolt icon – "instant results" --}}
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+              </svg>
             </div>
-            @endforeach
-          </div>
-        </div>
-
-        {{-- Right Panel – CTA --}}
-        <div class="w-full md:w-3/5 p-8 flex flex-col justify-center relative overflow-hidden">
-
-          {{-- Decorative clipboard illustration (CSS-only) --}}
-          <div class="absolute top-4 right-4 opacity-10 pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-40 h-40 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 2a1 1 0 000 2h6a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h6a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h4a1 1 0 100-2H7z" clip-rule="evenodd"/>
-            </svg>
-          </div>
-
-          <p class="text-orange-500 text-xs font-bold uppercase tracking-widest mb-3">Discover Where You Stand</p>
-          <h2 class="text-3xl font-extrabold text-gray-900 leading-tight mb-4">Step 2: Find Your Best Path</h2>
-          <p class="text-gray-500 text-sm leading-relaxed mb-8">
-            Take a quick assessment to discover your strengths, highlight areas to grow, and get a personalized learning path tailored just for you.
-          </p>
-
-          {{-- Feature badges --}}
-          <div class="flex flex-col sm:flex-row gap-3 mb-8">
-            <div class="flex items-center space-x-2 bg-purple-50 rounded-xl px-4 py-3 flex-1">
-              <span class="text-xl">⏱️</span>
-              <div>
-                <p class="text-xs font-bold text-gray-800">15 Quick</p>
-                <p class="text-xs text-gray-500">Questions</p>
-              </div>
+            <span class="text-sm text-gray-700">Instant results</span>
+          </li>
+          <li class="flex items-center space-x-3 py-3">
+            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+              {{-- Clipboard check icon – "skill evaluation" --}}
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+              </svg>
             </div>
-            <div class="flex items-center space-x-2 bg-orange-50 rounded-xl px-4 py-3 flex-1">
-              <span class="text-xl">📊</span>
-              <div>
-                <p class="text-xs font-bold text-gray-800">Instant</p>
-                <p class="text-xs text-gray-500">Results</p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-2 bg-green-50 rounded-xl px-4 py-3 flex-1">
-              <span class="text-xl">⭐</span>
-              <div>
-                <p class="text-xs font-bold text-gray-800">Personalized</p>
-                <p class="text-xs text-gray-500">Growth Plan</p>
-              </div>
-            </div>
-          </div>
+            <span class="text-sm text-gray-700">Skill Evaluation</span>
+          </li>
+        </ul>
 
-          {{-- CTA Button --}}
-          <a href="/member/quiz" class="w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-xl transition text-base mb-3">
-            <span>Take My Assessment</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
-          <p class="text-center text-xs text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-            100% Free &bull; Takes Less Than 2 Minutes
-          </p>
-        </div>
-
+        <a href="/member/quiz" class="mt-auto w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-xl transition text-sm">
+          <span>Start Assessment</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
       </div>
+
+      {{-- OR divider --}}
+      <div class="flex md:flex-col items-center justify-center px-4 py-4 md:py-0 z-10">
+        <div class="flex-1 h-px md:h-auto md:w-px bg-gray-200 md:flex-1"></div>
+        <span class="mx-3 md:mx-0 md:my-3 w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0 shadow-sm">OR</span>
+        <div class="flex-1 h-px md:h-auto md:w-px bg-gray-200 md:flex-1"></div>
+      </div>
+
+      {{-- Card 2: Personalized Guidance --}}
+      <div class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm p-8 flex flex-col items-center text-center relative overflow-hidden">
+
+        {{-- Premium badge --}}
+        <div class="absolute top-4 right-4 flex items-center space-x-1 bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold px-3 py-1 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+          </svg>
+          <span>Premium Choice</span>
+        </div>
+
+        {{-- Icon --}}
+        <div class="w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Personalized Guidance</h3>
+
+        {{-- Features --}}
+        <ul class="divide-y divide-gray-100 mb-8 w-full text-left">
+          <li class="flex items-center space-x-3 py-3">
+            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              {{-- Phone icon – "1-on-1 consultation" --}}
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </div>
+            <span class="text-sm text-gray-700">1-on-1 consultation</span>
+          </li>
+          <li class="flex items-center space-x-3 py-3">
+            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              {{-- Clock icon – "10-minutes call" --}}
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <span class="text-sm text-gray-700">10-minutes call</span>
+          </li>
+          <li class="flex items-center space-x-3 py-3">
+            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              {{-- Map icon – "Personalized Roadmap" --}}
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+              </svg>
+            </div>
+            <span class="text-sm text-gray-700">Personalized Roadmap</span>
+          </li>
+        </ul>
+
+        <a href="/member/discovery-call" class="mt-auto w-full flex items-center justify-center space-x-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-4 rounded-xl transition text-sm">
+          <span>Schedule Discovery Call</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
     </div>
   </div>
 
@@ -416,7 +447,7 @@
   </div>{{-- end step cards wrapper --}}
 
   {{-- ── Footer Navigation ── --}}
-  <div class="max-w-5xl mx-auto mt-8 flex items-center justify-between">
+  <div class="max-w-5xl mx-auto w-full mt-auto border-t border-gray-100 pt-6 flex items-center justify-between">
 
     <button
       @click="if (step > 1) step--"
