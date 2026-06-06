@@ -18,7 +18,7 @@
       <h2 class="text-3xl font-bold text-gray-900 tracking-tight">
         Welcome Back
       </h2>
-      
+
     </div>
 
     <!-- Form -->
@@ -114,7 +114,7 @@
 
     <!-- Footer -->
     <div class="mt-8 text-center text-sm text-gray-600">
-      Don’t have an account?
+      Don't have an account?
       <a href="/plans" class="font-semibold text-[#9C7A1C] hover:underline">
         Sign up
       </a>
