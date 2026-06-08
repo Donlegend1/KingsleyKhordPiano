@@ -36,8 +36,8 @@
     <header
       x-data="{ scrolled: false }"
       x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 10 })"
-      :class="scrolled ? 'bg-black' : 'bg-transparent'"
-      class="fixed w-full top-0 z-50 transition-colors duration-300">
+      :class="scrolled ? '!bg-black shadow-lg' : 'lg:bg-transparent'"
+      class="fixed w-full top-0 z-50 bg-black lg:bg-transparent transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <!-- Left: Logo -->
             <div class="flex items-center flex-shrink-0">
@@ -148,26 +148,26 @@
 
         <!-- Mobile Nav -->
             <div id="mobile-nav" class="lg:hidden hidden px-4 pb-4">
-                <div class="flex flex-col divide-y divide-gray-600 border border-gray-700 rounded-md overflow-hidden">
+                <div class="flex flex-col divide-y divide-gray-700 border border-gray-700 rounded-2xl overflow-hidden bg-black/95 shadow-2xl backdrop-blur">
                     <a href="/"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        class="block text-sm font-semibold transition duration-200 py-4 px-4 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Home
                     </a>
                     <a href="/about"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        class="block text-sm font-semibold transition duration-200 py-4 px-4 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         About
                     </a>
                     <a href="/contact"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                        class="block text-sm font-semibold transition duration-200 py-4 px-4 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Contact
                     </a>
                     <a href="https://khordsounds.com/product-category/piano-best-sellers/"
                     target="blank"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
+                        class="block text-sm font-semibold transition duration-200 py-4 px-4 text-gray-400 ">
                         Shop
                     </a>
                     <a href="/community/register"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
+                        class="block text-sm font-semibold transition duration-200 py-4 px-4 text-gray-400 ">
                         Community
                     </a>    
                 </div>
