@@ -26,6 +26,9 @@ use App\Http\Controllers\EmailCampaignController;
 use App\Http\Controllers\PDFDownloadController;
 use App\Http\Controllers\AudioDownloadController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\Admin\AdminLearnSongController;
+use App\Http\Controllers\Admin\AdminExtraCourseController;
+
 
 
 /*
@@ -62,6 +65,27 @@ use App\Http\Controllers\PlanController;
         Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
         Route::post('/courses/category/create', [CourseCategoryController::class, 'create']);
         Route::delete('/course/category/{name}/delete', [CourseCategoryController::class, 'delete']);
+
+        // Learn Songs Admin API
+        Route::get('learn-songs', [AdminLearnSongController::class, 'list']);
+        Route::get('all-songs', [AdminLearnSongController::class, 'allSongs']);
+        Route::post('learn-songs/store', [AdminLearnSongController::class, 'storeSong']);
+        Route::post('learn-songs/update/{id}', [AdminLearnSongController::class, 'updateSong']);
+        Route::delete('learn-songs/{id}', [AdminLearnSongController::class, 'deleteSong']);
+        Route::post('learn-songs/category/create', [AdminLearnSongController::class, 'createCategory']);
+        Route::delete('learn-songs/category/{name}/delete', [AdminLearnSongController::class, 'deleteCategory']);
+        Route::post('reorder/learn-songs', [AdminLearnSongController::class, 'updatePositions']);
+
+        // Extra Courses Admin API
+        Route::get('extra-courses-list', [AdminExtraCourseController::class, 'list']);
+        Route::get('all-extra-courses', [AdminExtraCourseController::class, 'allCourses']);
+        Route::post('extra-courses/store', [AdminExtraCourseController::class, 'storeCourse']);
+        Route::post('extra-courses/update/{id}', [AdminExtraCourseController::class, 'updateCourse']);
+        Route::delete('extra-courses/{id}', [AdminExtraCourseController::class, 'deleteCourse']);
+        Route::post('extra-courses/category/create', [AdminExtraCourseController::class, 'createCategory']);
+        Route::delete('extra-courses/category/{name}/delete', [AdminExtraCourseController::class, 'deleteCategory']);
+        Route::post('reorder/extra-courses', [AdminExtraCourseController::class, 'updatePositions']);
+
         Route::post('/midi-file/create', [MidiFileController::class, 'store']);
         Route::delete('/midi-files/{midiFile}', [MidiFileController::class, 'destroy']);
         Route::get('/midi-files', [MidiFileController::class, 'fetchAll']);

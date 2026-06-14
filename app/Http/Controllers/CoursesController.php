@@ -20,58 +20,64 @@ class CoursesController extends Controller
      */
     public function extraCourses(Request $request)
     {
-        $name = $request->input('name');
-        $series = $request->input('series');
-        $allPage = $request->input('all_page', 1);
-        $beginnerPage = $request->input('beginner_page', 1);
-        $intermediatePage = $request->input('intermediate_page', 1);
-        $advancedPage = $request->input('advanced_page', 1);
+        $search = $request->input('name');
+        $activeTab = $request->input('tab', 'beginner');
 
-        $fetchQuery = function($level = null) use ($name, $series) {
-            $query = \App\Models\Upload::where('category', 'extra courses');
-            
-            if ($level) {
-                $query->where('level', $level);
+        $fetchLevelCategories = function($level) use ($search) {
+            $query = \App\Models\ExtraCourseCategory::where('level', $level)
+                ->orderBy('position');
+
+            $query->with(['courses' => function($q) use ($search, $level) {
+                $q->where('level', $level)
+                  ->where('status', 'active')
+                  ->when($search, function($subQ) use ($search) {
+                      $subQ->where('title', 'like', "%{$search}%")
+                           ->orWhere('description', 'like', "%{$search}%");
+                  })
+                  ->orderBy('position');
+            }]);
+
+            $categories = $query->get();
+
+            if ($search) {
+                $categories = $categories->filter(function($category) {
+                    return $category->courses->isNotEmpty();
+                });
             }
 
-            if ($name) {
-                $query->where('title', 'like', '%' . $name . '%');
-            }
-            if ($series) {
-                $query->where('series', $series)->orderBy('id', 'asc');
-            } else {
-                // Grouping logic: Get unique series or standalone items
-                // We use a subquery to get the IDs of items we want to show
-                $subquery = \App\Models\Upload::where('category', 'extra courses')
-                    ->when($level, fn($q) => $q->where('level', $level))
-                    ->when($name, fn($q) => $q->where('title', 'like', '%' . $name . '%'))
-                    ->selectRaw('MIN(id) as id')
-                    ->groupBy(\DB::raw('COALESCE(series, CAST(id AS CHAR))'));
-                
-                $query->whereIn('id', $subquery)
-                    ->select('uploads.*')
-                    ->selectSub(function($q) {
-                        $q->from('uploads as u2')
-                          ->whereRaw('COALESCE(u2.series, CAST(u2.id AS CHAR)) = COALESCE(uploads.series, CAST(uploads.id AS CHAR))')
-                          ->selectRaw('count(*)');
-                    }, 'item_count')
-                    ->latest();
-            }
-
-            return $query;
+            return $categories;
         };
 
-        $all = $fetchQuery()->paginate(9, ['*'], 'all_page', $allPage);
-        $beginner = $fetchQuery('Beginner')->paginate(9, ['*'], 'beginner_page', $beginnerPage);
-        $intermediate = $fetchQuery('Intermediate')->paginate(9, ['*'], 'intermediate_page', $intermediatePage);
-        $advanced = $fetchQuery('Advanced')->paginate(9, ['*'], 'advanced_page', $advancedPage);
+        $beginnerCategories = $fetchLevelCategories('beginner');
+        $intermediateCategories = $fetchLevelCategories('intermediate');
+        $advancedCategories = $fetchLevelCategories('advanced');
 
-        return view('memberpages.extracources', compact('all', 'beginner', 'intermediate', 'advanced', 'series'));
+        return view('memberpages.extracources', compact(
+            'beginnerCategories',
+            'intermediateCategories',
+            'advancedCategories',
+            'search',
+            'activeTab'
+        ));
     }
 
     public function singleCourse($id, BookmarkService $service) 
     {
-        $lesson = Upload::findOrFail($id);
+        // Try ExtraCourse
+        $lesson = \App\Models\ExtraCourse::find($id);
+        $type = 'extra_course';
+
+        if (!$lesson) {
+            // Try LearnSong
+            $lesson = \App\Models\LearnSong::find($id);
+            $type = 'learn_song';
+        }
+
+        if (!$lesson) {
+            // Fallback to general Upload
+            $lesson = Upload::findOrFail($id);
+            $type = 'upload';
+        }
 
         $comments = CourseVideoComment::where('category', 'others')
             ->whereNot('course_id', $id)
@@ -81,17 +87,55 @@ class CoursesController extends Controller
             ->get();
 
         $relatedUploads = collect();
-        if (is_array($lesson->tags) && count($lesson->tags)) {
-            $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
+        if ($type === 'learn_song') {
+            if (is_array($lesson->related_songs) && count($lesson->related_songs)) {
+                $relatedUploads = \App\Models\LearnSong::whereIn('id', $lesson->related_songs)->get();
+            }
+        } elseif ($type === 'extra_course') {
+            if (is_array($lesson->related_courses) && count($lesson->related_courses)) {
+                $relatedUploads = \App\Models\ExtraCourse::whereIn('id', $lesson->related_courses)->get();
+            }
+        } else {
+            if (is_array($lesson->tags) && count($lesson->tags)) {
+                $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
+            }
         }
 
         $isBookmarked = $service->isBookmarked($lesson);
+
+        // Find next and previous video in the same category (if applicable)
+        $previousVideo = null;
+        $nextVideo = null;
+
+        if ($type === 'learn_song') {
+            $previousVideo = \App\Models\LearnSong::where('learn_song_category_id', $lesson->learn_song_category_id)
+                ->where('position', '<', $lesson->position)
+                ->orderBy('position', 'desc')
+                ->first();
+
+            $nextVideo = \App\Models\LearnSong::where('learn_song_category_id', $lesson->learn_song_category_id)
+                ->where('position', '>', $lesson->position)
+                ->orderBy('position', 'asc')
+                ->first();
+        } elseif ($type === 'extra_course') {
+            $previousVideo = \App\Models\ExtraCourse::where('extra_course_category_id', $lesson->extra_course_category_id)
+                ->where('position', '<', $lesson->position)
+                ->orderBy('position', 'desc')
+                ->first();
+
+            $nextVideo = \App\Models\ExtraCourse::where('extra_course_category_id', $lesson->extra_course_category_id)
+                ->where('position', '>', $lesson->position)
+                ->orderBy('position', 'asc')
+                ->first();
+        }
 
         return view('memberpages.singleExtracourse', compact(
             'lesson',
             'relatedUploads',
             'comments',
-            'isBookmarked'
+            'isBookmarked',
+            'previousVideo',
+            'nextVideo'
         ));
     }
 }

@@ -3,7 +3,7 @@
   {{-- Banner Image --}}
   <div class="w-full">
     <img
-      src="{{ asset('images/testimonials.jpeg') }}"
+      src="{{ asset('images/image.png') }}"
       alt="Join Our Private WhatsApp Group"
       class="w-full object-cover"
     />

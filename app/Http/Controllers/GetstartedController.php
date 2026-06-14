@@ -22,9 +22,9 @@ class GetstartedController extends Controller
         $setUp = WebsiteVideo::where('video_category', 'setUp')->first()?->video_url;
         $exper = WebsiteVideo::where('video_category', 'exper')->first()?->video_url;
 
-        $beginnerCourses = Upload::where('category', 'learn songs')->where('level', 'beginner')->latest()->take(3)->get();
-        $intermediateCourses = Upload::where('category', 'learn songs')->where('level', 'intermediate')->latest()->take(3)->get();
-        $advancedCourses = Upload::where('category', 'learn songs')->where('level', 'advanced')->latest()->take(3)->get();
+        $beginnerCourses = \App\Models\LearnSong::where('level', 'beginner')->where('status', 'active')->latest()->take(3)->get();
+        $intermediateCourses = \App\Models\LearnSong::where('level', 'intermediate')->where('status', 'active')->latest()->take(3)->get();
+        $advancedCourses = \App\Models\LearnSong::where('level', 'advanced')->where('status', 'active')->latest()->take(3)->get();
 
         return view('memberpages.getstarted', [
             'tour' => $tour,

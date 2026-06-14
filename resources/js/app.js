@@ -20,6 +20,8 @@ import './components/courses/Details';
 import './components/plans/PlanSwitchAndCurrencySelect';
 import './components/ZoomMeetingBooking';
 import './components/uploads/Uploads';
+import './components/uploads/LearnSongsAdmin';
+import './components/uploads/ExtraCoursesAdmin';
 import './components/uploads/Create';
 import './components/uploads/Single.jsx';
 import './components/EarTraining/Index';

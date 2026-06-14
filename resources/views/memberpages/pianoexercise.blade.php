@@ -44,7 +44,7 @@
 
                 <!-- Image -->
                 <div class="w-full h-52 rounded-2xl overflow-hidden mt-8 mb-6 shadow-sm">
-                    <img src="https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=800&auto=format&fit=crop"
+                    <img src="/images/finger-exercise.jpeg"
                          alt="Finger Exercises"
                          class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700">
                 </div>
@@ -72,7 +72,7 @@
 
                 <!-- Image -->
                 <div class="w-full h-52 rounded-2xl overflow-hidden mt-8 mb-6 shadow-sm bg-black">
-                    <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop"
+                    <img src="/images/musical-application.jpeg"
                          alt="Musical Application"
                          class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700 opacity-90">
                 </div>

@@ -10,7 +10,7 @@
 @include("components.approach")
 @include("components.membership")
 {{-- @include("components.practise") --}}
-@include("components.services")
+{{-- @include("components.services") --}}
 {{-- @include("components.price") --}}
 <div>
     <div id="pricing" class="mt-10"></div>

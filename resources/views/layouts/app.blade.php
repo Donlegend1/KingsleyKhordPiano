@@ -33,7 +33,7 @@
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
     <div id="app">
-    <header class="bg-black dark:bg-gray-800 shadow top-0 z-50">
+    <header class="bg-gradient-to-r from-black to-gray-800 dark:bg-gray-800 shadow top-0 ">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <!-- Left: Logo -->
             <div class="flex items-center flex-shrink-0">

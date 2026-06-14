@@ -238,7 +238,7 @@
                         ['url' => 'member/piano-exercise',  'label' => 'Piano Exercise','icon' => 'piano2.png'],
                         ['url' => 'member/ear-training',    'label' => 'Ear Training',  'icon' => 'eartraning.svg'],
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg'],
-                        ['url' => 'member/quick-lessons',   'label' => 'Quick Lesson',  'icon' => 'quick lession.svg'],
+                        // ['url' => 'member/quick-lessons',   'label' => 'Quick Lesson',  'icon' => 'quick lession.svg'],
                         ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'songs.svg'],
                         ['url' => 'member/live-session',    'label' => 'Live Session',  'icon' => 'livesession.svg'],
                     ];

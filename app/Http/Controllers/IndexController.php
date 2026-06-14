@@ -11,7 +11,7 @@ class IndexController extends Controller
 {
     public function index()
     {
-        $extracourses = Upload::where('category', 'extra courses')->latest()->take(3)->get();
+        $extracourses = \App\Models\ExtraCourse::where('status', 'active')->latest()->take(3)->get();
         $liveshow = Liveshow::where('start_time', '>=', Carbon::now())
         ->orderBy('start_time', 'asc')
         ->first();
