@@ -42,16 +42,6 @@
       </a>
 
     </div>
-
-    {{-- Mobile wave transition --}}
-    <div class="w-full" style="line-height: 0; margin-bottom: -2px;">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 414 60" preserveAspectRatio="none" class="w-full block">
-        <path d="M0,0 L414,0 L414,10 C310,50 104,50 0,10 Z" fill="#000000"/>
-        <path d="M0,10 C104,50 310,50 414,10 L414,60 L0,60 Z" fill="#FFD736" opacity="0.35"/>
-        <path d="M0,20 C104,55 310,55 414,20 L414,60 L0,60 Z" fill="#f0f0ee"/>
-      </svg>
-    </div>
-
   </div>
 
   {{-- ===== DESKTOP LAYOUT (hidden below md) ===== --}}
