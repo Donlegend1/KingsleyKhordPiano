@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('musical_applications')) {
+            return;
+        }
         Schema::table('musical_applications', function (Blueprint $table) {
             $table->json('tags')->nullable()->after('series');
         });

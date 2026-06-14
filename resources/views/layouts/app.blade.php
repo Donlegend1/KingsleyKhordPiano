@@ -33,7 +33,11 @@
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
     <div id="app">
-    <header class="bg-black dark:bg-gray-800 shadow top-0 z-50">
+    <header
+      x-data="{ scrolled: false }"
+      x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 10 })"
+      :class="scrolled ? 'bg-black' : 'bg-transparent'"
+      class="fixed w-full top-0 z-50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <!-- Left: Logo -->
             <div class="flex items-center flex-shrink-0">
@@ -95,26 +99,25 @@
             <!-- Center: Desktop Nav -->
             <nav class="hidden lg:grid grid-flow-col auto-cols-max gap-x-10 items-center justify-center flex-1">
                 <a href="/"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-base font-semibold transition duration-200 {{ Request::is('/') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Home
                 </a>
                 <a href="/about"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-base font-semibold transition duration-200 {{ Request::is('about') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     About
-                </a>
-                <a href="/contact"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Contact
                 </a>
                 <a href="https://khordsounds.com/product-category/piano-best-sellers/"
                     target="blank"
-                    class="text-lg font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
+                    class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Shop
                 </a>
-
                 <a href="/community/register"
-                    class="text-lg font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
+                    class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Community
+                </a>
+                <a href="/contact"
+                    class="text-base font-semibold transition duration-200 {{ Request::is('contact') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Contact
                 </a>
             </nav>
 
@@ -124,7 +127,7 @@
                 Sign Up
             </a>
             <a href="/login"
-                class="text-lg font-semibold px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-[#FFD736] hover:text-black shadow transition duration-200">
+                class="text-lg font-semibold px-4 py-2 rounded-lg bg-[#FFD736] text-black hover:bg-[#e6c22e] shadow transition duration-200">
                 Login
             </a>
         

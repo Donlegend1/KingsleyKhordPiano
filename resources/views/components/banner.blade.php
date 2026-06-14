@@ -1,24 +1,117 @@
-<section
-  class="relative min-h-[60vh] lg:min-h-[90vh] flex items-center justify-center bg-black text-white overflow-hidden bg-cover md:bg-center sm:bg-left"
-  style="background-image: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.2)), url('/images/banner2.jpg');">
-  <!-- Content -->
-  <div class="relative z-10 px-4 w-full max-w-4xl text-left sm:text-center">
-     <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight sm:mb-0 mb-4">
-      Master Gospel Piano
-      <p class=" justify-center text-3xl sm:text-5xl lg:text-5xl text-[#FFD736] italic font-playfair mb-6 mt-1">
-        and Play Like the Pros
-      </p>   
-    </h1>
-    <p class="text-base sm:text-lg text-gray-200 font-semibold mb-8">
-      Achieve Pro-Level Gospel Piano Skills—Even If You’re Starting from Scratch!
-    </p>
+<section class="bg-black text-white -mt-[72px]">
 
-    <div class="flex justify-start sm:justify-center">
+  {{-- ===== MOBILE LAYOUT (hidden md+) ===== --}}
+  <div class="md:hidden relative">
+
+    {{-- Image: absolute so its height never affects section height --}}
+    <div class="absolute inset-x-0" style="top: 48px; height: 80vh; z-index: 0;">
+      <img
+        src="/images/first-p.png"
+        alt="Kingsley Khord at the piano"
+        class="w-full h-full object-cover"
+        style="object-position: 65% 0%;"
+      >
+      {{-- Gradient fade into black --}}
+      <div class="absolute inset-x-0 bottom-0" style="height: 65%; background: linear-gradient(to top, #000000 0%, #000000 25%, rgba(0,0,0,0.75) 60%, rgba(0,0,0,0) 100%);"></div>
+    </div>
+
+    {{-- Content: sits in flow, starts below the visible image area --}}
+    <div class="relative px-6 pb-14 bg-transparent" style="padding-top: 54vh; z-index: 10;">
+
+      <p class="text-[#FFD736] text-[10px] font-semibold tracking-[0.22em] uppercase mb-4">
+        Master Gospel Piano
+      </p>
+
+      <h1 class="font-bold leading-[1.05] mb-0">
+        <span class="block text-white whitespace-nowrap" style="font-size: 9.5vw;">Play Gospel.</span>
+        <span class="block text-[#FFD736] italic font-playfair whitespace-nowrap" style="font-size: 9.5vw;">Play With Purpose.</span>
+      </h1>
+
+      <div class="w-10 h-[3px] bg-[#FFD736] mt-5 mb-5"></div>
+
+      <p class="text-[1.1rem] text-gray-300 mb-8 leading-relaxed">
+        Learn gospel piano step-by-step<br>and play with confidence.
+      </p>
+
       <a href="/plans#pricing"
-         class="inline-flex items-center bg-white text-black text-sm sm:text-base px-6 py-3 rounded-lg font-semibold uppercase hover:bg-[#c2ab39] transition">
-        Join Now
-        <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
+         class="flex items-center justify-center gap-2 bg-[#FFD736] text-black text-sm font-semibold px-7 py-4 rounded-full w-full hover:bg-[#e6c22e] transition">
+        Start Your Journey
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
       </a>
+
     </div>
   </div>
+
+  {{-- ===== DESKTOP LAYOUT (hidden below md) ===== --}}
+  <div class="hidden md:flex relative overflow-hidden" style="height: 100vh;">
+
+    {{-- Full-bleed background image --}}
+    <img
+      src="/images/first-p.png"
+      alt="Kingsley Khord at the piano"
+      class="absolute inset-0 w-full h-full object-cover"
+      style="object-position: 62% 0%;"
+      aria-hidden="true"
+    >
+
+    {{-- Left gradient: solid black → transparent --}}
+    <div class="absolute inset-0"
+         style="background: linear-gradient(to right,
+           #000000 0%,
+           #000000 30%,
+           rgba(0,0,0,0.92) 38%,
+           rgba(0,0,0,0.60) 50%,
+           rgba(0,0,0,0.15) 65%,
+           rgba(0,0,0,0) 80%
+         );"></div>
+
+    {{-- Bottom fade to black --}}
+    <div class="absolute inset-x-0 bottom-0 h-32"
+         style="background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);"></div>
+
+    {{-- Content: vertically centered below the fixed navbar --}}
+    <div class="relative z-10 flex flex-col justify-center w-full" style="padding-top: 72px;">
+      <div class="px-16 lg:px-20 xl:px-28" style="max-width: 48%;">
+
+        <p class="text-[#FFD736] text-xs font-semibold tracking-[0.22em] uppercase mb-5">
+          Master Gospel Piano
+        </p>
+
+        <h1 class="font-bold leading-[1.05] mb-0">
+          <span class="block text-5xl lg:text-[4.5rem] xl:text-[5rem] text-white">Play Gospel.</span>
+          <span class="block text-5xl lg:text-[4.5rem] xl:text-[5rem] text-[#FFD736] italic font-playfair">Play With Purpose.</span>
+        </h1>
+
+        <div class="w-12 h-[3px] bg-[#FFD736] mt-6 mb-6"></div>
+
+        <p class="text-base lg:text-lg text-gray-300 mb-10 leading-relaxed">
+          Learn gospel piano step-by-step<br>and play with confidence.
+        </p>
+
+        <a href="/plans#pricing"
+           class="inline-flex items-center gap-2 bg-[#FFD736] text-black text-sm font-semibold px-8 py-4 rounded-md hover:bg-[#e6c22e] transition">
+          Start Your Journey
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  {{-- Wave transition to next section --}}
+  <div class="w-full" style="line-height: 0; margin-top: -2px;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 60" preserveAspectRatio="none" class="w-full block">
+      {{-- Secondary colour layer (slightly offset) --}}
+      <path d="M0,10 C360,50 1080,50 1440,10 L1440,60 L0,60 Z" fill="#FFD736" opacity="0.35"/>
+      {{-- Primary wave --}}
+      <path d="M0,20 C360,55 1080,55 1440,20 L1440,60 L0,60 Z" fill="#f0f0ee"/>
+    </svg>
+  </div>
+
 </section>
