@@ -39,6 +39,10 @@ class GetstartedController extends Controller
     }
     public function roadMap() 
     {
+        $hasAssessment = \App\Models\UserAssessment::where('user_id', auth()->id())->exists();
+        if (!$hasAssessment) {
+            return redirect()->route('member.quiz')->with('error', 'Please complete the assessment quiz to unlock the Course Roadmap.');
+        }
 
         return view('memberpages.roadmap');
     }
@@ -49,5 +53,20 @@ class GetstartedController extends Controller
         $user->get_started = GetStartedStatus::Old->value;
         $user->save();
         return redirect()->back();
+    }
+
+    public function library() 
+    {
+        $pianoExerciseCount = \App\Models\Upload::where('category', 'piano exercise')->where('status', 'active')->count();
+        $earTrainingCount = \App\Models\Quiz::count();
+        $extraCoursesCount = \App\Models\ExtraCourse::where('status', 'active')->count();
+        $learnSongsCount = \App\Models\LearnSong::where('status', 'active')->count();
+
+        return view('memberpages.library', [
+            'pianoExerciseCount' => $pianoExerciseCount,
+            'earTrainingCount' => $earTrainingCount,
+            'extraCoursesCount' => $extraCoursesCount,
+            'learnSongsCount' => $learnSongsCount,
+        ]);
     }
 }

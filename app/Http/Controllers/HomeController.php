@@ -88,6 +88,7 @@ class HomeController extends Controller
         }
     }
 
+
     public function admin()
     {
         if (Auth::user()->role == UserRoles::ADMIN->value) {

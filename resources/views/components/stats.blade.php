@@ -37,7 +37,7 @@
           <i class="fas fa-eye text-[#0068DF] text-2xl"></i>
         </div>
         <div class="text-left">
-          <h3 class="text-2xl font-bold">500k+</h3>
+          <h3 class="text-2xl font-bold">170K+</h3>
           <p class="text-gray-300 text-sm">Lessons Viewed</p>
         </div>
       </div>
@@ -48,7 +48,7 @@
           <i class="fas fa-user-graduate text-[#0068DF] text-2xl"></i>
         </div>
         <div class="text-left">
-          <h3 class="text-2xl font-bold">1000+</h3>
+          <h3 class="text-2xl font-bold">700+</h3>
           <p class="text-gray-300 text-sm">Students Taught</p>
         </div>
       </div>

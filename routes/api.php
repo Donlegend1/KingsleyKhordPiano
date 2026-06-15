@@ -46,7 +46,7 @@ use App\Http\Controllers\Admin\AdminExtraCourseController;
         return $request->user();
     });
 
-    Route::get('/live-shows', [LiveShowController::class, 'list']);
+    Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
     Route::get('/plans', [PlanController::class, 'index']);
 
     Route::prefix('admin')->group(function () {

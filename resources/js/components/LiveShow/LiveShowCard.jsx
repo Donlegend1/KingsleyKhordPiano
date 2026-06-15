@@ -165,12 +165,50 @@ const LiveShowCard = () => {
                         );
                     })
                 ) : (
-                    <div className="col-span-full py-20 flex flex-col items-center justify-center bg-gray-900/50 backdrop-blur-md rounded-3xl border border-white/5 text-center">
-                        <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6 border border-white/10">
-                            <i className="fa-solid fa-microphone-slash text-3xl text-gray-600"></i>
+                    <div className="col-span-full py-16 flex flex-col items-center justify-center bg-[#F3F0FF] rounded-2xl border border-[#E5DEFF] text-center">
+                        {/* Calendar illustration */}
+                        <div className="relative mb-6 flex items-end justify-center">
+                            {/* Left cloud */}
+                            <svg className="absolute left-0 bottom-4 w-14 h-10 text-[#DDD6FE] opacity-80" viewBox="0 0 80 50" fill="currentColor">
+                                <ellipse cx="40" cy="35" rx="35" ry="15"/>
+                                <ellipse cx="25" cy="28" rx="18" ry="14"/>
+                                <ellipse cx="55" cy="25" rx="20" ry="16"/>
+                            </svg>
+                            {/* Right cloud */}
+                            <svg className="absolute right-0 bottom-6 w-12 h-8 text-[#DDD6FE] opacity-60" viewBox="0 0 80 50" fill="currentColor">
+                                <ellipse cx="40" cy="35" rx="30" ry="13"/>
+                                <ellipse cx="28" cy="26" rx="16" ry="13"/>
+                                <ellipse cx="52" cy="23" rx="18" ry="14"/>
+                            </svg>
+                            {/* Calendar icon */}
+                            <div className="relative z-10">
+                                <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    {/* Calendar body */}
+                                    <rect x="8" y="18" width="68" height="60" rx="8" fill="white" stroke="#C4B5FD" strokeWidth="2"/>
+                                    {/* Calendar header */}
+                                    <rect x="8" y="18" width="68" height="20" rx="8" fill="#7C3AED"/>
+                                    <rect x="8" y="30" width="68" height="8" fill="#7C3AED"/>
+                                    {/* Hooks */}
+                                    <rect x="25" y="10" width="6" height="16" rx="3" fill="#A78BFA"/>
+                                    <rect x="59" y="10" width="6" height="16" rx="3" fill="#A78BFA"/>
+                                    {/* Grid dots */}
+                                    {[0,1,2,3,4,5,6,7,8].map((i) => (
+                                        <rect key={i} x={20 + (i % 3) * 18} y={48 + Math.floor(i / 3) * 12} width="10" height="6" rx="2" fill="#DDD6FE"/>
+                                    ))}
+                                    {/* Live badge */}
+                                    <circle cx="68" cy="65" r="14" fill="#7C3AED"/>
+                                    <text x="68" y="70" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">((•))</text>
+                                </svg>
+                            </div>
+                            {/* Sparkles */}
+                            <span className="absolute top-0 left-8 text-[#C4B5FD] text-lg">✦</span>
+                            <span className="absolute top-4 right-6 text-[#C4B5FD] text-sm">✦</span>
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">No Live Shows Available</h3>
-                        <p className="text-gray-500 max-w-xs">Check back later for upcoming live sessions and workshops.</p>
+
+                        <h3 className="text-2xl font-bold text-[#1E1B4B] mb-2">No Live Shows Available</h3>
+                        <p className="text-gray-500 max-w-xs text-sm leading-relaxed">
+                            Check back later for upcoming live sessions<br/>and workshops.
+                        </p>
                     </div>
                 )}
             </div>

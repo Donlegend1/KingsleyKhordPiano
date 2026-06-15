@@ -154,6 +154,9 @@ const LiveShow = () => {
                                     Access Level
                                 </th>
                                 <th className="py-2 px-4 text-left">
+                                    Category
+                                </th>
+                                <th className="py-2 px-4 text-left">
                                     Video Url
                                 </th>
 
@@ -173,8 +176,11 @@ const LiveShow = () => {
                                         <td className="py-2 px-4">
                                             {user.start_time}
                                         </td>
-                                        <td className="py-2 px-4">
+                                        <td className="py-2 px-4 text-sm font-semibold capitalize">
                                             {user.access_type}
+                                        </td>
+                                        <td className="py-2 px-4 text-xs uppercase font-bold text-blue-600">
+                                            {user.category || 'event'}
                                         </td>
                                         <td className="py-2 px-4">
                                             {user.recording_url}
@@ -234,7 +240,7 @@ const LiveShow = () => {
                             type="text"
                             name="title"
                             placeholder="Title"
-                            defaultValue={liveShow?.title}
+                            value={liveShow?.title || ""}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         />
@@ -242,7 +248,7 @@ const LiveShow = () => {
                             type="text"
                             name="zoom_link"
                             placeholder="Zoom Link"
-                            defaultValue={liveShow?.zoom_link}
+                            value={liveShow?.zoom_link || ""}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         />
@@ -250,26 +256,47 @@ const LiveShow = () => {
                             type="text"
                             name="recording_url"
                             placeholder="Recording URL"
-                            defaultValue={liveShow?.recording_url}
+                            value={liveShow?.recording_url || ""}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         />
                         <input
                             type="datetime-local"
                             name="start_time"
-                            defaultValue={liveShow?.start_time}
+                            value={liveShow?.start_time || ""}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         />
                         <select
                             name="access_type"
-                            defaultValue={liveShow?.access_type}
+                            value={liveShow?.access_type || "all"}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         >
                             <option value="all">All Users</option>
                             <option value="premium">Premium Only</option>
                         </select>
+                        <select
+                            name="category"
+                            value={liveShow?.category || "event"}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        >
+                            <option value="event">Live Event</option>
+                            <option value="session">Live Session</option>
+                        </select>
+                        {liveShow?.category === "session" && (
+                            <input
+                                type="number"
+                                name="max_slots"
+                                min="1"
+                                placeholder="Max Slots"
+                                value={liveShow?.max_slots || 5}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-lg"
+                                required
+                            />
+                        )}
                     </div>
 
                     <button

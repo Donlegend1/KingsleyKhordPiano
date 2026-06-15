@@ -43,6 +43,7 @@
 <div id="app" class="flex flex-col flex-grow">
 
     {{-- ==================== HEADER ==================== --}}
+    @if(!isset($noHeader) || !$noHeader)
     <header
         x-data="{ openMobileNav: false, showLogoutModal: false }"
         class="bg-black dark:bg-gray-800 shadow sticky top-0 z-50"
@@ -62,8 +63,7 @@
 
                 {{-- Live Show Badge --}}
                @php
-                    use App\Models\Liveshow;
-                    $liveshow = Liveshow::where('start_time', '>=', now())->orderBy('start_time')->first();
+                    $liveshow = \App\Models\Liveshow::where('start_time', '>=', now())->orderBy('start_time')->first();
                 @endphp
 
                 @if($liveshow)
@@ -102,7 +102,7 @@
                     <a href="/member/getstarted" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-play-circle"></i> Get Started
                     </a>
-                    <a href="/member/community" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-users"></i> Community
                     </a>
                     <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
@@ -281,7 +281,7 @@
                     <a href="/member/getstarted" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-play-circle w-4"></i> Get Started
                     </a>
-                    <a href="/member/community" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-users w-4"></i> Community
                     </a>
                     <a href="/member/profile" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
@@ -324,6 +324,7 @@
         </div>
 
     </header>
+    @endif
 
     {{-- ==================== BANNERS ==================== --}}
     @include('partials.wip-banner')
@@ -346,6 +347,7 @@
     </main>
 
     {{-- ==================== FOOTER ==================== --}}
+    @if(!isset($noFooter) || !$noFooter)
     <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-5">
         <div class="max-w-7xl mx-auto px-4 flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <span>&copy; {{ date('Y') }} {{ config('app.name') }}</span>
@@ -353,6 +355,7 @@
             <span>All rights reserved.</span>
         </div>
     </footer>
+    @endif
 
 </div>
 

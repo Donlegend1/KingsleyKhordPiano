@@ -63,87 +63,71 @@
                 </a>
             </div>
 
-            <!-- COMMUNITY -->
+            <!-- Navigation Links -->
             <div class="mb-6 mt-16 md:mt-0">
-                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-widest mb-2">COMMUNITY</h3>
                 <div class="space-y-1">
                     <a href="/member/community"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"/>
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/community') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                         </svg>
-                        Activity Feed
+                        Overview
                     </a>
+                    
+                    <a href="/member/community/space/lessons"
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/community/space/lessons') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/>
+                        </svg>
+                        Tutorial
+                    </a>
+
                     <a href="/member/community/space/progress-report"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/space/progress-report') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/community/space/progress-report') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.25c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 0 1 3 18.375v-5.25ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-9.75ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
                         </svg>
                         Progress Report
                     </a>
-                    <a href="/member/community/space/lessons"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/space/lessons') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                        </svg>
-                        Lessons
-                    </a>
-                    <a href="/member/community/leaderboard"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/leaderboard') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8M12 17v4M7 4h10l-1 5a4 4 0 01-4 3H9a4 4 0 01-4-3L4 4h3zm0 0V3m10 1V3"/>
-                        </svg>
-                        Leaderboards
-                    </a>
-                </div>
-            </div>
 
-              <!-- Bookmark -->
-            <div class="mb-6  md:mt-0">
-                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-widest mb-2">BOOKMARKS</h3>
-                <div class="space-y-1">
-                   <a href="/member/bookmark"
-                class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/bookmark') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-                    </svg>
-                    Bookmarks
-                </a>
-               
-                </div>
-            </div>
-            <!-- MEMBERS ONLY -->
-            <div class="mb-6">
-                <h3 class="text-[#9CA3AF] dark:text-gray-400 text-[11px] font-bold tracking-widest mb-2">MEMBERS ONLY</h3>
-                <div class="space-y-1">
-                    <a href="/member/community/space/exclusive-feed"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/space/exclusive-feed') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    <a href="/member/bookmark"
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/bookmark') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
                         </svg>
-                        Exclusive Feed
+                        Bookmarks
                     </a>
+
+                    <a href="/member/community/leaderboard"
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/community/leaderboard') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3-3h.75a3 3 0 0 0 3-3v-1.5a3 3 0 0 0-3-3H18M16.5 18.75V21m-9 0V18.75m0 0a3 3 0 0 0-3-3H3.75a3 3 0 0 1-3-3v-1.5a3 3 0 0 1 3-3H6m10.5-3V3a.75.75 0 0 0-.75-.75h-7.5a.75.75 0 0 0-.75.75v3h9Z"/>
+                        </svg>
+                        Leaderboard
+                    </a>
+
                     <a href="/member/community/space/pdf-downloads"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/space/pdf-downloads') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/community/space/pdf-downloads') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
                         </svg>
-                        PDF Downloads
+                        PDF Files
                     </a>
+
                     <a href="/member/community/space/audio-downloads"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/space/audio-downloads') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/community/space/audio-downloads') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 0v11.25m0-11.25L9 9m0 0v11.25m0-11.25L19.5 6m0 0v11.25M9 20.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm10.5-3a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                         </svg>
-                        Audio Downloads
+                        Audio Files
                     </a>
+
                     <a href="/member/community/space/midi-downloads"
-                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors {{ Request::is('member/community/space/midi-downloads') ? 'bg-[#F3F4F6] dark:bg-gray-700' : '' }}">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14.23 12.004a2.236 2.236 0 0 1 2.235 2.236A2.236 2.236 0 0 1 14.23 16.476a2.236 2.236 0 0 1-2.235-2.236 2.236 2.236 0 0 1 2.235-2.236zm2.648-10.69c.366 0 .662.297.662.662v3.34c1.154.28 2.01 1.32 2.01 2.585a2.67 2.67 0 0 1-2.667 2.667h-4.666a2.67 2.67 0 0 1-2.667-2.667c0-1.265.856-2.305 2.01-2.585V1.976c0-.365.296-.662.662-.662h2.326zm-.662 4.666c-.735 0-1.333.598-1.333 1.333 0 .735.598 1.333 1.333 1.333h4.666c.735 0 1.333-.598 1.333-1.333 0-.735-.598-1.333-1.333-1.333h-4.666z"/>
+                       class="flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('member/community/space/midi-downloads') ? 'bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white' : 'text-[#6B7280] dark:text-gray-300 hover:bg-[#F3F4F6] dark:hover:bg-gray-700' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/>
                         </svg>
-                        Midi Files
+                        MIDI Files
                     </a>
                 </div>
             </div>
@@ -216,31 +200,23 @@
                 </a>
 
                 <!-- Desktop: Nav Links -->
-                <nav class="hidden md:flex items-center gap-8">
-                    <a href="/home" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"/>
-                        </svg>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a href="/home" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
                         Dashboard
                     </a>
-                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
-                        Shop Plugins
+                    <a href="/member/roadmap" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                        Roadmap
                     </a>
-                    <a href="/member/live-session" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                        </svg>
-                        Live Sessions
+                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                        Shop
                     </a>
-
-                    <a href="/member/support" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                        </svg>
+                    <a href="/member/live-session" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                        Live Shows
+                    </a>
+                    <a href="/member/library" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                        Library
+                    </a>
+                    <a href="/member/support" class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
                         Support
                     </a>
                 </nav>
@@ -249,7 +225,7 @@
                 <div class="flex items-center gap-2">
 
                     <!-- Theme Toggle -->
-                    {{-- <button @click="toggle"
+                    <button @click="toggle"
                         class="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         aria-label="Toggle Dark Mode">
                         <svg x-show="!isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +234,7 @@
                         <svg x-show="isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    </button> --}}
+                    </button>
 
                     <a href="#"
                         class="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -415,18 +391,26 @@
 <script>
     function themeToggle() {
         return {
-            isDark: true,
+            isDark: localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
             showSidebar: false,
             init() {
-                // Always dark — ignore localStorage
-                this.isDark = true;
                 this.applyTheme();
             },
             toggle() {
-                // No-op — toggle disabled
+                this.isDark = !this.isDark;
+                if (this.isDark) {
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    localStorage.setItem('color-theme', 'light');
+                }
+                this.applyTheme();
             },
             applyTheme() {
-                document.documentElement.classList.add('dark');
+                if (this.isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
             }
         }
     }

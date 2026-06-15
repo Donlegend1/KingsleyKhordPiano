@@ -1,58 +1,68 @@
-<section class=" py-20 bg-black">
-  <div class="max-w-7xl mx-auto px-6 lg:px-12">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      
-      <!-- Left: Text Content -->
-      <div class="text-white">
-        <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-6">
-          Get the Complete Piano Learning Experience
-        </h1>
+<section class="relative bg-[#0d1b2a] overflow-hidden">
 
-        <p class="text-[#E1E1E1]  max-w-lg mb-8 font-semibold">
-          Have you been feeling like you’re not progressing for a while now?
-          How many chances have slipped by because you weren’t quite as skilled
-          as others? Do you feel a bit embarrassed when you can’t perform well
-          in front of an audience? How many hours have you spent on YouTube piano
-          tutorials, yet still find yourself struggling?
-        </p>
+  <!-- Background image -->
+  <div class="absolute inset-0">
+    <img src="/images/paysec.webp" alt="" class="w-full h-full object-cover object-center">
+  </div>
 
-        <!-- Desktop CTA -->
-        <div class="hidden md:flex">
-          <a
-            href="/plans#pricing"
-            class="inline-flex items-center gap-2 bg-[#FFD736] uppercase px-6 py-3 text-black rounded-full font-medium hover:bg-[#c2ab39] transition"
-          >
-            Let’s do this
-            <img src="/icons/forward.png" alt="forward" class="h-4" />
-          </a>
-        </div>
+  <!-- Content -->
+  <div class="relative z-10 max-w-3xl mx-auto px-6 text-center pt-36 pb-16">
+
+    <!-- Eyebrow -->
+    <p class="text-[#E8472A] text-xs font-bold tracking-[0.22em] uppercase mb-3">
+      All-in-One Piano Learning
+    </p>
+    <div class="w-8 h-[2px] bg-[#E8472A] mx-auto mb-8"></div>
+
+    <!-- Headline -->
+    <h1 class="font-extrabold leading-tight mb-6">
+      <span class="block text-5xl md:text-6xl lg:text-7xl text-white">Get the complete</span>
+      <span class="block text-5xl md:text-6xl lg:text-7xl text-[#FFD736]">piano learning</span>
+      <span class="block text-5xl md:text-6xl lg:text-7xl text-white">experience.</span>
+    </h1>
+
+    <!-- Subtext -->
+    <p class="text-gray-300 text-base md:text-lg leading-relaxed max-w-xl mx-auto mb-10">
+      Stop guessing. Start progressing.<br>
+      Access structured lessons, guided practice and real support; everything you need to grow as a gospel pianist, all in one place.
+    </p>
+
+    <!-- CTA -->
+    <a href="/plans#pricing"
+       class="inline-flex items-center justify-center gap-2 bg-[#FFD736] text-black text-base font-semibold px-10 py-4 rounded-xl hover:bg-[#e6c22e] transition mb-16">
+      Let's do this
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+      </svg>
+    </a>
+
+    <!-- Divider -->
+    <div class="border-t border-white/20 mb-10"></div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-white/20">
+
+      <div class="px-6 py-4">
+        <p class="text-3xl md:text-4xl font-extrabold text-white">56K+</p>
+        <p class="text-gray-400 text-sm mt-1">YouTube Subscribers</p>
       </div>
 
-      <!-- Right: Video -->
-      <div class="bg-black rounded-2xl p-4 shadow-2xl">
-        <div class="aspect-video w-full overflow-hidden rounded-xl">
-          <iframe
-            class="w-full h-full"
-            src="https://drive.google.com/file/d/1x50L7apFJg2CAxBxnqn0Fqe1w0uvdcf4/preview"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </div>
+      <div class="px-6 py-4">
+        <p class="text-3xl md:text-4xl font-extrabold text-white">29K+</p>
+        <p class="text-gray-400 text-sm mt-1">Instagram Followers</p>
       </div>
 
-      <!-- Mobile CTA -->
-      <div class="md:hidden">
-        <a
-          href="/plans#pricing"
-          class="inline-flex items-center gap-2 bg-[#FFD736] uppercase px-6 py-3 text-black rounded-md font-medium hover:bg-[#c2ab39] transition"
-        >
-          Let’s do this
-          <img src="/icons/forward.png" alt="forward" class="h-4" />
-        </a>
+      <div class="px-6 py-4">
+        <p class="text-3xl md:text-4xl font-extrabold text-white">170K+</p>
+        <p class="text-gray-400 text-sm mt-1">Lessons Viewed</p>
+      </div>
+
+      <div class="px-6 py-4">
+        <p class="text-3xl md:text-4xl font-extrabold text-white">700+</p>
+        <p class="text-gray-400 text-sm mt-1">Students Enrolled</p>
       </div>
 
     </div>
+
   </div>
 </section>

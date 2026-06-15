@@ -8,6 +8,7 @@
 @include("components.features")
 
 @include("components.approach")
+@include("components.framework")
 @include("components.membership")
 {{-- @include("components.practise") --}}
 {{-- @include("components.services") --}}

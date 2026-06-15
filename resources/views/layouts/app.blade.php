@@ -95,26 +95,26 @@
             <!-- Center: Desktop Nav -->
             <nav class="hidden lg:grid grid-flow-col auto-cols-max gap-x-10 items-center justify-center flex-1">
                 <a href="/"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('/') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-base font-semibold transition duration-200 {{ Request::is('/') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Home
                 </a>
                 <a href="/about"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('about') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    class="text-base font-semibold transition duration-200 {{ Request::is('about') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     About
-                </a>
-                <a href="/contact"
-                    class="text-lg font-semibold transition duration-200 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
-                    Contact
                 </a>
                 <a href="https://khordsounds.com/product-category/piano-best-sellers/"
                     target="blank"
-                    class="text-lg font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
+                    class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Shop
                 </a>
-
-                <a href="/community/register"
-                    class="text-lg font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
+                <a href="https://discord.gg/TKKtTSYVvx"
+                    target="_blank" rel="noopener noreferrer"
+                    class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Community
+                </a>
+                <a href="/contact"
+                    class="text-base font-semibold transition duration-200 {{ Request::is('contact') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
+                    Contact
                 </a>
             </nav>
 
@@ -124,7 +124,7 @@
                 Sign Up
             </a>
             <a href="/login"
-                class="text-lg font-semibold px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-[#FFD736] hover:text-black shadow transition duration-200">
+                class="text-lg font-semibold px-4 py-2 rounded-lg bg-[#FFD736] text-black hover:bg-[#e6c22e] shadow transition duration-200">
                 Login
             </a>
         
@@ -163,7 +163,8 @@
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Shop
                     </a>
-                    <a href="/community/register"
+                    <a href="https://discord.gg/TKKtTSYVvx"
+                        target="_blank" rel="noopener noreferrer"
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Community
                     </a>    

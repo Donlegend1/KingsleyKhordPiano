@@ -26,7 +26,9 @@ class UpdateLiveshowRequest extends FormRequest
             'start_time' => 'required|date',
             'access_type' => 'required|in:all,premium',
             'zoom_link' => 'required',
-            'recording_url' =>'nullable'
+            'recording_url' => 'nullable',
+            'category' => 'nullable|string|in:event,session',
+            'max_slots' => 'nullable|integer|min:1'
         ];
     }
 }
