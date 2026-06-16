@@ -102,7 +102,7 @@
                     <a href="/member/getstarted" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-play-circle"></i> Get Started
                     </a>
-                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="/member/community" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-users"></i> Community
                     </a>
                     <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">

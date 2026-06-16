@@ -337,12 +337,11 @@
                             Explore shared files, PDF resources, backing tracks, MIDI downloads, and connect with other students.
                         </p>
                     </div>
-                    <a href="/member/community/space/lessons" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-gray-600 hover:border-emerald-500 dark:hover:border-emerald-400 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl text-xs font-bold transition">
+                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-gray-600 hover:border-emerald-500 dark:hover:border-emerald-400 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl text-xs font-bold transition">
                         <span>Visit Space</span>
                     </a>
                 </div>
             </div>
-
             {{-- 3. Continue Learning Widget --}}
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
                 <div class="flex items-center gap-2 mb-4">
