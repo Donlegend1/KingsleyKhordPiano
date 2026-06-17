@@ -8,7 +8,7 @@
       <img
         src="/images/first-p.png"
         alt="Kingsley Khord at the piano"
-        class="w-full h-full object-cover"
+        class="w-full h-full object-cover p-5 m-5"
         style="object-position: 65% 0%;"
       >
       {{-- Gradient fade into black --}}
@@ -62,7 +62,7 @@
       src="/images/first-p.png"
       alt="Kingsley Khord at the piano"
       class="absolute inset-0 w-full h-full object-cover"
-      style="object-position: 62% 0%;"
+      style="object-position: 62% 0%; padding-top: 72px;"
       aria-hidden="true"
     >
 
