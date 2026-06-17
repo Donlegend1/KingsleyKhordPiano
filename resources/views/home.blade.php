@@ -2,9 +2,9 @@
 
 @section('content')
 
-{{-- @if(auth()->user()->created_at->diffInDays(now()) <= 7 && auth()->user()->get_started === "no") --}}
+@if(auth()->user()->created_at->diffInDays(now()) <= 7 && auth()->user()->get_started === "no")
     @include("components.memberarea.getstarted")
-{{-- @endif --}}
+@endif
 @include("components.memberarea.details")
 @include("components.memberarea.guide")
 @include("components.memberarea.stats")

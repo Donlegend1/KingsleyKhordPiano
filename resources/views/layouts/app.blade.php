@@ -33,7 +33,11 @@
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
     <div id="app">
-    <header class="bg-gradient-to-r from-black to-gray-800 dark:bg-gray-800 shadow top-0 ">
+    <header
+      x-data="{ scrolled: false }"
+      x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 10 })"
+      :class="scrolled ? 'bg-black' : 'bg-transparent'"
+      class="fixed w-full top-0 z-50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <!-- Left: Logo -->
             <div class="flex items-center flex-shrink-0">
@@ -107,8 +111,7 @@
                     class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Shop
                 </a>
-                <a href="https://discord.gg/TKKtTSYVvx"
-                    target="_blank" rel="noopener noreferrer"
+                <a href="/community/register"
                     class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Community
                 </a>
@@ -163,8 +166,7 @@
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Shop
                     </a>
-                    <a href="https://discord.gg/TKKtTSYVvx"
-                        target="_blank" rel="noopener noreferrer"
+                    <a href="/community/register"
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Community
                     </a>    
