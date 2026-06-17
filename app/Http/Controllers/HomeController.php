@@ -61,19 +61,26 @@ class HomeController extends Controller
                 ]];
             });
 
-        $categories = ['piano exercise', 'extra courses', 'quick lessons', 'learn songs'];
+        $latestCourses = [];
 
-            $latestCourses = [];
-
-            foreach ($categories as $category) {
-                $course = Upload::
-                    where('category', $category)
+            foreach (['piano exercise', 'quick lessons'] as $category) {
+                $course = Upload::where('category', $category)
                     ->orderBy('created_at', 'desc')
                     ->first();
 
                 if ($course) {
                     $latestCourses[$category] = $course;
                 }
+            }
+
+            $latestLearnSong = \App\Models\LearnSong::orderBy('created_at', 'desc')->first();
+            if ($latestLearnSong) {
+                $latestCourses['learn songs'] = $latestLearnSong;
+            }
+
+            $latestExtraCourse = \App\Models\ExtraCourse::orderBy('created_at', 'desc')->first();
+            if ($latestExtraCourse) {
+                $latestCourses['extra courses'] = $latestExtraCourse;
             }
             $latestComments = \App\Models\CourseVideoComment::with(['user', 'course'])->latest()->take(4)->get();
 

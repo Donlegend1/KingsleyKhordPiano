@@ -10,35 +10,35 @@
             'title' => 'Independence',
             'desc' => 'Develop the ability to move each hand independently with control.',
             'icon' => 'fa-child-reaching',
-            'img' => 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=600&auto=format&fit=crop'
+            'img' => '/images/hand-independence.jpeg'
         ],
         [
             'id' => 'flexibility',
             'title' => 'Flexibility',
             'desc' => 'Improve your range of motion and adapt to different musical situations.',
             'icon' => 'fa-arrows-left-right',
-            'img' => 'https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=600&auto=format&fit=crop'
+            'img' => '/images/hand-flexibility.jpeg'
         ],
         [
             'id' => 'dexterity',
             'title' => 'Dexterity',
             'desc' => 'Enhance finger agility and coordination for smooth execution.',
             'icon' => 'fa-hand',
-            'img' => 'https://images.unsplash.com/photo-1571115764595-644a1f56a55c?q=80&w=600&auto=format&fit=crop'
+            'img' => '/images/hands-dexterity.jpeg'
         ],
         [
             'id' => 'strength',
             'title' => 'Strength',
             'desc' => 'Build finger strength and endurance for powerful playing.',
             'icon' => 'fa-dumbbell',
-            'img' => 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=600&auto=format&fit=crop'
+            'img' => '/images/finger-strength.jpeg'
         ],
         [
             'id' => 'technique',
             'title' => 'Technique',
             'desc' => 'Refine your overall technique for expressive playing.',
             'icon' => 'fa-sliders',
-            'img' => 'https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?q=80&w=600&auto=format&fit=crop'
+            'img' => '/images/technique.jpeg'
         ],
     ];
 @endphp

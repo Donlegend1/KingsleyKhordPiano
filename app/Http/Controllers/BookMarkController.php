@@ -52,6 +52,8 @@ class BookMarkController extends Controller
             'uploads' => \App\Models\Upload::class,
             'courses' => \App\Models\Course::class,
             'posts'   => \App\Models\Post::class,
+            'learn_songs' => \App\Models\LearnSong::class,
+            'extra_courses' => \App\Models\ExtraCourse::class,
             default   => null,
         };
     }

@@ -454,6 +454,7 @@ const UploadList = () => {
                                 >
                                     <option value="">Select Video Type</option>
                                     <option value="youtube">YouTube</option>
+                                    <option value="vimeo">Vimeo</option>
                                     <option value="google">Google</option>
                                     <option value="local">Local</option>
                                     <option value="iframe">Iframe</option>
@@ -622,6 +623,7 @@ const UploadList = () => {
                                 >
                                     <option value="">Select Video Type</option>
                                     <option value="youtube">YouTube</option>
+                                    <option value="vimeo">Vimeo</option>
                                     <option value="google">Google</option>
                                     <option value="local">Local</option>
                                     <option value="iframe">Iframe</option>

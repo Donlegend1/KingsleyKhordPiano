@@ -14,6 +14,8 @@ const LiveShowForm = () => {
         zoom_link: "",
         access_type: "all",
         start_time: "",
+        category: "event",
+        max_slots: 5,
     });
 
     const { showMessage } = useFlashMessage();
@@ -37,6 +39,8 @@ const LiveShowForm = () => {
                 zoom_link: "",
                 access_type: "all",
                 start_time: "", 
+                category: "event",
+                max_slots: 5,
             })
             window.location ="/admin/live-shows"
            
@@ -111,6 +115,38 @@ const LiveShowForm = () => {
                                 <option value="premium">Premium Only</option>
                             </select>
                         </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Category
+                            </label>
+                            <select
+                                name="category"
+                                defaultValue={liveShow.category}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-md"
+                            >
+                                <option value="event">Live Event</option>
+                                <option value="session">Live Session</option>
+                            </select>
+                        </div>
+
+                        {liveShow.category === "session" && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Max Slots
+                                </label>
+                                <input
+                                    name="max_slots"
+                                    type="number"
+                                    min="1"
+                                    defaultValue={liveShow.max_slots}
+                                    onChange={handleChange}
+                                    className="w-full p-3 border rounded-md"
+                                    required
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="text-center">

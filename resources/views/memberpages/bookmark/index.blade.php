@@ -23,7 +23,9 @@
                         '/member/course/' . $bookmark->bookmarkable?->level
                         . '?selected_course=' . $bookmark->bookmarkable?->id,
             
-                    'App\Models\Upload' =>
+                    'App\Models\Upload',
+                    'App\Models\LearnSong',
+                    'App\Models\ExtraCourse' =>
                         '/member/lesson/' . $bookmark->bookmarkable?->id,
             
                     'App\Models\Post' =>
@@ -37,8 +39,8 @@
                         
                         <!-- Thumbnail -->
                         <a href="{{ $url }}">
-                            <img src="{{'/logo/logoblack.png' }}" 
-                                alt="{{ $bookmark->bookmarkable->title }}" 
+                            <img src="{{ $bookmark->bookmarkable?->thumbnail_url ?? ($bookmark->bookmarkable?->thumbnail ? asset($bookmark->bookmarkable->thumbnail) : asset('logo/logoblack.png')) }}" 
+                                alt="{{ $bookmark->bookmarkable?->title ?? 'Bookmarked item' }}" 
                                 class="w-full h-44 object-cover">
 
                             {{-- <p class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($bookmark->video->category) }}</p> --}}

@@ -22,9 +22,9 @@ class GetstartedController extends Controller
         $setUp = WebsiteVideo::where('video_category', 'setUp')->first()?->video_url;
         $exper = WebsiteVideo::where('video_category', 'exper')->first()?->video_url;
 
-        $beginnerCourses = Upload::where('category', 'learn songs')->where('level', 'beginner')->latest()->take(3)->get();
-        $intermediateCourses = Upload::where('category', 'learn songs')->where('level', 'intermediate')->latest()->take(3)->get();
-        $advancedCourses = Upload::where('category', 'learn songs')->where('level', 'advanced')->latest()->take(3)->get();
+        $beginnerCourses = \App\Models\LearnSong::where('level', 'beginner')->where('status', 'active')->latest()->take(3)->get();
+        $intermediateCourses = \App\Models\LearnSong::where('level', 'intermediate')->where('status', 'active')->latest()->take(3)->get();
+        $advancedCourses = \App\Models\LearnSong::where('level', 'advanced')->where('status', 'active')->latest()->take(3)->get();
 
         return view('memberpages.getstarted', [
             'tour' => $tour,
@@ -39,6 +39,10 @@ class GetstartedController extends Controller
     }
     public function roadMap() 
     {
+        $hasAssessment = \App\Models\UserAssessment::where('user_id', auth()->id())->exists();
+        if (!$hasAssessment) {
+            return redirect()->route('member.quiz')->with('error', 'Please complete the assessment quiz to unlock the Course Roadmap.');
+        }
 
         return view('memberpages.roadmap');
     }
@@ -49,5 +53,20 @@ class GetstartedController extends Controller
         $user->get_started = GetStartedStatus::Old->value;
         $user->save();
         return redirect()->back();
+    }
+
+    public function library() 
+    {
+        $pianoExerciseCount = \App\Models\Upload::where('category', 'piano exercise')->where('status', 'active')->count();
+        $earTrainingCount = \App\Models\Quiz::count();
+        $extraCoursesCount = \App\Models\ExtraCourse::where('status', 'active')->count();
+        $learnSongsCount = \App\Models\LearnSong::where('status', 'active')->count();
+
+        return view('memberpages.library', [
+            'pianoExerciseCount' => $pianoExerciseCount,
+            'earTrainingCount' => $earTrainingCount,
+            'extraCoursesCount' => $extraCoursesCount,
+            'learnSongsCount' => $learnSongsCount,
+        ]);
     }
 }

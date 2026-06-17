@@ -1,189 +1,390 @@
 @extends('layouts.member')
 
 @section('content')
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4">
-  <div class="max-w-7xl mx-auto space-y-3">
-    <!-- Breadcrumb -->
-    <div class="flex justify-between items-center">
-      <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-        <a href="/home" class="hover:text-blue-600">Dashboard</a>
-        <span>/</span>
-        <a href="/member/{{ Str::slug($lesson->category) }}" class="hover:text-blue-600 font-semibold">
-          {{ Str::title($lesson->category) }} /
-        </a>
-        <a href="/member/lesson/{{ $lesson->id }}" class="hover:text-blue-600 font-semibold">
-          {{ Str::title($lesson->title) }}
-        </a>
-        {{-- <pre>{{$lesson}}</pre> --}}
-      </div>
-      <div class="flex items-center space-x-2">
-        <i class="fa fa-user-circle text-xl"></i>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section class="flex items-start justify-center min-h-screen bg-gray-100 p-6">
-  <!-- Main Content -->
-  <div class="bg-white max-w-3xl w-full rounded-lg shadow-lg p-4 md:p-6 space-y-6">
-    <!-- Video Section -->
-        <div class="w-full rounded-lg overflow-hidden">
-      <div class="relative w-full pb-[75%] sm:pb-[65%] md:pb-[56.25%] h-0">
-        <div class="absolute top-0 left-0 w-full h-full">
-          <div id="uploads-single"></div>
-        </div>
-      </div>
-    </div>
+    @php
+        // Determine the type
+        $lessonType = 'uploads';
+        if ($lesson instanceof \App\Models\LearnSong) {
+            $lessonType = 'learn_songs';
+        } elseif ($lesson instanceof \App\Models\ExtraCourse) {
+            $lessonType = 'extra_courses';
+        }
 
+        // Fetch playlist based on category
+        $playlist = collect();
+        if ($lessonType === 'learn_songs') {
+            $playlist = \App\Models\LearnSong::where('learn_song_category_id', $lesson->learn_song_category_id)
+                ->orderBy('position')
+                ->get();
+        } elseif ($lessonType === 'extra_courses') {
+            $playlist = \App\Models\ExtraCourse::where('extra_course_category_id', $lesson->extra_course_category_id)
+                ->orderBy('position')
+                ->get();
+        }
 
-    <!-- Title + Bookmark -->
-    <div class="flex items-center justify-between">
-      <h1 class="text-xl font-bold text-gray-800">
-        {{ Str::title($lesson->title) }}
-      </h1>
+        // Find current index safely with loose comparison
+        $currentIndex = 0;
+        if ($lesson) {
+            $found = $playlist->search(function ($item) use ($lesson) {
+                return $item->id == $lesson->id;
+            });
+            if ($found !== false) {
+                $currentIndex = $found;
+            }
+        }
 
-      <!-- Bookmark Toggle -->
-      <form action="{{ route('bookmark.toggle') }}" method="POST" class="inline bookmark-form">
-        @csrf
-        <input type="hidden" name="bookmarkable_id" value="{{ $lesson->id }}">
-        <input type="hidden" name="bookmarkable_type" value="uploads">
+        // Get next and previous video securely using values() to reset keys
+        $nextVideo = $playlist->values()->get($currentIndex + 1);
+        $previousVideo = $currentIndex > 0 ? $playlist->values()->get($currentIndex - 1) : null;
 
-        <button type="submit" 
-          class="bookmark-btn flex items-center px-3 py-1.5 border rounded-lg text-sm 
-                 {{ $isBookmarked ? 'bg-yellow-100 border-yellow-500 text-yellow-600' : 'bg-gray-100 border-gray-300 text-gray-600' }}">
-          <i class="fa fa-bookmark mr-2"></i>
-          {{ $isBookmarked ? 'Bookmarked' : 'Bookmark' }}
+        // Priority: Use explicitly linked related courses if provided, otherwise fallback to playlist neighbors
+        if (isset($relatedUploads) && $relatedUploads->count() > 0) {
+            $relatedLessons = $relatedUploads;
+        } else {
+            // Get related lessons (excluding the active video) from the playlist
+            $otherLessons = $playlist
+                ->filter(function ($item) use ($lesson) {
+                    return $lesson ? $item->id != $lesson->id : true;
+                })
+                ->values();
 
-        </button>
-      </form>
-    </div>
+            // Try to get next 3 lessons in sequence, wrap around if needed
+            $relatedLessons = $otherLessons->slice($currentIndex, 3);
+            if ($relatedLessons->count() < 3 && $otherLessons->count() > 0) {
+                $relatedLessons = $relatedLessons->merge($otherLessons->take(3 - $relatedLessons->count()))->unique('id');
+            }
+        }
 
-    <!-- Comments -->
-    <div class="mt-6">
-      <h2 class="text-lg font-semibold mb-4">Comments</h2>
-      <div id="comment-section" class="space-y-4">
-        @foreach ($comments as $comment)
-          <div class="flex items-start space-x-3">
-            <i class="fa fa-user-circle text-gray-500 text-2xl"></i>
-            <div class="bg-gray-100 rounded-lg px-4 py-2 w-full">
-              <p class="text-gray-800 text-sm">
-                <span class="font-semibold">{{ $comment->user->first_name }}:</span> "{{ $comment->comment }}"
-              </p>
-              <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+        // Fallback: If still empty (no playlist and no tags), get other uploads in the same category
+        if ($relatedLessons->isEmpty()) {
+            if ($lessonType === 'learn_songs') {
+                $relatedLessons = \App\Models\LearnSong::where('level', $lesson->level)
+                    ->where('id', '!=', $lesson->id)
+                    ->inRandomOrder()
+                    ->take(3)
+                    ->get();
+            } elseif ($lessonType === 'extra_courses') {
+                $relatedLessons = \App\Models\ExtraCourse::where('level', $lesson->level)
+                    ->where('id', '!=', $lesson->id)
+                    ->inRandomOrder()
+                    ->take(3)
+                    ->get();
+            } else {
+                $relatedLessons = \App\Models\Upload::where('category', $lesson->category)
+                    ->where('id', '!=', $lesson->id)
+                    ->inRandomOrder()
+                    ->take(3)
+                    ->get();
+            }
+        }
+
+        // Get comments specifically for this lesson
+        $lessonComments = \App\Models\CourseVideoComment::where('course_id', $lesson->id)
+            ->where('category', 'others')
+            ->with(['user'])
+            ->latest()
+            ->get();
+    @endphp
+
+    <div class="min-h-screen bg-white">
+
+        {{-- Breadcrumb --}}
+        <div class="px-6 py-3 border-b border-gray-100">
+            <div class="max-w-[1280px] mx-auto flex items-center gap-1.5 text-[13px] text-gray-500">
+                <a href="/home" class="hover:text-[#0FA9A0]">Dashboard</a>
+                <span class="text-gray-300 text-xs">›</span>
+                @if ($lessonType === 'learn_songs')
+                    <a href="{{ route('learn.songs') }}" class="hover:text-[#0FA9A0]">Learn Songs</a>
+                @else
+                    <a href="{{ route('extra.courses') }}" class="hover:text-[#0FA9A0]">Extra Courses</a>
+                @endif
+                @if ($lesson)
+                    <span class="text-gray-300 text-xs">›</span>
+                    <span class="text-gray-700 font-medium">{{ Str::title($lesson->title) }}</span>
+                @endif
             </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </div>
+        </div>
 
-  <!-- Sidebar -->
-  <aside class="hidden md:flex w-96 bg-white rounded-xl shadow-xl px-5 py-6 ml-6 flex-col gap-8">
+        @if ($lesson)
 
-    {{-- Related Courses --}}
-    <div class="border-b pb-5">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fa fa-book text-blue-500"></i>
-            Related Courses
-        </h3>
+            {{-- Main layout: video+content LEFT, sidebar RIGHT --}}
+            <div class="max-w-[1280px] mx-auto px-6 pt-6 pb-16 flex flex-col lg:flex-row gap-8 items-start">
 
-        @if ($relatedUploads->isNotEmpty())
-            <ul class="space-y-2">
-                @foreach ($relatedUploads as $item)
-                    <li>
-                        <a
-                            href="/member/lesson/{{ $item->id }}"
-                            class="block px-3 py-2 rounded-lg text-sm text-blue-600
-                            hover:bg-blue-50 hover:underline transition"
-                        >
-                            {{ $item->title }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-        @else
-            <p class="text-gray-500 text-sm italic">
-                No related courses available.
-            </p>
-        @endif
-    </div>
+                {{-- ── LEFT COLUMN ── --}}
+                <div class="flex-1 min-w-0 w-full">
 
-    {{-- Latest Comments --}}
-    <div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fa fa-comments text-green-500"></i>
-            Latest Comments
-        </h3>
+                    {{-- Video Player --}}
+                    <div id="uploads-single" class="w-full h-full"></div>
 
-        <ul class="space-y-4">
-            @foreach ($comments as $comment)
-                <li>
-                    <a
-                        href="{{ $comment->url }}"
-                        class="block p-4 rounded-xl border border-gray-200
-                        hover:shadow-md hover:border-blue-300 transition group"
-                    >
-                        {{-- Course title --}}
+                    {{-- Title + Description --}}
+                    <h1 class="text-[22px] font-bold text-gray-900 mb-1 mt-5">
+                        {{ Str::title($lesson->title) }}
+                    </h1>
+                    <p class="text-gray-500 text-[14px] leading-relaxed mb-5">
+                        {{ $lesson->description ?? 'Learn how to play and improve your piano skills with this comprehensive extra course.' }}
+                    </p>
 
-                        <div class="flex items-start gap-3">
-                            <i class="fa fa-user-circle text-gray-400 text-2xl"></i>
+                    {{-- Action Buttons --}}
+                    <div class="flex items-center flex-wrap gap-3 mb-10">
+                        <form action="{{ route('bookmark.toggle') }}" method="POST" class="bookmark-form">
+                            @csrf
+                            <input type="hidden" name="bookmarkable_id" value="{{ $lesson->id }}">
+                            <input type="hidden" name="bookmarkable_type" value="{{ $lessonType }}">
+                            <button type="submit"
+                                class="bookmark-btn flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
+                                {{ $isBookmarked
+                                    ? 'bg-yellow-50 border-yellow-200 text-yellow-600 hover:bg-yellow-100'
+                                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50' }}">
+                                <i class="fa-regular fa-bookmark text-[15px]"></i>
+                                {{ $isBookmarked ? 'Bookmarked' : 'Bookmark' }}
+                            </button>
+                        </form>
+                    </div>
 
-                            <div class="flex-1">
-                                <p class="text-gray-800 text-sm leading-snug">
-                                    <span class="font-semibold">
-                                        {{ $comment->user->first_name }} 
-                                    </span>
-                                    <span class="text-gray-600 italic">
-                                        "{{ $comment->comment }}"
-                                    </span>
-                                </p>
+                    {{-- Related Lessons (Only visible at the bottom if playlist is in sidebar) --}}
+                    @if ($playlist->count() > 1 && $relatedLessons->count() > 0)
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
+                            </div>
 
-                                <div class="mt-1 flex items-center justify-between">
-                                    <span class="text-xs text-gray-400">
-                                        {{ $comment->created_at->diffForHumans() }}
-                                    </span>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                @foreach ($relatedLessons as $related)
+                                    @php
+                                        $relatedLink = "/member/lesson/{$related->id}";
+                                    @endphp
+                                    <a href="{{ $relatedLink }}"
+                                        class="group bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
 
-                                    <span class="text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition">
-                                        View →
-                                    </span>
-                                </div>
+                                        {{-- Thumbnail --}}
+                                        <div class="relative aspect-video bg-black overflow-hidden">
+                                            <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
+                                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+
+                                            {{-- Duration badge top-left --}}
+                                            <div
+                                                class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded">
+                                                {{ $related->duration ?? '05:00' }}
+                                            </div>
+
+                                            {{-- Play button center --}}
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <div
+                                                    class="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-[#0FA9A0] transition-colors">
+                                                    <i class="fa-solid fa-play text-white text-xs ml-0.5"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Card text --}}
+                                        <div class="p-4">
+                                            <p
+                                                class="text-[13px] font-semibold text-gray-900 leading-snug line-clamp-2 mb-3 text-center">
+                                                {{ Str::title($related->title) }}
+                                            </p>
+                                            <div class="flex justify-center">
+                                                <span
+                                                    class="bg-[#0FA9A0]/10 text-[#0FA9A0] text-[11px] font-bold px-3 py-1 rounded-full">
+                                                    {{ ucfirst($related->level ?? $lesson->level ?? 'Basic') }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
                             </div>
                         </div>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
+                    @endif
+
+                    {{-- Discussion / Comments --}}
+                    <div class="mt-8">
+                        <h2 class="text-[18px] font-bold text-gray-900 mb-6">Discussion</h2>
+                        <form action="{{ route('piano.exercise.comment') }}" method="POST" class="mb-8">
+                            @csrf
+                            <input type="hidden" name="course_id" value="{{ $lesson->id }}">
+                            <input type="hidden" name="category" value="others">
+                            <textarea name="comment" placeholder="What did you learn from this lesson?" 
+                                class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#0FA9A0] focus:border-transparent transition-all outline-none" rows="3"></textarea>
+                            <div class="flex justify-end mt-3">
+                                <button type="submit" class="bg-[#0FA9A0] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#0c9088] transition-all">Comment</button>
+                            </div>
+                        </form>
+
+                        <div class="space-y-6">
+                            @foreach($lessonComments as $comment)
+                                <div class="flex gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                                    <div class="w-10 h-10 bg-[#0FA9A0]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-[#0FA9A0] font-bold text-sm">
+                                            {{ $comment->user ? substr($comment->user->first_name ?? $comment->user->name ?? 'U', 0, 1) : 'U' }}
+                                        </span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <p class="text-[14px] font-bold text-gray-900">
+                                                {{ $comment->user ? ($comment->user->first_name . ' ' . $comment->user->last_name) : 'User' }}
+                                            </p>
+                                            <span class="text-[11px] text-gray-400">• {{ $comment->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        <p class="text-[13px] text-gray-600 leading-relaxed">{{ $comment->comment }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- ── RIGHT COLUMN: Sidebar (Playlist or Related Lessons) ── --}}
+                <aside
+                    class="w-full lg:w-[360px] flex-shrink-0 border border-gray-100 rounded-xl overflow-hidden shadow-sm sticky top-6 bg-white">
+
+                    @if ($playlist->count() > 1)
+                        {{-- Header --}}
+                        <div class="px-5 py-4 border-b border-gray-100">
+                            <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                                Lessons in this course:
+                            </p>
+                        </div>
+
+                        {{-- Scrollable list --}}
+                        <div class="overflow-y-auto" style="max-height: 520px;">
+                            @foreach ($playlist as $item)
+                                @php $isActive = $item->id == $lesson->id; @endphp
+                                <a href="/member/lesson/{{ $item->id }}"
+                                    class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors
+                                    {{ $isActive ? 'bg-[#0FA9A0] text-white' : 'bg-white hover:bg-gray-50' }}">
+
+                                    {{-- Play icon --}}
+                                    <div class="shrink-0 mt-0.5">
+                                        @if ($isActive)
+                                            <i class="fa-solid fa-circle-play text-white text-[18px]"></i>
+                                        @else
+                                            <i class="fa-regular fa-circle-play text-gray-300 text-[18px]"></i>
+                                        @endif
+                                    </div>
+
+                                    {{-- Title + duration --}}
+                                    <div class="flex-1 min-w-0">
+                                        <p
+                                            class="text-[12px] font-bold uppercase tracking-wide leading-snug
+                                            {{ $isActive ? 'text-white' : 'text-gray-800' }}">
+                                            {{ $item->title }}
+                                        </p>
+                                        <p class="text-[11px] mt-1.5 {{ $isActive ? 'text-teal-100' : 'text-gray-400' }}">
+                                            {{ $item->duration ?? '05:00' }}
+                                        </p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+
+                        {{-- Next Lesson button --}}
+                        <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
+                            @if ($previousVideo)
+                                <a href="/member/lesson/{{ $previousVideo->id }}"
+                                    class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                    <i class="fa-solid fa-arrow-left text-sm"></i> Prev
+                                </a>
+                            @endif
+
+                            @if ($nextVideo)
+                                <a href="/member/lesson/{{ $nextVideo->id }}"
+                                    class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                    Next <i class="fa-solid fa-arrow-right text-sm"></i>
+                                </a>
+                            @else
+                                <button disabled
+                                    class="w-full py-3 border border-gray-100 rounded-lg text-gray-400 font-bold text-[14px] bg-gray-50 cursor-not-allowed">
+                                    Course Completed
+                                </button>
+                            @endif
+                        </div>
+                    @else
+                        {{-- Header --}}
+                        <div class="px-5 py-4 border-b border-gray-100">
+                            <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                                Related Lessons:
+                            </p>
+                        </div>
+
+                        {{-- Scrollable list --}}
+                        <div class="overflow-y-auto" style="max-height: 520px;">
+                            @foreach ($relatedLessons as $item)
+                                <a href="/member/lesson/{{ $item->id }}"
+                                    class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors bg-white hover:bg-gray-50">
+
+                                    {{-- Play icon --}}
+                                    <div class="shrink-0 mt-0.5">
+                                        <i class="fa-regular fa-circle-play text-gray-300 text-[18px]"></i>
+                                    </div>
+
+                                    {{-- Title + duration --}}
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-[12px] font-bold uppercase tracking-wide leading-snug text-gray-800">
+                                            {{ $item->title }}
+                                        </p>
+                                        <p class="text-[11px] mt-1.5 text-gray-400">
+                                            {{ $item->duration ?? '05:00' }}
+                                        </p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+
+                </aside>
+
+            </div>
+        @else
+            {{-- Empty state --}}
+            <div class="max-w-[1280px] mx-auto px-6 py-20 text-center">
+                <i class="fa-regular fa-folder-open text-gray-200 text-6xl block mb-5"></i>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">No lesson found</h2>
+                <p class="text-gray-400 mb-7">There is currently no lesson available.</p>
+                <a href="{{ route('extra.courses') }}"
+                    class="inline-block bg-[#0FA9A0] text-white px-7 py-2.5 rounded-lg font-semibold hover:bg-[#0d928a] transition-colors">
+                    Go Back
+                </a>
+            </div>
+
+        @endif
+
     </div>
 
-</aside>
+    @if ($lesson)
+        <script>
+            window.uploadData = @json($lesson);
+        </script>
+        <script>
+            document.querySelectorAll('.bookmark-form').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const res = await fetch(this.action, {
+                        method: 'POST',
+                        body: new FormData(this),
+                        headers: {
+                            'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value
+                        }
+                    });
+                    const json = await res.json();
+                    const btn = this.querySelector('.bookmark-btn');
+                    if (json.status === 'added') {
+                        btn.classList.remove('bg-white', 'border-gray-200', 'text-gray-700',
+                            'hover:bg-gray-50');
+                        btn.classList.add('bg-yellow-50', 'border-yellow-200', 'text-yellow-600',
+                            'hover:bg-yellow-100');
+                        btn.innerHTML = '<i class="fa-regular fa-bookmark text-[15px]"></i> Bookmarked';
+                    } else {
+                        btn.classList.remove('bg-yellow-50', 'border-yellow-200', 'text-yellow-600',
+                            'hover:bg-yellow-100');
+                        btn.classList.add('bg-white', 'border-gray-200', 'text-gray-700',
+                            'hover:bg-gray-50');
+                        btn.innerHTML =
+                        '<i class="fa-regular fa-bookmark text-[15px]"></i> Bookmark';
+                    }
+                });
+            });
+        </script>
+    @endif
 
-</section>
-<script>
-    window.uploadData = @json($lesson);
-</script>
-
-<script>
-  // Optional AJAX toggle
-  document.querySelectorAll('.bookmark-form').forEach(form => {
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      let res = await fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-        headers: { 'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value }
-      });
-      let json = await res.json();
-      let btn = this.querySelector('.bookmark-btn');
-      if (json.status === 'added') {
-        btn.classList.remove('bg-gray-100','border-gray-300','text-gray-600');
-        btn.classList.add('bg-yellow-100','border-yellow-500','text-yellow-600');
-        btn.innerHTML = '<i class="fa fa-bookmark mr-2"></i> Bookmarked';
-      } else {
-        btn.classList.remove('bg-yellow-100','border-yellow-500','text-yellow-600');
-        btn.classList.add('bg-gray-100','border-gray-300','text-gray-600');
-        btn.innerHTML = '<i class="fa fa-bookmark mr-2"></i> Bookmark';
-      }
-    });
-  });
-</script>
 @endsection

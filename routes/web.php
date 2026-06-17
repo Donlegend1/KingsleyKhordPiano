@@ -23,6 +23,7 @@ use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\QuizController;
 use App\Http\Controllers\CommunityIndexController;
 // use App\Http\Controllers\StripeWebhookController;
 use Laravel\Cashier\Http\Controllers\WebhookController;
@@ -142,10 +143,14 @@ Route::post('/support/send', [ContactController::class, 'store'])->name('support
 Route::post('/contact/send', [ContactController::class, 'create']);
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
-    Route::get('roadmap', [GetstartedController::class, 'roadmap']);
+    Route::get('roadmap', [GetstartedController::class, 'roadmap'])->name('member.roadmap');
+    Route::get('library', [GetstartedController::class, 'library'])->name('member.library');
     Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
+    Route::get('quiz', [QuizController::class, 'index'])->name('member.quiz');
+    Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
+    Route::redirect('dashboard', '/home');
     Route::get('piano-exercise/finger', [ExerciseController::class, 'fingerExercises'])->name('piano.exercise.finger');
     Route::get('piano-exercise/musical-application', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
     Route::get('piano-exercise/player', [ExerciseController::class, 'pianoExercisePlayer'])->name('piano.exercise.player');
@@ -158,6 +163,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('quick-lessons', [LessonController::class, 'quicklession'])->name('quick.lession');
     Route::get('learn-songs', [LessonController::class, 'learnSongs'])->name('learn.songs');
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
+    Route::get('live-session/{liveshow}/confirm', [LiveSessionController::class, 'confirmBooking'])->name('member.live-session.confirm');
+    Route::post('live-session/{liveshow}/book', [LiveSessionController::class, 'bookSlot'])->name('member.live-session.book');
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
 });
@@ -236,6 +243,9 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('musical-application-list', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'musicalApplicationList']);
     Route::get('musical-application-all-courses', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'getAllCourses']);
     Route::resource('musical-application', \App\Http\Controllers\Admin\MusicalApplicationController::class, ['as' => 'admin']);
+    
+    // Community Tutorials Admin
+    Route::resource('tutorials', \App\Http\Controllers\Admin\AdminTutorialController::class, ['as' => 'admin'])->except(['show']);
 
     // Guest Bookings
     Route::prefix('guest-bookings')->name('admin.guest-bookings.')->group(function () {

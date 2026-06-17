@@ -145,13 +145,15 @@ class ExerciseController extends Controller
 
     public function musicalApplication(Request $request)
     {
-        $skillLevel = $request->query('skill_level', 'Beginner');
-        $skillLevels = ['Beginner', 'Intermediate', 'Advanced'];
+        $skillLevel = $request->query('skill_level', 'ALL');
+        $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
         
-        $applications = \App\Models\MusicalApplication::where('skill_level', $skillLevel)
-                            ->where('status', 'active')
-                            ->get()
-                            ->groupBy('series');
+        $query = \App\Models\MusicalApplication::where('status', 'active');
+        if ($skillLevel !== 'ALL') {
+            $query->where('skill_level', $skillLevel);
+        }
+        
+        $applications = $query->get()->groupBy('series');
 
         return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications'));
     }

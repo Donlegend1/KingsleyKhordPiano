@@ -82,7 +82,7 @@
 
                     {{-- Action Buttons --}}
                     <div class="flex items-center flex-wrap gap-3 mb-10">
-                        @if($previousVideo)
+                        {{-- @if($previousVideo)
                             <a href="{{ request()->fullUrlWithQuery(['video_id' => $previousVideo->id]) }}" 
                                class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 <i class="fa-solid fa-arrow-left text-[14px]"></i> Previous
@@ -94,7 +94,7 @@
                                class="flex items-center gap-2 bg-[#0FA9A0]/10 hover:bg-[#0FA9A0]/20 text-[#0FA9A0] text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 Next Lesson <i class="fa-solid fa-arrow-right text-[14px]"></i>
                             </a>
-                        @endif
+                        @endif --}}
 
                         <form action="/member/course/{{ $activeVideo->id }}/complete" method="POST">
                             @csrf
@@ -125,8 +125,8 @@
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
-                                <a href="#" class="text-[#0FA9A0] text-[13px] font-semibold hover:underline">View
-                                    All</a>
+                                {{-- <a href="#" class="text-[#0FA9A0] text-[13px] font-semibold hover:underline">View
+                                    All</a> --}}
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

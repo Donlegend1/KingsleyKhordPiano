@@ -169,6 +169,14 @@
                         <h2 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Points Breakdown</h2>
                         <div class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
                             <div class="flex items-center justify-between rounded-2xl bg-white px-4 py-3 dark:bg-slate-900">
+                                <span>Lesson completed</span>
+                                <strong>10 pts</strong>
+                            </div>
+                            <div class="flex items-center justify-between rounded-2xl bg-white px-4 py-3 dark:bg-slate-900">
+                                <span>Milestone tier achieved</span>
+                                <strong>20 pts</strong>
+                            </div>
+                            <div class="flex items-center justify-between rounded-2xl bg-white px-4 py-3 dark:bg-slate-900">
                                 <span>Post created</span>
                                 <strong>5 pts</strong>
                             </div>

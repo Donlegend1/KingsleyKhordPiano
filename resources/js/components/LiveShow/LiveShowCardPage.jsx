@@ -160,6 +160,7 @@ const PremiumVideoSection = () => {
                     const date = dayjs(video.start_time);
                     const isRestricted = video.access_type === "premium" && !isPremium;
                     const isPast = date.isBefore(dayjs());
+                    const isToday = date.isSame(dayjs(), 'day');
                     const hasVideoLink = !!video.recording_url; // or zoom_link for live
                     const countdown = countdowns[video.id] || { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
@@ -189,88 +190,172 @@ const PremiumVideoSection = () => {
 
                             {/* Content Container */}
                             <div className="relative z-10 h-full flex flex-col justify-end p-8">
-                                {/* Header Info */}
-                                <div className="mb-6 transform transition-transform duration-500 group-hover:-translate-y-2">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="p-2 bg-[#FFD736]/20 backdrop-blur-md rounded-lg border border-[#FFD736]/30">
-                                            <img src="/icons/wave.png" alt="Icon" className="w-5 h-5 invert" />
-                                        </div>
-                                        {isPast ? (
-                                             <span className="text-sky-400 text-xs font-black uppercase tracking-widest bg-sky-400/10 px-2.5 py-1 rounded-md border border-sky-400/20 shadow-[0_0_15px_rgba(56,189,248,0.1)]">Past Event</span>
-                                        ) : (
-                                             <span className="text-yellow-400 text-xs font-bold uppercase tracking-widest bg-yellow-400/10 px-2 py-0.5 rounded">Upcoming Live</span>
-                                        )}
-                                    </div>
-                                    <h3 className="text-2xl font-black text-white leading-tight mb-2 tracking-tight group-hover:text-[#FFD736] transition-colors line-clamp-2">
-                                        {video.title}
-                                    </h3>
-                                    <div className="flex items-center gap-4 text-white/70 text-sm font-medium">
-                                        <div className="flex items-center gap-1.5">
-                                            <i className="fa-regular fa-calendar text-[#FFD736]"></i>
-                                            {date.format("MMM DD, YYYY")}
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <i className="fa-regular fa-clock text-[#FFD736]"></i>
-                                            {date.format("HH:mm")}
-                                        </div>
-                                    </div>
-                                </div>
+                                 {/* Header Info */}
+                                 <div className="mb-6 transform transition-transform duration-500 group-hover:-translate-y-2">
+                                     <div className="flex items-center gap-3 mb-2">
+                                         {video.category === "session" ? (
+                                             <div className="p-2 bg-indigo-600/20 backdrop-blur-md rounded-lg border border-indigo-600/30">
+                                                 <i className="fa-solid fa-users text-indigo-400 text-sm"></i>
+                                             </div>
+                                         ) : (
+                                             <div className="p-2 bg-red-600/20 backdrop-blur-md rounded-lg border border-red-600/30">
+                                                 <i className="fa-solid fa-tower-broadcast text-red-500 text-sm"></i>
+                                             </div>
+                                         )}
+                                         {isPast ? (
+                                             <span className="text-sky-400 text-xs font-black uppercase tracking-widest bg-sky-400/10 px-2.5 py-1 rounded-md border border-sky-400/20 shadow-[0_0_15px_rgba(56,189,248,0.1)]">Past Show</span>
+                                         ) : video.category === "session" ? (
+                                             <span className="text-indigo-400 text-xs font-bold uppercase tracking-widest bg-indigo-400/10 px-2.5 py-1 rounded-md border border-indigo-400/20 shadow-[0_0_15px_rgba(79,70,229,0.1)]">Live Session</span>
+                                         ) : (
+                                             <span className="text-yellow-400 text-xs font-bold uppercase tracking-widest bg-yellow-400/10 px-2.5 py-1 rounded-md border border-yellow-400/20 shadow-[0_0_15px_rgba(250,204,21,0.1)]">Live Event</span>
+                                         )}
+                                     </div>
+                                     <h3 className="text-2xl font-black text-white leading-tight mb-2 tracking-tight group-hover:text-[#FFD736] transition-colors line-clamp-2">
+                                         {video.title}
+                                     </h3>
+                                     <div className="flex items-center gap-4 text-white/70 text-sm font-medium">
+                                         <div className="flex items-center gap-1.5">
+                                             <i className="fa-regular fa-calendar text-[#FFD736]"></i>
+                                             {date.format("MMM DD, YYYY")}
+                                         </div>
+                                         <div className="flex items-center gap-1.5">
+                                             <i className="fa-regular fa-clock text-[#FFD736]"></i>
+                                             {date.format("HH:mm")} (WAT)
+                                         </div>
+                                     </div>
+                                 </div>
 
-                                {/* Custom Content Area (Past vs Future) */}
-                                {isPast ? (
-                                    <div className="mb-8">
-                                        {video.recording_url ? (
-                                            <div 
-                                                onClick={() => handleVideoClick(video)}
-                                                className="flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl cursor-pointer transition-colors shadow-lg group/btn"
-                                            >
-                                                <i className="fa-solid fa-play-circle text-xl animate-pulse group-hover/btn:scale-110 transition-transform"></i>
-                                                <span className="font-black text-sm uppercase tracking-widest">Watch Recording</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center justify-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 text-white/50 py-3 rounded-xl">
-                                                <i className="fa-solid fa-circle-info mt-0.5"></i>
-                                                <span className="font-bold text-xs uppercase tracking-widest">Live Show Ended</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <>
-                                        {/* Countdown Blocks */}
-                                        <div className="grid grid-cols-4 gap-2 mb-8 transform transition-all duration-500 group-hover:-translate-y-1">
-                                            {[
-                                                { label: 'Days', val: countdown.days },
-                                                { label: 'Hours', val: countdown.hours },
-                                                { label: 'Min', val: countdown.minutes },
-                                                { label: 'Sec', val: countdown.seconds }
-                                            ].map((unit, i) => (
-                                                <div key={i} className="flex flex-col items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl p-2 border border-white/10 shadow-lg">
-                                                    <span className="text-xl font-black text-white tabular-nums">{unit.val ?? '-'}</span>
-                                                    <span className="text-[9px] font-bold text-white/50 uppercase tracking-tighter">{unit.label}</span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                 {/* Custom Content Area (Past vs Future) */}
+                                 {isPast ? (
+                                     <div className="mb-8">
+                                         {video.recording_url ? (
+                                             <div 
+                                                 onClick={() => handleVideoClick(video)}
+                                                 className="flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl cursor-pointer transition-colors shadow-lg group/btn"
+                                             >
+                                                 <i className="fa-solid fa-play-circle text-xl animate-pulse group-hover/btn:scale-110 transition-transform"></i>
+                                                 <span className="font-black text-sm uppercase tracking-widest">Watch Recording</span>
+                                             </div>
+                                         ) : (
+                                             <div className="flex items-center justify-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 text-white/50 py-3 rounded-xl">
+                                                 <i className="fa-solid fa-circle-info mt-0.5"></i>
+                                                 <span className="font-bold text-xs uppercase tracking-widest">Live Show Ended</span>
+                                             </div>
+                                         )}
+                                     </div>
+                                 ) : (
+                                     <>
+                                         {/* Session Seats Filled vs Event Countdown */}
+                                         {video.category === "session" ? (
+                                             <div className="flex flex-col gap-3 mb-8 transform transition-all duration-500 group-hover:-translate-y-1">
+                                                 <div className="flex items-center justify-between bg-white/5 backdrop-blur-xl rounded-2xl p-3 border border-white/10 shadow-lg">
+                                                     <div className="flex items-center gap-2">
+                                                         <div className="w-7 h-7 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300">
+                                                             <i className="fa-solid fa-users text-xs"></i>
+                                                         </div>
+                                                         <div className="flex flex-col">
+                                                             <span className="text-[9px] font-bold text-white/50 uppercase tracking-wider">Seats Filled</span>
+                                                             <span className="text-xs font-black text-white">{video.bookings_count ?? 0} / {video.max_slots ?? 5}</span>
+                                                         </div>
+                                                     </div>
+                                                     
+                                                     {/* Overlapping avatars */}
+                                                     <div className="flex -space-x-1.5 overflow-hidden">
+                                                         {video.bookings && video.bookings.slice(0, 3).map((b) => {
+                                                             const avatar = b.passport 
+                                                                 ? (b.passport.startsWith('http') ? b.passport : '/' + b.passport) 
+                                                                 : '/images/default-avatar.png';
+                                                             return (
+                                                                 <img 
+                                                                     key={b.id} 
+                                                                     src={avatar} 
+                                                                     className="inline-block h-6 w-6 rounded-full ring-2 ring-gray-950 object-cover" 
+                                                                     alt="Avatar"
+                                                                     title={`${b.first_name} ${b.last_name}`}
+                                                                     onError={(e) => { e.target.src = '/images/default-avatar.png'; }}
+                                                                 />
+                                                             );
+                                                         })}
+                                                         {video.bookings_count > 3 && (
+                                                             <div className="inline-flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-gray-950 bg-indigo-600 text-white text-[9px] font-black">
+                                                                 +{video.bookings_count - 3}
+                                                             </div>
+                                                         )}
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         ) : (
+                                             /* Countdown Blocks */
+                                             <div className="grid grid-cols-4 gap-2 mb-8 transform transition-all duration-500 group-hover:-translate-y-1">
+                                                 {[
+                                                     { label: 'Days', val: countdown.days },
+                                                     { label: 'Hours', val: countdown.hours },
+                                                     { label: 'Min', val: countdown.minutes },
+                                                     { label: 'Sec', val: countdown.seconds }
+                                                 ].map((unit, i) => (
+                                                     <div key={i} className="flex flex-col items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl p-2 border border-white/10 shadow-lg">
+                                                         <span className="text-xl font-black text-white tabular-nums">{unit.val ?? '-'}</span>
+                                                         <span className="text-[9px] font-bold text-white/50 uppercase tracking-tighter">{unit.label}</span>
+                                                     </div>
+                                                 ))}
+                                             </div>
+                                         )}
 
-                                        {/* Action Buttons for future shows */}
-                                        <div className="flex flex-col gap-3">
-                                            <a
-                                                href={isRestricted ? "#" : video.zoom_link}
-                                                onClick={isRestricted ? handleVideoClick : undefined}
-                                                className="w-full py-3.5 rounded-xl bg-[#FFD736] text-black text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-yellow-400/20 hover:bg-white hover:scale-[1.02] active:scale-95 transition-all duration-300"
-                                            >
-                                                {video.zoom_link ? "Join Live Show" : "Enter Live Show"}
-                                            </a>
-                                            <a
-                                                href={isRestricted ? "#" : `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(video.title)}&dates=${date.format("YYYYMMDDTHHmmss")}/${date.add(1, "hour").format("YYYYMMDDTHHmmss")}&details=${encodeURIComponent(video.zoom_link)}`}
-                                                onClick={isRestricted ? handleVideoClick : undefined}
-                                                className="w-full py-3 rounded-xl border border-white/20 bg-white/5 backdrop-blur-md text-white text-[11px] font-bold text-center uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-300"
-                                            >
-                                                <i className="fa-regular fa-calendar-plus mr-2"></i>
-                                                Add to Calendar
-                                            </a>
-                                        </div>
-                                    </>
-                                )}
+                                         {/* Action Buttons for future shows */}
+                                         <div className="flex flex-col gap-3">
+                                             {video.category === "session" ? (
+                                                 isToday ? (
+                                                     <a
+                                                         href={isRestricted ? "#" : video.zoom_link}
+                                                         onClick={isRestricted ? handleVideoClick : undefined}
+                                                         className="w-full py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
+                                                     >
+                                                         Join the Live Show
+                                                     </a>
+                                                 ) : video.booked_by_user ? (
+                                                     <a
+                                                         href={isRestricted ? "#" : video.zoom_link}
+                                                         onClick={isRestricted ? handleVideoClick : undefined}
+                                                         className="w-full py-3.5 rounded-xl bg-green-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-green-500/20 hover:bg-green-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
+                                                     >
+                                                         Enter Live Session
+                                                     </a>
+                                                 ) : video.bookings_count >= video.max_slots ? (
+                                                     <button
+                                                         disabled
+                                                         className="w-full py-3.5 rounded-xl bg-gray-700 text-gray-400 text-sm font-black text-center uppercase tracking-widest cursor-not-allowed"
+                                                     >
+                                                         Slot Full
+                                                     </button>
+                                                 ) : (
+                                                     <a
+                                                         href={isRestricted ? "#" : `/member/live-session/${video.id}/confirm`}
+                                                         onClick={isRestricted ? (e) => { e.preventDefault(); handleVideoClick(video); } : undefined}
+                                                         className="w-full py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
+                                                     >
+                                                         Join the Slot
+                                                     </a>
+                                                 )
+                                             ) : (
+                                                 <a
+                                                     href={isRestricted ? "#" : video.zoom_link}
+                                                     onClick={isRestricted ? handleVideoClick : undefined}
+                                                     className="w-full py-3.5 rounded-xl bg-red-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-red-500/20 hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
+                                                 >
+                                                     {video.zoom_link ? "Join Live Show" : "Enter Live Show"}
+                                                 </a>
+                                             )}
+                                             <a
+                                                 href={isRestricted ? "#" : `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(video.title)}&dates=${date.format("YYYYMMDDTHHmmss")}/${date.add(1, "hour").format("YYYYMMDDTHHmmss")}&details=${encodeURIComponent(video.zoom_link || video.category)}`}
+                                                 onClick={isRestricted ? handleVideoClick : undefined}
+                                                 className="w-full py-3 rounded-xl border border-white/20 bg-white/5 backdrop-blur-md text-white text-[11px] font-bold text-center uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-300"
+                                             >
+                                                 <i className="fa-regular fa-calendar-plus mr-2"></i>
+                                                 Add to Calendar
+                                             </a>
+                                         </div>
+                                     </>
+                                 )}
                             </div>
                         </div>
                     );

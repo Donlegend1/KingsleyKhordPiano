@@ -1,9 +1,12 @@
+@php
+    $noHeader = true;
+@endphp
 @extends('layouts.member')
 
 @section('content')
 
 <div
-  x-data="{ step: 1, totalSteps: 4 }"
+  x-data="{ step: {{ request('step', 1) }}, totalSteps: 4 }"
   x-init="$watch('step', () => window.scrollTo({ top: 0, behavior: 'smooth' }))"
   class="min-h-screen bg-white dark:bg-gray-900 py-6 px-4 flex flex-col"
 >
@@ -431,7 +434,7 @@
             @endforeach
           </ul>
 
-          <a href="/member/community" class="w-full max-w-sm flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition text-sm mb-3">
+          <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="w-full max-w-sm flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition text-sm mb-3">
             <span>Join Community</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>

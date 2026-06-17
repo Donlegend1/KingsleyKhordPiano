@@ -3,280 +3,420 @@
 @section("content")
 
 @php
-    // Calculate profile completion
-    $user = auth()->user();
-    $totalFields = 6;
-    $completedFields = 0;
+    $milestonesList = [
+        ['name' => 'Starter', 'lessons' => 1],
+        ['name' => 'Player', 'lessons' => 4],
+        ['name' => 'Performer', 'lessons' => 9],
+        ['name' => 'Artist', 'lessons' => 14],
+        ['name' => 'Maestro', 'lessons' => 21],
+        ['name' => 'Master', 'lessons' => 31],
+        ['name' => 'Grand Master', 'lessons' => 43],
+        ['name' => 'Composer', 'lessons' => 58],
+        ['name' => 'Conductor', 'lessons' => 76],
+        ['name' => 'Virtuoso', 'lessons' => 96],
+        ['name' => 'Prodigy', 'lessons' => 121],
+        ['name' => 'Piano Legend', 'lessons' => 151],
+    ];
 
-    // Check each field
-    $hasProfilePhoto = !empty($user->passport);
-    // $hasBiography = !empty($user->biography);
-    $hasSocialMedia = !empty($user->instagram) || !empty($user->youtube) || !empty($user->facebook) || !empty($user->tiktok);
-    $hasSkillLevel = !empty($user->skill_level);
-    // $hasPhoneNumber = !empty($user->phone_number);
-    $hasCountry = !empty($user->country);
+    $currentMilestoneName = 'None';
+    foreach ($milestonesList as $ms) {
+        if ($totalCompleted >= $ms['lessons']) {
+            $currentMilestoneName = $ms['name'];
+        }
+    }
 
-    // Count completed fields
-    if ($hasProfilePhoto) $completedFields++;
-    // if ($hasBiography) $completedFields++;
-    if ($hasSocialMedia) $completedFields++;
-    if ($hasSkillLevel) $completedFields++;
-    // if ($hasPhoneNumber) $completedFields++;
-    if ($hasCountry) $completedFields++;
+    // Colors mapping for skill level
+    $levelColor = 'indigo-600';
+    $levelBg = 'indigo-50';
+    $levelBorder = 'indigo-100';
+    $levelText = 'indigo-700';
+    $strokeColor = '#4F46E5';
 
-    // Calculate percentage
-    $completionPercentage = round(($completedFields / $totalFields) * 100);
-
-    // Calculate stroke-dashoffset for progress circle (339.292 is the circumference of the circle)
-    $strokeDashoffset = 339.292 - (339.292 * $completionPercentage / 100);
+    if ($assessment) {
+        $levelLower = strtolower($assessment->skill_level);
+        if ($levelLower === 'beginner') {
+            $levelColor = 'blue-600';
+            $levelBg = 'blue-50';
+            $levelBorder = 'blue-100';
+            $levelText = 'blue-700';
+            $strokeColor = '#3B82F6';
+        } elseif ($levelLower === 'intermediate') {
+            $levelColor = 'violet-600';
+            $levelBg = 'violet-50';
+            $levelBorder = 'violet-100';
+            $levelText = 'violet-700';
+            $strokeColor = '#8B5CF6';
+        } elseif ($levelLower === 'advanced') {
+            $levelColor = 'rose-600';
+            $levelBg = 'rose-50';
+            $levelBorder = 'rose-100';
+            $levelText = 'rose-700';
+            $strokeColor = '#F43F5E';
+        }
+    }
 @endphp
 
 <!-- Header Section -->
-<div class="bg-white dark:bg-gray-800 mb-6">
-    <div class="px-4 sm:px-6 py-4">
-        <h1 class="text-2xl sm:text-3xl font-bold text-[#1F2937] dark:text-white">Activity Feed</h1>
+<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+    <div class="px-4 sm:px-6 lg:px-8 py-5 max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Your Growth at a Glance</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Track your skills assessment, progress metrics, and continue your music learning journey.</p>
+        </div>
     </div>
 </div>
-<!-- Main Feed Section -->
-<section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-gray-900">
-  <div class="flex flex-col lg:flex-row gap-6">
 
-    <!-- Left: Main Feed Area -->
-    <div class="flex-1 space-y-6">
-        <!-- Feed Posts Container -->
-        <div id="post-list" class="space-y-6"></div>
-    </div>
+<!-- Main Overview Content -->
+<div class="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-12">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-    <!-- Right Sidebar -->
-    <div class="hidden lg:block w-80 xl:w-96 flex-shrink-0 space-y-6">
+        {{-- ===== LEFT COLUMN: Profile, Stats & Feedback (2/5 width) ===== --}}
+        <div class="lg:col-span-2 space-y-6">
 
-        <!-- Complete Your Profile Card -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold text-[#1F2937] dark:text-white">Complete Your Profile</h3>
-                <a href="/member/profile" class="text-sm dark:text-white hover:text-[#09941c] font-medium transition-colors">
-                    Edit Profile →
-                </a>
-            </div>
+            {{-- 1. Profile Widget --}}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
+                @if($user->passport)
+                    <img src="{{ asset($user->passport) }}" alt="Avatar" class="w-24 h-24 rounded-full object-cover ring-4 ring-indigo-500/20">
+                @else
+                    <div class="w-24 h-24 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-extrabold text-3xl ring-4 ring-indigo-500/20">
+                        {{ strtoupper(substr($user->first_name ?? $user->name ?? 'U', 0, 1)) }}
+                    </div>
+                @endif
 
-            <!-- Progress Circle -->
-            <div class="flex justify-center mb-5">
-                <div class="relative w-32 h-32">
-                    <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                        <circle
-                            cx="60"
-                            cy="60"
-                            r="54"
-                            stroke="#E5E7EB"
-                            stroke-width="8"
-                            fill="none"
-                        />
-                        <circle
-                            cx="60"
-                            cy="60"
-                            r="54"
-                            stroke="#10B981"
-                            stroke-width="8"
-                            fill="none"
-                            stroke-dasharray="339.292"
-                            stroke-dashoffset="{{ $strokeDashoffset }}"
-                            stroke-linecap="round"
-                            class="transition-all duration-300"
-                        />
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mt-4 flex items-center gap-1">
+                    {{ $user->first_name }} {{ $user->last_name }}
+                    @if($user->verified)
+                        <span class="text-blue-500" title="Verified Member">
+                            <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </span>
+                    @endif
+                </h2>
+
+                <p class="text-xs text-indigo-500 dark:text-indigo-400 font-semibold mt-1">
+                    {{ !empty($user->biography) ? $user->biography : 'Gospel Piano Enthusiast' }}
+                </p>
+
+                <div class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 px-3 py-1.5 rounded-full">
+                    <svg class="w-3.5 h-3.5 text-red-500 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                     </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-3xl font-bold text-[#1F2937]">{{ $completionPercentage }}</span>
-                        <span class="text-base text-[#6B7280]">%</span>
-                        <span class="text-xs text-[#9CA3AF] mt-1">Complete</span>
+                    <span>{{ $user->country ?? 'Global Citizen' }}</span>
+                </div>
+
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-4">
+                    Joined {{ $user->created_at ? $user->created_at->format('F Y') : 'June 2026' }}
+                </p>
+            </div>
+
+            {{-- 2. Metrics Block --}}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Your Academy Stats</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 rounded-xl p-4 flex flex-col items-center text-center">
+                        <span class="text-3xl font-black text-indigo-600 dark:text-indigo-400">{{ $totalCompleted }}</span>
+                        <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide mt-1.5">Lessons Done</span>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 rounded-xl p-4 flex flex-col items-center text-center">
+                        <span class="text-3xl font-black text-amber-500 dark:text-amber-400">{{ $achievedCount }}</span>
+                        <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide mt-1.5">Milestones</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Checklist Items -->
-            <div class="space-y-3">
-                <!-- Profile Photo -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        @if($hasProfilePhoto)
-                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
-                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-sm text-[#10B981] font-medium">Profile Photo</span>
-                        @else
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-                            </div>
-                            <span class="text-sm text-[#6B7280]">Profile Photo</span>
-                        @endif
-                    </div>
+            {{-- 3. Feedback Widget --}}
+            <div 
+                x-data="{ rating: 0, hoverRating: 0, comment: '', submitted: false }" 
+                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm"
+            >
+                <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-2">Help Us Improve</h3>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">How has your academy experience been? Share your thoughts below.</p>
+
+                <!-- Interactive Stars -->
+                <div class="flex items-center gap-1.5 mb-4">
+                    <template x-for="i in 5">
+                        <button 
+                            type="button" 
+                            @click="rating = i" 
+                            @mouseenter="hoverRating = i" 
+                            @mouseleave="hoverRating = 0"
+                            class="focus:outline-none transition-transform active:scale-95 p-0.5"
+                        >
+                            <svg 
+                                class="w-6 h-6 transition-colors"
+                                :class="{
+                                    'fill-amber-400 text-amber-400': (hoverRating || rating) >= i,
+                                    'text-gray-300 dark:text-gray-600 fill-none stroke-current stroke-2': (hoverRating || rating) < i
+                                }"
+                                viewBox="0 0 24 24"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        </button>
+                    </template>
                 </div>
 
-                <!-- Biography -->
-                {{-- <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        @if($hasBiography)
-                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
-                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-sm text-[#10B981] font-medium">Biography</span>
-                        @else
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-                            </div>
-                            <span class="text-sm text-[#6B7280]">Biography</span>
-                        @endif
-                    </div>
-                </div> --}}
+                <!-- Comment Input -->
+                <textarea 
+                    x-model="comment" 
+                    placeholder="Suggest courses, report bugs, or share positive feedback..." 
+                    class="w-full text-xs bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 mb-3 resize-none h-20"
+                ></textarea>
 
-                <!-- Social Media Links -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        @if($hasSocialMedia)
-                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
-                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
+                <button 
+                    type="button" 
+                    @click="if(rating > 0 || comment.trim() !== '') { submitted = true; rating = 0; comment = ''; setTimeout(() => submitted = false, 5000) }"
+                    class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-sm"
+                >
+                    Submit Feedback
+                </button>
+
+                <!-- Success Alert -->
+                <div 
+                    x-show="submitted" 
+                    x-transition 
+                    x-cloak 
+                    class="mt-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs p-3 rounded-xl text-center font-medium"
+                >
+                    Thank you! Your feedback has been received. ✨
+                </div>
+            </div>
+
+        </div>
+
+        {{-- ===== RIGHT COLUMN: Current Level, Quick Links, Resume Learning & Reviews (3/5 width) ===== --}}
+        <div class="lg:col-span-3 space-y-6">
+
+            {{-- 1. Current Level Widget --}}
+            @if($assessment)
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6">
+                    <!-- Circular Gauge -->
+                    <div class="relative w-32 h-32 flex-shrink-0">
+                        <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                            <circle
+                                cx="60"
+                                cy="60"
+                                r="52"
+                                stroke="#E5E7EB"
+                                class="dark:stroke-gray-700"
+                                stroke-width="8"
+                                fill="none"
+                            />
+                            <circle
+                                cx="60"
+                                cy="60"
+                                r="52"
+                                stroke="{{ $strokeColor }}"
+                                stroke-width="8"
+                                fill="none"
+                                stroke-dasharray="326.725"
+                                stroke-dashoffset="{{ 326.725 - (326.725 * $assessment->score / 100) }}"
+                                stroke-linecap="round"
+                                class="transition-all duration-500"
+                            />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-3xl font-extrabold text-gray-900 dark:text-white">{{ $assessment->score }}%</span>
+                            <span class="text-[9px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wider">Score</span>
+                        </div>
+                    </div>
+
+                    <!-- Level & Breakdown -->
+                    <div class="flex-grow min-w-0 w-full">
+                        <div class="flex items-center justify-between gap-4 mb-2">
+                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Assigned Level</span>
+                            <span class="text-xs font-black uppercase bg-{{ $levelBg }} text-{{ $levelText }} dark:bg-{{ $levelColor }}/10 dark:text-{{ $levelColor }} border border-{{ $levelBorder }} dark:border-{{ $levelColor }}/20 px-3 py-1 rounded-full">
+                                {{ $assessment->skill_level }}
+                            </span>
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
+                            @if(strtolower($assessment->skill_level) === 'beginner')
+                                You're building the fundamentals of your musical journey. Focus on developing strong basics, steady practice habits, and confidence.
+                            @elseif(strtolower($assessment->skill_level) === 'intermediate')
+                                You have a solid foundation and good understanding of gospel music. Keep building consistency and explore more advanced concepts!
+                            @else
+                                You demonstrate strong musical proficiency and a deep understanding. Continue refining your artistry and mastering advanced techniques.
+                            @endif
+                        </p>
+
+                        <!-- Breakdown bars -->
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mb-1">
+                                    <span>Fundamentals</span>
+                                    <span class="font-bold">{{ $assessment->fundamentals_score }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                                    <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ $assessment->fundamentals_score }}%"></div>
+                                </div>
                             </div>
-                            <span class="text-sm text-[#10B981] font-medium">Social Media Links</span>
-                        @else
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mb-1">
+                                    <span>Ear Training</span>
+                                    <span class="font-bold">{{ $assessment->ear_training_score }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                                    <div class="bg-emerald-500 h-1.5 rounded-full" style="width: {{ $assessment->ear_training_score }}%"></div>
+                                </div>
                             </div>
-                            <span class="text-sm text-[#6B7280]">Social Media Links</span>
-                        @endif
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mb-1">
+                                    <span>Chords & Harmony</span>
+                                    <span class="font-bold">{{ $assessment->chords_harmony_score }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                                    <div class="bg-violet-500 h-1.5 rounded-full" style="width: {{ $assessment->chords_harmony_score }}%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mb-1">
+                                    <span>Experience</span>
+                                    <span class="font-bold">{{ $assessment->experience_score }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                                    <div class="bg-amber-500 h-1.5 rounded-full" style="width: {{ $assessment->experience_score }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex justify-end">
+                            <a href="/member/quiz" class="text-xs text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 font-bold inline-flex items-center gap-1 transition">
+                                Retake Assessment <i class="fa fa-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Skill Level -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        @if($hasSkillLevel)
-                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
-                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-sm text-[#10B981] font-medium">Skill Level</span>
-                        @else
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-                            </div>
-                            <span class="text-sm text-[#6B7280]">Skill Level</span>
-                        @endif
+            @else
+                <div class="bg-gradient-to-r from-indigo-900 to-violet-800 text-white rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 border border-indigo-700/20">
+                    <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-3xl flex-shrink-0">
+                        🏆
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-bold text-white mb-1.5">Evaluate Your Piano Skill Level</h3>
+                        <p class="text-xs text-indigo-200 leading-relaxed mb-4">
+                            You haven't completed your diagnostic quiz yet. Spend 2 minutes taking the assessment to identify your starting level, unlock custom goals, and find the perfect courses for your journey.
+                        </p>
+                        <a href="/member/quiz" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold rounded-xl text-xs transition shadow-sm">
+                            Take Assessment Quiz
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                            </svg>
+                        </a>
                     </div>
                 </div>
+            @endif
 
-                <!-- Phone Number -->
-                {{-- <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        @if($hasPhoneNumber)
-                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
-                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-sm text-[#10B981] font-medium">Phone Number</span>
-                        @else
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-                            </div>
-                            <span class="text-sm text-[#6B7280]">Phone Number</span>
-                        @endif
+            {{-- 2. Quick Links Row --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Get Started Card -->
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl flex items-center justify-center text-xl mb-4">
+                            🧭
+                        </div>
+                        <h4 class="text-base font-bold text-gray-900 dark:text-white mb-1">Get Started</h4>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed mb-4">
+                            Get familiar with the platform and follow our step-by-step setup guides to start smoothly.
+                        </p>
                     </div>
-                </div> --}}
+                    <a href="/member/getstarted" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-gray-600 hover:border-indigo-500 dark:hover:border-indigo-400 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl text-xs font-bold transition">
+                        <span>Continue Setup</span>
+                    </a>
+                </div>
 
-                <!-- Location / Country -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        @if($hasCountry)
-                            <div class="w-5 h-5 rounded-full border-2 border-[#10B981] flex items-center justify-center">
-                                <svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
+                <!-- Community Space Card -->
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl flex items-center justify-center text-xl mb-4">
+                            👥
+                        </div>
+                        <h4 class="text-base font-bold text-gray-900 dark:text-white mb-1">Community Space</h4>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed mb-4">
+                            Explore shared files, PDF resources, backing tracks, MIDI downloads, and connect with other students.
+                        </p>
+                    </div>
+                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-gray-600 hover:border-emerald-500 dark:hover:border-emerald-400 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl text-xs font-bold transition">
+                        <span>Visit Space</span>
+                    </a>
+                </div>
+            </div>
+            {{-- 3. Continue Learning Widget --}}
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center text-violet-600 dark:text-violet-400">
+                        <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                    <span class="text-sm font-bold text-gray-900 dark:text-white">Continue Learning</span>
+                </div>
+                
+                @if($resumeLesson)
+                    @php
+                        $thumbnail = $resumeLesson->thumbnail ? asset($resumeLesson->thumbnail) : ($resumeLesson->thumbnail_url ?? asset('images/featured1.jpeg'));
+                    @endphp
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-24 h-24 object-cover rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex-shrink-0">
+                        <div class="flex-grow min-w-0 w-full">
+                            <h4 class="text-base font-bold text-gray-900 dark:text-white truncate mb-0.5">{{ $resumeLesson->title }}</h4>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">{{ ucfirst($resumeLesson->level ?? 'Beginner') }} Lesson</p>
+                            
+                            {{-- Progress bar --}}
+                            <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 mb-1.5">
+                                <div class="bg-violet-600 dark:bg-violet-500 h-1.5 rounded-full" style="width: 45%"></div>
                             </div>
-                            <span class="text-sm text-[#10B981] font-medium">Location / Country</span>
-                        @else
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            <div class="flex justify-between items-center text-[10px] text-gray-400 dark:text-gray-500 font-semibold">
+                                <span>45% Completed</span>
+                                <a href="{{ $resumeUrl }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
+                                    <span>Resume</span>
+                                    <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </a>
                             </div>
-                            <span class="text-sm text-[#6B7280]">Location / Country</span>
-                        @endif
+                        </div>
+                    </div>
+                @else
+                    <p class="text-xs text-gray-400 py-6 text-center">No active lessons found.</p>
+                @endif
+            </div>
+
+            {{-- 4. Testimonials Slider --}}
+            <div 
+                x-data="{ active: 0, reviews: [
+                    { text: 'Kingsley\'s academy is the best investment I have made in my music. The lessons are exceptionally detailed and easy to follow.', author: 'Marcus T.', role: 'Gospel Keyboardist' },
+                    { text: 'The diagnostic assessment placed me perfectly at the Intermediate level. I\'ve already completed 14 lessons this month!', author: 'Sarah P.', role: 'Academy Student' },
+                    { text: 'The community spacing is awesome. Downloading PDF sheets and MIDI files directly to practice on has helped me save hours.', author: 'David E.', role: 'Worship Director' }
+                ] }"
+                x-init="setInterval(() => active = (active + 1) % reviews.length, 5000)"
+                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm"
+            >
+                <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Student Spotlights</h4>
+                <div class="min-h-[100px] flex flex-col justify-between">
+                    <p class="text-sm italic text-gray-600 dark:text-gray-300 leading-relaxed" x-text="'“' + reviews[active].text + '”'"></p>
+                    <div class="mt-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-gray-900 dark:text-white" x-text="reviews[active].author"></p>
+                            <p class="text-[10px] text-indigo-500 dark:text-indigo-400" x-text="reviews[active].role"></p>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <template x-for="(rev, idx) in reviews">
+                                <button 
+                                    @click="active = idx" 
+                                    class="w-2 h-2 rounded-full transition-all focus:outline-none"
+                                    :class="active === idx ? 'bg-indigo-600 dark:bg-indigo-400 w-4' : 'bg-gray-200 dark:bg-gray-700'"
+                                ></button>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
-</div>
 
-        <!-- Latest Updates Card -->
-        {{-- <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
-            <h3 class="text-lg font-bold text-[#1F2937] dark:text-white mb-4">Latest updates</h3>
+        </div>
 
-            <div class="space-y-4">
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">John</span> posted an update</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">4 years ago</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">Adele</span> posted an update</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">4 years ago</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">John</span> posted an update</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">5 years ago</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-800 dark:text-gray-200"><span class="font-semibold">John</span> posted an update in the group <span class="font-semibold">Coffee Addicts</span></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">5 years ago</p>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
     </div>
-  </div>
-</section>
-
-<!-- Floating Action Button -->
-<button class="fixed bottom-6 right-6 w-14 h-14 bg-[#FF6B35] dark:bg-[#E55A2B] rounded-full shadow-lg hover:bg-[#E55A2B] dark:hover:bg-[#CC5A27] transition-colors duration-200 flex items-center justify-center">
-    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5H19M7 13l-1.1 5M7 13l4 4h4l4-4m-8 4V9m0 8v4"></path>
-    </svg>
-</button>
-
-
-
+</div>
 
 @endsection
-

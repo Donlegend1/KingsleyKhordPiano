@@ -61,14 +61,16 @@ class LiveShowController extends Controller
     /**
      * Update the specified resource in storage.
      */
-   public function update(UpdateLiveshowRequest $request, Liveshow $liveshow)
+    public function update(UpdateLiveshowRequest $request, Liveshow $liveshow)
     {
         $liveshow->update($request->only([
             'title',
             'zoom_link',
             'recording_url',
             'start_time',
-            'access_type'
+            'access_type',
+            'category',
+            'max_slots'
         ]));
 
         return response()->json([
@@ -81,7 +83,7 @@ class LiveShowController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(Liveshow $liveshow)
+    public function destroy(Liveshow $liveshow)
     {
         $liveshow->delete();
 
@@ -93,7 +95,7 @@ class LiveShowController extends Controller
     public function list(Request $request)
     {
         $filter = $request->query('filter');
-        $query = LiveShow::query();
+        $query = LiveShow::with('bookedUsers');
 
         if ($filter === 'future') {
             $query->where('start_time', '>', Carbon::now())
@@ -105,7 +107,16 @@ class LiveShowController extends Controller
             $query->orderBy('start_time', 'desc');
         }
 
-        return response()->json($query->get());
+        $userId = auth()->id();
+        
+        $shows = $query->get()->map(function ($show) use ($userId) {
+            $show->bookings_count = $show->bookedUsers->count();
+            $show->booked_by_user = $userId ? $show->bookedUsers->contains('id', $userId) : false;
+            $show->bookings = $show->bookedUsers;
+            return $show;
+        });
+
+        return response()->json($shows);
     }
 
 }
