@@ -25,8 +25,8 @@
 </section>
 
 <div class="max-w-[580px] mx-auto">
-  <p class="text-center text-red-600 text-2xl font-bold">
-    As a premium member, you’re eligible for one free 1-on-1 session every month
+  <p class="text-center text-indigo-600 text-2xl font-bold">
+    Book a 1-on-1 coaching session with Kingsley Khord
   </p>
 </div>
 

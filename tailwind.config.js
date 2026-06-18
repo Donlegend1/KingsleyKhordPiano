@@ -10,6 +10,7 @@ module.exports = {
             fontFamily: {
                 playfair: ['"Playfair Display"', "serif"],
                 sf: ['"SF Pro Display"', 'sans-serif'],
+                jakarta: ['"Plus Jakarta Sans Variable"', 'sans-serif'],
             },
             zIndex: {
                 '1000': '1000',

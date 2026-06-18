@@ -36,7 +36,7 @@
     <header
       x-data="{ scrolled: false }"
       x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 10 })"
-      :class="scrolled ? 'bg-black' : 'bg-transparent'"
+      :class="'bg-black'"
       class="fixed w-full top-0 z-50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <!-- Left: Logo -->

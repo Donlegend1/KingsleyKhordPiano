@@ -145,6 +145,7 @@ Route::post('/contact/send', [ContactController::class, 'create']);
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('roadmap', [GetstartedController::class, 'roadmap'])->name('member.roadmap');
     Route::get('library', [GetstartedController::class, 'library'])->name('member.library');
+    Route::get('my-library', fn() => view('memberpages.my-library'))->name('member.my-library');
     Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);

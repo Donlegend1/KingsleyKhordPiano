@@ -2,13 +2,15 @@
     grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 gap-4">
 
   <!-- Card 1 -->
-  <a href="/member/roadmap" class="block transition-shadow hover:shadow-md">
+  <a href="/member/my-library" class="block transition-shadow hover:shadow-md">
     <div class="min-h-[120px] h-full flex justify-between items-center p-6 bg-[#F3F5F6] rounded-lg shadow-sm border">
       <div class="flex items-center space-x-4">
-        <img src="/images/compass.png" class="w-12 h-12 object-contain" />
+        <div class="w-12 h-12 flex items-center justify-center bg-[#E8EDF2] rounded-xl">
+          <i class="fa fa-book-open text-[#435065] text-xl"></i>
+        </div>
         <div>
-          <h4 class="font-semibold text-[#435065] text-[20px] font-sf">Course Roadmaps</h4>
-          <p class="text-sm text-[#5E6779] mt-1 font-sf">Find your paths to master the piano</p>
+          <h4 class="font-semibold text-[#435065] text-[20px] font-sf">My Library</h4>
+          <p class="text-sm text-[#5E6779] mt-1 font-sf">Access all downloadable files and materials</p>
         </div>
       </div>
       <i class="fa fa-angle-right text-gray-400 text-lg"></i>

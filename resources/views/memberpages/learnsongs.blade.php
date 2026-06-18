@@ -4,258 +4,192 @@
 
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
   <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-    <!-- Breadcrumb -->
-    <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 w-full sm:w-auto">
-      <a href="/home" class="hover:text-blue-600 transition">Dashboard</a>
+    <div class="flex items-center gap-2 text-sm text-gray-500">
+      <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
-      <span class="text-gray-900 dark:text-white font-semibold">Learn Songs</span>
+      <span class="text-[#6366F1] font-medium">Learn Songs</span>
     </div>
-    
-    <!-- Search Bar -->
     <div class="w-full sm:w-auto">
       <form method="GET" action="{{ route('learn.songs') }}" class="flex">
-        <input type="hidden" name="tab" value="{{ request('tab', 'beginner') }}">
+        <input type="hidden" name="tab" value="{{ request('tab', 'all') }}">
         <div class="relative w-full sm:w-72">
-          <input 
-            type="text" 
-            name="search" 
-            value="{{ request('search') }}" 
-            class="w-full border border-gray-300 dark:border-gray-750 dark:bg-gray-800 rounded-full pl-4 pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          <input
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            class="w-full border border-gray-200 rounded-full pl-4 pr-10 py-2 text-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
             placeholder="Search songs..."
           >
-          <button 
-            type="submit" 
-            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-white p-1"
-          >
-            <i class="fa fa-search"></i>
+          <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1">
+            <i class="fa fa-search text-sm"></i>
           </button>
-        </div> 
+        </div>
       </form>
     </div>
   </div>
 </section>
 
-<section class="bg-gray-50 dark:bg-gray-950 py-8 px-4 sm:px-6 lg:px-8">
-  <div class="w-full max-w-7xl mx-auto" x-data="{ activeTab: '{{ request('tab', 'beginner') }}' }">
+@php
+  $beginnerGroups     = $beginnerCategories->filter(fn($cat) => $cat->songs->isNotEmpty());
+  $intermediateGroups = $intermediateCategories->filter(fn($cat) => $cat->songs->isNotEmpty());
+  $advancedGroups     = $advancedCategories->filter(fn($cat) => $cat->songs->isNotEmpty());
+  $allGroups          = $beginnerGroups->merge($intermediateGroups)->merge($advancedGroups);
 
-    <!-- Mobile Dropdown Navigation -->
-    <div class="block lg:hidden mb-6">
-      <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm">
-        <label for="learnsongs-mobile-filter" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-500">
-          Select Difficulty Level
-        </label>
-        <div class="relative">
-          <select
-            id="learnsongs-mobile-filter"
-            x-model="activeTab"
-            onChange="window.location.href = '?tab=' + this.value + '{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}'"
-            class="w-full appearance-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-3 pl-4 pr-12 text-base font-semibold text-gray-800 dark:text-gray-200 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
-          >
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd" />
+  $levelLabels = [
+    'beginner'     => 'Beginner',
+    'intermediate' => 'Intermediate',
+    'advanced'     => 'Advanced',
+  ];
+@endphp
+
+<section class="bg-gray-50 dark:bg-gray-950 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-7xl mx-auto" x-data="{ activeTab: '{{ request('tab', 'all') }}' }">
+
+    <!-- Mobile Dropdown -->
+    <div class="block lg:hidden mb-6" x-data="{ open: false, selected: '{{ request('tab', 'all') }}',
+      options: [
+        { value: 'all',          label: 'All' },
+        { value: 'beginner',     label: 'Beginner' },
+        { value: 'intermediate', label: 'Intermediate' },
+        { value: 'advanced',     label: 'Advanced' },
+      ],
+      get selectedLabel() { return this.options.find(o => o.value === this.selected)?.label ?? 'All'; },
+      pick(val) { this.selected = val; this.open = false; window.location.href = '?tab=' + val + '{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}'; }
+    }" @click.outside="open = false">
+
+      <!-- Trigger -->
+      <button @click="open = !open" type="button"
+        class="w-full flex items-center justify-between rounded-2xl px-5 py-4 shadow-sm transition-all duration-200 bg-[#6366F1]">
+        <p class="text-base font-bold text-white" x-text="selectedLabel"></p>
+        <svg class="w-5 h-5 text-white transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <!-- Dropdown Panel -->
+      <div x-show="open"
+        x-transition:enter="transition ease-out duration-150"
+        x-transition:enter-start="opacity-0 -translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-100"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-2"
+        style="display:none;"
+        class="mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-50">
+        <template x-for="opt in options" :key="opt.value">
+          <button @click="pick(opt.value)" type="button"
+            class="w-full flex items-center justify-between px-5 py-3.5 transition-colors duration-150 border-b border-gray-50 last:border-0"
+            :class="selected === opt.value ? 'bg-[#6366F1]' : 'hover:bg-gray-50'">
+            <span class="text-sm font-semibold" :class="selected === opt.value ? 'text-white' : 'text-gray-700'" x-text="opt.label"></span>
+            <svg x-show="selected === opt.value" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
             </svg>
-          </div>
-        </div>
+          </button>
+        </template>
       </div>
     </div>
 
-    <!-- Desktop Tab Navigation -->
-    <div class="hidden lg:flex justify-center border-b border-gray-200 dark:border-gray-800 mb-8 gap-4">
-      <a href="?tab=beginner{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}" 
-        class="py-3 px-6 font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white border-b-2 transition-all duration-200"
-        :class="activeTab === 'beginner' ? 'border-yellow-400 text-gray-900 dark:text-white' : 'border-transparent'">
-        Beginner
-      </a>
-      <a href="?tab=intermediate{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}" 
-        class="py-3 px-6 font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white border-b-2 transition-all duration-200"
-        :class="activeTab === 'intermediate' ? 'border-yellow-400 text-gray-900 dark:text-white' : 'border-transparent'">
-        Intermediate
-      </a>
-      <a href="?tab=advanced{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}" 
-        class="py-3 px-6 font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white border-b-2 transition-all duration-200"
-        :class="activeTab === 'advanced' ? 'border-yellow-400 text-gray-900 dark:text-white' : 'border-transparent'">
-        Advanced
-      </a>
+    <!-- Desktop Tabs -->
+    <div class="hidden lg:flex items-center justify-center gap-2 mb-10">
+      @php
+        $tabs = [
+          'all'          => ['label' => 'All',          'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>'],
+          'beginner'     => ['label' => 'Beginner',     'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>'],
+          'intermediate' => ['label' => 'Intermediate', 'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>'],
+          'advanced'     => ['label' => 'Advanced',     'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>'],
+        ];
+      @endphp
+
+      @foreach($tabs as $key => $tab)
+        <a href="?tab={{ $key }}{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}"
+           class="px-6 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200
+             {{ request('tab', 'all') === $key
+               ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-200'
+               : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100' }}">
+          {{ $tab['label'] }}
+        </a>
+      @endforeach
     </div>
 
-    <!-- Content List -->
-    <!-- Content List -->
+    <!-- Song Cards -->
     @php
-      $beginnerGroups = $beginnerCategories->filter(fn($cat) => $cat->songs->isNotEmpty());
-      $intermediateGroups = $intermediateCategories->filter(fn($cat) => $cat->songs->isNotEmpty());
-      $advancedGroups = $advancedCategories->filter(fn($cat) => $cat->songs->isNotEmpty());
+      $activeTab = request('tab', 'all');
+
+      $groups = match($activeTab) {
+        'beginner'     => $beginnerGroups,
+        'intermediate' => $intermediateGroups,
+        'advanced'     => $advancedGroups,
+        default        => $allGroups,
+      };
+
+      $levelMap = [];
+      foreach($beginnerCategories as $cat)     $levelMap[$cat->id] = 'beginner';
+      foreach($intermediateCategories as $cat) $levelMap[$cat->id] = 'intermediate';
+      foreach($advancedCategories as $cat)     $levelMap[$cat->id] = 'advanced';
     @endphp
 
-    <div class="mt-8">
-      <!-- Beginner tab view -->
-      <div x-show="activeTab === 'beginner'">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          @forelse($beginnerGroups as $cat)
-            @php
-              $firstCourse = $cat->songs->first();
-              $lessonCount = $cat->songs->count();
-            @endphp
-            <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-150 dark:border-gray-805 flex flex-col justify-between group">
-              <a href="/member/lesson/{{ $firstCourse->id }}" class="block relative overflow-hidden aspect-video bg-gray-100 dark:bg-gray-855">
-                @if($firstCourse->thumbnail_url)
-                  <img src="{{ $firstCourse->thumbnail_url }}" alt="{{ $cat->category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                @else
-                  <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-650 bg-gray-50 dark:bg-gray-800">
-                    <i class="fa fa-music text-4xl"></i>
-                  </div>
-                @endif
-                
-                <!-- Play Button Hover Overlay -->
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                  <div class="w-14 h-14 bg-[#0FA9A0] text-white rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition duration-300">
-                    <i class="fa fa-play text-xl ml-1"></i>
-                  </div>
-                </div>
-                
-                <!-- Lessons count badge -->
-                <div class="absolute bottom-3 right-3 bg-black/75 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
-                  {{ $lessonCount }} {{ Str::plural('Song', $lessonCount) }}
-                </div>
-              </a>
-              
-              <div class="p-6 flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug group-hover:text-[#0FA9A0] transition-colors">
-                    {{ $cat->category }}
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-405 line-clamp-2 leading-relaxed mb-5">
-                    {{ $firstCourse->description ?? 'Explore this song library category and learn chords, song structures, and techniques.' }}
-                  </p>
-                </div>
-                
-                <a href="/member/lesson/{{ $firstCourse->id }}" class="flex items-center justify-center gap-2 w-full py-3 bg-gray-55 dark:bg-gray-800 hover:bg-[#0FA9A0] hover:text-white text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-all duration-300">
-                  <i class="fa fa-play text-[10px] ml-0.5"></i> View Course
-                </a>
-              </div>
-            </div>
-          @empty
-            <div class="col-span-full text-center text-gray-500 py-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-850">
-              <i class="fa fa-music text-4xl text-gray-300 mb-3 block"></i>
-              No songs found for Beginner level.
-            </div>
-          @endforelse
-        </div>
-      </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @forelse($groups as $cat)
+        @php
+          $firstSong   = $cat->songs->first();
+          $songCount   = $cat->songs->count();
+          $level       = $levelMap[$cat->id] ?? 'beginner';
+          $levelLabel  = $levelLabels[$level];
+        @endphp
 
-      <!-- Intermediate tab view -->
-      <div x-show="activeTab === 'intermediate'">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          @forelse($intermediateGroups as $cat)
-            @php
-              $firstCourse = $cat->songs->first();
-              $lessonCount = $cat->songs->count();
-            @endphp
-            <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-150 dark:border-gray-855 flex flex-col justify-between group">
-              <a href="/member/lesson/{{ $firstCourse->id }}" class="block relative overflow-hidden aspect-video bg-gray-100 dark:bg-gray-855">
-                @if($firstCourse->thumbnail_url)
-                  <img src="{{ $firstCourse->thumbnail_url }}" alt="{{ $cat->category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                @else
-                  <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-655 bg-gray-50 dark:bg-gray-800">
-                    <i class="fa fa-music text-4xl"></i>
-                  </div>
-                @endif
-                
-                <!-- Play Button Hover Overlay -->
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                  <div class="w-14 h-14 bg-[#0FA9A0] text-white rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition duration-300">
-                    <i class="fa fa-play text-xl ml-1"></i>
-                  </div>
-                </div>
-                
-                <!-- Lessons count badge -->
-                <div class="absolute bottom-3 right-3 bg-black/75 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
-                  {{ $lessonCount }} {{ Str::plural('Song', $lessonCount) }}
-                </div>
-              </a>
-              
-              <div class="p-6 flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug group-hover:text-[#0FA9A0] transition-colors">
-                    {{ $cat->category }}
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-405 line-clamp-2 leading-relaxed mb-5">
-                    {{ $firstCourse->description ?? 'Explore this song library category and learn chords, song structures, and techniques.' }}
-                  </p>
-                </div>
-                
-                <a href="/member/lesson/{{ $firstCourse->id }}" class="flex items-center justify-center gap-2 w-full py-3 bg-gray-55 dark:bg-gray-800 hover:bg-[#0FA9A0] hover:text-white text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-all duration-300">
-                  <i class="fa fa-play text-[10px] ml-0.5"></i> View Course
-                </a>
-              </div>
-            </div>
-          @empty
-            <div class="col-span-full text-center text-gray-500 py-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-855">
-              <i class="fa fa-music text-4xl text-gray-300 mb-3 block"></i>
-              No songs found for Intermediate level.
-            </div>
-          @endforelse
-        </div>
-      </div>
+        <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
-      <!-- Advanced tab view -->
-      <div x-show="activeTab === 'advanced'">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          @forelse($advancedGroups as $cat)
-            @php
-              $firstCourse = $cat->songs->first();
-              $lessonCount = $cat->songs->count();
-            @endphp
-            <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-150 dark:border-gray-855 flex flex-col justify-between group">
-              <a href="/member/lesson/{{ $firstCourse->id }}" class="block relative overflow-hidden aspect-video bg-gray-100 dark:bg-gray-855">
-                @if($firstCourse->thumbnail_url)
-                  <img src="{{ $firstCourse->thumbnail_url }}" alt="{{ $cat->category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                @else
-                  <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-655 bg-gray-50 dark:bg-gray-800">
-                    <i class="fa fa-music text-4xl"></i>
-                  </div>
-                @endif
-                
-                <!-- Play Button Hover Overlay -->
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                  <div class="w-14 h-14 bg-[#0FA9A0] text-white rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition duration-300">
-                    <i class="fa fa-play text-xl ml-1"></i>
-                  </div>
-                </div>
-                
-                <!-- Lessons count badge -->
-                <div class="absolute bottom-3 right-3 bg-black/75 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
-                  {{ $lessonCount }} {{ Str::plural('Song', $lessonCount) }}
-                </div>
-              </a>
-              
-              <div class="p-6 flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug group-hover:text-[#0FA9A0] transition-colors">
-                    {{ $cat->category }}
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-405 line-clamp-2 leading-relaxed mb-5">
-                    {{ $firstCourse->description ?? 'Explore this song library category and learn chords, song structures, and techniques.' }}
-                  </p>
-                </div>
-                
-                <a href="/member/lesson/{{ $firstCourse->id }}" class="flex items-center justify-center gap-2 w-full py-3 bg-gray-55 dark:bg-gray-800 hover:bg-[#0FA9A0] hover:text-white text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-all duration-300">
-                  <i class="fa fa-play text-[10px] ml-0.5"></i> View Course
-                </a>
+          <!-- Thumbnail -->
+          <a href="/member/lesson/{{ $firstSong->id }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+            @if($firstSong->thumbnail_url)
+              <img src="{{ $firstSong->thumbnail_url }}" alt="{{ $cat->category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+            @else
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900 to-purple-900">
+                <i class="fa fa-music text-5xl text-white/30"></i>
+              </div>
+            @endif
+
+            <!-- Song count badge -->
+            <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
+              {{ $songCount }} {{ Str::plural('Song', $songCount) }}
+            </div>
+
+            <!-- Play overlay -->
+            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+              <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
+                <i class="fa fa-play text-indigo-600 text-sm ml-0.5"></i>
               </div>
             </div>
-          @empty
-            <div class="col-span-full text-center text-gray-500 py-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-855">
-              <i class="fa fa-music text-4xl text-gray-300 mb-3 block"></i>
-              No songs found for Advanced level.
+          </a>
+
+          <!-- Card Body -->
+          <div class="p-5 flex flex-col gap-3 flex-1">
+            <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug">
+              {{ $cat->category }}
+            </h3>
+
+            <!-- Level Badge -->
+            <div>
+              <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                {{ $levelLabel }}
+              </span>
             </div>
-          @endforelse
+
+            <!-- Watch Now Button -->
+            <a href="/member/lesson/{{ $firstSong->id }}"
+               class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
+              Watch Now
+            </a>
+          </div>
         </div>
-      </div>
+
+      @empty
+        <div class="col-span-full text-center py-20 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100">
+          <i class="fa fa-music text-5xl text-gray-200 mb-4 block"></i>
+          <p class="text-gray-500 font-medium">No songs found for this level.</p>
+        </div>
+      @endforelse
     </div>
 
   </div>
