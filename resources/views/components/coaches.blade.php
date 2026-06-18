@@ -1,35 +1,58 @@
-<section class="coaches-section py-14" style="background-color: #0d1b3e;">
+<section class="coaches-section py-14" style="
+    background-color: #05050f;
+    background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,215,54,0.07) 0%, transparent 70%),
+        linear-gradient(180deg, #05050f 0%, #0a0a1a 100%);
+    position: relative;
+    overflow: hidden;
+">
+    {{-- Grid lines --}}
+    <div style="
+        position: absolute; inset: 0; pointer-events: none;
+        background-image: linear-gradient(rgba(255,215,54,0.04) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(255,215,54,0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+    "></div>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-    <h2 class="text-center text-white font-bold mb-10"
-        style="font-size: clamp(1.4rem, 4vw, 2.2rem); letter-spacing: 0.04em;">
-        Learn To Apply
-    </h2>
+    <div class="text-center mb-10 px-4" style="position: relative; z-index: 1;">
+<h2 class="font-black" style="
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff 0%, #FFD736 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        ">
+            Learn To Apply
+        </h2>
+        <div class="mx-auto mt-4" style="width: 60px; height: 1px; background: linear-gradient(90deg, transparent, #FFD736, transparent);"></div>
+    </div>
 
     <div class="swiper coaches-swiper">
         <div class="swiper-wrapper">
 
             @php
                 $base = 'https://www.youtube.com/embed/';
-                $params = '?rel=0&modestbranding=1&playsinline=1&controls=1';
+                $params = '?rel=0&modestbranding=1&playsinline=1&controls=1&enablejsapi=1';
                 $coaches = [
-                    ['src' => $base.'JqeVxcsKu4A'.$params, 'name' => 'Coach 1'],
-                    ['src' => $base.'ckNI-O_TuRc'.$params,  'name' => 'Coach 2'],
-                    ['src' => $base.'gVtATcXUaM0'.$params,  'name' => 'Coach 3'],
-                    ['src' => $base.'F_TPjWB3dYg'.$params,  'name' => 'Coach 4'],
-                    ['src' => $base.'_kEHErnLoTk'.$params,  'name' => 'Coach 5'],
-                    ['src' => $base.'qcfC5zn1hzs'.$params,  'name' => 'Coach 6'],
-                    ['src' => $base.'HR0AU0Xd1RE'.$params,  'name' => 'Coach 7'],
-                    ['src' => $base.'ghC7W6keZ-Y'.$params,  'name' => 'Coach 8'],
-                    ['src' => $base.'yHsgcyA4tZ0'.$params,  'name' => 'Coach 9'],
+                    ['src' => $base.'XNypgaUtlRY'.$params, 'name' => 'Coach 1'],
+                    ['src' => $base.'UOBAL7mmkHY'.$params, 'name' => 'Coach 2'],
+                    ['src' => $base.'hwvpOGtSk6A'.$params, 'name' => 'Coach 3'],
+                    ['src' => $base.'gVtATcXUaM0'.$params, 'name' => 'Coach 4'],
+                    ['src' => $base.'JqeVxcsKu4A'.$params, 'name' => 'Coach 5'],
+                    ['src' => $base.'XonpAmgCHtY'.$params, 'name' => 'Coach 6'],
+                    ['src' => $base.'ckNI-O_TuRc'.$params, 'name' => 'Coach 7'],
+                    ['src' => $base.'_kEHErnLoTk'.$params, 'name' => 'Coach 8'],
+                    ['src' => $base.'yPCoUFZ6csY'.$params, 'name' => 'Coach 9'],
                 ];
             @endphp
 
             @foreach ($coaches as $coach)
             <div class="swiper-slide">
                 <div style="aspect-ratio:9/16; background:#000; border-radius:1.5rem;
-                            overflow:hidden; border:3px solid rgba(255,255,255,0.9);
+                            overflow:hidden;
                             box-shadow:0 12px 40px rgba(0,0,0,0.4);">
                     <iframe
                         src="{{ $coach['src'] }}"
@@ -99,17 +122,23 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
 (function () {
-    function updateAutoplay(swiper) {
+    function extractId(src) {
+        var match = src.match(/embed\/([^?]+)/);
+        return match ? match[1] : '';
+    }
+
+    // No autoplay — user must press play. `loop=1&playlist=<id>` makes a
+    // single YouTube embed replay itself automatically once it finishes.
+    function buildSrc(base) {
+        return base + '&loop=1&playlist=' + extractId(base);
+    }
+
+    function applyLoop(swiper) {
         swiper.slides.forEach(function (slide) {
             var iframe = slide.querySelector('iframe[data-src]');
             if (!iframe) return;
             var base = iframe.getAttribute('data-src');
-            if (slide.classList.contains('swiper-slide-active')) {
-                iframe.src = base + '&autoplay=1&mute=1';
-            } else {
-                // Reset src to stop playback on non-active slides
-                iframe.src = base;
-            }
+            iframe.src = buildSrc(base);
         });
     }
 
@@ -130,8 +159,7 @@
                 1024: { slidesPerView: 4,   spaceBetween: 22 },
             },
             on: {
-                init:                    function (s) { updateAutoplay(s); },
-                slideChangeTransitionEnd: function (s) { updateAutoplay(s); },
+                init: function (s) { applyLoop(s); },
             },
         });
     }

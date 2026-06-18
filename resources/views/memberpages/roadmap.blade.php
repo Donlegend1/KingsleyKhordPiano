@@ -44,9 +44,19 @@
           </li>
         </ul>
         <div class="mt-auto">
+          @php $b = $progress['Beginner']; @endphp
+          <div class="mb-4">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>{{ $b['completed'] }}/{{ $b['total'] }} courses completed</span>
+              <span>{{ $b['pct'] }}%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2">
+              <div class="bg-[#6366F1] h-2 rounded-full transition-all duration-500" style="width: {{ $b['pct'] }}%"></div>
+            </div>
+          </div>
           <a href="/member/course/beginner"
              class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#6366F1] hover:bg-[#4F46E5] text-white font-semibold rounded-xl transition">
-            Start Course
+            {{ $b['completed'] > 0 ? 'Continue Course' : 'Start Course' }}
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </a>
         </div>
@@ -76,9 +86,19 @@
           </li>
         </ul>
         <div class="mt-auto">
+          @php $i = $progress['Intermediate']; @endphp
+          <div class="mb-4">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>{{ $i['completed'] }}/{{ $i['total'] }} courses completed</span>
+              <span>{{ $i['pct'] }}%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2">
+              <div class="bg-[#22C55E] h-2 rounded-full transition-all duration-500" style="width: {{ $i['pct'] }}%"></div>
+            </div>
+          </div>
           <a href="/member/course/intermediate"
              class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#22C55E] hover:bg-[#16A34A] text-white font-semibold rounded-xl transition">
-            Start Course
+            {{ $i['completed'] > 0 ? 'Continue Course' : 'Start Course' }}
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </a>
         </div>
@@ -108,9 +128,19 @@
           </li>
         </ul>
         <div class="mt-auto">
+          @php $a = $progress['Advanced']; @endphp
+          <div class="mb-4">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>{{ $a['completed'] }}/{{ $a['total'] }} courses completed</span>
+              <span>{{ $a['pct'] }}%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2">
+              <div class="bg-[#EF4444] h-2 rounded-full transition-all duration-500" style="width: {{ $a['pct'] }}%"></div>
+            </div>
+          </div>
           <a href="/member/course/advanced"
              class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#EF4444] hover:bg-[#DC2626] text-white font-semibold rounded-xl transition">
-            Start Course
+            {{ $a['completed'] > 0 ? 'Continue Course' : 'Start Course' }}
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </a>
         </div>

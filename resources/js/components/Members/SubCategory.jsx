@@ -419,8 +419,8 @@ const SubCategory = () => {
 
     return (
         <>
-            <div className="flex gap-6">
-                <div className=" w-full md:w-2/3">
+            <div className="flex gap-6 justify-center">
+                <div className="w-full max-w-3xl">
                     <div className="flex-1 space-y-6 mb-5">
                         <CreatePostBox
                             handlePost={handlePost}
@@ -500,7 +500,7 @@ const SubCategory = () => {
                     </div>
                 </div>
                 {/* hidden md:block mx-4 md:mx-7 w-1/3 */}
-                <div className="hidden lg:block w-80 xl:w-96  flex-shrink-0 space-y-6">
+                <div className="hidden flex-shrink-0 space-y-6">
                     {/* Complete Your Profile Card */}
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                         <div className="flex justify-between items-center mb-6">

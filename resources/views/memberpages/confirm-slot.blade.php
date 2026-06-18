@@ -5,13 +5,13 @@
     <div class="max-w-6xl mx-auto space-y-8">
         
         <!-- Breadcrumb -->
-        <nav class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-            <a href="/home" class="hover:text-blue-600">Dashboard</a>
-            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
-            <a href="/member/live-session" class="hover:text-blue-600">Live Session</a>
-            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
-            <span class="font-semibold text-gray-800 dark:text-white">Confirm Booking</span>
-        </nav>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+            <a href="/home" class="hover:text-gray-700">Dashboard</a>
+            <span>/</span>
+            <a href="/member/live-session" class="hover:text-gray-700">Live Session</a>
+            <span>/</span>
+            <span class="text-[#6366F1] font-medium">Confirm Booking</span>
+        </div>
 
         <!-- Page Header -->
         <div class="text-center max-w-2xl mx-auto space-y-2">

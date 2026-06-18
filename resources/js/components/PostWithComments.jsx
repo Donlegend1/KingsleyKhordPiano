@@ -208,8 +208,8 @@ const PostWithComments = ({
     
     return (
         <div
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 mb-5"
-            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 mb-3 hover:bg-gray-50 transition-colors duration-150"
+            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.07)" }}
         >
             {/* Post Header */}
             <div className="flex justify-between items-start mb-4">

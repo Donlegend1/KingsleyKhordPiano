@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // System / sync jobs
         $schedule->command('subscriptions:check-expired')->dailyAt('00:00');
+        $schedule->command('booking:generate-availability')->dailyAt('00:30');
         $schedule->command('community:sync-users')->dailyAt('01:00');
         $schedule->command('stripe:sync-subscribers')->everyThreeMinutes();
 

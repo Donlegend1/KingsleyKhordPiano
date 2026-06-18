@@ -37,14 +37,30 @@ class GetstartedController extends Controller
         ]);
         
     }
-    public function roadMap() 
+    public function roadMap()
     {
         $hasAssessment = \App\Models\UserAssessment::where('user_id', auth()->id())->exists();
         if (!$hasAssessment) {
             return redirect()->route('member.quiz')->with('error', 'Please complete the assessment quiz to unlock the Course Roadmap.');
         }
 
-        return view('memberpages.roadmap');
+        $userId = auth()->id();
+        $levels = ['Beginner', 'Intermediate', 'Advanced'];
+        $progress = [];
+
+        foreach ($levels as $level) {
+            $total = \App\Models\Course::where('level', strtolower($level))->where('status', 'active')->count();
+            $completed = \App\Models\CourseProgress::where('user_id', $userId)
+                ->whereHas('course', fn($q) => $q->where('level', strtolower($level)))
+                ->count();
+            $progress[$level] = [
+                'total'     => $total,
+                'completed' => $completed,
+                'pct'       => $total > 0 ? round(($completed / $total) * 100) : 0,
+            ];
+        }
+
+        return view('memberpages.roadmap', compact('progress'));
     }
 
     public function updateGetStarted() 

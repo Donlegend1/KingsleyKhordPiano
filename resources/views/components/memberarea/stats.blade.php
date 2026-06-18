@@ -1,64 +1,6 @@
-<section class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-5 gap-6">
+<section class="max-w-7xl mx-auto px-4 py-8">
 
-  {{-- ===== LEFT: Student Progress ===== --}}
-  <div class="lg:col-span-2 p-8 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-6">
-
-    {{-- Header --}}
-    <div class="flex items-center gap-4">
-      <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-md">
-        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M3 12h4v9H3v-9zm7-5h4v14h-4V7zm7-4h4v18h-4V3z"/>
-        </svg>
-      </div>
-      <div>
-        <h2 class="text-xl font-bold text-[#1E2A3A]">Student Progress</h2>
-        <p class="text-sm text-gray-400 mt-0.5">Track your learning milestones</p>
-      </div>
-    </div>
-
-    <div class="border-t border-gray-100"></div>
-
-    {{-- Level rows --}}
-    @php $levels = ['Beginner', 'Intermediate', 'Advanced']; @endphp
-
-    @foreach ($levels as $level)
-      @php
-        $total     = $progress[$level]['total'] ?? 0;
-        $completed = $progress[$level]['completed'] ?? 0;
-        $pct       = $total > 0 ? round(($completed / $total) * 100) : 0;
-        $hasStarted = $completed > 0;
-        $colors = ['Beginner' => 'bg-violet-500', 'Intermediate' => 'bg-blue-500', 'Advanced' => 'bg-indigo-600'];
-        $barColor = $colors[$level];
-      @endphp
-
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center justify-between">
-          <span class="font-semibold text-[#1E2A3A] text-sm">{{ $level }}</span>
-          <span class="text-xs text-gray-400">{{ $pct }}%</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="text-blue-600 font-bold text-sm">{{ $completed }}/{{ $total }}</span>
-          <span class="text-gray-400 text-sm">courses completed</span>
-        </div>
-        <div class="w-full bg-gray-100 rounded-full h-2">
-          <div class="{{ $barColor }} h-2 rounded-full transition-all duration-500" style="width: {{ $pct }}%"></div>
-        </div>
-        <a href="/member/course/{{ urlencode(strtolower($level)) }}"
-           class="inline-flex items-center gap-2 self-start px-5 py-2 rounded-full border border-gray-300 text-[#1E2A3A] text-sm font-medium hover:border-blue-500 hover:text-blue-600 transition-colors">
-          {{ $hasStarted ? 'Continue' : 'Start' }} {{ $level }}
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </a>
-      </div>
-
-      @if (!$loop->last)
-        <div class="border-t border-gray-100"></div>
-      @endif
-    @endforeach
-
-  </div>
-
-
-  {{-- ===== RIGHT: Your Piano Journey ===== --}}
+  {{-- ===== Your Piano Journey ===== --}}
   @php
     $totalCompleted = collect($progress)->sum('completed');
     $totalCourses   = collect($progress)->sum('total');
@@ -173,7 +115,7 @@
     }
   @endphp
 
-  <div class="lg:col-span-3 flex flex-col gap-6">
+  <div class="flex flex-col gap-6">
     
     {{-- Header Card --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
@@ -191,10 +133,10 @@
     </div>
 
     {{-- Row 1: Resume Last Lesson & Practice Streak --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
       {{-- Resume Last Lesson --}}
-      <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
         <div class="flex items-center gap-2 mb-4">
           <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
             <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
@@ -249,7 +191,7 @@
           </div>
           
           <div class="flex items-baseline gap-1 mt-2">
-            <span class="text-4xl font-extrabold text-orange-500">{{ $streak }}</span>
+            <span class="text-4xl font-extrabold text-gray-900">{{ $streak }}</span>
             <span class="text-base font-semibold text-gray-500">days</span>
           </div>
           <p class="text-xs text-gray-400 mt-1">Keep it going!</p>
@@ -266,12 +208,22 @@
         @endphp
         <div class="flex justify-between items-center gap-1 mt-6">
           @foreach($daysOfWeek as $i => $day)
-            @php
-              $isHighlighted = in_array($i, $highlightedIndices);
-            @endphp
-            <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
-              {{ $isHighlighted ? 'bg-orange-500 text-white shadow-sm' : 'bg-gray-50 text-gray-400 border border-gray-200' }}">
-              {{ $day }}
+            @php $isHighlighted = in_array($i, $highlightedIndices); @endphp
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-semibold text-gray-900">{{ $day }}</span>
+              @if($isHighlighted)
+                <div class="w-7 h-7 rounded-full flex items-center justify-center bg-green-100">
+                  <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+              @else
+                <div class="w-7 h-7 rounded-full flex items-center justify-center bg-red-50">
+                  <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </div>
+              @endif
             </div>
           @endforeach
         </div>

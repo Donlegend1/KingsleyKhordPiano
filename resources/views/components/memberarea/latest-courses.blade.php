@@ -3,8 +3,7 @@
         {{-- Left side: Latest Courses --}}
         <div>
             <div class="flex items-center gap-3 mb-6">
-                <i class="fas fa-music text-2xl text-blue-600"></i>
-                <h2 class="text-2xl font-extrabold text-gray-900">Latest Lessons</h2>
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Latest Lessons</h2>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -59,8 +58,7 @@
         {{-- Right side: Latest Comments --}}
         <div>
             <div class="flex items-center gap-3 mb-6">
-                <i class="fas fa-comments text-2xl text-blue-600"></i>
-                <h2 class="text-2xl font-extrabold text-gray-900">Latest Comments</h2>
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Latest Comments</h2>
             </div>
             
             <div class="space-y-4">

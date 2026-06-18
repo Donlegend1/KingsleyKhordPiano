@@ -46,17 +46,11 @@
         <div class="max-w-6xl mx-auto">
 
             <!-- Breadcrumbs -->
-            <nav class="flex mb-8 text-sm text-gray-400" aria-label="Breadcrumb">
-                <ol class="flex items-center space-x-2">
-                    <li>
-                        <a href="{{ route('home') }}" class="hover:text-gray-600">Home</a>
-                    </li>
-                    <li>
-                        <span class="mx-2">></span>
-                    </li>
-                    <li class="text-gray-600 font-medium">Musical Application</li>
-                </ol>
-            </nav>
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-8">
+                <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
+                <span>/</span>
+                <span class="text-[#6366F1] font-medium">Musical Application</span>
+            </div>
 
             <!-- Hero Section -->
             <div
