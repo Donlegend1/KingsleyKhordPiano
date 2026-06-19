@@ -42,14 +42,9 @@
   {{-- ── Custom Quiz Header ── --}}
   <header class="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
     <div class="flex items-center gap-3">
-      <a href="/" class="flex items-center gap-2">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
-          KK
-        </div>
-        <span class="font-extrabold text-gray-900 text-lg tracking-tight">Gospel Keys</span>
+      <a href="{{ route('home') }}" class="flex items-center">
+        <img src="/logo/logoblack.png" alt="Kingsley Khord" class="h-9 w-auto">
       </a>
-      <span class="text-gray-300 font-light text-xl">|</span>
-      <span class="text-sm font-semibold text-gray-500">Gospel Musician Skills Assessment</span>
     </div>
 
     <div class="flex items-center gap-4">
@@ -279,8 +274,8 @@
             <p class="text-xs text-gray-500 mt-1 leading-relaxed">Your journey as a gospel musician is just beginning.</p>
           </div>
         </div>
-        <a href="/member/dashboard" class="px-5 py-3 border-2 border-emerald-500 hover:bg-emerald-500 hover:text-white text-emerald-600 rounded-xl text-xs font-bold transition flex items-center gap-2 flex-shrink-0">
-          Go to Dashboard
+        <a href="{{ route('member.roadmap') }}" class="px-5 py-3 border-2 border-emerald-500 hover:bg-emerald-500 hover:text-white text-emerald-600 rounded-xl text-xs font-bold transition flex items-center gap-2 flex-shrink-0">
+          Go to Roadmap
           <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-width-2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
           </svg>

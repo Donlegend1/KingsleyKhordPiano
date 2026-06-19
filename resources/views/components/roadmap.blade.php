@@ -90,10 +90,11 @@
       </p>
       <ul class="list-disc pl-5 space-y-2 text-base">
         <li>Roadmap for all skill levels</li>
-        <li>Premium midi files</li>
-        <li>Ear Training Quiz</li>
-        <li>Zoom Live Lessons</li>
-        <li>Supportive Community</li>
+        <li>Personalized practice plan</li>
+        <li>Songs and midi transcriptions</li>
+        <li>Downloadable resources</li>
+        <li>Monthly live sessions</li>
+        <li>Supportive community</li>
       </ul>
     </div>
   </div>

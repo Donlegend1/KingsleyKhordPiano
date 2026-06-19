@@ -99,13 +99,17 @@
 
         {{-- Right Panel – Video --}}
         <div class="w-full md:w-3/5 bg-white flex items-center justify-center min-h-[340px]">
-          <iframe
-            src="https://player.vimeo.com/video/1195123553"
-            style="border:0; max-width:100%;"
-            class="w-full h-[420px]"
-            allowfullscreen
-            allow="autoplay; fullscreen; picture-in-picture"
-          ></iframe>
+          <script src="https://fast.wistia.com/player.js" async></script>
+          <script src="https://fast.wistia.com/embed/gd8m2mxi65.js" async type="module"></script>
+          <style>
+            wistia-player[media-id='gd8m2mxi65']:not(:defined) {
+              background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/gd8m2mxi65/swatch');
+              display: block;
+              filter: blur(5px);
+              padding-top: 56.25%;
+            }
+          </style>
+          <wistia-player media-id="gd8m2mxi65" aspect="1.7777777777777777" class="w-full"></wistia-player>
         </div>
 
       </div>
@@ -450,30 +454,29 @@
   </div>{{-- end step cards wrapper --}}
 
   {{-- ── Footer Navigation ── --}}
-  <div class="max-w-5xl mx-auto w-full mt-auto border-t border-gray-100 pt-6 flex items-center justify-between">
+  <div class="max-w-5xl mx-auto w-full mt-auto border-t border-gray-100 pt-4 flex items-center justify-between gap-3 px-4 sm:px-0">
 
     <button
       @click="if (step > 1) step--"
       :disabled="step === 1"
-      class="flex items-center space-x-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
+      class="flex items-center gap-1.5 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
       </svg>
       <span>Previous</span>
     </button>
 
-    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+    <span class="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">
       Step <span x-text="step"></span> of <span x-text="totalSteps"></span>
     </span>
 
     <button
-      @click="if (step < totalSteps) step++"
-      :disabled="step === totalSteps"
-      class="flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+      @click="if (step < totalSteps) { step++ } else { window.location.href = '{{ route('home') }}' }"
+      class="flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition whitespace-nowrap"
     >
       <span x-text="step === totalSteps ? 'Finish' : 'Next Step'"></span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
       </svg>
     </button>

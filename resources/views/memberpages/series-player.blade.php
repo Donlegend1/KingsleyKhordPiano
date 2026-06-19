@@ -41,20 +41,20 @@
 
         {{-- Breadcrumb --}}
         <div class="px-6 py-3 border-b border-gray-100">
-            <div class="max-w-[1280px] mx-auto flex items-center gap-1.5 text-[13px] text-gray-500">
-                <a href="/home" class="hover:text-[#0FA9A0]">Home</a>
-                <span class="text-gray-300 text-xs">›</span>
+            <div class="max-w-[1280px] mx-auto flex items-center gap-2 text-sm text-gray-500">
+                <a href="/home" class="hover:text-gray-700">Dashboard</a>
+                <span>/</span>
                 @if($series)
-                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-[#0FA9A0]">Musical Application</a>
+                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-gray-700">Musical Application</a>
                 @else
-                    <a href="{{ route('piano.exercise.finger') }}" class="hover:text-[#0FA9A0]">Finger Exercises</a>
+                    <a href="{{ route('piano.exercise.finger') }}" class="hover:text-gray-700">Finger Exercises</a>
                 @endif
-                <span class="text-gray-300 text-xs">›</span>
+                <span>/</span>
                 <a href="{{ url()->current() . '?' . http_build_query(request()->except('video_id')) }}"
-                    class="hover:text-[#0FA9A0]">{{ ucfirst($skillLevel) }}</a>
+                    class="hover:text-gray-700">{{ ucfirst($skillLevel) }}</a>
                 @if ($activeVideo)
-                    <span class="text-gray-300 text-xs">›</span>
-                    <span class="text-gray-700 font-medium">{{ Str::title($activeVideo->title) }}</span>
+                    <span>/</span>
+                    <span class="text-[#6366F1] font-medium">{{ Str::title($activeVideo->title) }}</span>
                 @endif
             </div>
         </div>

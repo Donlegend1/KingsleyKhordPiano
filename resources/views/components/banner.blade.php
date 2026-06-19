@@ -61,8 +61,8 @@
     <img
       src="/images/first-p.png"
       alt="Kingsley Khord at the piano"
-      class="absolute inset-0 w-full h-full object-cover"
-      style="object-position: 62% 0%;"
+      class="absolute w-full object-cover"
+      style="top: 72px; left: 0; right: 0; bottom: 0; height: calc(100% - 72px); object-position: 62% 0%;"
       aria-hidden="true"
     >
 

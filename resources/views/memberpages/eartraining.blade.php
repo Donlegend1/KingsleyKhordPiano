@@ -7,10 +7,10 @@
 
     <!-- Breadcrumb & User -->
     <div class="flex justify-between items-center my-2">
-      <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-        <a href="/home" class="hover:text-blue-600">Dashboard</a>
+      <div class="flex items-center gap-2 text-sm text-gray-500">
+        <a href="/home" class="hover:text-gray-700">Dashboard</a>
         <span>/</span>
-        <a href="/member/ear-training" class="hover:text-blue-600 font-semibold">Ear Training</a>
+        <span class="text-[#6366F1] font-medium">Ear Training</span>
       </div>
       {{-- <div class="flex items-center space-x-2">
           <form method="GET" action="{{ route('ear.training') }}" class="mb-2 flex justify-end">

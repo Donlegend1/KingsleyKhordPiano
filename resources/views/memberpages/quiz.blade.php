@@ -90,14 +90,9 @@
   {{-- ── Custom Quiz Header ── --}}
   <header class="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
     <div class="flex items-center gap-3">
-      <a href="/" class="flex items-center gap-2">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
-          KK
-        </div>
-        <span class="font-extrabold text-gray-900 text-lg tracking-tight">Gospel Keys</span>
+      <a href="{{ route('home') }}" class="flex items-center">
+        <img src="/logo/logoblack.png" alt="Kingsley Khord" class="h-9 w-auto">
       </a>
-      <span class="text-gray-300 font-light text-xl">|</span>
-      <span class="text-sm font-semibold text-gray-500">Gospel Musician Skills Assessment</span>
     </div>
 
     <div class="flex items-center gap-4">

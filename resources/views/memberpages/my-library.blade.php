@@ -15,11 +15,11 @@
         days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
 
         slotsByDow: {
-            0: [{start:[9,0],end:[9,40]},  {start:[15,30],end:[16,10]}, {start:[19,20],end:[20,0]}],
-            1: [{start:[9,0],end:[9,40]},  {start:[15,30],end:[16,10]}, {start:[19,20],end:[20,0]}],
-            2: [{start:[11,30],end:[12,10]},{start:[17,0],end:[17,40]}],
-            4: [{start:[9,0],end:[9,40]},  {start:[15,30],end:[16,10]}, {start:[19,20],end:[20,0]}],
-            5: [{start:[11,30],end:[12,10]},{start:[17,0],end:[17,40]}]
+            0: [{start:[9,0],end:[9,45]},  {start:[15,30],end:[16,15]}, {start:[19,20],end:[20,5]}],
+            1: [{start:[14,0],end:[14,45]}],
+            2: [{start:[11,30],end:[12,15]},{start:[17,0],end:[17,45]}],
+            4: [{start:[18,10],end:[19,5]}],
+            5: [{start:[11,30],end:[12,15]},{start:[17,0],end:[17,45]}]
         },
 
         get todayMidnight() {
@@ -46,8 +46,8 @@
             if (this.selectedDay === null) return [];
             let dow = this.getDayOfWeek(this.selectedDay);
             let slots = this.slotsByDow[dow] || [];
-            let now = new Date();
-            let isToday = new Date(this.currentYear, this.currentMonth, this.selectedDay).getTime() === this.todayMidnight.getTime();
+            // Bookings must be made at least 24 hours in advance.
+            let cutoff = new Date(Date.now() + 24 * 60 * 60 * 1000);
             return slots
                 .map(slot => {
                     let startUtc = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.start[0] - 1, slot.start[1]));
@@ -55,7 +55,7 @@
                     let fmt = t => t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: this.userTz });
                     return { label: fmt(startUtc) + ' – ' + fmt(endUtc), startUtc };
                 })
-                .filter(s => !isToday || s.startUtc > now)
+                .filter(s => s.startUtc > cutoff)
                 .map(s => s.label);
         },
 
@@ -157,7 +157,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-400 font-medium">Duration</p>
-                            <p class="text-base font-bold text-gray-800">40 Minutes</p>
+                            <p class="text-base font-bold text-gray-800">45 Minutes</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4 px-6 py-5">
@@ -336,7 +336,7 @@
                             </div>
                             <div>
                                 <p class="text-xl font-bold text-gray-900 leading-tight" x-text="selectedDateLabel"></p>
-                                <p class="text-sm text-gray-500 mt-0.5" x-text="selectedTime + ' (40 Minutes)'"></p>
+                                <p class="text-sm text-gray-500 mt-0.5" x-text="selectedTime + ' (45 Minutes)'"></p>
                             </div>
                         </div>
 

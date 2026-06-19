@@ -15,13 +15,25 @@ use App\Mail\GuestBookingConfirmed;
 
 class GuestBookingController extends Controller
 {
+    /**
+     * Bookings must be made at least 24 hours in advance so Kingsley has time to prepare.
+     */
+    private function earliestBookableAt()
+    {
+        return now()->addHours(24);
+    }
+
     public function getAllAvailableSlots()
     {
+        $cutoff = $this->earliestBookableAt();
+
         $slots = BookingAvailability::where('date', '>=', now()->toDateString())
             ->where('is_booked', false)
             ->orderBy('date', 'asc')
             ->orderBy('time', 'asc')
-            ->get();
+            ->get()
+            ->filter(fn ($slot) => \Carbon\Carbon::parse("{$slot->date} {$slot->time}") >= $cutoff)
+            ->values();
 
         return response()->json($slots);
     }
@@ -29,10 +41,14 @@ class GuestBookingController extends Controller
     public function getAvailableSlots(Request $request)
     {
         $request->validate(['date' => 'required|date']);
-        
+
+        $cutoff = $this->earliestBookableAt();
+
         $slots = BookingAvailability::where('date', $request->date)
             ->where('is_booked', false)
-            ->get(['time']);
+            ->get(['time'])
+            ->filter(fn ($slot) => \Carbon\Carbon::parse("{$request->date} {$slot->time}") >= $cutoff)
+            ->values();
 
         return response()->json($slots);
     }
@@ -45,7 +61,7 @@ class GuestBookingController extends Controller
             'date' => 'required|date|after_or_equal:today',
             'time' => 'required',
             'focus' => 'nullable|string',
-            'skillLevel' => 'required|string',
+            'skillLevel' => 'nullable|string',
             'paymentMethod' => 'required|in:stripe,paystack',
         ]);
 
@@ -58,6 +74,10 @@ class GuestBookingController extends Controller
             return response()->json(['error' => 'This time slot is no longer available.'], 422);
         }
 
+        if (\Carbon\Carbon::parse("{$request->date} {$request->time}") < $this->earliestBookableAt()) {
+            return response()->json(['error' => 'Bookings must be made at least 24 hours in advance.'], 422);
+        }
+
         $reference = Str::uuid()->toString();
 
         $booking = GuestBooking::create([
@@ -66,7 +86,7 @@ class GuestBookingController extends Controller
             'date' => $request->date,
             'time' => $request->time,
             'focus' => $request->focus,
-            'skill_level' => $request->skillLevel,
+            'skill_level' => $request->skillLevel ?? '',
             'payment_method' => $request->paymentMethod,
             'payment_status' => 'pending',
         ]);
@@ -91,7 +111,7 @@ class GuestBookingController extends Controller
                         'product_data' => [
                             'name' => 'One-on-One Piano Lesson with Kingsley Khord',
                         ],
-                        'unit_amount' => 10 * 100, // $10.00
+                        'unit_amount' => 60 * 100, // $60.00
                     ],
                     'quantity' => 1,
                 ]],
@@ -118,7 +138,8 @@ class GuestBookingController extends Controller
         try {
             $payload = [
                 'email' => $booking->email,
-                'amount' => 15000 * 100, // ₦15,000.00 in kobo
+                'amount' => 60 * 100, // $60.00 in cents
+                'currency' => 'USD',
                 'reference' => $reference,
                 'callback_url' => route('guest-booking.success', ['provider' => 'paystack']),
                 'metadata' => [

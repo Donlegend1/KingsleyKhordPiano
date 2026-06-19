@@ -91,17 +91,17 @@
 
         {{-- Breadcrumb --}}
         <div class="px-6 py-3 border-b border-gray-100">
-            <div class="max-w-[1280px] mx-auto flex items-center gap-1.5 text-[13px] text-gray-500">
-                <a href="/home" class="hover:text-[#0FA9A0]">Dashboard</a>
-                <span class="text-gray-300 text-xs">›</span>
+            <div class="max-w-[1280px] mx-auto flex items-center gap-2 text-sm text-gray-500">
+                <a href="/home" class="hover:text-gray-700">Dashboard</a>
+                <span>/</span>
                 @if ($lessonType === 'learn_songs')
-                    <a href="{{ route('learn.songs') }}" class="hover:text-[#0FA9A0]">Learn Songs</a>
+                    <a href="{{ route('learn.songs') }}" class="hover:text-gray-700">Learn Songs</a>
                 @else
-                    <a href="{{ route('extra.courses') }}" class="hover:text-[#0FA9A0]">Extra Courses</a>
+                    <a href="{{ route('extra.courses') }}" class="hover:text-gray-700">Extra Courses</a>
                 @endif
                 @if ($lesson)
-                    <span class="text-gray-300 text-xs">›</span>
-                    <span class="text-gray-700 font-medium">{{ Str::title($lesson->title) }}</span>
+                    <span>/</span>
+                    <span class="text-[#6366F1] font-medium">{{ Str::title($lesson->title) }}</span>
                 @endif
             </div>
         </div>

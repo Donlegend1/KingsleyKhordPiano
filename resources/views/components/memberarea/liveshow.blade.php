@@ -1,8 +1,5 @@
 <div class="max-w-7xl mx-auto px-5 mt-6">
   <div class="flex items-center gap-3 mb-1">
-    <div class="inline-flex items-center justify-center bg-[#F2EDED] p-2 rounded-full">
-      <img src="/icons/diamondred.png" alt="Premium Icon" class="w-6 h-6">
-    </div>
     <p class="text-[#1E1B4B] text-[28px] font-sf font-bold">Live Show</p>
   </div>
   <p class="text-[#5E6779] mt-1 font-sf">
