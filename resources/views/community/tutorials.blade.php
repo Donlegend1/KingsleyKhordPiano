@@ -57,43 +57,19 @@
             @endif
           </div>
 
-          {{-- Body Info --}}
-          <div class="p-5 flex-grow">
-            <h3 class="text-base font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition line-clamp-2">
+          {{-- Footer --}}
+          <div class="p-5">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
               {{ $t->title }}
             </h3>
-            @if($t->description)
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed line-clamp-2">
-                {{ $t->description }}
-              </p>
-            @endif
-          </div>
-
-          {{-- Footer --}}
-          <div class="px-5 py-4 bg-gray-50 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              @if($t->author_avatar)
-                <img src="{{ $avatar }}" class="w-6 h-6 rounded-full object-cover ring-2 ring-indigo-500/10">
-              @else
-                <div class="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center text-[10px] font-bold text-indigo-500 ring-2 ring-indigo-500/10">
-                  {{ strtoupper(substr($t->author_name, 0, 1)) }}
-                </div>
-              @endif
-              <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                {{ $t->author_name }}
-              </span>
-              @if($t->level)
-                <span class="text-[10px] text-gray-400 dark:text-gray-500">
-                  &bull; <span class="font-bold text-indigo-500 dark:text-indigo-400">{{ $t->level }}</span>
-                </span>
-              @endif
-            </div>
-            
-            {{-- Options Dots --}}
-            <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">
+            <button
+              @click="activeVideo = '{{ $t->video_url }}'; activeType = '{{ $t->video_type }}'"
+              class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2.5 rounded-xl transition"
+            >
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                <path d="M8 5v14l11-7z"/>
               </svg>
+              Watch Now
             </button>
           </div>
 

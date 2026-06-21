@@ -184,208 +184,189 @@ const PremiumVideoSection = () => {
             )}
 
             {/* Video Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {videos.map((video) => {
                     const date = dayjs(video.start_time);
                     const isRestricted = video.access_type === "premium" && !isPremium;
                     const isPast = date.isBefore(dayjs());
                     const isToday = date.isSame(dayjs(), 'day');
-                    const hasVideoLink = !!video.recording_url; // or zoom_link for live
                     const countdown = countdowns[video.id] || { days: 0, hours: 0, minutes: 0, seconds: 0 };
+                    const isSession = video.category === "session";
 
                     return (
                         <div
                             key={video.id}
-                            className="relative group h-[420px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(255,215,54,0.15)] bg-gray-900"
+                            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 flex flex-col transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                         >
-                            {/* Background Image with dynamic overlay */}
-                            <div 
-                                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                style={{ 
-                                    backgroundImage: `url('${isPast && video.thumbnail ? video.thumbnail : "/images/Background.jpg"}')` 
-                                }}
-                            ></div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/20 opacity-95 transition-opacity duration-500 group-hover:opacity-100"></div>
-
-                            {/* Premium Badge */}
-                            {video.access_type === "premium" && (
-                                <div className="absolute top-5 right-5 z-20">
-                                    <div className="flex items-center gap-2 bg-red-600/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-xl border border-white/20">
-                                        <img src="/icons/diamondred.png" alt="Premium" className="w-3.5 h-3.5 animate-pulse" />
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isSession ? "bg-indigo-50" : "bg-red-50"}`}>
+                                        <i className={`fa-solid ${isSession ? "fa-users text-indigo-600" : "fa-tower-broadcast text-red-500"} text-sm`}></i>
+                                    </div>
+                                    {isPast ? (
+                                        <span className="text-sky-700 text-[11px] font-bold uppercase tracking-widest bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full">Past Show</span>
+                                    ) : isSession ? (
+                                        <span className="text-indigo-600 text-[11px] font-bold uppercase tracking-widest bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-full">Live Session</span>
+                                    ) : (
+                                        <span className="text-amber-600 text-[11px] font-bold uppercase tracking-widest bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">Live Event</span>
+                                    )}
+                                </div>
+                                {video.access_type === "premium" && (
+                                    <div className="flex items-center gap-1 bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full">
+                                        <img src="/icons/diamondred.png" alt="Premium" className="w-3 h-3" />
                                         Premium
                                     </div>
-                                </div>
-                            )}
-
-                            {/* Content Container */}
-                            <div className="relative z-10 h-full flex flex-col justify-end p-8">
-                                 {/* Header Info */}
-                                 <div className="mb-6 transform transition-transform duration-500 group-hover:-translate-y-2">
-                                     <div className="flex items-center gap-3 mb-2">
-                                         {video.category === "session" ? (
-                                             <div className="p-2 bg-indigo-600/20 backdrop-blur-md rounded-lg border border-indigo-600/30">
-                                                 <i className="fa-solid fa-users text-indigo-400 text-sm"></i>
-                                             </div>
-                                         ) : (
-                                             <div className="p-2 bg-red-600/20 backdrop-blur-md rounded-lg border border-red-600/30">
-                                                 <i className="fa-solid fa-tower-broadcast text-red-500 text-sm"></i>
-                                             </div>
-                                         )}
-                                         {isPast ? (
-                                             <span className="text-sky-400 text-xs font-black uppercase tracking-widest bg-sky-400/10 px-2.5 py-1 rounded-md border border-sky-400/20 shadow-[0_0_15px_rgba(56,189,248,0.1)]">Past Show</span>
-                                         ) : video.category === "session" ? (
-                                             <span className="text-indigo-400 text-xs font-bold uppercase tracking-widest bg-indigo-400/10 px-2.5 py-1 rounded-md border border-indigo-400/20 shadow-[0_0_15px_rgba(79,70,229,0.1)]">Live Session</span>
-                                         ) : (
-                                             <span className="text-yellow-400 text-xs font-bold uppercase tracking-widest bg-yellow-400/10 px-2.5 py-1 rounded-md border border-yellow-400/20 shadow-[0_0_15px_rgba(250,204,21,0.1)]">Live Event</span>
-                                         )}
-                                     </div>
-                                     <h3 className="text-2xl font-black text-white leading-tight mb-2 tracking-tight group-hover:text-[#FFD736] transition-colors line-clamp-2">
-                                         {video.title}
-                                     </h3>
-                                     <div className="flex items-center gap-4 text-white/70 text-sm font-medium">
-                                         <div className="flex items-center gap-1.5">
-                                             <i className="fa-regular fa-calendar text-[#FFD736]"></i>
-                                             {date.format("MMM DD, YYYY")}
-                                         </div>
-                                         <div className="flex items-center gap-1.5">
-                                             <i className="fa-regular fa-clock text-[#FFD736]"></i>
-                                             {date.format("HH:mm")} (WAT)
-                                         </div>
-                                     </div>
-                                 </div>
-
-                                 {/* Custom Content Area (Past vs Future) */}
-                                 {isPast ? (
-                                     <div className="mb-8">
-                                         {video.recording_url ? (
-                                             <div 
-                                                 onClick={() => handleVideoClick(video)}
-                                                 className="flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl cursor-pointer transition-colors shadow-lg group/btn"
-                                             >
-                                                 <i className="fa-solid fa-play-circle text-xl animate-pulse group-hover/btn:scale-110 transition-transform"></i>
-                                                 <span className="font-black text-sm uppercase tracking-widest">Watch Recording</span>
-                                             </div>
-                                         ) : (
-                                             <div className="flex items-center justify-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 text-white/50 py-3 rounded-xl">
-                                                 <i className="fa-solid fa-circle-info mt-0.5"></i>
-                                                 <span className="font-bold text-xs uppercase tracking-widest">Live Show Ended</span>
-                                             </div>
-                                         )}
-                                     </div>
-                                 ) : (
-                                     <>
-                                         {/* Session Seats Filled vs Event Countdown */}
-                                         {video.category === "session" ? (
-                                             <div className="flex flex-col gap-3 mb-8 transform transition-all duration-500 group-hover:-translate-y-1">
-                                                 <div className="flex items-center justify-between bg-white/5 backdrop-blur-xl rounded-2xl p-3 border border-white/10 shadow-lg">
-                                                     <div className="flex items-center gap-2">
-                                                         <div className="w-7 h-7 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300">
-                                                             <i className="fa-solid fa-users text-xs"></i>
-                                                         </div>
-                                                         <div className="flex flex-col">
-                                                             <span className="text-[9px] font-bold text-white/50 uppercase tracking-wider">Seats Filled</span>
-                                                             <span className="text-xs font-black text-white">{video.bookings_count ?? 0} / {video.max_slots ?? 5}</span>
-                                                         </div>
-                                                     </div>
-                                                     
-                                                     {/* Overlapping avatars */}
-                                                     <div className="flex -space-x-1.5 overflow-hidden">
-                                                         {video.bookings && video.bookings.slice(0, 3).map((b) => {
-                                                             const avatar = b.passport 
-                                                                 ? (b.passport.startsWith('http') ? b.passport : '/' + b.passport) 
-                                                                 : '/images/default-avatar.png';
-                                                             return (
-                                                                 <img 
-                                                                     key={b.id} 
-                                                                     src={avatar} 
-                                                                     className="inline-block h-6 w-6 rounded-full ring-2 ring-gray-950 object-cover" 
-                                                                     alt="Avatar"
-                                                                     title={`${b.first_name} ${b.last_name}`}
-                                                                     onError={(e) => { e.target.src = '/images/default-avatar.png'; }}
-                                                                 />
-                                                             );
-                                                         })}
-                                                         {video.bookings_count > 3 && (
-                                                             <div className="inline-flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-gray-950 bg-indigo-600 text-white text-[9px] font-black">
-                                                                 +{video.bookings_count - 3}
-                                                             </div>
-                                                         )}
-                                                     </div>
-                                                 </div>
-                                             </div>
-                                         ) : (
-                                             /* Countdown Blocks */
-                                             <div className="grid grid-cols-4 gap-2 mb-8 transform transition-all duration-500 group-hover:-translate-y-1">
-                                                 {[
-                                                     { label: 'Days', val: countdown.days },
-                                                     { label: 'Hours', val: countdown.hours },
-                                                     { label: 'Min', val: countdown.minutes },
-                                                     { label: 'Sec', val: countdown.seconds }
-                                                 ].map((unit, i) => (
-                                                     <div key={i} className="flex flex-col items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl p-2 border border-white/10 shadow-lg">
-                                                         <span className="text-xl font-black text-white tabular-nums">{unit.val ?? '-'}</span>
-                                                         <span className="text-[9px] font-bold text-white/50 uppercase tracking-tighter">{unit.label}</span>
-                                                     </div>
-                                                 ))}
-                                             </div>
-                                         )}
-
-                                         {/* Action Buttons for future shows */}
-                                         <div className="flex flex-col gap-3">
-                                             {video.category === "session" ? (
-                                                 isToday ? (
-                                                     <a
-                                                         href={isRestricted ? "#" : video.zoom_link}
-                                                         onClick={isRestricted ? handleVideoClick : undefined}
-                                                         className="w-full py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
-                                                     >
-                                                         Join the Live Show
-                                                     </a>
-                                                 ) : video.booked_by_user ? (
-                                                     <a
-                                                         href={isRestricted ? "#" : video.zoom_link}
-                                                         onClick={isRestricted ? handleVideoClick : undefined}
-                                                         className="w-full py-3.5 rounded-xl bg-green-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-green-500/20 hover:bg-green-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
-                                                     >
-                                                         Enter Live Session
-                                                     </a>
-                                                 ) : video.bookings_count >= video.max_slots ? (
-                                                     <button
-                                                         disabled
-                                                         className="w-full py-3.5 rounded-xl bg-gray-700 text-gray-400 text-sm font-black text-center uppercase tracking-widest cursor-not-allowed"
-                                                     >
-                                                         Slot Full
-                                                     </button>
-                                                 ) : (
-                                                     <a
-                                                         href={isRestricted ? "#" : `/member/live-session/${video.id}/confirm`}
-                                                         onClick={isRestricted ? (e) => { e.preventDefault(); handleVideoClick(video); } : undefined}
-                                                         className="w-full py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
-                                                     >
-                                                         Join the Slot
-                                                     </a>
-                                                 )
-                                             ) : (
-                                                 <a
-                                                     href={isRestricted ? "#" : video.zoom_link}
-                                                     onClick={isRestricted ? handleVideoClick : undefined}
-                                                     className="w-full py-3.5 rounded-xl bg-red-600 text-white text-sm font-black text-center uppercase tracking-widest shadow-xl shadow-red-500/20 hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-all duration-300"
-                                                 >
-                                                     {video.zoom_link ? "Join Live Show" : "Enter Live Show"}
-                                                 </a>
-                                             )}
-                                             <a
-                                                 href={isRestricted ? "#" : `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(video.title)}&dates=${date.format("YYYYMMDDTHHmmss")}/${date.add(1, "hour").format("YYYYMMDDTHHmmss")}&details=${encodeURIComponent(video.zoom_link || video.category)}`}
-                                                 onClick={isRestricted ? handleVideoClick : undefined}
-                                                 className="w-full py-3 rounded-xl border border-white/20 bg-white/5 backdrop-blur-md text-white text-[11px] font-bold text-center uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-300"
-                                             >
-                                                 <i className="fa-regular fa-calendar-plus mr-2"></i>
-                                                 Add to Calendar
-                                             </a>
-                                         </div>
-                                     </>
-                                 )}
+                                )}
                             </div>
+
+                            <h3 className="text-lg font-bold text-gray-900 leading-tight mb-3 line-clamp-2">
+                                {video.title}
+                            </h3>
+
+                            <div className="flex items-center gap-4 text-gray-500 text-sm font-medium mb-6">
+                                <div className="flex items-center gap-1.5">
+                                    <i className="fa-regular fa-calendar text-gray-400"></i>
+                                    {date.format("MMM DD, YYYY")}
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <i className="fa-regular fa-clock text-gray-400"></i>
+                                    {date.format("HH:mm")} (WAT)
+                                </div>
+                            </div>
+
+                            {/* Custom Content Area (Past vs Future) */}
+                            {isPast ? (
+                                <div className="mt-auto">
+                                    {video.recording_url ? (
+                                        <button
+                                            onClick={() => handleVideoClick(video)}
+                                            className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition-colors shadow-sm shadow-red-200"
+                                        >
+                                            <i className="fa-solid fa-play-circle"></i>
+                                            <span className="font-bold text-sm uppercase tracking-widest">Watch Recording</span>
+                                        </button>
+                                    ) : (
+                                        <div className="flex items-center justify-center gap-2 bg-gray-50 border border-gray-100 text-gray-400 py-3 rounded-xl">
+                                            <i className="fa-solid fa-circle-info"></i>
+                                            <span className="font-bold text-xs uppercase tracking-widest">Live Show Ended</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Session Seats Filled vs Event Countdown */}
+                                    {isSession ? (
+                                        <div className="flex items-center justify-between mb-6 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3.5">
+                                            <div className="flex items-center gap-2">
+                                                <i className="fa-solid fa-users text-indigo-500 text-sm"></i>
+                                                <div>
+                                                    <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">Seats Filled</p>
+                                                    <p className="text-base font-bold text-gray-900 leading-none">
+                                                        {video.bookings_count ?? 0} / {video.max_slots ?? 5}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Overlapping avatars */}
+                                            <div className="flex -space-x-2">
+                                                {video.bookings && video.bookings.slice(0, 3).map((b) => {
+                                                    const avatar = b.passport
+                                                        ? (b.passport.startsWith('http') ? b.passport : '/' + b.passport)
+                                                        : null;
+                                                    return avatar ? (
+                                                        <img
+                                                            key={b.id}
+                                                            src={avatar}
+                                                            className="h-7 w-7 rounded-full ring-2 ring-white object-cover"
+                                                            alt="Avatar"
+                                                            title={`${b.first_name} ${b.last_name}`}
+                                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                                        />
+                                                    ) : (
+                                                        <div key={b.id} className="h-7 w-7 rounded-full ring-2 ring-white bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-600">
+                                                            {(b.first_name || "?").charAt(0).toUpperCase()}
+                                                        </div>
+                                                    );
+                                                })}
+                                                {video.bookings_count > 3 && (
+                                                    <div className="h-7 w-7 rounded-full ring-2 ring-white bg-indigo-500 flex items-center justify-center text-[10px] font-bold text-white">
+                                                        +{video.bookings_count - 3}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* Countdown Blocks */
+                                        <div className="grid grid-cols-4 gap-2 mb-6">
+                                            {[
+                                                { label: 'Days', val: countdown.days },
+                                                { label: 'Hours', val: countdown.hours },
+                                                { label: 'Min', val: countdown.minutes },
+                                                { label: 'Sec', val: countdown.seconds }
+                                            ].map((unit, i) => (
+                                                <div key={i} className="flex flex-col items-center justify-center bg-gray-50 rounded-xl py-2.5 border border-gray-100">
+                                                    <span className="text-lg font-bold text-gray-900 tabular-nums">{unit.val ?? '-'}</span>
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">{unit.label}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Action Buttons for future shows */}
+                                    <div className="flex flex-col gap-2.5 mt-auto">
+                                        {isSession ? (
+                                            isToday ? (
+                                                <a
+                                                    href={isRestricted ? "#" : video.zoom_link}
+                                                    onClick={isRestricted ? handleVideoClick : undefined}
+                                                    className="w-full py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center uppercase tracking-widest shadow-sm shadow-indigo-200 hover:bg-indigo-700 transition-all duration-200"
+                                                >
+                                                    Join the Live Show
+                                                </a>
+                                            ) : video.booked_by_user ? (
+                                                <a
+                                                    href={isRestricted ? "#" : video.zoom_link}
+                                                    onClick={isRestricted ? handleVideoClick : undefined}
+                                                    className="w-full py-3.5 rounded-xl bg-green-600 text-white text-sm font-bold text-center uppercase tracking-widest shadow-sm shadow-green-200 hover:bg-green-700 transition-all duration-200"
+                                                >
+                                                    Enter Live Session
+                                                </a>
+                                            ) : video.bookings_count >= video.max_slots ? (
+                                                <button
+                                                    disabled
+                                                    className="w-full py-3.5 rounded-xl bg-gray-100 text-gray-400 text-sm font-bold text-center uppercase tracking-widest cursor-not-allowed"
+                                                >
+                                                    Slot Full
+                                                </button>
+                                            ) : (
+                                                <a
+                                                    href={isRestricted ? "#" : `/member/live-session/${video.id}/confirm`}
+                                                    onClick={isRestricted ? (e) => { e.preventDefault(); handleVideoClick(video); } : undefined}
+                                                    className="w-full py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center uppercase tracking-widest shadow-sm shadow-indigo-200 hover:bg-indigo-700 transition-all duration-200"
+                                                >
+                                                    Join the Slot
+                                                </a>
+                                            )
+                                        ) : (
+                                            <a
+                                                href={isRestricted ? "#" : video.zoom_link}
+                                                onClick={isRestricted ? handleVideoClick : undefined}
+                                                className="w-full py-3.5 rounded-xl bg-red-500 text-white text-sm font-bold text-center uppercase tracking-widest shadow-sm shadow-red-200 hover:bg-red-600 transition-all duration-200"
+                                            >
+                                                {video.zoom_link ? "Join Live Show" : "Enter Live Show"}
+                                            </a>
+                                        )}
+                                        <a
+                                            href={isRestricted ? "#" : `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(video.title)}&dates=${date.format("YYYYMMDDTHHmmss")}/${date.add(1, "hour").format("YYYYMMDDTHHmmss")}&details=${encodeURIComponent(video.zoom_link || video.category)}`}
+                                            onClick={isRestricted ? handleVideoClick : undefined}
+                                            className="w-full py-3 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold text-center uppercase tracking-widest hover:bg-gray-50 transition-all duration-200"
+                                        >
+                                            <i className="fa-regular fa-calendar-plus mr-2"></i>
+                                            Add to Calendar
+                                        </a>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     );
                 })}

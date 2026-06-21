@@ -31,6 +31,8 @@ use App\Http\Controllers\PremiumChatController;
 use App\Http\Controllers\WebsiteVideoController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\BookMarkController;
+use App\Http\Controllers\LessonCompletionController;
+use App\Http\Controllers\LiveCoachingBookingController;
 use App\Http\Controllers\MidiFileController;
 use App\Http\Controllers\EmailCampaignController;
 use App\Http\Controllers\PDFDownloadController;
@@ -67,6 +69,10 @@ Route::get('/about', function () {
 Route::get('/shop', function () {
     return view('shop', ['pageTitle' => 'About Us']);
 });
+
+Route::get('/book-session', function () {
+    return view('book-session', ['pageTitle' => 'Book a Session']);
+})->name('book-session');
 
 Route::get('/contact', function () {
     return view('contact', ['pageTitle' => 'Contact']);
@@ -145,7 +151,8 @@ Route::post('/contact/send', [ContactController::class, 'create']);
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('roadmap', [GetstartedController::class, 'roadmap'])->name('member.roadmap');
     Route::get('library', [GetstartedController::class, 'library'])->name('member.library');
-    Route::get('my-library', fn() => view('memberpages.my-library'))->name('member.my-library');
+    Route::get('my-library', [LiveCoachingBookingController::class, 'index'])->name('member.my-library');
+    Route::post('my-library/book', [LiveCoachingBookingController::class, 'store'])->name('member.my-library.book');
     Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
@@ -173,10 +180,12 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('profile', [HomeController::class, 'profile']);
     Route::post('whatsapp-preference', [HomeController::class, 'updateWhatsappPreference']);
+    Route::post('timezone', [HomeController::class, 'updateTimezone'])->name('member.timezone');
     Route::get('/shop', [ShopController::class, 'index']);
     Route::get('support', [HomeController::class, 'support']);
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
+    Route::get('/library', [CommunityIndexController::class, 'index'])->name('member.library');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
     Route::get('/community/leaderboard', [CommunityIndexController::class, 'leaderboard'])->name('community.leaderboard');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
@@ -204,6 +213,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community/u/{community}/update', [CommunityController::class, 'edit']);
     Route::get('bookmark', [BookMarkController::class, 'bookmark']);
     Route::post('/bookmark/toggle', [BookmarkController::class, 'toggle'])->name('bookmark.toggle');
+    Route::post('/lesson-completion', [LessonCompletionController::class, 'store'])->name('lesson.complete');
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {

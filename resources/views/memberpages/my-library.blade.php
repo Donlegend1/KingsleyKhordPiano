@@ -9,10 +9,18 @@
         selectedDay: null,
         selectedTime: null,
         confirmed: false,
+        calendarMenuOpen: false,
+        booking: false,
+        bookingError: '',
         userTz: Intl.DateTimeFormat().resolvedOptions().timeZone,
         userTzLabel: '',
         months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
         days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+
+        sessionsUsed: {{ $sessionsUsed }},
+        sessionsIncluded: {{ $sessionsIncluded }},
+        nextResetLabel: {{ json_encode($nextResetLabel) }},
+        bookedSlotsByDate: {{ json_encode($bookedSlots) }},
 
         slotsByDow: {
             0: [{start:[9,0],end:[9,45]},  {start:[15,30],end:[16,15]}, {start:[19,20],end:[20,5]}],
@@ -42,10 +50,22 @@
             return date < this.todayMidnight || date > this.maxDate;
         },
 
+        pad(n) { return String(n).padStart(2, '0'); },
+
+        dateKeyFor(day) {
+            return this.currentYear + '-' + this.pad(this.currentMonth + 1) + '-' + this.pad(day);
+        },
+
+        isSlotBooked(dateKey, timeStr) {
+            let booked = this.bookedSlotsByDate[dateKey] || [];
+            return booked.includes(timeStr);
+        },
+
         get convertedSlots() {
             if (this.selectedDay === null) return [];
             let dow = this.getDayOfWeek(this.selectedDay);
             let slots = this.slotsByDow[dow] || [];
+            let dateKey = this.dateKeyFor(this.selectedDay);
             // Bookings must be made at least 24 hours in advance.
             let cutoff = new Date(Date.now() + 24 * 60 * 60 * 1000);
             return slots
@@ -53,10 +73,122 @@
                     let startUtc = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.start[0] - 1, slot.start[1]));
                     let endUtc   = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.end[0]   - 1, slot.end[1]));
                     let fmt = t => t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: this.userTz });
-                    return { label: fmt(startUtc) + ' – ' + fmt(endUtc), startUtc };
+                    let time = this.pad(slot.start[0]) + ':' + this.pad(slot.start[1]) + ':00';
+                    return {
+                        time,
+                        label: fmt(startUtc) + ' – ' + fmt(endUtc),
+                        startUtc,
+                        booked: this.isSlotBooked(dateKey, time),
+                    };
                 })
-                .filter(s => s.startUtc > cutoff)
-                .map(s => s.label);
+                .filter(s => s.startUtc > cutoff);
+        },
+
+        // Re-derives the raw HH:MM:SS time for the selected slot (needed for
+        // the booking request — convertedSlots labels are display-only).
+        get selectedSlotTime() {
+            if (this.selectedDay === null || !this.selectedTime) return null;
+            let match = this.convertedSlots.find(s => s.label === this.selectedTime);
+            return match ? match.time : null;
+        },
+
+        async bookSlot() {
+            if (this.selectedDay === null || !this.selectedTime || this.booking) return;
+            this.booking = true;
+            this.bookingError = '';
+            let dateKey = this.dateKeyFor(this.selectedDay);
+            let time = this.selectedSlotTime;
+            try {
+                const response = await fetch('{{ route('member.my-library.book') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    },
+                    body: JSON.stringify({ date: dateKey, time }),
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    this.bookingError = data.error || 'Something went wrong. Please try again.';
+                    if (!this.bookedSlotsByDate[dateKey]) this.bookedSlotsByDate[dateKey] = [];
+                    if (!this.bookedSlotsByDate[dateKey].includes(time)) this.bookedSlotsByDate[dateKey].push(time);
+                    this.selectedTime = null;
+                    return;
+                }
+                this.sessionsUsed++;
+                this.confirmed = true;
+            } catch (e) {
+                this.bookingError = 'Something went wrong. Please try again.';
+            } finally {
+                this.booking = false;
+            }
+        },
+
+        // Re-derives the actual start/end Date objects for the selected slot
+        // (convertedSlots only exposes formatted label strings for display).
+        get selectedSlotRange() {
+            if (this.selectedDay === null || !this.selectedTime) return null;
+            let dow = this.getDayOfWeek(this.selectedDay);
+            let slots = this.slotsByDow[dow] || [];
+            for (let slot of slots) {
+                let startUtc = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.start[0] - 1, slot.start[1]));
+                let endUtc   = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.end[0]   - 1, slot.end[1]));
+                let fmt = t => t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: this.userTz });
+                if ((fmt(startUtc) + ' – ' + fmt(endUtc)) === this.selectedTime) {
+                    return { startUtc, endUtc };
+                }
+            }
+            return null;
+        },
+
+        icsDate(d) {
+            return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        },
+
+        get googleCalendarUrl() {
+            let range = this.selectedSlotRange;
+            if (!range) return '#';
+            let title = encodeURIComponent('Live Piano Coaching Session with Kingsley Khord');
+            let details = encodeURIComponent('Your one-on-one piano coaching session with Kingsley Khord.');
+            let dates = this.icsDate(range.startUtc) + '/' + this.icsDate(range.endUtc);
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}`;
+        },
+
+        get outlookCalendarUrl() {
+            let range = this.selectedSlotRange;
+            if (!range) return '#';
+            let title = encodeURIComponent('Live Piano Coaching Session with Kingsley Khord');
+            let details = encodeURIComponent('Your one-on-one piano coaching session with Kingsley Khord.');
+            return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${range.startUtc.toISOString()}&enddt=${range.endUtc.toISOString()}&body=${details}&path=/calendar/action/compose&rru=addevent`;
+        },
+
+        downloadIcs() {
+            let range = this.selectedSlotRange;
+            if (!range) return;
+            let ics = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'BEGIN:VEVENT',
+                'UID:' + Date.now() + '@kingsleykhord.com',
+                'DTSTAMP:' + this.icsDate(new Date()),
+                'DTSTART:' + this.icsDate(range.startUtc),
+                'DTEND:' + this.icsDate(range.endUtc),
+                'SUMMARY:Live Piano Coaching Session with Kingsley Khord',
+                'DESCRIPTION:Your one-on-one piano coaching session with Kingsley Khord.',
+                'END:VEVENT',
+                'END:VCALENDAR',
+            ].join('\r\n');
+            let blob = new Blob([ics], { type: 'text/calendar' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'piano-coaching-session.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            this.calendarMenuOpen = false;
         },
 
         get monthName() { return this.months[this.currentMonth]; },
@@ -134,6 +266,12 @@
             <h1 class="text-2xl font-bold text-gray-900 mb-1">Book Your Live Coaching Session</h1>
             <p class="text-sm text-gray-500 mb-7">You get 1 free live coaching session every month as part of your membership.</p>
 
+            <div x-show="sessionsUsed >= sessionsIncluded" x-cloak
+                class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-5 py-4 mb-6 text-sm">
+                You've used your free session for this month. Your next session becomes available on
+                <span class="font-bold" x-text="nextResetLabel"></span>.
+            </div>
+
             <!-- Stats Row -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">
                 <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100">
@@ -145,7 +283,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-400 font-medium">Monthly Session</p>
-                            <p class="text-xl font-bold text-amber-500 leading-tight">0 <span class="text-gray-300 font-light">/</span> 1</p>
+                            <p class="text-xl font-bold text-amber-500 leading-tight"><span x-text="sessionsUsed"></span> <span class="text-gray-300 font-light">/</span> <span x-text="sessionsIncluded"></span></p>
                             <p class="text-[11px] text-gray-400">Sessions used</p>
                         </div>
                     </div>
@@ -179,7 +317,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-400 font-medium">Next Reset</p>
-                            <p class="text-base font-bold text-gray-800">July 1, 2026</p>
+                            <p class="text-base font-bold text-gray-800" x-text="nextResetLabel"></p>
                         </div>
                     </div>
                 </div>
@@ -251,18 +389,22 @@
                         </div>
 
                         <div class="flex flex-col gap-3 flex-1" x-show="selectedDay !== null && convertedSlots.length > 0" x-transition>
-                            <template x-for="slot in convertedSlots" :key="slot">
+                            <template x-for="slot in convertedSlots" :key="slot.time">
                                 <label
-                                    class="flex items-center gap-4 px-5 py-4 rounded-xl border cursor-pointer transition-all duration-150"
-                                    :class="selectedTime === slot
-                                        ? 'border-amber-500 bg-amber-50 ring-1 ring-amber-400'
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
-                                    <input type="radio" name="time" :value="slot" x-model="selectedTime" class="hidden">
+                                    class="flex items-center gap-4 px-5 py-4 rounded-xl border transition-all duration-150"
+                                    :class="slot.booked
+                                        ? 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60'
+                                        : (selectedTime === slot.label
+                                            ? 'border-amber-500 bg-amber-50 ring-1 ring-amber-400 cursor-pointer'
+                                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 cursor-pointer')">
+                                    <input type="radio" name="time" :value="slot.label" :disabled="slot.booked"
+                                        @change="selectedTime = slot.label" :checked="selectedTime === slot.label" class="hidden">
                                     <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition"
-                                        :class="selectedTime === slot ? 'border-amber-500' : 'border-gray-300'">
-                                        <div class="w-2.5 h-2.5 rounded-full bg-amber-500 transition" x-show="selectedTime === slot"></div>
+                                        :class="slot.booked ? 'border-gray-300' : (selectedTime === slot.label ? 'border-amber-500' : 'border-gray-300')">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-amber-500 transition" x-show="!slot.booked && selectedTime === slot.label"></div>
                                     </div>
-                                    <span class="text-sm font-semibold text-gray-700" x-text="slot"></span>
+                                    <span class="text-sm font-semibold flex-1" :class="slot.booked ? 'text-gray-400' : 'text-gray-700'" x-text="slot.label"></span>
+                                    <span x-show="slot.booked" class="text-[10px] font-bold text-gray-400 uppercase tracking-wide bg-gray-100 px-2 py-1 rounded-full">Booked</span>
                                 </label>
                             </template>
                         </div>
@@ -275,14 +417,16 @@
                             Pick an available date to see time slots.
                         </div>
 
+                        <p x-show="bookingError" x-text="bookingError" class="mt-3 text-sm text-red-600 font-medium"></p>
+
                         <button
-                            @click="if (selectedDay !== null && selectedTime !== null) confirmed = true"
+                            @click="bookSlot()"
                             class="mt-6 w-full py-4 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-200"
-                            :class="selectedDay !== null && selectedTime !== null
+                            :class="selectedDay !== null && selectedTime !== null && !booking
                                 ? 'bg-gray-900 text-white hover:bg-gray-700 shadow-md'
                                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
-                            :disabled="selectedDay === null || selectedTime === null">
-                            Continue to Confirm
+                            :disabled="selectedDay === null || selectedTime === null || booking">
+                            <span x-text="booking ? 'Booking...' : 'Continue to Confirm'"></span>
                         </button>
                     </div>
 
@@ -294,6 +438,12 @@
 
         <!-- ─── CONFIRMATION VIEW ─── -->
         <div x-show="confirmed" x-transition>
+
+            <nav class="flex items-center gap-1.5 text-xs text-gray-400 mb-3">
+                <a href="/home" class="hover:text-gray-600">Dashboard</a>
+                <span>/</span>
+                <span class="text-gray-600 font-semibold">Live Session</span>
+            </nav>
 
             <h1 class="text-2xl font-bold text-gray-900 mb-1">Your Live Coaching Session</h1>
             <p class="text-sm text-gray-500 mb-6">You get 1 free live coaching session every month as part of your membership.</p>
@@ -311,12 +461,38 @@
                         <p class="text-sm text-gray-400">The Zoom link will be sent to your registered email.</p>
                     </div>
                 </div>
-                <button class="flex items-center gap-2 text-sm font-semibold text-gray-700 border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition flex-shrink-0">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Add to Calendar
-                </button>
+
+                <!-- Add to Calendar -->
+                <div class="relative flex-shrink-0" @click.away="calendarMenuOpen = false">
+                    <button @click="calendarMenuOpen = !calendarMenuOpen"
+                        class="flex items-center gap-2 text-sm font-semibold text-gray-700 border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Add to Calendar
+                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div x-show="calendarMenuOpen" x-transition x-cloak
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-lg py-2 z-20">
+                        <a :href="googleCalendarUrl" target="_blank" rel="noopener noreferrer"
+                            @click="calendarMenuOpen = false"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            Google Calendar
+                        </a>
+                        <a :href="outlookCalendarUrl" target="_blank" rel="noopener noreferrer"
+                            @click="calendarMenuOpen = false"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            Outlook Calendar
+                        </a>
+                        <button @click="downloadIcs()"
+                            class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left">
+                            Apple / Other (.ics)
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Detail Grid -->

@@ -111,7 +111,8 @@
                     class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Shop
                 </a>
-                <a href="/community/register"
+                <a href="https://discord.gg/TKKtTSYVvx"
+                    target="_blank" rel="noopener noreferrer"
                     class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
                     Community
                 </a>
@@ -166,10 +167,11 @@
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Shop
                     </a>
-                    <a href="/community/register"
+                    <a href="https://discord.gg/TKKtTSYVvx"
+                        target="_blank" rel="noopener noreferrer"
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
                         Community
-                    </a>    
+                    </a>
                 </div>
 
                 <div class="flex flex-col space-y-2 mt-4">

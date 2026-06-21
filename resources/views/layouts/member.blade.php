@@ -102,7 +102,10 @@
                     <a href="/member/getstarted" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-play-circle"></i> Get Started
                     </a>
-                    <a href="/member/community" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="/member/library" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                        <i class="fa fa-book"></i> Library
+                    </a>
+                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-users"></i> Community
                     </a>
                     <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
@@ -394,6 +397,26 @@
             }).formatToParts(date).find(p => p.type === 'timeZoneName')?.value;
 
             el.textContent = `${localDate} ${localTime} (${tzLabel})`;
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const knownTimezone = window.authUser?.timezone;
+
+                if (detectedTimezone && detectedTimezone !== knownTimezone) {
+                    fetch('{{ route('member.timezone') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({ timezone: detectedTimezone }),
+                    });
+                }
+            } catch (e) {}
         });
     </script>
 

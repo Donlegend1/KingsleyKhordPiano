@@ -12,7 +12,7 @@
       
       <!-- Image -->
       <div class="md:w-1/2">
-        <img src="/images/kingsley.jpg" alt="Kingsley Akunwa" class="w-full rounded-lg shadow-md">
+        <img src="/images/kingsley.jpg" alt="Kingsley Khord" class="w-full rounded-lg shadow-md">
       </div>
 
       <!-- Text -->
@@ -59,7 +59,7 @@
   <div class="flex justify-left w-full ">
   <div class="text-left max-w-7xl">
     <p class="font-normal text-[18px] mb-4">
-      Welcome to KingsleyKhord Music Academy, where piano playing meets mastery. Under the guidance of Kingsley Akunwa, one of Nigeria’s leading piano instructors, we support musicians at every level.
+      Welcome to KingsleyKhord Music Academy, where piano playing meets mastery. Under the guidance of Kingsley Khord, one of Nigeria’s leading piano instructors, we support musicians at every level.
 
       Our mission is to help you achieve piano mastery through personalized, step-by-step programs that build your skills and confidence.
     </p>

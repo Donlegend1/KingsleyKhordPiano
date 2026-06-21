@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles\UserRoles;
+use App\Models\UserDailyLogin;
 
 class LoginController extends Controller
 {
@@ -26,6 +27,8 @@ class LoginController extends Controller
         $user->update([
             'last_login_at' => now()
         ]);
+
+        UserDailyLogin::recordToday($user->id, $user->timezone);
     }
 
     /**

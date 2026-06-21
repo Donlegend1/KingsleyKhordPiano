@@ -12,8 +12,6 @@
 @include("components.blogs")
 {{-- @include("components.courses") --}}
 
-<div id="zoomMeetingBooking"></div>
-
 @include("components.subscribe")
 
 @endsection

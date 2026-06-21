@@ -5,10 +5,7 @@
     $totalCompleted = collect($progress)->sum('completed');
     $totalCourses   = collect($progress)->sum('total');
     $overallPct     = $totalCourses > 0 ? round(($totalCompleted / $totalCourses) * 100) : 0;
-    $currentLevel   = 'Beginner';
-    foreach (['Intermediate', 'Advanced'] as $lvl) {
-      if (($progress[$lvl]['completed'] ?? 0) > 0) $currentLevel = $lvl;
-    }
+    $currentLevel = isset($assessment) && $assessment ? $assessment->skill_level : 'Nil';
 
     // Milestones definition
     $milestonesList = [
@@ -52,16 +49,49 @@
         $milestonePct = 100;
     }
 
-    // Streak logic
-    $streak = 1;
-    if (Auth::user()->last_login_at) {
-        $lastLogin = \Carbon\Carbon::parse(Auth::user()->last_login_at);
-        if ($lastLogin->isToday() || $lastLogin->isYesterday()) {
-            $streak = 5; // Highlight 5 days streak baseline
+    // All day/date math below uses the user's own timezone, so "today" and
+    // "this week" line up with their local calendar, not the server's.
+    $userTimezone   = Auth::user()->timezone ?: config('app.timezone');
+    $today          = now($userTimezone)->startOfDay();
+    $registeredOn   = Auth::user()->created_at->copy()->setTimezone($userTimezone)->startOfDay();
+
+    $daysOfWeek      = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    $currentDayIndex = $today->format('N') - 1; // 0 for Monday, 6 for Sunday
+    $weekStart       = $today->copy()->startOfWeek(); // Monday, in the user's timezone
+
+    // Dates the user logged in / visited the dashboard *this week* (resets every Monday)
+    $loginDatesThisWeek = DB::table('user_daily_logins')
+        ->where('user_id', Auth::id())
+        ->where('date', '>=', $weekStart->toDateString())
+        ->pluck('date')
+        ->map(fn ($d) => \Carbon\Carbon::parse($d)->toDateString())
+        ->toArray();
+
+    // For each day of the week: 'neutral' if it hasn't happened yet, or happened
+    // before the user even registered (nothing to record); otherwise 'active'/'inactive'.
+    $dayStatuses = [];
+    foreach (range(0, 6) as $i) {
+        $date = $weekStart->copy()->addDays($i);
+
+        if ($date->gt($today) || $date->lt($registeredOn)) {
+            $dayStatuses[$i] = 'neutral';
+        } elseif (in_array($date->toDateString(), $loginDatesThisWeek, true)) {
+            $dayStatuses[$i] = 'active';
+        } else {
+            $dayStatuses[$i] = 'inactive';
         }
     }
-    $daysOfWeek = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    $currentDayIndex = now()->format('N') - 1; // 0 for Monday, 6 for Sunday
+
+    // Consecutive-day streak counting backwards from today
+    $streak = 0;
+    $cursor = $today->copy();
+    while (
+        $cursor->gte($registeredOn)
+        && DB::table('user_daily_logins')->where('user_id', Auth::id())->whereDate('date', $cursor->toDateString())->exists()
+    ) {
+        $streak++;
+        $cursor->subDay();
+    }
 
     // Recent Activity query
     $recentActivity = DB::table('course_progress')
@@ -197,21 +227,18 @@
           <p class="text-xs text-gray-400 mt-1">Keep it going!</p>
         </div>
         
-        {{-- Streak circles --}}
-        @php
-          $highlightedIndices = [];
-          $tempIndex = $currentDayIndex;
-          for ($s = 0; $s < min($streak, 7); $s++) {
-              $highlightedIndices[] = $tempIndex;
-              $tempIndex = ($tempIndex - 1 + 7) % 7;
-          }
-        @endphp
+        {{-- Streak circles (this week only — resets every Monday) --}}
         <div class="flex justify-between items-center gap-1 mt-6">
           @foreach($daysOfWeek as $i => $day)
-            @php $isHighlighted = in_array($i, $highlightedIndices); @endphp
             <div class="flex flex-col items-center gap-1">
               <span class="text-[10px] font-semibold text-gray-900">{{ $day }}</span>
-              @if($isHighlighted)
+              @if($dayStatuses[$i] === 'neutral')
+                <div class="w-7 h-7 rounded-full flex items-center justify-center bg-gray-100">
+                  <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/>
+                  </svg>
+                </div>
+              @elseif($dayStatuses[$i] === 'active')
                 <div class="w-7 h-7 rounded-full flex items-center justify-center bg-green-100">
                   <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -246,7 +273,6 @@
               </div>
               <span class="text-sm font-bold text-gray-900">Recent Activity</span>
             </div>
-            <a href="/member/bookmark" class="text-xs text-[#0FA9A0] font-bold hover:underline">View All</a>
           </div>
           
           <div class="space-y-4">

@@ -65,4 +65,11 @@ return [
         'calendar_id' => env('GOOGLE_CALENDAR_ID', 'primary'),
     ],
 
+    'admin_notification_email' => env('ADMIN_NOTIFICATION_EMAIL', 'kingsleykhord@gmail.com'),
+
+    // When enabled, guest bookings skip the real Stripe/Paystack checkout and are
+    // marked as paid immediately, so the email + confirmation flow can be tested
+    // end-to-end without real money. Must never be true in production.
+    'fake_guest_payments' => env('FAKE_GUEST_PAYMENTS', false),
+
 ];

@@ -12,6 +12,8 @@ use Stripe\Price;
 use Laravel\Cashier\Subscription;
 use App\Models\Course;
 use App\Models\Upload;
+use App\Models\UserAssessment;
+use App\Models\UserDailyLogin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -39,6 +41,14 @@ class HomeController extends Controller
     {
         if (Auth::user()->role == UserRoles::MEMBER->value) {
             $userId = Auth::id();
+
+            // Mark the user as active today (covers persisted/"remember me" sessions
+            // as well as fresh logins, since this dashboard is where today's
+            // activity is recorded for the practice-streak grid).
+            UserDailyLogin::recordToday($userId, Auth::user()->timezone);
+
+            // Check assessment
+            $assessment = UserAssessment::where('user_id', $userId)->latest()->first();
 
             // Define levels
             $levels = ['Beginner', 'Intermediate', 'Advanced'];
@@ -84,7 +94,7 @@ class HomeController extends Controller
             }
             $latestComments = \App\Models\CourseVideoComment::with(['user', 'course'])->latest()->take(4)->get();
 
-            return view('home', compact('progress', 'levels', 'latestCourses', 'latestComments'));
+            return view('home', compact('progress', 'levels', 'latestCourses', 'latestComments', 'assessment'));
         }
     }
 
@@ -365,7 +375,22 @@ class HomeController extends Controller
         
         $user->metadata = $metadata;
         $user->save();
-        
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Store the browser-detected IANA timezone for the authenticated user,
+     * so day-based stats (e.g. the practice streak) use their local time.
+     */
+    public function updateTimezone(Request $request)
+    {
+        $request->validate(['timezone' => 'required|string|max:64']);
+
+        if (in_array($request->timezone, \DateTimeZone::listIdentifiers(), true)) {
+            Auth::user()->update(['timezone' => $request->timezone]);
+        }
+
         return response()->json(['success' => true]);
     }
 }

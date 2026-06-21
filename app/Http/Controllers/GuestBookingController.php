@@ -12,6 +12,7 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\GuestBookingConfirmed;
+use App\Mail\NewGuestBookingNotification;
 
 class GuestBookingController extends Controller
 {
@@ -27,8 +28,9 @@ class GuestBookingController extends Controller
     {
         $cutoff = $this->earliestBookableAt();
 
+        // Booked slots are included (not filtered out) so the calendar can
+        // show them as disabled rather than hiding them entirely.
         $slots = BookingAvailability::where('date', '>=', now()->toDateString())
-            ->where('is_booked', false)
             ->orderBy('date', 'asc')
             ->orderBy('time', 'asc')
             ->get()
@@ -45,8 +47,7 @@ class GuestBookingController extends Controller
         $cutoff = $this->earliestBookableAt();
 
         $slots = BookingAvailability::where('date', $request->date)
-            ->where('is_booked', false)
-            ->get(['time'])
+            ->get(['time', 'is_booked'])
             ->filter(fn ($slot) => \Carbon\Carbon::parse("{$request->date} {$slot->time}") >= $cutoff)
             ->values();
 
@@ -90,6 +91,20 @@ class GuestBookingController extends Controller
             'payment_method' => $request->paymentMethod,
             'payment_status' => 'pending',
         ]);
+
+        if (config('services.fake_guest_payments')) {
+            $fakeRef = Str::uuid()->toString();
+
+            if ($request->paymentMethod === 'stripe') {
+                $booking->update(['stripe_session_id' => $fakeRef]);
+                $url = route('guest-booking.success', ['provider' => 'stripe']) . '?session_id=' . $fakeRef;
+            } else {
+                $booking->update(['paystack_reference' => $fakeRef]);
+                $url = route('guest-booking.success', ['provider' => 'paystack']) . '?reference=' . $fakeRef;
+            }
+
+            return response()->json(['url' => $url]);
+        }
 
         if ($request->paymentMethod === 'stripe') {
             return $this->initiateStripe($booking);
@@ -208,5 +223,8 @@ class GuestBookingController extends Controller
 
         // Send email notification (Link will be added manually by admin later)
         Mail::to($booking->email)->send(new GuestBookingConfirmed($booking));
+
+        // Notify the admin so they can prepare and send the meeting link
+        Mail::to(config('services.admin_notification_email'))->send(new NewGuestBookingNotification($booking));
     }
 }
