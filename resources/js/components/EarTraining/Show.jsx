@@ -14,6 +14,7 @@ const shuffleArray = (array) => {
 };
 
 const ShowEartraining = () => {
+    const { showMessage } = useFlashMessage();
     const [quiz, setQuiz] = useState(null);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -21,6 +22,10 @@ const ShowEartraining = () => {
     const [showResult, setShowResult] = useState(false);
     const [score, setScore] = useState(0);
     const [quizModal, setQuizModal] = useState(false);
+    const [isCompleted, setIsCompleted] = useState(
+        document.getElementById("ear-training-quiz-show")?.dataset.completed === "1"
+    );
+    const [markingComplete, setMarkingComplete] = useState(false);
 
     const showQuizModal = () => {
         setQuizModal(true);
@@ -28,6 +33,24 @@ const ShowEartraining = () => {
 
     const hideQuizModal = () => {
         setQuizModal(false);
+    };
+
+    const handleMarkAsCompleted = async () => {
+        if (!quiz?.id || isCompleted) return;
+        setMarkingComplete(true);
+        try {
+            await axios.post("/member/lesson-completion", {
+                completable_id: quiz.id,
+                completable_type: "quizzes",
+            });
+            setIsCompleted(true);
+            showMessage("Marked as completed!", "success");
+        } catch (error) {
+            console.error("Error marking quiz as completed:", error);
+            showMessage("Failed to mark as completed.", "error");
+        } finally {
+            setMarkingComplete(false);
+        }
     };
 
     const RELATIVE_OPTIONS = ["DOH", "REH", "MI", "FAH", "SOH", "LAH", "TI"];
@@ -285,7 +308,21 @@ const ShowEartraining = () => {
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg mt-6">
-            <h2 className="text-2xl font-bold mb-4">{quiz.title}</h2>
+            <div className="flex items-center justify-between gap-3 mb-4">
+                <h2 className="text-2xl font-bold">{quiz.title}</h2>
+                <button
+                    onClick={handleMarkAsCompleted}
+                    disabled={markingComplete || isCompleted}
+                    className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border transition-colors flex-shrink-0 ${
+                        isCompleted
+                            ? "bg-green-50 border-green-200 text-green-600 cursor-not-allowed"
+                            : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                    }`}
+                >
+                    <CheckCircle2 className="w-4 h-4" />
+                    {isCompleted ? "Completed" : "Mark as Complete"}
+                </button>
+            </div>
 
             {/* Progress Bar */}
             <div className="mb-6">

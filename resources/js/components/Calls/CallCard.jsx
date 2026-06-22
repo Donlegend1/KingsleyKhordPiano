@@ -24,7 +24,7 @@ const CallCard = () => {
     return (
         <>
             <a
-                href="/member/premium-booking"
+                href="/member/my-library"
                 onClick={handleClick}
                 className="block transition-shadow hover:shadow-md"
             >

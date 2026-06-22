@@ -1,33 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="relative min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[#0B0B0B] via-[#FFF] to-black">
-
-  <!-- Soft ambient glow -->
-  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,215,54,0.08),transparent_60%)]"></div>
+<section class="min-h-screen flex items-center justify-center bg-gray-50 px-4 pt-24 pb-16">
 
   <!-- Card -->
-  <div
-    class="relative z-10 w-full max-w-md
-           bg-white/90 backdrop-blur-xl
-           rounded-3xl px-8 py-10
-           shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)]"
-  >
+  <div class="w-full max-w-2xl bg-white p-8 sm:p-12 rounded-2xl border border-gray-100">
+
     <!-- Header -->
     <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold text-gray-900 tracking-tight">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
         Welcome Back
       </h2>
-
+      <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+        Sign in to pick up right where you left off.
+      </p>
     </div>
 
     <!-- Form -->
-    <form method="POST" action="{{ route('login') }}" class="space-y-6">
+    <form method="POST" action="{{ route('login') }}" class="space-y-4">
       @csrf
 
       <!-- Email -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">
           Email Address
         </label>
         <input
@@ -37,54 +32,49 @@
           required
           autofocus
           placeholder="you@example.com"
-          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3
+          class="w-full border border-gray-200 px-4 py-2.5 rounded-lg
                  text-gray-900 placeholder-gray-400
-                 focus:ring-2 focus:ring-[#FFD736] focus:border-[#FFD736]
+                 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900
                  transition @error('email') border-red-500 @enderror"
         />
         @error('email')
-          <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+          <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
         @enderror
       </div>
 
       <!-- Password -->
-      <div x-data="{ show: false }">
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+      <div x-data="{ show: false }" class="relative">
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">
           Password
         </label>
-
-        <div class="relative">
-          <input
-            :type="show ? 'text' : 'password'"
-            name="password"
-            placeholder="••••••••"
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 pr-12
-                   text-gray-900 placeholder-gray-400
-                   focus:ring-2 focus:ring-[#FFD736] focus:border-[#FFD736]
-                   transition @error('password') border-red-500 @enderror"
-          />
-
-          <button
-            type="button"
-            @click="show = !show"
-            class="absolute inset-y-0 right-4 flex items-center text-gray-500 hover:text-gray-800"
-          >
-            <i :class="show ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
-          </button>
-        </div>
-
+        <input
+          :type="show ? 'text' : 'password'"
+          name="password"
+          placeholder="Your password"
+          class="w-full border border-gray-200 px-4 py-2.5 pr-10 rounded-lg
+                 text-gray-900 placeholder-gray-400
+                 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900
+                 transition @error('password') border-red-500 @enderror"
+        />
+        <button
+          type="button"
+          @click="show = !show"
+          class="absolute right-3.5 top-[2.55rem] text-gray-400 hover:text-gray-600"
+        >
+          <i :class="show ? 'fa fa-eye-slash' : 'fa fa-eye'" class="text-sm"></i>
+        </button>
         @error('password')
-          <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+          <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
         @enderror
       </div>
 
       <!-- Remember / Forgot -->
-      <div class="flex items-center justify-between text-sm">
+      <div class="flex items-center justify-between text-sm pt-1">
         <label class="flex items-center gap-2 text-gray-600">
           <input
             type="checkbox"
             name="remember"
-            class="rounded border-gray-300 text-[#FFD736] focus:ring-[#FFD736]"
+            class="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
             {{ old('remember') ? 'checked' : '' }}
           />
           Remember me
@@ -93,7 +83,7 @@
         @if (Route::has('password.request'))
           <a
             href="{{ route('password.request') }}"
-            class="font-medium text-[#9C7A1C] hover:underline"
+            class="font-semibold text-gray-900 hover:underline"
           >
             Forgot password?
           </a>
@@ -103,22 +93,19 @@
       <!-- CTA -->
       <button
         type="submit"
-        class="w-full py-3 rounded-xl font-semibold text-black
-               bg-gradient-to-r from-[#FFD736] to-[#E6C531]
-               hover:from-[#E6C531] hover:to-[#FFD736]
-               shadow-lg transition active:scale-[0.98]"
+        class="w-full py-3 rounded-lg font-semibold text-white bg-gray-900 hover:bg-gray-800 transition-colors mt-2"
       >
         Login
       </button>
     </form>
 
     <!-- Footer -->
-    <div class="mt-8 text-center text-sm text-gray-600">
+    <p class="mt-6 text-center text-sm text-gray-500">
       Don't have an account?
-      <a href="/plans" class="font-semibold text-[#9C7A1C] hover:underline">
+      <a href="/plans" class="font-semibold text-gray-900 hover:underline">
         Sign up
       </a>
-    </div>
+    </p>
   </div>
 </section>
 @endsection

@@ -11,9 +11,7 @@
         Get personalized guidance with private<br class="hidden sm:block" /> one-on-one coaching from an expert.
       </p>
       <a
-        href="https://tr.ee/kingsleykhordbooking"
-        target="_blank"
-        rel="noopener noreferrer"
+        href="{{ route('book-session') }}"
         class="mt-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors duration-200"
       >
         Book My Session

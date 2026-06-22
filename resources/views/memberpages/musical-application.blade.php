@@ -52,28 +52,6 @@
                 <span class="text-[#6366F1] font-medium">Musical Application</span>
             </div>
 
-            <!-- Hero Section -->
-            <div
-                class="relative bg-white rounded-3xl p-8 mb-12 shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row items-center justify-between">
-                <div class="flex items-center gap-6 z-10">
-                    <div
-                        class="w-16 h-16 bg-[#0FA9A0] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#0fa9a0]/20">
-                        <i class="fa-solid fa-music text-3xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900 mb-2">Musical Application</h1>
-                        <p class="text-gray-500 max-w-md">Apply your technique in real musical contexts and sound great.</p>
-                    </div>
-                </div>
-
-                <!-- Hero Decorative Image (Right Side) -->
-                <div class="hidden md:block absolute right-0 top-0 h-full w-1/2">
-                    <div class="absolute inset-0 bg-gradient-to-l from-transparent via-white/80 to-white z-10"></div>
-                    <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop"
-                        alt="Musical Pattern" class="w-full h-full object-cover opacity-30">
-                </div>
-            </div>
-
             <!-- Choose Your Level -->
             <div class="mb-12">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">Choose Your Level</h2>

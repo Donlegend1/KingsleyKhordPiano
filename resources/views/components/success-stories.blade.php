@@ -7,16 +7,16 @@
     <div class="max-w-3xl mx-auto">
         <div class="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
             <script src="https://fast.wistia.com/player.js" async></script>
-            <script src="https://fast.wistia.com/embed/3iq1y0n4ma.js" async type="module"></script>
+            <script src="https://fast.wistia.com/embed/4g51rpw8fc.js" async type="module"></script>
             <style>
-                wistia-player[media-id='3iq1y0n4ma']:not(:defined) {
-                    background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/3iq1y0n4ma/swatch');
+                wistia-player[media-id='4g51rpw8fc']:not(:defined) {
+                    background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/4g51rpw8fc/swatch');
                     display: block;
                     filter: blur(5px);
                     padding-top: 56.25%;
                 }
             </style>
-            <wistia-player media-id="3iq1y0n4ma" aspect="1.7777777777777777"></wistia-player>
+            <wistia-player media-id="4g51rpw8fc" aspect="1.7777777777777777"></wistia-player>
         </div>
     </div>
 </section>

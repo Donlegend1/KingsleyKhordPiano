@@ -23,7 +23,7 @@ class CommunityIndexController extends Controller
         $userId = $user->id;
 
         // Check assessment
-        $assessment = UserAssessment::where('user_id', $userId)->first();
+        $assessment = UserAssessment::where('user_id', $userId)->latest()->first();
 
         // Calculate progress statistics
         $levels = ['Beginner', 'Intermediate', 'Advanced'];

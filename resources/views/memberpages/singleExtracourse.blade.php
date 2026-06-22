@@ -11,6 +11,11 @@
             $lessonType = 'extra_courses';
         }
 
+        $isCompleted = $lesson && \App\Models\LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_id', $lesson->id)
+            ->where('completable_type', get_class($lesson))
+            ->exists();
+
         // Fetch playlist based on category
         $playlist = collect();
         if ($lessonType === 'learn_songs') {
@@ -138,6 +143,20 @@
                                     : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50' }}">
                                 <i class="fa-regular fa-bookmark text-[15px]"></i>
                                 {{ $isBookmarked ? 'Bookmarked' : 'Bookmark' }}
+                            </button>
+                        </form>
+
+                        <form action="{{ route('lesson.complete') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="completable_id" value="{{ $lesson->id }}">
+                            <input type="hidden" name="completable_type" value="{{ $lessonType }}">
+                            <button type="submit" {{ $isCompleted ? 'disabled' : '' }}
+                                class="flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
+                                {{ $isCompleted
+                                    ? 'bg-green-50 border-green-200 text-green-600 cursor-not-allowed'
+                                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50' }}">
+                                <i class="fa-solid fa-check text-[15px]"></i>
+                                {{ $isCompleted ? 'Completed' : 'Mark as Complete' }}
                             </button>
                         </form>
                     </div>

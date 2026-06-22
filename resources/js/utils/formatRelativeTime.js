@@ -1,3 +1,7 @@
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 
 export const formatRelativeTime = (dateString) => {
     const now = Date.now(); // current UTC timestamp in ms

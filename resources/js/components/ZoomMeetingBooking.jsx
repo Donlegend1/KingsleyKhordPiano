@@ -341,31 +341,39 @@ const ZoomMeetingBooking = () => {
                                                     {availableSlots[selectedDate].map((slot) => (
                                                         <label
                                                             key={slot.id}
-                                                            className={`flex items-center gap-4 px-5 py-4 rounded-xl border cursor-pointer transition-all duration-150 ${
-                                                                pendingTime === slot.id
-                                                                    ? "border-blue-500 bg-blue-50 ring-1 ring-blue-400"
-                                                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                                            className={`flex items-center gap-4 px-5 py-4 rounded-xl border transition-all duration-150 ${
+                                                                slot.is_booked
+                                                                    ? "border-gray-100 bg-gray-50 cursor-not-allowed opacity-60"
+                                                                    : (pendingTime === slot.id
+                                                                        ? "border-blue-500 bg-blue-50 ring-1 ring-blue-400 cursor-pointer"
+                                                                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 cursor-pointer")
                                                             }`}
                                                         >
                                                             <input
                                                                 type="radio"
                                                                 name="time"
                                                                 className="hidden"
+                                                                disabled={!!slot.is_booked}
                                                                 checked={pendingTime === slot.id}
                                                                 onChange={() => setPendingTime(slot.id)}
                                                             />
                                                             <div
                                                                 className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition ${
-                                                                    pendingTime === slot.id ? "border-blue-500" : "border-gray-300"
+                                                                    !slot.is_booked && pendingTime === slot.id ? "border-blue-500" : "border-gray-300"
                                                                 }`}
                                                             >
-                                                                {pendingTime === slot.id && (
+                                                                {!slot.is_booked && pendingTime === slot.id && (
                                                                     <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
                                                                 )}
                                                             </div>
-                                                            <span className="text-sm font-semibold text-gray-700">
+                                                            <span className={`text-sm font-semibold flex-1 ${slot.is_booked ? "text-gray-400" : "text-gray-700"}`}>
                                                                 {formatSlotTime(slot.date, slot.time)}
                                                             </span>
+                                                            {slot.is_booked ? (
+                                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide bg-gray-100 px-2 py-1 rounded-full">
+                                                                    Booked
+                                                                </span>
+                                                            ) : null}
                                                         </label>
                                                     ))}
                                                 </div>

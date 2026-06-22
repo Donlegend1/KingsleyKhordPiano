@@ -40,7 +40,13 @@ class EarTrainingController extends Controller
 
     public function showmember($id) {
         $quiz = Quiz::with('questions')->findOrFail($id);
-        return view('memberpages.eartraining.show', compact('quiz'));
+
+        $isCompleted = \App\Models\LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_id', $quiz->id)
+            ->where('completable_type', \App\Models\Quiz::class)
+            ->exists();
+
+        return view('memberpages.eartraining.show', compact('quiz', 'isCompleted'));
     }
 
     public  function showadmin() {
