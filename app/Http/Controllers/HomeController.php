@@ -53,23 +53,11 @@ class HomeController extends Controller
             // Define levels
             $levels = ['Beginner', 'Intermediate', 'Advanced'];
 
-            $progress = collect($levels)->mapWithKeys(function ($level) use ($userId) {
-                $total = DB::table('courses')
-                    ->where('level', $level)
-                    ->count();
+            $progress = \App\Support\LessonProgress::progressByLevel($userId, $levels);
 
-                $completed = DB::table('course_progress')
-                    ->join('courses', 'course_progress.course_id', '=', 'courses.id')
-                    ->where('course_progress.user_id', $userId)
-                    ->where('courses.level', $level)
-                    ->distinct('course_progress.course_id')
-                    ->count('course_progress.course_id');
-
-                return [$level => [
-                    'total' => $total,
-                    'completed' => $completed,
-                ]];
-            });
+            // Lessons completed elsewhere with no level (quizzes, uploads)
+            // still need to count toward the overall total used for milestones.
+            $extraCompleted = \App\Support\LessonProgress::totalCompleted($userId) - collect($progress)->sum('completed');
 
         $latestCourses = [];
 
@@ -94,7 +82,7 @@ class HomeController extends Controller
             }
             $latestComments = \App\Models\CourseVideoComment::with(['user', 'course'])->latest()->take(4)->get();
 
-            return view('home', compact('progress', 'levels', 'latestCourses', 'latestComments', 'assessment'));
+            return view('home', compact('progress', 'levels', 'latestCourses', 'latestComments', 'assessment', 'extraCompleted'));
         }
     }
 

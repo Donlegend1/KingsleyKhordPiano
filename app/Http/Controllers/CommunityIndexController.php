@@ -27,28 +27,9 @@ class CommunityIndexController extends Controller
 
         // Calculate progress statistics
         $levels = ['Beginner', 'Intermediate', 'Advanced'];
-        $progress = collect($levels)->mapWithKeys(function ($level) use ($userId) {
-            $total = DB::table('courses')
-                ->where('level', $level)
-                ->count();
+        $progress = \App\Support\LessonProgress::progressByLevel($userId, $levels);
 
-            $completed = DB::table('course_progress')
-                ->join('courses', 'course_progress.course_id', '=', 'courses.id')
-                ->where('course_progress.user_id', $userId)
-                ->where('courses.level', $level)
-                ->distinct('course_progress.course_id')
-                ->count('course_progress.course_id');
-
-            return [$level => [
-                'total' => $total,
-                'completed' => $completed,
-            ]];
-        })->toArray();
-
-        $totalCompleted = DB::table('course_progress')
-            ->where('user_id', $userId)
-            ->distinct('course_id')
-            ->count('course_id');
+        $totalCompleted = \App\Support\LessonProgress::totalCompleted($userId);
 
         // Milestones
         $milestonesList = [

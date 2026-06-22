@@ -12,6 +12,15 @@ class VideoHelper
             return "https://drive.google.com/file/d/{$googleDriveFileId}/preview";
         }
 
+        // Wistia — returns the full <wistia-player> embed markup (scripts,
+        // placeholder style, and custom element), not a bare iframe src,
+        // since Wistia's player is a web component rather than an iframe.
+        $wistiaMediaId = self::extractWistiaId($url);
+
+        if ($wistiaMediaId) {
+            return self::wistiaEmbedHtml($wistiaMediaId);
+        }
+
         // YouTube
         // if (preg_match('/youtu\.be\/([^\?]+)|youtube\.com\/watch\?v=([^\&]+)/', $url, $m)) {
         //     $id = $m[1] ?? $m[2];
@@ -74,6 +83,10 @@ class VideoHelper
 
     public static function getLinkType(string $url): string
     {
+        if (self::extractWistiaId($url)) {
+            return 'wistia'; // render the raw embed HTML from linkToEmbed(), not an <iframe>
+        }
+
         if (
             self::extractGoogleDriveFileId($url) ||
             preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos/', $url)
@@ -111,5 +124,49 @@ class VideoHelper
         parse_str($query, $params);
 
         return $params['id'] ?? null;
+    }
+
+    /**
+     * Extracts a Wistia media ID from any of its common URL forms, e.g.
+     * https://*.wistia.com/medias/{id}, https://fast.wistia.net/embed/iframe/{id},
+     * or https://fast.wistia.net/embed/medias/{id}.jsonp.
+     */
+    private static function extractWistiaId(string $url): ?string
+    {
+        if (!str_contains($url, 'wistia.com') && !str_contains($url, 'wistia.net')) {
+            return null;
+        }
+
+        if (preg_match('/wistia\.(?:com|net)\/(?:medias|embed\/iframe|embed\/medias)\/([a-zA-Z0-9]+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * Builds the full <wistia-player> embed markup (player script, the
+     * placeholder/blur style, and the custom element) for a given media ID.
+     * Unlike the other providers, Wistia's modern embed is a web component
+     * rather than a plain iframe, so this returns ready-to-render HTML
+     * instead of a bare src URL.
+     */
+    public static function wistiaEmbedHtml(string $mediaId, string $aspect = '1.7777777777777777'): string
+    {
+        $mediaId = htmlspecialchars($mediaId, ENT_QUOTES);
+
+        return <<<HTML
+<script src="https://fast.wistia.com/player.js" async></script>
+<script src="https://fast.wistia.com/embed/{$mediaId}.js" async type="module"></script>
+<style>
+    wistia-player[media-id='{$mediaId}']:not(:defined) {
+        background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/{$mediaId}/swatch');
+        display: block;
+        filter: blur(5px);
+        padding-top: 56.25%;
+    }
+</style>
+<wistia-player media-id="{$mediaId}" aspect="{$aspect}"></wistia-player>
+HTML;
     }
 }

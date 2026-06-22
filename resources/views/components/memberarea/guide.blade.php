@@ -2,7 +2,7 @@
     grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-3 gap-4">
 
   <!-- Card 1 -->
-  <a href="/member/library" class="block transition-shadow hover:shadow-md">
+  <a href="/member/community" class="block transition-shadow hover:shadow-md">
     <div class="min-h-[120px] h-full flex justify-between items-center p-6 bg-[#F3F5F6] rounded-lg shadow-sm border">
       <div class="flex items-center space-x-4">
         <div class="w-12 h-12 flex items-center justify-center bg-[#E8EDF2] rounded-xl">

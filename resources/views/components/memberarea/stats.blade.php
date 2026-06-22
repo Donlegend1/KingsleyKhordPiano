@@ -2,7 +2,9 @@
 
   {{-- ===== Your Piano Journey ===== --}}
   @php
-    $totalCompleted = collect($progress)->sum('completed');
+    // Lessons with no level (quizzes, uploads) completed via the generic
+    // lesson-completion flow still count toward the overall total.
+    $totalCompleted = collect($progress)->sum('completed') + ($extraCompleted ?? 0);
     $totalCourses   = collect($progress)->sum('total');
     $overallPct     = $totalCourses > 0 ? round(($totalCompleted / $totalCourses) * 100) : 0;
     $currentLevel = isset($assessment) && $assessment ? $assessment->skill_level : 'Nil';
@@ -82,11 +84,14 @@
         }
     }
 
-    // Consecutive-day streak counting backwards from today
+    // Consecutive-day streak counting backwards from today, bounded to the
+    // current week — the streak resets every Monday along with the grid below,
+    // it never carries over a login from last week.
     $streak = 0;
     $cursor = $today->copy();
     while (
-        $cursor->gte($registeredOn)
+        $cursor->gte($weekStart)
+        && $cursor->gte($registeredOn)
         && DB::table('user_daily_logins')->where('user_id', Auth::id())->whereDate('date', $cursor->toDateString())->exists()
     ) {
         $streak++;
