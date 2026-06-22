@@ -214,7 +214,15 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
 
     const renderVideoPlayer = () => {
         if (!course.video_type || !course.video_url) {
-            return (
+            return course.thumbnail_url || course.thumbnail ? (
+                <div className="mb-4 w-full h-[400px] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <img
+                        src={course.thumbnail_url || course.thumbnail}
+                        alt={course.title}
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            ) : (
                 <div className="mb-4 text-gray-500">No video available.</div>
             );
         }
@@ -261,6 +269,7 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
                         width="100%"
                         height="400"
                         className="rounded"
+                        poster={course.thumbnail_url || course.thumbnail}
                     >
                         <source
                             src={`/uploads/videos/${course.video_url}`}
@@ -308,7 +317,26 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
                 </button>
             </div>
 
-            <div className="mb-4">{renderVideoPlayer()}</div>
+            <div class="mb-4">{renderVideoPlayer()}</div>
+
+            {course.description && (
+                <div className="mt-4 mb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                    {course.description}
+                </div>
+            )}
+
+            {course.image_urls && course.image_urls.length > 0 && (
+                <div className="mt-6 mb-6">
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-3">Course Walkthrough / Highlights</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {course.image_urls.map((url, idx) => (
+                            <div key={idx} className="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-900">
+                                <img src={url} alt="Description Highlight" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="text-center mt-6">
                 <button

@@ -64,6 +64,7 @@ class GuestBookingController extends Controller
             'focus' => 'nullable|string',
             'skillLevel' => 'nullable|string',
             'paymentMethod' => 'required|in:stripe,paystack',
+            'timezone' => 'nullable|string|max:64',
         ]);
 
         // Check availability
@@ -84,6 +85,7 @@ class GuestBookingController extends Controller
         $booking = GuestBooking::create([
             'name' => $request->name,
             'email' => $request->email,
+            'timezone' => $request->timezone,
             'date' => $request->date,
             'time' => $request->time,
             'focus' => $request->focus,
@@ -115,7 +117,7 @@ class GuestBookingController extends Controller
 
     private function initiateStripe(GuestBooking $booking)
     {
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe::setApiKey(config('stripe.secret_key'));
 
         try {
             $session = StripeSession::create([
@@ -153,8 +155,8 @@ class GuestBookingController extends Controller
         try {
             $payload = [
                 'email' => $booking->email,
-                'amount' => 60 * 100, // $60.00 in cents
-                'currency' => 'USD',
+                'amount' => 80000 * 100, // #80000.00 in cents
+              
                 'reference' => $reference,
                 'callback_url' => route('guest-booking.success', ['provider' => 'paystack']),
                 'metadata' => [

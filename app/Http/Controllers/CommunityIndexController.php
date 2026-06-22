@@ -167,11 +167,10 @@ class CommunityIndexController extends Controller
          return redirect('/member/plan');
       }
 
-      $beginners = PDFDownload::where('category', 'beginner')->get();
-      $intermediate = PDFDownload::where('category', 'intermediate')->get();
-      $advanced = PDFDownload::where('category', 'advanced')->get();
+      $pdfList = PDFDownload::latest()->get();
 
-      return view('community.pdf-downloads', compact('beginners', 'intermediate', 'advanced'));
+
+      return view('community.pdf-downloads', compact('pdfList'));
    }
 
    public function audioDownloads()

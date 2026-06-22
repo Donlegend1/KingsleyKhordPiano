@@ -31,7 +31,15 @@ const SingleUpload = () => {
 
     const renderVideoPlayer = () => {
         if (!upload?.video_type || !upload?.video_url) {
-            return (
+            return upload?.thumbnail_url || upload?.thumbnail ? (
+                <div className="relative w-full aspect-video rounded overflow-hidden shadow-lg bg-black">
+                    <img
+                        src={upload.thumbnail_url || upload.thumbnail}
+                        alt={upload.title}
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            ) : (
                 <div className="mb-4 text-gray-500">
                     No video available.
                 </div>
@@ -90,6 +98,7 @@ const SingleUpload = () => {
                     <video
                         controls
                         className="w-full aspect-video rounded bg-black shadow-lg"
+                        poster={upload.thumbnail_url || upload.thumbnail}
                     >
                         <source
                             src={`/uploads/videos/${upload.video_url}`}

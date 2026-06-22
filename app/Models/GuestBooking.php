@@ -12,6 +12,7 @@ class GuestBooking extends Model
     protected $fillable = [
         'name',
         'email',
+        'timezone',
         'date',
         'time',
         'focus',

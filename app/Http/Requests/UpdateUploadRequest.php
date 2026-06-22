@@ -33,6 +33,8 @@ class UpdateUploadRequest extends FormRequest
             'skill_level' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
             'series' => 'nullable|string|max:255',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
         ];
     }
 }

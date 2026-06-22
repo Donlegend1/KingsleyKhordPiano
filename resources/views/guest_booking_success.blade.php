@@ -3,7 +3,8 @@
 @php
     use Carbon\Carbon;
 
-    $start = Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos');
+    $userTz = $booking->timezone ?: 'UTC';
+    $start = Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos')->setTimezone($userTz);
     $end = $start->copy()->addHour();
 
     $title = rawurlencode('Piano Coaching Session with Kingsley Khord');
@@ -73,7 +74,7 @@
                         </svg>
                         <div>
                             <p class="text-xs text-gray-400">Time</p>
-                            <p class="text-sm font-semibold text-gray-900">{{ $start->format('g:i A') }} – {{ $end->format('g:i A') }}</p>
+                            <p class="text-sm font-semibold text-gray-900">{{ $start->format('g:i A') }} – {{ $end->format('g:i A') }} ({{ $userTz }})</p>
                         </div>
                     </div>
 

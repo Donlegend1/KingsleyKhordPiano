@@ -62,6 +62,37 @@ class CourseController extends Controller
             $validated['video_url'] = $videoPath;
         }
 
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+            $filename = time() . '_' . $thumbnail->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/thumbnails');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/thumbnails');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $thumbnail->move($destination, $filename);
+            $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
+        }
+
+        if ($request->hasFile('images')) {
+            $destination = base_path('../public_html/uploads/descriptions');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/descriptions');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $descriptionImages = [];
+            foreach ($request->file('images') as $imgFile) {
+                $filename = time() . '_' . uniqid() . '_' . $imgFile->getClientOriginalName();
+                $imgFile->move($destination, $filename);
+                $descriptionImages[] = 'uploads/descriptions/' . $filename;
+            }
+            $validated['images'] = $descriptionImages;
+        }
+
         $course = Course::create($validated);
         $members = User::where('role', UserRoles::MEMBER->value)->get();
 
@@ -116,6 +147,53 @@ class CourseController extends Controller
         if ($videoType === 'iframe' && isset($validated['video_url'])) {
             // Keep iframe HTML as-is
             $validated['video_url'] = $videoPath;
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+            $filename = time() . '_' . $thumbnail->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/thumbnails');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/thumbnails');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            
+            // Delete old thumbnail if it exists
+            if ($course->thumbnail && file_exists(public_path($course->thumbnail))) {
+                @unlink(public_path($course->thumbnail));
+            }
+            
+            $thumbnail->move($destination, $filename);
+            $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
+        }
+
+        if ($request->hasFile('images')) {
+            $destination = base_path('../public_html/uploads/descriptions');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/descriptions');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Delete old images
+            if ($course->images && is_array($course->images)) {
+                foreach ($course->images as $oldImg) {
+                    if (file_exists(public_path($oldImg))) {
+                        @unlink(public_path($oldImg));
+                    }
+                }
+            }
+
+            $descriptionImages = [];
+            foreach ($request->file('images') as $imgFile) {
+                $filename = time() . '_' . uniqid() . '_' . $imgFile->getClientOriginalName();
+                $imgFile->move($destination, $filename);
+                $descriptionImages[] = 'uploads/descriptions/' . $filename;
+            }
+            $validated['images'] = $descriptionImages;
         }
 
         /* ---------------------------------------

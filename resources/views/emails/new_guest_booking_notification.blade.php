@@ -1,28 +1,53 @@
-<x-mail::message>
-# New Session Booked
+@extends('layouts.email')
 
-A guest just booked and paid for a one-on-one piano coaching session. Here are their details:
+@section('content')
 
-<x-mail::panel>
-**Name:** {{ $booking->name }}<br>
-**Email:** {{ $booking->email }}<br>
-**Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}<br>
-**Time:** {{ \Carbon\Carbon::parse($booking->date . ' ' . $booking->time)->format('g:i A') }} – {{ \Carbon\Carbon::parse($booking->date . ' ' . $booking->time)->addHour()->format('g:i A') }}<br>
-**Payment:** ${{ '60' }} via {{ ucfirst($booking->payment_method) }} ({{ ucfirst($booking->payment_status) }})<br>
-@if($booking->skill_level)
-**Skill Level:** {{ ucfirst($booking->skill_level) }}<br>
-@endif
-@if($booking->focus)
-**Focus:** {{ $booking->focus }}<br>
-@endif
-</x-mail::panel>
+@php
+    $startLagos = \Carbon\Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos');
+    $endLagos = $startLagos->copy()->addHour();
+    $startGmt = $startLagos->copy()->setTimezone('UTC');
+    $endGmt = $startGmt->copy()->addHour();
+    $userTz = $booking->timezone ?: 'UTC';
+    $startUser = $startLagos->copy()->setTimezone($userTz);
+    $endUser = $startUser->copy()->addHour();
+@endphp
 
-**Action needed:** Prepare a Zoom meeting link for this session and add it to the booking so it gets sent to {{ $booking->name }} before their session.
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; overflow: hidden;">
+        <tr>
+            <td style="padding: 30px;">
+                <h2 style="color: #222; margin-bottom: 20px;">New Guest Booking 🎹</h2>
+                
+                <p>A guest has just booked and paid for a one-on-one piano coaching session. Here are the details:</p>
+                
+                <table width="100%" cellpadding="10" cellspacing="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1d4ed8; font-size: 15px;">
+                    <tr>
+                        <td style="padding: 12px 15px; color: #555; line-height: 1.8;">
+                            <strong>👤 Name:</strong> {{ $booking->name }}<br>
+                            <strong>✉️ Email:</strong> {{ $booking->email }}<br>
+                            <strong>📅 Date:</strong> {{ $startLagos->format('l, F j, Y') }}<br>
+                            <strong>🕗 Time (Your local):</strong> {{ $startLagos->format('g:i A') }} – {{ $endLagos->format('g:i A') }} (WAT)<br>
+                            <strong>🕗 Time (Guest local):</strong> {{ $startUser->format('g:i A') }} – {{ $endUser->format('g:i A') }} ({{ $userTz }})<br>
+                            <strong>🕗 Time (GMT):</strong> {{ $startGmt->format('g:i A') }} – {{ $endGmt->format('g:i A') }} (GMT)<br>
+                            <strong>💳 Payment:</strong> $60 via {{ ucfirst($booking->payment_method) }} ({{ ucfirst($booking->payment_status) }})
+                            @if($booking->skill_level)
+                                <br><strong>📈 Skill Level:</strong> {{ ucfirst($booking->skill_level) }}
+                            @endif
+                            @if($booking->focus)
+                                <br><strong>🎯 Focus:</strong> {{ $booking->focus }}
+                            @endif
+                        </td>
+                    </tr>
+                </table>
 
-<x-mail::button :url="route('admin.guest-bookings.index')">
-View Booking in Admin
-</x-mail::button>
+                <p><strong>Action needed:</strong> Prepare a Zoom meeting link for this session and add it to the booking in the admin panel so it gets sent to {{ $booking->name }} before their session.</p>
 
-Thanks,<br>
-{{ config('app.name') }}
-</x-mail::message>
+                <div style="text-align: center; margin: 25px 0;">
+                    <a href="{{ route('admin.guest-bookings.index') }}" style="background-color: #007bff; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 6px; display: inline-block; font-weight: bold;">View Booking in Admin Panel</a>
+                </div>
+
+                <p>Thanks,<br><strong>{{ config('app.name') }}</strong></p>
+            </td>
+        </tr>
+    </table>
+
+@endsection

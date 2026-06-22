@@ -96,6 +96,16 @@ const PremiumVideoSection = () => {
         }
         setSelectedVideo(video);
     };
+
+    const handleCreateLiveShowNotification = async () => {
+        try {
+            await axios.post("/api/notifications/subscribe-live-shows");
+            showMessage("You'll be notified about upcoming live shows!", "success");
+        } catch (error) {
+            console.error("Failed to subscribe to live show notifications:", error);
+            showMessage("Failed to subscribe for notifications. Please try again later.", "error");
+        }
+    };
     return (
         <section className="max-w-7xl mx-auto px-6 py-16">
             {/* Video Modal Overlay */}
@@ -172,7 +182,7 @@ const PremiumVideoSection = () => {
                     <h3 className="text-xl font-bold text-gray-800 mb-2">No Live Shows Available</h3>
                     <p className="text-gray-500 text-sm max-w-xs mb-7">Check back later for upcoming live sessions and workshops.</p>
                     <button
-                        onClick={() => alert("You'll be notified when a live show is scheduled!")}
+                        onClick={() => handleCreateLiveShowNotification()}
                         className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-6 py-3 rounded-xl shadow-md shadow-indigo-200 transition-all duration-150 hover:scale-[1.02] active:scale-95"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

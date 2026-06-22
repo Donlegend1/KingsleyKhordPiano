@@ -9,6 +9,7 @@ import {
 
 const UploadForm = () => {
     const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
     const { showMessage } = useFlashMessage();
     const [tagOptions, setUploadList] = useState([]);
 
@@ -87,6 +88,9 @@ const UploadForm = () => {
 
         const formData = new FormData();
         formData.append("thumbnail", thumbnailFile);
+        descriptionImageFiles.forEach((file, idx) => {
+            formData.append(`images[${idx}]`, file);
+        });
 
         // Upload fields
         Object.entries(upload).forEach(([key, value]) =>
@@ -116,6 +120,7 @@ const UploadForm = () => {
                 status: "active",
                 series: "",
             });
+            setDescriptionImageFiles([]);
             setSelectedTags([]);
         } catch (error) {
             showMessage("Error creating upload.", "error");
@@ -354,6 +359,29 @@ const UploadForm = () => {
                         className="w-full p-3 border rounded-lg"
                         rows="4"
                     ></textarea>
+                </div>
+
+                {/* Description Images */}
+                <div>
+                    <label
+                        htmlFor="images"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Description Images (Optional)
+                    </label>
+                    <input
+                        type="file"
+                        id="images"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                        className="w-full p-3 border rounded-lg outline-none text-sm"
+                    />
+                    {descriptionImageFiles.length > 0 && (
+                        <div className="text-xs text-gray-500 mt-1">
+                            {descriptionImageFiles.length} file(s) selected
+                        </div>
+                    )}
                 </div>
 
                 {/* Submit Button */}

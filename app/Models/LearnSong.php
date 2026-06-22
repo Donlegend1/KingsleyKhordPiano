@@ -20,17 +20,27 @@ class LearnSong extends Model
         'status',
         'position',
         'related_songs',
+        'images',
     ];
 
     protected $casts = [
         'related_songs' => 'array',
+        'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url'];
+    protected $appends = ['thumbnail_url', 'image_urls'];
 
     public function getThumbnailUrlAttribute()
     {
         return $this->thumbnail ? asset($this->thumbnail) : null;
+    }
+
+    public function getImageUrlsAttribute()
+    {
+        if (!$this->images) {
+            return [];
+        }
+        return array_map(fn($path) => asset($path), $this->images);
     }
 
     public function category()

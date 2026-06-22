@@ -113,6 +113,19 @@ class LiveCoachingBookingController extends Controller
             'time' => $time,
         ]);
 
+        $booking->load('user');
+
+        try {
+            // Send notification to the member who booked
+            $user->notify(new \App\Notifications\CoachingBookingNotification($booking));
+
+            // Send notification to the admin
+            \Illuminate\Support\Facades\Notification::route('mail', 'Kingsleykhord@gmail.com')
+                ->notify(new \App\Notifications\AdminCoachingBookingNotification($booking));
+        } catch (\Exception $e) {
+            logger()->warning('Failed to send live coaching session booking emails: ' . $e->getMessage());
+        }
+
         return response()->json(['success' => true, 'booking' => $booking]);
     }
 }

@@ -80,6 +80,20 @@
                         {{ $activeVideo->description ?? 'Learn how to use the up-down principle to create smooth, musical embellishments.' }}
                     </p>
 
+                    @if (!empty($activeVideo->images) && is_array($activeVideo->images))
+                        <div class="mt-6 mb-8">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Course Walkthrough / Highlights</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach ($activeVideo->images as $imgPath)
+                                    <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50 aspect-video relative group">
+                                        <img src="{{ asset($imgPath) }}" alt="Walkthrough Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+
                     {{-- Action Buttons --}}
                     <div class="flex items-center flex-wrap gap-3 mb-10">
                         {{-- @if($previousVideo)

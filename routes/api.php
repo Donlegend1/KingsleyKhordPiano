@@ -28,6 +28,9 @@ use App\Http\Controllers\AudioDownloadController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\Admin\AdminLearnSongController;
 use App\Http\Controllers\Admin\AdminExtraCourseController;
+use App\Http\Controllers\LiveShowNotificationController;
+
+
 
 
 
@@ -47,6 +50,10 @@ use App\Http\Controllers\Admin\AdminExtraCourseController;
     });
 
     Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
+    Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
+    Route::post('/notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
+    
+
     Route::get('/plans', [PlanController::class, 'index']);
 
     Route::prefix('admin')->group(function () {

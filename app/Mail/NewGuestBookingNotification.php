@@ -40,7 +40,7 @@ class NewGuestBookingNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.new_guest_booking_notification',
+            view: 'emails.new_guest_booking_notification',
         );
     }
 

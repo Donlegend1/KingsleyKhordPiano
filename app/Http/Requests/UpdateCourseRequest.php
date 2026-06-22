@@ -35,6 +35,8 @@ class UpdateCourseRequest extends FormRequest
             'what_you_will_learn' => 'nullable|string',
             'published_at' => 'nullable|date',
             'related_courses' => 'nullable|array',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
         ];
     }
 }

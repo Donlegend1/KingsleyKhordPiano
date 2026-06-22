@@ -130,6 +130,20 @@
                         {{ $lesson->description ?? 'Learn how to play and improve your piano skills with this comprehensive extra course.' }}
                     </p>
 
+                    @if (!empty($lesson->images) && is_array($lesson->images))
+                        <div class="mt-6 mb-8">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Course Walkthrough / Highlights</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach ($lesson->images as $imgPath)
+                                    <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50 aspect-video relative group">
+                                        <img src="{{ asset($imgPath) }}" alt="Walkthrough Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+
                     {{-- Action Buttons --}}
                     <div class="flex items-center flex-wrap gap-3 mb-10">
                         <form action="{{ route('bookmark.toggle') }}" method="POST" class="bookmark-form">
@@ -160,6 +174,72 @@
                             </button>
                         </form>
                     </div>
+
+                    {{-- Lessons in this course (Mobile Only) --}}
+                    @if ($playlist->count() > 1)
+                        <div class="block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                            {{-- Header --}}
+                            <div class="px-5 py-4 border-b border-gray-100">
+                                <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                                    Lessons in this course:
+                                </p>
+                            </div>
+
+                            {{-- Scrollable list --}}
+                            <div class="overflow-y-auto" style="max-height: 300px;">
+                                @foreach ($playlist as $item)
+                                    @php $isActive = $item->id == $lesson->id; @endphp
+                                    <a href="/member/lesson/{{ $item->id }}"
+                                        class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors
+                                        {{ $isActive ? 'bg-[#0FA9A0] text-white' : 'bg-white hover:bg-gray-50' }}">
+
+                                        {{-- Play icon --}}
+                                        <div class="shrink-0 mt-0.5">
+                                            @if ($isActive)
+                                                <i class="fa-solid fa-circle-play text-white text-[18px]"></i>
+                                            @else
+                                                <i class="fa-regular fa-circle-play text-gray-300 text-[18px]"></i>
+                                            @endif
+                                        </div>
+
+                                        {{-- Title + duration --}}
+                                        <div class="flex-1 min-w-0">
+                                            <p
+                                                class="text-[12px] font-bold uppercase tracking-wide leading-snug
+                                                {{ $isActive ? 'text-white' : 'text-gray-800' }}">
+                                                {{ $item->title }}
+                                            </p>
+                                            <p class="text-[11px] mt-1.5 {{ $isActive ? 'text-teal-100' : 'text-gray-400' }}">
+                                                {{ $item->duration ?? '05:00' }}
+                                            </p>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+
+                            {{-- Next/Prev Lesson buttons --}}
+                            <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
+                                @if ($previousVideo)
+                                    <a href="/member/lesson/{{ $previousVideo->id }}"
+                                        class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                        <i class="fa-solid fa-arrow-left text-sm"></i> Prev
+                                    </a>
+                                @endif
+
+                                @if ($nextVideo)
+                                    <a href="/member/lesson/{{ $nextVideo->id }}"
+                                        class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                        Next <i class="fa-solid fa-arrow-right text-sm"></i>
+                                    </a>
+                                @else
+                                    <button disabled
+                                        class="w-full py-3 border border-gray-100 rounded-lg text-gray-400 font-bold text-[14px] bg-gray-50 cursor-not-allowed">
+                                        Course Completed
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
                     {{-- Related Lessons (Only visible at the bottom if playlist is in sidebar) --}}
                     @if ($playlist->count() > 1 && $relatedLessons->count() > 0)
@@ -255,7 +335,7 @@
 
                 {{-- ── RIGHT COLUMN: Sidebar (Playlist or Related Lessons) ── --}}
                 <aside
-                    class="w-full lg:w-[360px] flex-shrink-0 border border-gray-100 rounded-xl overflow-hidden shadow-sm sticky top-6 bg-white">
+                    class="w-full lg:w-[360px] flex-shrink-0 border border-gray-100 rounded-xl overflow-hidden shadow-sm sticky top-6 bg-white {{ $playlist->count() > 1 ? 'hidden lg:block' : '' }}">
 
                     @if ($playlist->count() > 1)
                         {{-- Header --}}

@@ -30,7 +30,7 @@ class GuestBookingConfirmed extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your One-on-One Piano Lesson is Confirmed!',
+            subject: 'Session Confirmed!',
         );
     }
 
@@ -40,7 +40,7 @@ class GuestBookingConfirmed extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.guest_booking_confirmed',
+            view: 'emails.guest_booking_confirmed',
         );
     }
 

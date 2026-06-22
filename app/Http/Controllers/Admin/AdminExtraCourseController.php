@@ -64,6 +64,8 @@ class AdminExtraCourseController extends Controller
             'description' => 'nullable|string',
             'thumbnail' => 'nullable|image|max:5000',
             'related_courses' => 'nullable|array',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
         ]);
 
         $level = strtolower($request->input('level'));
@@ -101,6 +103,22 @@ class AdminExtraCourseController extends Controller
             $thumbnailPath = 'uploads/thumbnails/' . $filename;
         }
 
+        $descriptionImages = [];
+        if ($request->hasFile('images')) {
+            $destination = base_path('../public_html/uploads/descriptions');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/descriptions');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            foreach ($request->file('images') as $imgFile) {
+                $filename = time() . '_' . uniqid() . '_' . $imgFile->getClientOriginalName();
+                $imgFile->move($destination, $filename);
+                $descriptionImages[] = 'uploads/descriptions/' . $filename;
+            }
+        }
+
         $maxPos = ExtraCourse::where('extra_course_category_id', $category->id)->max('position') ?: 0;
 
         $course = ExtraCourse::create([
@@ -114,6 +132,7 @@ class AdminExtraCourseController extends Controller
             'status' => $request->input('status'),
             'position' => $maxPos + 1,
             'related_courses' => $request->input('related_courses'),
+            'images' => $descriptionImages,
         ]);
 
         return response()->json($course, 201);
@@ -131,6 +150,8 @@ class AdminExtraCourseController extends Controller
             'description' => 'nullable|string',
             'thumbnail' => 'nullable|image|max:5000',
             'related_courses' => 'nullable|array',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
         ]);
 
         $videoType = $request->input('video_type') ?? $course->video_type;
@@ -164,6 +185,33 @@ class AdminExtraCourseController extends Controller
             $thumbnailPath = 'uploads/thumbnails/' . $filename;
         }
 
+        $descriptionImages = $course->images;
+        if ($request->hasFile('images')) {
+            $destination = base_path('../public_html/uploads/descriptions');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/descriptions');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Delete old images
+            if ($course->images && is_array($course->images)) {
+                foreach ($course->images as $oldImg) {
+                    if (file_exists(public_path($oldImg))) {
+                        @unlink(public_path($oldImg));
+                    }
+                }
+            }
+
+            $descriptionImages = [];
+            foreach ($request->file('images') as $imgFile) {
+                $filename = time() . '_' . uniqid() . '_' . $imgFile->getClientOriginalName();
+                $imgFile->move($destination, $filename);
+                $descriptionImages[] = 'uploads/descriptions/' . $filename;
+            }
+        }
+
         $course->update([
             'title' => $request->input('title') ?? $course->title,
             'description' => $request->input('description') ?? $course->description,
@@ -172,6 +220,7 @@ class AdminExtraCourseController extends Controller
             'thumbnail' => $thumbnailPath,
             'status' => $request->input('status') ?? $course->status,
             'related_courses' => $request->input('related_courses') ?? $course->related_courses,
+            'images' => $descriptionImages,
         ]);
 
         return response()->json($course, 200);

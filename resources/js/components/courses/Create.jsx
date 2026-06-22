@@ -8,6 +8,7 @@ import {
 } from "../Alert/FlashMessageContext";
 
 const CourseForm = () => {
+    const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
     const [course, setCourse] = useState({
         title: "",
         category: "",
@@ -65,9 +66,34 @@ const CourseForm = () => {
         e.preventDefault();
         try {
             setLoading(true);
+            const formData = new FormData();
+            formData.append("title", course.title || "");
+            formData.append("category", course.category || "");
+            formData.append("description", course.description || "");
+            formData.append("video_url", course.video_url || "");
+            formData.append("video_type", course.video_type || "");
+            formData.append("level", course.level || "");
+            formData.append("status", course.status || "");
+            if (course.related_courses) {
+                course.related_courses.forEach((id) => {
+                    formData.append("related_courses[]", id);
+                });
+            }
+            if (course.thumbnail_file) {
+                formData.append("thumbnail", course.thumbnail_file);
+            }
+            descriptionImageFiles.forEach((file, idx) => {
+                formData.append(`images[${idx}]`, file);
+            });
+
             const response = await axios.post(
                 "/api/admin/course/store",
-                course
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    }
+                }
             );
             showMessage("Course saved", "success");
             setCourse({
@@ -85,7 +111,9 @@ const CourseForm = () => {
                 likes: 0,
                 dislikes: 0,
                 related_courses: [],
+                thumbnail_file: null,
             });
+            setDescriptionImageFiles([]);
         } catch (error) {
             showMessage("Error creating course", "error");
         } finally {
@@ -227,6 +255,39 @@ const CourseForm = () => {
                             value={allCourses.filter(opt => course.related_courses.includes(opt.value))}
                             placeholder="Select related courses..."
                         />
+                    </div>
+                    <div className="col-span-1 sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Thumbnail Image (Optional)
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                setCourse({
+                                    ...course,
+                                    thumbnail_file: e.target.files[0]
+                                });
+                            }}
+                            className="w-full p-2 border rounded-lg text-sm"
+                        />
+                    </div>
+                    <div className="col-span-1 sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Description Images (Optional)
+                        </label>
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                            className="w-full p-2 border rounded-lg text-sm outline-none"
+                        />
+                        {descriptionImageFiles.length > 0 && (
+                            <div className="text-xs text-gray-500 mt-1">
+                                {descriptionImageFiles.length} file(s) selected
+                            </div>
+                        )}
                     </div>
                 </div>
 

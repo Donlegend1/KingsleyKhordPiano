@@ -67,6 +67,12 @@ class LiveSessionController extends Controller
         // Book slot
         $liveshow->bookedUsers()->attach($userId);
 
+        try {
+            auth()->user()->notify(new \App\Notifications\LiveshowSlothNotification($liveshow));
+        } catch (\Exception $e) {
+            logger()->warning('Failed to send live session booking confirmation email: ' . $e->getMessage());
+        }
+
         return redirect('/member/live-session')->with('success', 'Your live session slot has been booked successfully!');
     }
 }

@@ -19,21 +19,31 @@ class Upload extends Model
         'thumbnail',
         'tags',
         'video_type',
-        'series'
+        'series',
+        'images',
     ];
 
     protected $casts = [
         'category' => 'string',
         'status' => 'string',
         'tags' => 'array',
+        'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url'];
+    protected $appends = ['thumbnail_url', 'image_urls'];
     
 
     public function getThumbnailUrlAttribute()
     {
         return $this->thumbnail ? asset($this->thumbnail) : null;
+    }
+
+    public function getImageUrlsAttribute()
+    {
+        if (!$this->images) {
+            return [];
+        }
+        return array_map(fn($path) => asset($path), $this->images);
     }
 
     public function bookmarks()

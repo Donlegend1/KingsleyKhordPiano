@@ -48,6 +48,7 @@ const DraggableCategoryList = ({
     });
 
     const [allCourses, setAllCourses] = useState([]);
+    const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
 
     const handleChangeNewCourse = (e) => {
         const { name, value } = e.target;
@@ -103,6 +104,7 @@ const DraggableCategoryList = ({
 
     const openEditModal = (course) => {
         setSelectedCourse(course);
+        setDescriptionImageFiles([]);
         setIsEditModalOpen(true);
     };
 
@@ -130,6 +132,7 @@ const DraggableCategoryList = ({
     const openNewCourseModal = (e, level, category) => {
         setSelectedCourseLevel(level);
         setSelectedCourseCategory(category);
+        setDescriptionImageFiles([]);
         setIsNewCourseModalOpen(true);
     };
 
@@ -159,12 +162,34 @@ const DraggableCategoryList = ({
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await axios.patch(
+            const formData = new FormData();
+            formData.append("_method", "PATCH");
+            formData.append("title", selectedCourse.title || "");
+            formData.append("category", selectedCourse.category || "");
+            formData.append("description", selectedCourse.description || "");
+            formData.append("video_url", selectedCourse.video_url || "");
+            formData.append("video_type", selectedCourse.video_type || "");
+            formData.append("status", selectedCourse.status || "");
+            formData.append("level", selectedCourse.level || "");
+            if (selectedCourse.related_courses) {
+                selectedCourse.related_courses.forEach((id) => {
+                    formData.append("related_courses[]", id);
+                });
+            }
+            if (selectedCourse.thumbnail_file) {
+                formData.append("thumbnail", selectedCourse.thumbnail_file);
+            }
+            descriptionImageFiles.forEach((file, idx) => {
+                formData.append(`images[${idx}]`, file);
+            });
+
+            const response = await axios.post(
                 `/api/admin/courses/${selectedCourse.id}`,
-                selectedCourse,
+                formData,
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
+                        "Content-Type": "multipart/form-data",
                     },
                     withCredentials: true,
                 }
@@ -174,7 +199,7 @@ const DraggableCategoryList = ({
             fetchCourses();
         } catch (error) {
             console.error("Error updating course:", error);
-            showMessage("Error creating course", "error");
+            showMessage("Error updating course", "error");
         } finally {
             setLoading(false);
         }
@@ -199,25 +224,54 @@ const DraggableCategoryList = ({
         }
     };
 
-    const handleCreateNewCourse = () => {
+    const handleCreateNewCourse = async () => {
         setLoading(true);
         try {
-            const response = axios.post(
+            const formData = new FormData();
+            formData.append("title", course.title || "");
+            formData.append("video_type", course.video_type || "youtube");
+            formData.append("video_url", course.video_url || "");
+            formData.append("status", course.status || "active");
+            formData.append("description", course.description || "");
+            formData.append("category", selectedCourseCategory || "");
+            formData.append("level", selectedCourseLevel || "");
+            if (course.related_courses) {
+                course.related_courses.forEach((id) => {
+                    formData.append("related_courses[]", id);
+                });
+            }
+            if (course.thumbnail_file) {
+                formData.append("thumbnail", course.thumbnail_file);
+            }
+            descriptionImageFiles.forEach((file, idx) => {
+                formData.append(`images[${idx}]`, file);
+            });
+
+            const response = await axios.post(
                 `/api/admin/course/store`,
-                {
-                    ...course,
-                    category: selectedCourseCategory,
-                    level: selectedCourseLevel,
-                },
+                formData,
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
+                        "Content-Type": "multipart/form-data",
                     },
                     withCredentials: true,
                 }
             );
             showMessage("Course Created", "success");
             closeNewCourseModal();
+            setCourse({
+                title: "",
+                category: "",
+                description: "",
+                video_url: "",
+                video_type: "youtube",
+                level: "beginner",
+                status: "active",
+                related_courses: [],
+                thumbnail_file: null,
+            });
+            setDescriptionImageFiles([]);
             fetchCourses();
         } catch (error) {
             console.error("Error creating new course:", error);
@@ -557,6 +611,23 @@ const DraggableCategoryList = ({
                                 placeholder="Select related courses..."
                             />
                         </div>
+
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Thumbnail Image (Optional)
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    setSelectedCourse({
+                                        ...selectedCourse,
+                                        thumbnail_file: e.target.files[0]
+                                    });
+                                }}
+                                className="w-full p-2 border rounded-lg"
+                            />
+                        </div>
                     </div>
 
                     <textarea
@@ -567,6 +638,33 @@ const DraggableCategoryList = ({
                         className="w-full p-3 border rounded-lg"
                         rows="4"
                     ></textarea>
+
+                    <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Description Images (Optional)
+                        </label>
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                            className="w-full p-2 border rounded-lg outline-none text-sm"
+                        />
+                        {descriptionImageFiles.length > 0 && (
+                            <div className="text-xs text-gray-500 mt-1">
+                                {descriptionImageFiles.length} file(s) selected
+                            </div>
+                        )}
+                        {selectedCourse?.image_urls && selectedCourse.image_urls.length > 0 && (
+                            <div className="mt-2 flex gap-2 flex-wrap">
+                                {selectedCourse.image_urls.map((url, idx) => (
+                                    <div key={idx} className="w-16 h-12 border rounded overflow-hidden">
+                                        <img src={url} className="w-full h-full object-cover" />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     <button
                         type="submit"
@@ -706,6 +804,23 @@ const DraggableCategoryList = ({
 
                 <div className="mt-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Thumbnail Image (Optional)
+                    </label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                            setCourse({
+                                ...course,
+                                thumbnail_file: e.target.files[0]
+                            });
+                        }}
+                        className="w-full p-2 border rounded-lg"
+                    />
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                         Related Courses
                     </label>
                     <Select
@@ -734,6 +849,24 @@ const DraggableCategoryList = ({
                         className="w-full p-3 border rounded-lg"
                         rows="4"
                     ></textarea>
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description Images (Optional)
+                    </label>
+                    <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                        className="w-full p-2 border rounded-lg outline-none text-sm"
+                    />
+                    {descriptionImageFiles.length > 0 && (
+                        <div className="text-xs text-gray-500 mt-1">
+                            {descriptionImageFiles.length} file(s) selected
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-4 flex justify-end">

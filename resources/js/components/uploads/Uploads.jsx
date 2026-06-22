@@ -71,6 +71,7 @@ const UploadList = () => {
         selectedCourse?.thumbnail_url || null,
     );
     const [thumbnail, setThumbnail] = useState(null);
+    const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
     const fileInputRef = useRef(null);
     const handleChangeCreate = (e) => {
         const { name, value } = e.target;
@@ -160,6 +161,8 @@ const UploadList = () => {
 
     const openEditModal = (course) => {
         setSelectedCourse(course);
+        setThumbnail(null);
+        setDescriptionImageFiles([]);
         setIsEditModalOpen(true);
     };
 
@@ -179,6 +182,8 @@ const UploadList = () => {
     };
 
     const openCreateModal = () => {
+        setThumbnailFile(null);
+        setDescriptionImageFiles([]);
         setIsCreateModalOpen(true);
     };
 
@@ -203,6 +208,9 @@ const UploadList = () => {
         if (thumbnail instanceof File) {
             formData.append("thumbnail", thumbnail);
         }
+        descriptionImageFiles.forEach((file, idx) => {
+            formData.append(`images[${idx}]`, file);
+        });
 
         try {
             const response = await axios.post(
@@ -236,6 +244,9 @@ const UploadList = () => {
 
         const formData = new FormData();
         formData.append("thumbnail", thumbnailFile);
+        descriptionImageFiles.forEach((file, idx) => {
+            formData.append(`images[${idx}]`, file);
+        });
 
         // Upload fields
         Object.entries(upload).forEach(([key, value]) =>
@@ -512,6 +523,32 @@ const UploadList = () => {
                             className="w-full p-3 border rounded-lg"
                             rows="4"
                         ></textarea>
+
+                        {/* Description Images */}
+                        <div className="flex flex-col space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Description Images (Optional)</label>
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                                className="w-full p-3 border rounded-lg outline-none"
+                            />
+                            {descriptionImageFiles.length > 0 && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                    {descriptionImageFiles.length} file(s) selected
+                                </div>
+                            )}
+                            {selectedCourse?.image_urls && selectedCourse.image_urls.length > 0 && (
+                                <div className="mt-2 flex gap-2 flex-wrap">
+                                    {selectedCourse.image_urls.map((url, idx) => (
+                                        <div key={idx} className="w-16 h-12 border rounded overflow-hidden">
+                                            <img src={url} className="w-full h-full object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
                         {/* Submit Button */}
                         <div className="text-right">
@@ -799,6 +836,23 @@ const UploadList = () => {
                                 className="w-full p-1 border rounded-lg"
                                 rows="2"
                             ></textarea>
+                        </div>
+
+                        {/* Description Images */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description Images (Optional)</label>
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                                className="w-full p-3 border rounded-lg outline-none"
+                            />
+                            {descriptionImageFiles.length > 0 && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                    {descriptionImageFiles.length} file(s) selected
+                                </div>
+                            )}
                         </div>
 
                         {/* Submit Button */}

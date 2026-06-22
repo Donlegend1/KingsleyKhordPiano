@@ -6,7 +6,7 @@
 @section('content')
 
 <div
-  x-data="{ step: {{ request('step', 1) }}, totalSteps: 4 }"
+  x-data="{ step: {{ request('step', 1) }}, totalSteps: 4, showDiscoveryCallModal: false }"
   x-init="$watch('step', () => window.scrollTo({ top: 0, behavior: 'smooth' }))"
   class="min-h-screen bg-white dark:bg-gray-900 py-6 px-4 flex flex-col"
 >
@@ -240,12 +240,16 @@
           </li>
         </ul>
 
-        <a href="/member/discovery-call" class="mt-auto w-full flex items-center justify-center space-x-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-4 rounded-xl transition text-sm">
+        <button 
+          @click="showDiscoveryCallModal = true"
+          type="button"
+          class="mt-auto w-full flex items-center justify-center space-x-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-4 rounded-xl transition text-sm"
+        >
           <span>Schedule Discovery Call</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
           </svg>
-        </a>
+        </button>
       </div>
 
     </div>
@@ -481,6 +485,79 @@
       </svg>
     </button>
 
+  </div>
+
+  {{-- ── Discovery Call Modal ── --}}
+  <div
+    x-cloak
+    x-show="showDiscoveryCallModal"
+    class="fixed inset-0 z-50 overflow-y-auto"
+    aria-labelledby="modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <!-- Background backdrop -->
+    <div
+      x-show="showDiscoveryCallModal"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-200"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+      @click="showDiscoveryCallModal = false"
+    ></div>
+
+    <!-- Modal position wrapper -->
+    <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+      <div
+        x-show="showDiscoveryCallModal"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        class="relative transform overflow-hidden rounded-[24px] bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-4xl border border-gray-100 flex flex-col"
+      >
+        <!-- Modal Header -->
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900" id="modal-title">
+              Book Discovery Call
+            </h3>
+          </div>
+          <button
+            @click="showDiscoveryCallModal = false"
+            type="button"
+            class="rounded-xl p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <span class="sr-only">Close modal</span>
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Body (Iframe) -->
+        <div class="bg-white p-2 sm:p-4">
+          <iframe
+            src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0VKbR_cb5DfipW_nRZiGtwsXkBlbwwG8q4kutzKRqaVO9-AdBCzb3ltzCS3BqotzPnKRCIGpoV?gv=true"
+            style="border: 0"
+            width="100%"
+            height="600"
+            frameborder="0"
+            class="rounded-xl overflow-hidden"
+          ></iframe>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

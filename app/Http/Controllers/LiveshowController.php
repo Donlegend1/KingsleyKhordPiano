@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Liveshow;
+use App\Models\LiveShowNotification;
 use App\Http\Requests\StoreLiveshowRequest;
 use App\Http\Requests\UpdateLiveshowRequest;
  use Carbon\Carbon;
  use Illuminate\Http\Request;
+ use App\Notifications\NewLiveShowNotification;
+use Illuminate\Support\Facades\DB;
 
 class LiveShowController extends Controller
 {
@@ -33,7 +36,18 @@ class LiveShowController extends Controller
      */
     public function store(StoreLiveshowRequest $request)
     {
-         LiveShow::create($request->all());
+        DB::transaction(function () use ($request) {
+            $liveshow = LiveShow::create($request->all());
+
+            LiveShowNotification::chunkById(100, function ($notifications) use ($liveshow) {
+                foreach ($notifications as $notification) {
+                    $user = $notification->user;
+                    if ($user) {
+                        $user->notify(new NewLiveShowNotification($liveshow));
+                    }
+                }
+            }, 'id', 'id');
+        });
 
         return redirect()->back()->with('success', 'Live show created.');
     }

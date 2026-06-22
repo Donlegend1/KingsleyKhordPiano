@@ -49,6 +49,7 @@ const LearnSongsAdmin = () => {
 
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
     const fileInputRef = useRef(null);
 
     const { showMessage } = useFlashMessage();
@@ -184,6 +185,7 @@ const LearnSongsAdmin = () => {
         });
         setThumbnailFile(null);
         setPreviewUrl(null);
+        setDescriptionImageFiles([]);
         setIsCreateSongModalOpen(true);
     };
 
@@ -202,6 +204,9 @@ const LearnSongsAdmin = () => {
         if (thumbnailFile) {
             formData.append("thumbnail", thumbnailFile);
         }
+        descriptionImageFiles.forEach((file, idx) => {
+            formData.append(`images[${idx}]`, file);
+        });
         newSong.related_songs.forEach((id, idx) => {
             formData.append(`related_songs[${idx}]`, id);
         });
@@ -232,6 +237,7 @@ const LearnSongsAdmin = () => {
         });
         setPreviewUrl(song.thumbnail_url);
         setThumbnailFile(null);
+        setDescriptionImageFiles([]);
         setIsEditSongModalOpen(true);
     };
 
@@ -248,6 +254,9 @@ const LearnSongsAdmin = () => {
         if (thumbnailFile) {
             formData.append("thumbnail", thumbnailFile);
         }
+        descriptionImageFiles.forEach((file, idx) => {
+            formData.append(`images[${idx}]`, file);
+        });
         editingSong.related_songs.forEach((id, idx) => {
             formData.append(`related_songs[${idx}]`, id);
         });
@@ -530,6 +539,21 @@ const LearnSongsAdmin = () => {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description Images (Optional)</label>
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                            />
+                            {descriptionImageFiles.length > 0 && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                    {descriptionImageFiles.length} file(s) selected
+                                </div>
+                            )}
+                        </div>
                         <div className="col-span-1 sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Related Songs</label>
                             <Select
@@ -627,6 +651,30 @@ const LearnSongsAdmin = () => {
                                     onChange={handleFileChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Description Images (Optional)</label>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => setDescriptionImageFiles(Array.from(e.target.files))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                {descriptionImageFiles.length > 0 && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {descriptionImageFiles.length} file(s) selected
+                                    </div>
+                                )}
+                                {editingSong.image_urls && editingSong.image_urls.length > 0 && (
+                                    <div className="mt-2 flex gap-2 flex-wrap">
+                                        {editingSong.image_urls.map((url, idx) => (
+                                            <div key={idx} className="w-16 h-12 border rounded overflow-hidden">
+                                                <img src={url} className="w-full h-full object-cover" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div className="col-span-1 sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Related Songs</label>

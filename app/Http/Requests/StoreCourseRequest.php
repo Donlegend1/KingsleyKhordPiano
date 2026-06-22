@@ -32,6 +32,9 @@ class StoreCourseRequest extends FormRequest
             'rating_count' => 'nullable|integer',
             'average_rating' => 'nullable|numeric',
             'related_courses' => 'nullable|array',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5000',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
         ];
     }
 }

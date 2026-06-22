@@ -55,7 +55,7 @@
     >
         {{-- Logo --}}
         <div class="px-6 py-5 border-b border-gray-200 flex justify-center">
-            <a href="/member/community">
+            <a href="/home" class="flex items-center gap-2">
                 <img src="/logo/logoblack.png" alt="Kingsley Khord" class="h-10 w-auto">
             </a>
         </div>

@@ -160,7 +160,8 @@ const ZoomMeetingBooking = () => {
                 date: selectedSlot.date,
                 time: selectedSlot.time,
                 paymentMethod: method,
-                skillLevel: meetingDetails.skillLevel
+                skillLevel: meetingDetails.skillLevel,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
             });
 
             if (response.data.url) {

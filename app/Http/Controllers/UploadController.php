@@ -86,7 +86,9 @@ class UploadController extends Controller
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
 
             $destination = base_path('../public_html/uploads/thumbnails');
-
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/thumbnails');
+            }
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
             }
@@ -94,6 +96,22 @@ class UploadController extends Controller
             $thumbnail->move($destination, $filename);
 
             $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
+        }
+
+        $descriptionImages = [];
+        if ($request->hasFile('images')) {
+            $destination = base_path('../public_html/uploads/descriptions');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/descriptions');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            foreach ($request->file('images') as $imgFile) {
+                $filename = time() . '_' . uniqid() . '_' . $imgFile->getClientOriginalName();
+                $imgFile->move($destination, $filename);
+                $descriptionImages[] = 'uploads/descriptions/' . $filename;
+            }
         }
 
         $upload = Upload::create([
@@ -108,6 +126,7 @@ class UploadController extends Controller
             'tags'         => $validated['tags'] ?? null,
             'thumbnail'    => $validated['thumbnail'] ?? null,
             'series'       => $validated['series'] ?? null,
+            'images'       => $descriptionImages,
         ]);
 
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -176,7 +195,9 @@ class UploadController extends Controller
             $filename = time() . '_' . $thumbnail->getClientOriginalName();
 
             $destination = base_path('../public_html/uploads/thumbnails');
-
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/thumbnails');
+            }
             if (!file_exists($destination)) {
                 mkdir($destination, 0755, true);
             }
@@ -188,6 +209,34 @@ class UploadController extends Controller
 
             $thumbnail->move($destination, $filename);
             $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
+        }
+
+        /* ---------------- IMAGES UPLOAD ---------------- */
+        $descriptionImages = $upload->images ?? [];
+        if ($request->hasFile('images')) {
+            $destination = base_path('../public_html/uploads/descriptions');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/descriptions');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Delete old images
+            if ($upload->images && is_array($upload->images)) {
+                foreach ($upload->images as $oldImg) {
+                    if (file_exists(public_path($oldImg))) {
+                        @unlink(public_path($oldImg));
+                    }
+                }
+            }
+
+            $descriptionImages = [];
+            foreach ($request->file('images') as $imgFile) {
+                $filename = time() . '_' . uniqid() . '_' . $imgFile->getClientOriginalName();
+                $imgFile->move($destination, $filename);
+                $descriptionImages[] = 'uploads/descriptions/' . $filename;
+            }
         }
 
         /* ---------------- UPDATE MODEL ---------------- */
@@ -204,6 +253,7 @@ class UploadController extends Controller
             'tags'         => $validated['tags'] ?? $upload->tags,
             'thumbnail'    => $validated['thumbnail'] ?? $upload->thumbnail,
             'series'       => $validated['series'] ?? $upload->series,
+            'images'       => $descriptionImages,
         ]);
         logger()->info(['video' => $validated['video_type']]);
         

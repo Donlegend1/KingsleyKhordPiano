@@ -1,3 +1,11 @@
+@php
+    $userTz = (isset($user) && $user && $user->timezone) ? $user->timezone : 'UTC';
+    $startLocal = \Carbon\Carbon::parse($show['start_time'], 'Africa/Lagos')->setTimezone($userTz);
+    
+    // For calendar integration, convert to UTC/GMT
+    $startUtc = \Carbon\Carbon::parse($show['start_time'], 'Africa/Lagos')->setTimezone('UTC');
+    $endUtc = $startUtc->copy()->addHour();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,11 +40,11 @@
                                 <tr>
                                     <td width="50%" style="padding:18px 24px;text-align:center;border-right:1px solid #EDE9FE;">
                                         <p style="margin:0 0 2px;font-size:10px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:1.5px;">Date</p>
-                                        <p style="margin:0;font-size:16px;font-weight:700;color:#1E1B4B;">{{ \Carbon\Carbon::parse($show['start_time'])->format('l, F j, Y') }}</p>
+                                        <p style="margin:0;font-size:16px;font-weight:700;color:#1E1B4B;">{{ $startLocal->format('l, F j, Y') }}</p>
                                     </td>
                                     <td width="50%" style="padding:18px 24px;text-align:center;">
                                         <p style="margin:0 0 2px;font-size:10px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:1.5px;">Time</p>
-                                        <p style="margin:0;font-size:16px;font-weight:700;color:#1E1B4B;">{{ \Carbon\Carbon::parse($show['start_time'])->format('g:i A') }} (WAT)</p>
+                                        <p style="margin:0;font-size:16px;font-weight:700;color:#1E1B4B;">{{ $startLocal->format('g:i A') }} ({{ $userTz }})</p>
                                     </td>
                                 </tr>
                             </table>
@@ -90,7 +98,7 @@
                             <table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 0;">
                                 <tr>
                                     <td align="center">
-                                        <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ urlencode($show['title'] ?? 'Kingsley Khord Live Show') }}&dates={{ \Carbon\Carbon::parse($show['start_time'])->format('Ymd\THis') }}/{{ \Carbon\Carbon::parse($show['start_time'])->addHour()->format('Ymd\THis') }}&details={{ urlencode('Join the live session at kingsleykhord.com') }}"
+                                        <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ urlencode($show['title'] ?? 'Kingsley Khord Live Show') }}&dates={{ $startUtc->format('Ymd\THis\Z') }}/{{ $endUtc->format('Ymd\THis\Z') }}&details={{ urlencode('Join the live session at kingsleykhord.com') }}"
                                            target="_blank"
                                            style="display:inline-block;border:1.5px solid #D1D5DB;color:#6B7280;text-decoration:none;font-size:13px;font-weight:600;padding:11px 28px;border-radius:8px;">
                                             📅 Add to Google Calendar
