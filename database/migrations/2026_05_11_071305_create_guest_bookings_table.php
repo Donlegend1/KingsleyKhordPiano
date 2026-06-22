@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('guest_bookings')) {
         Schema::create('guest_bookings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->string('google_calendar_event_id')->nullable();
             $table->timestamps();
         });
+        }
     }
 
     /**

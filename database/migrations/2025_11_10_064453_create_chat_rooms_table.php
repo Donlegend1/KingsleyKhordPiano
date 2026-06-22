@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('chat_rooms')) {
         Schema::create('chat_rooms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->boolean('is_premium')->default(true);
             $table->timestamps();
         });
+        }
     }
 
     /**

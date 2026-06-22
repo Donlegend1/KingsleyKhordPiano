@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('tutorials')){
         Schema::create('tutorials', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->string('status')->default('active');
             $table->timestamps();
         });
+        }
     }
 
     /**

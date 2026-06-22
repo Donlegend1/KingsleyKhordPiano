@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('website_videos')) {
         Schema::create('website_videos', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->string('video_category');
             $table->timestamps();
         });
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('posts')) {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
+        }
     }
 
     /**

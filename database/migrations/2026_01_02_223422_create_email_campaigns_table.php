@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('email_campaigns')) {
         Schema::create('email_campaigns', function (Blueprint $table) {
             $table->id();
             $table->string('subject');
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->string('status');
             $table->timestamps();
         });
+        }
     }
 
     /**

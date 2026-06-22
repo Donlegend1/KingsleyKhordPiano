@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('booking_availabilities')) {
+
         Schema::create('booking_availabilities', function (Blueprint $table) {
             $table->id();
             $table->date('date');
@@ -20,6 +22,7 @@ return new class extends Migration
 
             $table->unique(['date', 'time']);
         });
+        }
     }
 
     /**

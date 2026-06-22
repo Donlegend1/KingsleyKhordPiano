@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('bookmarks')) {
         Schema::create('bookmarks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -23,6 +24,7 @@ return new class extends Migration
 
             $table->unique(['user_id', 'bookmarkable_id', 'bookmarkable_type'], 'unique_user_bookmark');
         });
+        }
     }
 
     /**

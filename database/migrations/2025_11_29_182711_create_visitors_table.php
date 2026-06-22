@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('visitors')) {
         Schema::create('visitors', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
             $table->enum('source', ['visitor_page'])->default('visitor_page');
             $table->timestamps();
         });
+        }
     }
 
     /**

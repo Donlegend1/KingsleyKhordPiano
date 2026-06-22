@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('audio_downloads')) {
         Schema::create('audio_downloads', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->string('file_size')->nullable();
             $table->timestamps();
         });
+        }
     }
 
     /**

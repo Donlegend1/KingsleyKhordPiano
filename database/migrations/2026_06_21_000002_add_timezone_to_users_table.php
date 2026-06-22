@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('timezone')->nullable()->after('last_login_at');
+            if (! Schema::hasColumn('users', 'timezone')) {
+                $table->string('timezone')->nullable()->after('last_login_at');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('timezone');
+            if (Schema::hasColumn('users', 'timezone')) {
+                $table->dropColumn('timezone');
+            }
         });
     }
 };

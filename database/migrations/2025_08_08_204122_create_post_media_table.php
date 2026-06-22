@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('post_media')) {
         Schema::create('post_media', function (Blueprint $table) {
             $table->id();
             $table->string('post_id');
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->enum('type', ['image', 'video']);
             $table->timestamps();
         });
+        }
     }
 
     /**

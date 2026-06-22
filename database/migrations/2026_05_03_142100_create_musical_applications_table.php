@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('musical_applications')) {
         Schema::create('musical_applications', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'inactive', 'draft'])->default('active');
             $table->timestamps();
         });
+        }
     }
 
     /**

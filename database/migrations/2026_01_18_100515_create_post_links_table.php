@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('post_blocks')) {
         Schema::create('post_blocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained()->cascadeOnDelete();
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->unsignedInteger('position');
             $table->timestamps();
         });
+        }
     }
 
     /**

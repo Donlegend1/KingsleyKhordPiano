@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('course_video_comments', function (Blueprint $table) {
-            $table->string('url')->after('comment')->nullable();
+            if (! Schema::hasColumn('course_video_comments', 'url')) {
+                $table->string('url')->after('comment')->nullable();
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('course_video_comments', function (Blueprint $table) {
-            $table->dropColumn('url');
+            if (Schema::hasColumn('course_video_comments', 'url')) {
+                $table->dropColumn('url');
+            }
         });
     }
 };

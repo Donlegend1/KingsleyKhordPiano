@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('learn_song_categories')){
         Schema::create('user_assessments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->json('answers'); // selected option ids/points for each question
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

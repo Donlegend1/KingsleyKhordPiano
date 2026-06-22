@@ -11,6 +11,7 @@ class CreateCourseVideoCommentRepliesTable extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('course_video_comment_replies')) {
         Schema::create('course_video_comment_replies', function (Blueprint $table) {
             $table->id();
             $table->integer('course_video_comment_id');
@@ -18,6 +19,7 @@ class CreateCourseVideoCommentRepliesTable extends Migration
             $table->text('reply');
             $table->timestamps();
         });
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('p_d_f_downloads')) {
         Schema::create('p_d_f_downloads', function (Blueprint $table) {
             $table->id();
             $table->string('title');
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->string('file_url');
             $table->timestamps();
         });
+        }
     }
 
     /**

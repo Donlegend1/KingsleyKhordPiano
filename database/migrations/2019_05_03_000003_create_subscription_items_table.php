@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('subscription_items')) {
         Schema::create('subscription_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subscription_id');
@@ -22,6 +23,7 @@ return new class extends Migration
 
             $table->index(['subscription_id', 'stripe_price']);
         });
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('post_comments')) {
         Schema::create('post_comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->text('body');
             $table->timestamps();
         });
+        }
     }
 
     /**

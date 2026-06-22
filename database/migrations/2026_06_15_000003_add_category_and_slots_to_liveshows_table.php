@@ -12,18 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('liveshows', function (Blueprint $table) {
-            $table->string('category')->default('event'); // 'event' or 'session'
-            $table->integer('max_slots')->default(5);
+            if (! Schema::hasColumn('liveshows', 'category')) {
+                $table->string('category')->default('event'); // 'event' or 'session'
+            }
+
+            if (! Schema::hasColumn('liveshows', 'max_slots')) {
+                $table->integer('max_slots')->default(5);
+            }
         });
 
-        Schema::create('liveshow_bookings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('liveshow_id')->constrained('liveshows')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->timestamps();
-            
-            $table->unique(['liveshow_id', 'user_id']);
-        });
+        if (! Schema::hasTable('liveshow_bookings')) {
+            Schema::create('liveshow_bookings', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('liveshow_id')->constrained('liveshows')->cascadeOnDelete();
+                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+                $table->timestamps();
+
+                $table->unique(['liveshow_id', 'user_id']);
+            });
+        }
     }
 
     /**
@@ -34,7 +41,19 @@ return new class extends Migration
         Schema::dropIfExists('liveshow_bookings');
 
         Schema::table('liveshows', function (Blueprint $table) {
-            $table->dropColumn(['category', 'max_slots']);
+            $columnsToDrop = [];
+
+            if (Schema::hasColumn('liveshows', 'category')) {
+                $columnsToDrop[] = 'category';
+            }
+
+            if (Schema::hasColumn('liveshows', 'max_slots')) {
+                $columnsToDrop[] = 'max_slots';
+            }
+
+            if (! empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };

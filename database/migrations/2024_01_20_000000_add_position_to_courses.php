@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
+        if (! Schema::hasTable('course_categories')) {
         Schema::create('course_categories', function (Blueprint $table) {
             $table->id();
             $table->string('category');
@@ -16,6 +17,7 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(['category', 'level', 'position']);
         });
+        }
     }
 
     public function down()

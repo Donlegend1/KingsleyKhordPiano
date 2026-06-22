@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('live_coaching_bookings')){
         Schema::create('live_coaching_bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -21,6 +22,7 @@ return new class extends Migration
             // No two members can book the exact same slot.
             $table->unique(['date', 'time']);
         });
+        }
     }
 
     /**

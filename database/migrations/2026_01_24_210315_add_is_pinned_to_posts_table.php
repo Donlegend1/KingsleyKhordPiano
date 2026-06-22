@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->boolean('is_pinned')->default(false)->index();
+            if (! Schema::hasColumn('posts', 'is_pinned')) {
+                $table->boolean('is_pinned')->default(false)->index();
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn('is_pinned');
+            if (Schema::hasColumn('posts', 'is_pinned')) {
+                $table->dropColumn('is_pinned');
+            }
         });
     }
 };

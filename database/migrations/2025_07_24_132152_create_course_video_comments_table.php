@@ -11,6 +11,7 @@ class CreateCourseVideoCommentsTable extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('course_video_comments')) {
         Schema::create('course_video_comments', function (Blueprint $table) {
             $table->id();
             $table->string('category');
@@ -19,6 +20,7 @@ class CreateCourseVideoCommentsTable extends Migration
             $table->text('comment');
             $table->timestamps();
         });
+        }
     }
 
     /**

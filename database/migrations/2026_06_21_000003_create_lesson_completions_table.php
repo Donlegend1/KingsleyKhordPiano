@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+         if (! Schema::hasTable('lesson_completions')){
         Schema::create('lesson_completions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -23,6 +24,7 @@ return new class extends Migration
 
             $table->unique(['user_id', 'completable_id', 'completable_type'], 'unique_user_completion');
         });
+         }
     }
 
     /**

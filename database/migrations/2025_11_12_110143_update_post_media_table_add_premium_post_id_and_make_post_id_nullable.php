@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('post_media')) {
         Schema::table('post_media', function (Blueprint $table) {
             // Make post_id nullable
             $table->unsignedBigInteger('post_id')->nullable()->change();
@@ -21,6 +22,7 @@ return new class extends Migration
             // (Optional) If it references a premium_posts table:
             // $table->foreign('premium_post_id')->references('id')->on('premium_posts')->onDelete('cascade');
         });
+        }
     }
 
     /**

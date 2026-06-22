@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('midi_files', function (Blueprint $table) {
-            $table->string('lms_file_path')->nullable()->after('lmv_file_path');
+            if (! Schema::hasColumn('midi_files', 'lms_file_path')) {
+                $table->string('lms_file_path')->nullable()->after('lmv_file_path');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('midi_files', function (Blueprint $table) {
-            $table->dropColumn('lms_file_path');
+            if (Schema::hasColumn('midi_files', 'lms_file_path')) {
+                $table->dropColumn('lms_file_path');
+            }
         });
     }
 };

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('post_likes')) {
         Schema::create('post_likes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
@@ -20,6 +21,7 @@ return new class extends Migration
             // Prevent duplicate likes from same user on same post
             $table->unique(['post_id', 'user_id']);
         });
+        }
     }
 
     /**
