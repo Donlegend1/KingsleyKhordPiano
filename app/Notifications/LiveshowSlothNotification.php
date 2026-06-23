@@ -45,13 +45,25 @@ class LiveshowSlothNotification extends Notification implements ShouldQueue
         $timeFormatted = $startTimeLocal->format('g:i A');
         $setupLink = url('/member/getstarted?step=3');
 
+        $offset = $startTimeLocal->offset;
+        $hours = intval($offset / 3600);
+        $minutes = abs(intval(($offset % 3600) / 60));
+        if ($offset == 0) {
+            $gmtLabel = 'GMT';
+        } else {
+            $gmtLabel = 'GMT' . ($hours >= 0 ? '+' : '-') . abs($hours);
+            if ($minutes > 0) {
+                $gmtLabel .= ':' . sprintf('%02d', $minutes);
+            }
+        }
+
         return (new MailMessage)
             ->subject('Confirmed! See you at the Live Session 🎹')
             ->view('emails.liveshow-sloth', [
                 'memberName' => $memberName,
                 'dateFormatted' => $dateFormatted,
                 'timeFormatted' => $timeFormatted,
-                'timezone' => $userTz,
+                'timezone' => $gmtLabel,
                 'setupLink' => $setupLink,
             ]);
     }

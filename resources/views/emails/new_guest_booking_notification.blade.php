@@ -3,13 +3,21 @@
 @section('content')
 
 @php
-    $startLagos = \Carbon\Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos');
-    $endLagos = $startLagos->copy()->addHour();
-    $startGmt = $startLagos->copy()->setTimezone('UTC');
-    $endGmt = $startGmt->copy()->addHour();
     $userTz = $booking->timezone ?: 'UTC';
-    $startUser = $startLagos->copy()->setTimezone($userTz);
-    $endUser = $startUser->copy()->addHour();
+    $start = \Carbon\Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos')->setTimezone($userTz);
+    $end = $start->copy()->addHour();
+
+    $offset = $start->offset;
+    $hours = intval($offset / 3600);
+    $minutes = abs(intval(($offset % 3600) / 60));
+    if ($offset == 0) {
+        $gmtLabel = 'GMT';
+    } else {
+        $gmtLabel = 'GMT' . ($hours >= 0 ? '+' : '-') . abs($hours);
+        if ($minutes > 0) {
+            $gmtLabel .= ':' . sprintf('%02d', $minutes);
+        }
+    }
 @endphp
 
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; overflow: hidden;">
@@ -24,10 +32,8 @@
                         <td style="padding: 12px 15px; color: #555; line-height: 1.8;">
                             <strong>👤 Name:</strong> {{ $booking->name }}<br>
                             <strong>✉️ Email:</strong> {{ $booking->email }}<br>
-                            <strong>📅 Date:</strong> {{ $startLagos->format('l, F j, Y') }}<br>
-                            <strong>🕗 Time (Your local):</strong> {{ $startLagos->format('g:i A') }} – {{ $endLagos->format('g:i A') }} (WAT)<br>
-                            <strong>🕗 Time (Guest local):</strong> {{ $startUser->format('g:i A') }} – {{ $endUser->format('g:i A') }} ({{ $userTz }})<br>
-                            <strong>🕗 Time (GMT):</strong> {{ $startGmt->format('g:i A') }} – {{ $endGmt->format('g:i A') }} (GMT)<br>
+                            <strong>📅 Date:</strong> {{ $start->format('l, F j, Y') }}<br>
+                            <strong>🕗 Time:</strong> {{ $start->format('g:i A') }} – {{ $end->format('g:i A') }} ({{ $gmtLabel }})<br>
                             <strong>💳 Payment:</strong> $60 via {{ ucfirst($booking->payment_method) }} ({{ ucfirst($booking->payment_status) }})
                             @if($booking->skill_level)
                                 <br><strong>📈 Skill Level:</strong> {{ ucfirst($booking->skill_level) }}

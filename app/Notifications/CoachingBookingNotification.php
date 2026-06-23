@@ -43,13 +43,25 @@ class CoachingBookingNotification extends Notification implements ShouldQueue
         $timeFormatted = $dateTime->format('g:i A');
         $setupLink = url('/member/getstarted?step=3');
 
+        $offset = $dateTime->offset;
+        $hours = intval($offset / 3600);
+        $minutes = abs(intval(($offset % 3600) / 60));
+        if ($offset == 0) {
+            $gmtLabel = 'GMT';
+        } else {
+            $gmtLabel = 'GMT' . ($hours >= 0 ? '+' : '-') . abs($hours);
+            if ($minutes > 0) {
+                $gmtLabel .= ':' . sprintf('%02d', $minutes);
+            }
+        }
+
         return (new MailMessage)
             ->subject('Session Confirmed 🎹')
             ->view('emails.coaching-booking-confirmed', [
                 'memberName' => $memberName,
                 'dateFormatted' => $dateFormatted,
                 'timeFormatted' => $timeFormatted,
-                'timezone' => $userTz,
+                'timezone' => $gmtLabel,
                 'setupLink' => $setupLink,
             ]);
     }

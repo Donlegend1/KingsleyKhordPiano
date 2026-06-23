@@ -8,7 +8,8 @@
         currentYear: new Date().getFullYear(),
         selectedDay: null,
         selectedTime: null,
-        confirmed: false,
+        confirmed: {{ $activeBooking ? 'true' : 'false' }},
+        activeBooking: {{ json_encode($activeBooking) }},
         calendarMenuOpen: false,
         booking: false,
         bookingError: '',
@@ -116,6 +117,7 @@
                     this.selectedTime = null;
                     return;
                 }
+                this.activeBooking = data.booking;
                 this.sessionsUsed++;
                 this.confirmed = true;
             } catch (e) {
@@ -128,6 +130,19 @@
         // Re-derives the actual start/end Date objects for the selected slot
         // (convertedSlots only exposes formatted label strings for display).
         get selectedSlotRange() {
+            if (this.activeBooking) {
+                let parts = this.activeBooking.date.split('-');
+                let timeParts = this.activeBooking.time.split(':');
+                let yr = parseInt(parts[0]);
+                let mo = parseInt(parts[1]) - 1;
+                let dy = parseInt(parts[2]);
+                let hr = parseInt(timeParts[0]);
+                let mn = parseInt(timeParts[1]);
+
+                let startUtc = new Date(Date.UTC(yr, mo, dy, hr - 1, mn));
+                let endUtc   = new Date(Date.UTC(yr, mo, dy, hr - 1, mn + 45));
+                return { startUtc, endUtc };
+            }
             if (this.selectedDay === null || !this.selectedTime) return null;
             let dow = this.getDayOfWeek(this.selectedDay);
             let slots = this.slotsByDow[dow] || [];
@@ -240,6 +255,36 @@
             this.selectedDay = day; this.selectedTime = null;
         },
 
+        getFormattedBookingDate() {
+            if (!this.activeBooking) return '';
+            let parts = this.activeBooking.date.split('-');
+            let timeParts = this.activeBooking.time.split(':');
+            let yr = parseInt(parts[0]);
+            let mo = parseInt(parts[1]) - 1;
+            let dy = parseInt(parts[2]);
+            let hr = parseInt(timeParts[0]);
+            let mn = parseInt(timeParts[1]);
+
+            let startUtc = new Date(Date.UTC(yr, mo, dy, hr - 1, mn));
+            return startUtc.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric', timeZone: this.userTz });
+        },
+
+        getFormattedBookingTime() {
+            if (!this.activeBooking) return '';
+            let parts = this.activeBooking.date.split('-');
+            let timeParts = this.activeBooking.time.split(':');
+            let yr = parseInt(parts[0]);
+            let mo = parseInt(parts[1]) - 1;
+            let dy = parseInt(parts[2]);
+            let hr = parseInt(timeParts[0]);
+            let mn = parseInt(timeParts[1]);
+
+            let startUtc = new Date(Date.UTC(yr, mo, dy, hr - 1, mn));
+            let endUtc   = new Date(Date.UTC(yr, mo, dy, hr - 1, mn + 45));
+            let fmt = t => t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: this.userTz });
+            return fmt(startUtc) + ' – ' + fmt(endUtc);
+        },
+
         init() {
             try {
                 const offset = -new Date().getTimezoneOffset();
@@ -249,7 +294,8 @@
             } catch(e) { this.userTzLabel = 'local time'; }
         }
     }"
-    x-init="init()">
+    x-init="init()"
+    >
 
     <div class="max-w-5xl mx-auto">
 
@@ -324,7 +370,7 @@
             </div>
 
             <!-- Calendar + Time Slots -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div x-show="sessionsUsed < sessionsIncluded" x-cloak class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
 
                     <!-- Left: Calendar -->
@@ -511,8 +557,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-xl font-bold text-gray-900 leading-tight" x-text="selectedDateLabel"></p>
-                                <p class="text-sm text-gray-500 mt-0.5" x-text="selectedTime + ' (45 Minutes)'"></p>
+                                <p class="text-xl font-bold text-gray-900 leading-tight" x-text="activeBooking ? getFormattedBookingDate() : selectedDateLabel"></p>
+                                <p class="text-sm text-gray-500 mt-0.5" x-text="(activeBooking ? getFormattedBookingTime() : selectedTime) + ' (45 Minutes)'"></p>
                             </div>
                         </div>
 
@@ -578,24 +624,24 @@
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
                         <div class="flex items-center justify-between mb-6">
                             <p class="text-sm font-bold text-gray-900">Monthly Session Status</p>
-                            <span class="text-xs font-bold text-green-700 bg-green-100 px-3 py-1.5 rounded-full">1 / 1 Used</span>
+                            <span class="text-xs font-bold text-green-700 bg-green-100 px-3 py-1.5 rounded-full" x-text="sessionsUsed + ' / ' + sessionsIncluded + ' Used'"></span>
                         </div>
                         <div class="flex flex-col gap-0 divide-y divide-gray-100">
                             <div class="flex items-center justify-between py-3.5">
                                 <span class="text-sm text-gray-500">Sessions Included</span>
-                                <span class="text-sm font-bold text-gray-900">1</span>
+                                <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded"></span>
                             </div>
                             <div class="flex items-center justify-between py-3.5">
                                 <span class="text-sm text-gray-500">Sessions Used</span>
-                                <span class="text-sm font-bold text-gray-900">1</span>
+                                <span class="text-sm font-bold text-gray-900" x-text="sessionsUsed"></span>
                             </div>
                             <div class="flex items-center justify-between py-3.5">
                                 <span class="text-sm text-gray-500">Remaining Sessions</span>
-                                <span class="text-sm font-bold text-gray-900">0</span>
+                                <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded - sessionsUsed"></span>
                             </div>
                             <div class="flex items-center justify-between py-3.5">
                                 <span class="text-sm text-gray-500">Next Available</span>
-                                <span class="text-sm font-bold text-gray-900">July 1, 2026</span>
+                                <span class="text-sm font-bold text-gray-900" x-text="nextResetLabel"></span>
                             </div>
                         </div>
                     </div>

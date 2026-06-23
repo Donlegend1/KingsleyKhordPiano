@@ -48,11 +48,16 @@ class LiveCoachingBookingController extends Controller
             ->map(fn ($rows) => $rows->map(fn ($b) => substr($b->time, 0, 8))->values())
             ->toArray();
 
+        $activeBooking = LiveCoachingBooking::where('user_id', $user->id)
+            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->first();
+
         return view('memberpages.my-library', [
             'sessionsUsed' => $sessionsUsed,
             'sessionsIncluded' => $sessionsIncluded,
             'nextResetLabel' => $nextResetLabel,
             'bookedSlots' => $bookedSlots,
+            'activeBooking' => $activeBooking,
         ]);
     }
 

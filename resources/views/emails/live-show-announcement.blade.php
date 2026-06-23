@@ -5,6 +5,18 @@
     // For calendar integration, convert to UTC/GMT
     $startUtc = \Carbon\Carbon::parse($show['start_time'], 'Africa/Lagos')->setTimezone('UTC');
     $endUtc = $startUtc->copy()->addHour();
+
+    $offset = $startLocal->offset;
+    $hours = intval($offset / 3600);
+    $minutes = abs(intval(($offset % 3600) / 60));
+    if ($offset == 0) {
+        $gmtLabel = 'GMT';
+    } else {
+        $gmtLabel = 'GMT' . ($hours >= 0 ? '+' : '-') . abs($hours);
+        if ($minutes > 0) {
+            $gmtLabel .= ':' . sprintf('%02d', $minutes);
+        }
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -44,7 +56,7 @@
                                     </td>
                                     <td width="50%" style="padding:18px 24px;text-align:center;">
                                         <p style="margin:0 0 2px;font-size:10px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:1.5px;">Time</p>
-                                        <p style="margin:0;font-size:16px;font-weight:700;color:#1E1B4B;">{{ $startLocal->format('g:i A') }} ({{ $userTz }})</p>
+                                        <p style="margin:0;font-size:16px;font-weight:700;color:#1E1B4B;">{{ $startLocal->format('g:i A') }} ({{ $gmtLabel }})</p>
                                     </td>
                                 </tr>
                             </table>

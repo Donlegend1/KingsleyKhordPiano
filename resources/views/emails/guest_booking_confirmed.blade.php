@@ -12,14 +12,27 @@
                 <p>Thank you for booking a one-on-one piano coaching session with Kingsley Khord! Your session is confirmed — here's a summary of your booking:</p>
                 
                 @php
-                    $startGmt = \Carbon\Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos')->setTimezone('UTC');
-                    $endGmt = $startGmt->copy()->addHour();
+                    $userTz = $booking->timezone ?: 'UTC';
+                    $start = \Carbon\Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos')->setTimezone($userTz);
+                    $end = $start->copy()->addHour();
+
+                    $offset = $start->offset;
+                    $hours = intval($offset / 3600);
+                    $minutes = abs(intval(($offset % 3600) / 60));
+                    if ($offset == 0) {
+                        $gmtLabel = 'GMT';
+                    } else {
+                        $gmtLabel = 'GMT' . ($hours >= 0 ? '+' : '-') . abs($hours);
+                        if ($minutes > 0) {
+                            $gmtLabel .= ':' . sprintf('%02d', $minutes);
+                        }
+                    }
                 @endphp
                 <table width="100%" cellpadding="10" cellspacing="0" style="background-color: #f8f9fa; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1d4ed8; font-size: 15px;">
                     <tr>
                         <td style="padding: 12px 15px; color: #555; line-height: 1.8;">
-                            <strong>📅 Date:</strong> {{ $startGmt->format('l, F j, Y') }}<br>
-                            <strong>🕗 Time:</strong> {{ $startGmt->format('g:i A') }} – {{ $endGmt->format('g:i A') }} (GMT)<br>
+                            <strong>📅 Date:</strong> {{ $start->format('l, F j, Y') }}<br>
+                            <strong>🕗 Time:</strong> {{ $start->format('g:i A') }} – {{ $end->format('g:i A') }} ({{ $gmtLabel }})<br>
                             <strong>👤 Host:</strong> Kingsley Khord<br>
                             <strong>⏱️ Duration:</strong> 1 Hour<br>
                             <strong>💳 Price:</strong> $60 (Paid via {{ ucfirst($booking->payment_method) }})

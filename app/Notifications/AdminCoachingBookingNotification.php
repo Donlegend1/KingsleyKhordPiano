@@ -39,21 +39,32 @@ class AdminCoachingBookingNotification extends Notification implements ShouldQue
         $memberName = $this->booking->user ? ($this->booking->user->first_name ?: $this->booking->user->name) : 'A member';
         $memberEmail = $this->booking->user ? $this->booking->user->email : 'N/A';
         $startLagos = Carbon::parse($this->booking->date . ' ' . $this->booking->time, 'Africa/Lagos');
-        $startGmt = $startLagos->copy()->setTimezone('UTC');
         
         $userTz = ($this->booking->user && $this->booking->user->timezone) ? $this->booking->user->timezone : 'UTC';
         $startUser = $startLagos->copy()->setTimezone($userTz);
+        $endUser = $startUser->copy()->addMinutes(45);
+        $timeFormatted = $startUser->format('g:i A') . ' – ' . $endUser->format('g:i A');
+
+        $offset = $startUser->offset;
+        $hours = intval($offset / 3600);
+        $minutes = abs(intval(($offset % 3600) / 60));
+        if ($offset == 0) {
+            $gmtLabel = 'GMT';
+        } else {
+            $gmtLabel = 'GMT' . ($hours >= 0 ? '+' : '-') . abs($hours);
+            if ($minutes > 0) {
+                $gmtLabel .= ':' . sprintf('%02d', $minutes);
+            }
+        }
 
         return (new MailMessage)
             ->subject('New Live Coaching Session Booked 🎹')
             ->view('emails.admin-coaching-booking-notification', [
                 'memberName' => $memberName,
                 'memberEmail' => $memberEmail,
-                'dateFormatted' => $startLagos->format('l, F j, Y'),
-                'timeLagos' => $startLagos->format('g:i A'),
-                'timeUser' => $startUser->format('g:i A'),
-                'timeGmt' => $startGmt->format('g:i A'),
-                'userTz' => $userTz,
+                'dateFormatted' => $startUser->format('l, F j, Y'),
+                'timeFormatted' => $timeFormatted,
+                'timezone' => $gmtLabel,
             ]);
     }
 }

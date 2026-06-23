@@ -7,6 +7,18 @@
     $start = Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos')->setTimezone($userTz);
     $end = $start->copy()->addHour();
 
+    $offset = $start->offset;
+    $hours = intval($offset / 3600);
+    $minutes = abs(intval(($offset % 3600) / 60));
+    if ($offset == 0) {
+        $gmtLabel = 'GMT';
+    } else {
+        $gmtLabel = 'GMT' . ($hours >= 0 ? '+' : '-') . abs($hours);
+        if ($minutes > 0) {
+            $gmtLabel .= ':' . sprintf('%02d', $minutes);
+        }
+    }
+
     $title = rawurlencode('Piano Coaching Session with Kingsley Khord');
     $details = rawurlencode('Your one-on-one piano coaching session with Kingsley Khord.');
 
@@ -74,7 +86,7 @@
                         </svg>
                         <div>
                             <p class="text-xs text-gray-400">Time</p>
-                            <p class="text-sm font-semibold text-gray-900">{{ $start->format('g:i A') }} – {{ $end->format('g:i A') }} ({{ $userTz }})</p>
+                            <p class="text-sm font-semibold text-gray-900">{{ $start->format('g:i A') }} – {{ $end->format('g:i A') }} ({{ $gmtLabel }})</p>
                         </div>
                     </div>
 

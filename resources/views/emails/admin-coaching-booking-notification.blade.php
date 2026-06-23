@@ -13,9 +13,7 @@
                     <strong>Member Name:</strong> {{ $memberName }}<br>
                     <strong>Member Email:</strong> {{ $memberEmail }}<br>
                     📅 <strong>Date:</strong> {{ $dateFormatted }}<br>
-                    🕗 <strong>Time (Your local):</strong> {{ $timeLagos }} (WAT)<br>
-                    🕗 <strong>Time (Student local):</strong> {{ $timeUser }} ({{ $userTz }})<br>
-                    🕗 <strong>Time (GMT):</strong> {{ $timeGmt }} (GMT)
+                    🕗 <strong>Time:</strong> {{ $timeFormatted }} ({{ $timezone }})
                 </p>
                 
                 <p>Thanks,<br><strong>{{ config('app.name') }}</strong></p>
