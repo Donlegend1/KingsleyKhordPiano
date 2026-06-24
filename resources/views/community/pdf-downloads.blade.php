@@ -2,17 +2,9 @@
 
 @section('content')
 <!-- Header Section -->
-<div class="bg-white dark:bg-gray-800 mb-6">
-    <div class="px-4 sm:px-6 py-6">
-        <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-            <a href="/member/community" class="hover:text-[#FFD736]">Community</a>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span>PDF Downloads</span>
-        </div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-[#1F2937] dark:text-white">PDF Downloads</h1>
-        <p class="text-gray-600 dark:text-gray-300 mt-2">Access exclusive PDF resources organized by skill level</p>
+<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+    <div class="px-6 py-5">
+        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">PDF Downloads</h1>
     </div>
 </div>
 
@@ -30,7 +22,7 @@
                 <div  x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
                 @if($pdfList->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        @foreach($beginners as $pdf)
+                        @foreach($pdfList as $pdf)
                         <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
                             <div class="relative h-52 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#4F8DF7,_#3267D6)] flex items-center justify-center overflow-hidden">
                                 @if($pdf->thumbnail)

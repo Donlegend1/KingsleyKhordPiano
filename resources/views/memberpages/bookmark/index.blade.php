@@ -18,48 +18,94 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($bookmarks as $bookmark)
                 @php
+                $item = $bookmark->bookmarkable;
+                $isPost = $bookmark->bookmarkable_type === 'App\Models\Post';
+
                 $url = match ($bookmark->bookmarkable_type) {
                     'App\Models\Course' =>
-                        '/member/course/' . $bookmark->bookmarkable?->level
-                        . '?selected_course=' . $bookmark->bookmarkable?->id,
-            
+                        '/member/course/' . $item?->level
+                        . '?selected_course=' . $item?->id,
+
                     'App\Models\Upload',
                     'App\Models\LearnSong',
                     'App\Models\ExtraCourse' =>
-                        '/member/lesson/' . $bookmark->bookmarkable?->id,
-            
+                        '/member/lesson/' . $item?->id,
+
                     'App\Models\Post' =>
-                        '/member/post/' . $bookmark->bookmarkable?->id,
-            
+                        '/member/post/' . $item?->id,
+
                     default => '#',
                 };
+
+                if ($isPost) {
+                    $author = $item?->user;
+                    $authorName = trim(($author?->first_name ?? '') . ' ' . ($author?->last_name ?? '')) ?: 'Member';
+                    $imageBlock = $item?->media?->firstWhere('type', 'image')
+                        ?? $item?->blocks?->firstWhere('type', 'image');
+                    $postImage = $imageBlock
+                        ? asset($imageBlock->file_path ?? $imageBlock->content)
+                        : null;
+                    $textBlock = $item?->blocks?->firstWhere('type', 'text');
+                    $excerpt = $textBlock ? \Illuminate\Support\Str::limit($textBlock->content, 90) : null;
+                }
             @endphp
 
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:-translate-y-1">
-                        
-                        <!-- Thumbnail -->
-                        <a href="{{ $url }}">
-                            <img src="{{ $bookmark->bookmarkable?->thumbnail_url ?? ($bookmark->bookmarkable?->thumbnail ? asset($bookmark->bookmarkable->thumbnail) : asset('logo/logoblack.png')) }}" 
-                                alt="{{ $bookmark->bookmarkable?->title ?? 'Bookmarked item' }}" 
-                                class="w-full h-44 object-cover">
 
-                            {{-- <p class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($bookmark->video->category) }}</p> --}}
-                        </a>
+                        @if($isPost)
+                            <!-- Post Preview -->
+                            <a href="{{ $url }}" class="block">
+                                @if($postImage)
+                                    <img src="{{ $postImage }}" alt="Post by {{ $authorName }}" class="w-full h-44 object-cover">
+                                @else
+                                    <div class="w-full h-44 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-900 flex flex-col items-center justify-center px-6 text-center">
+                                        <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-lg mb-3">
+                                            {{ strtoupper(substr($authorName, 0, 1)) }}
+                                        </div>
+                                        @if($excerpt)
+                                            <p class="text-sm text-gray-600 dark:text-gray-300 italic line-clamp-3">"{{ $excerpt }}"</p>
+                                        @else
+                                            <p class="text-sm text-gray-400 dark:text-gray-500">Community post</p>
+                                        @endif
+                                    </div>
+                                @endif
+                            </a>
 
-                        <!-- Content -->
-                        <div class="p-5 text-center space-y-3">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white line-clamp-2">
-                                <i class="fas fa-play-circle text-blue-500 mr-1"></i>
-                                {{ $bookmark->bookmarkable?->title }}
-                            </h3>
-                            
-                            <div class="flex justify-center space-x-3">
-                                <a href="{{ $url }}" 
-                                class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 font-semibold px-4 py-2 rounded-lg shadow">
-                                    <i class="fas fa-video"></i> View Lesson
-                                </a>
+                            <div class="p-5 text-center space-y-3">
+                                <h3 class="text-sm font-bold text-gray-800 dark:text-white">
+                                    <i class="fas fa-comment-dots text-indigo-500 mr-1"></i>
+                                    {{ $authorName }}
+                                </h3>
+
+                                <div class="flex justify-center space-x-3">
+                                    <a href="{{ $url }}"
+                                    class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 font-semibold px-4 py-2 rounded-lg shadow">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        @else
+                            <!-- Lesson Preview -->
+                            <a href="{{ $url }}">
+                                <img src="{{ $item?->thumbnail_url ?? ($item?->thumbnail ? asset($item->thumbnail) : asset('logo/logoblack.png')) }}"
+                                    alt="{{ $item?->title ?? 'Bookmarked item' }}"
+                                    class="w-full h-44 object-cover">
+                            </a>
+
+                            <div class="p-5 text-center space-y-3">
+                                <h3 class="text-lg font-bold text-gray-800 dark:text-white line-clamp-2">
+                                    <i class="fas fa-play-circle text-blue-500 mr-1"></i>
+                                    {{ $item?->title }}
+                                </h3>
+
+                                <div class="flex justify-center space-x-3">
+                                    <a href="{{ $url }}"
+                                    class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 font-semibold px-4 py-2 rounded-lg shadow">
+                                        <i class="fas fa-video"></i> View
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
 

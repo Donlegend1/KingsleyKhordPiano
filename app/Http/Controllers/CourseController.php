@@ -284,7 +284,7 @@ class CourseController extends Controller
                             $q->where('user_id', $userId);
                         }
                     ])
-                    ->orderBy('position');
+                    ->orderBy('id');
             }
         ])
         ->where('level', $level)

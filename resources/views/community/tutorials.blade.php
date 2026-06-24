@@ -2,16 +2,14 @@
 
 @section('content')
 
-<div 
-  x-data="{ activeVideo: null, activeType: 'vimeo' }"
+<div
   class="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12"
 >
   
   {{-- Header --}}
-  <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-6 mb-6">
-    <div class="max-w-7xl mx-auto">
-      <h1 class="text-3xl font-black text-gray-900 dark:text-white leading-tight">Tutorial</h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1.5">Watch and learn from step-by-step video tutorials.</p>
+  <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+    <div class="px-6 py-5">
+      <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Tutorial</h1>
     </div>
   </div>
 
@@ -30,9 +28,9 @@
         <div class="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition duration-300 overflow-hidden flex flex-col justify-between">
           
           {{-- Thumbnail Area --}}
-          <div 
-            @click="activeVideo = '{{ $t->video_url }}'; activeType = '{{ $t->video_type }}'"
-            class="relative aspect-video bg-black cursor-pointer overflow-hidden group"
+          <a
+            href="{{ route('community.tutorials.show', $t->id) }}"
+            class="relative aspect-video bg-black cursor-pointer overflow-hidden group block"
           >
             <img 
               src="{{ $thumbnail }}" 
@@ -55,22 +53,22 @@
                 {{ $t->duration }}
               </span>
             @endif
-          </div>
+          </a>
 
           {{-- Footer --}}
           <div class="p-5">
             <h3 class="text-base font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
               {{ $t->title }}
             </h3>
-            <button
-              @click="activeVideo = '{{ $t->video_url }}'; activeType = '{{ $t->video_type }}'"
+            <a
+              href="{{ route('community.tutorials.show', $t->id) }}"
               class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2.5 rounded-xl transition"
             >
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z"/>
               </svg>
               Watch Now
-            </button>
+            </a>
           </div>
 
         </div>
@@ -83,66 +81,6 @@
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Check back later or explore other sections in the space.</p>
         </div>
       @endforelse
-
-    </div>
-  </div>
-
-  {{-- ===== Dynamic Video Player Modal ===== --}}
-  <div 
-    x-show="activeVideo" 
-    x-transition 
-    x-cloak 
-    class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85"
-    @keydown.escape.window="activeVideo = null"
-  >
-    <div class="fixed inset-0" @click="activeVideo = null"></div>
-    
-    <div class="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 transform transition-all z-10">
-      
-      <button 
-        @click="activeVideo = null" 
-        class="absolute top-4 right-4 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-black/60 hover:bg-black text-white hover:text-red-500 transition text-2xl font-bold"
-        aria-label="Close Player"
-      >
-        &times;
-      </button>
-
-      <div class="aspect-video w-full bg-black">
-        <!-- Vimeo Player -->
-        <template x-if="activeVideo && activeType === 'vimeo'">
-          <iframe
-            :src="'https://player.vimeo.com/video/' + activeVideo + '?autoplay=1'"
-            class="w-full h-full border-0"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </template>
-        
-        <!-- YouTube Player -->
-        <template x-if="activeVideo && activeType === 'youtube'">
-          <iframe
-            :src="'https://www.youtube.com/embed/' + activeVideo + '?autoplay=1'"
-            class="w-full h-full border-0"
-            allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </template>
-        
-        <!-- Google Drive Player -->
-        <template x-if="activeVideo && activeType === 'google'">
-          <iframe
-            :src="'https://drive.google.com/file/d/' + activeVideo + '/preview?autoplay=1'"
-            class="w-full h-full border-0"
-            allow="autoplay"
-            allowfullscreen
-          ></iframe>
-        </template>
-        
-        <!-- Local / Direct File Player -->
-        <template x-if="activeVideo && activeType === 'local'">
-          <video :src="activeVideo" class="w-full h-full" controls autoplay></video>
-        </template>
-      </div>
 
     </div>
   </div>

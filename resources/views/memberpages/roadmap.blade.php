@@ -2,14 +2,15 @@
 
 @section('content')
 
-<div class="max-w-6xl mx-auto px-6 py-10">
-
-  {{-- Breadcrumb --}}
-  <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
+  <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
     <a href="/home" class="hover:text-gray-700">Dashboard</a>
     <span>/</span>
     <a href="/member/roadmap" class="text-[#6366F1] font-medium">Roadmap</a>
   </div>
+</section>
+
+<div class="max-w-6xl mx-auto px-6 py-10">
 
   {{-- Title --}}
   <div class="mb-10">

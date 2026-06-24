@@ -1,19 +1,9 @@
 <section class="coaches-section py-14" style="
-    background-color: #05050f;
-    background-image:
-        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,215,54,0.07) 0%, transparent 70%),
-        linear-gradient(180deg, #05050f 0%, #0a0a1a 100%);
+    background-color: #0a0a0f;
+    background-image: linear-gradient(180deg, #0a0a0f 0%, #11111a 100%);
     position: relative;
     overflow: hidden;
 ">
-    {{-- Grid lines --}}
-    <div style="
-        position: absolute; inset: 0; pointer-events: none;
-        background-image: linear-gradient(rgba(255,215,54,0.04) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(255,215,54,0.04) 1px, transparent 1px);
-        background-size: 60px 60px;
-    "></div>
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     <div class="text-center mb-10 px-4" style="position: relative; z-index: 1;">

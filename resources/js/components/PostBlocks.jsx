@@ -53,7 +53,7 @@ export default function PostBlocks({ post }) {
                 switch (block.type) {
                     case "text":
                         return (
-                            <p key={idx} className="whitespace-pre-wrap dark:text-gray-300">
+                            <p key={idx} className="whitespace-pre-wrap text-gray-900 dark:text-gray-300">
                                 {renderTextWithLinks(block.content, setModalUrl)}
                             </p>
                         );
@@ -81,22 +81,21 @@ export default function PostBlocks({ post }) {
                             </audio>
                         );
 
-                    case "link":
+                    case "link": {
+                        const embedSrc = block.embed_url || block.content || "";
+                        const isVertical = /instagram\.com|tiktok\.com/.test(embedSrc);
                         return block.content ? (
                             <div
                                 key={idx}
-                                className="relative aspect-video rounded-lg overflow-hidden cursor-pointer"
-                                onClick={() => setModalUrl(block.embed_url || block.content)}
+                                className={`relative rounded-lg overflow-hidden ${isVertical ? "aspect-[9/16] max-w-sm mx-auto" : "aspect-video"}`}
                             >
                                 <iframe
                                     src={block.embed_url}
-                                    className="w-full h-full pointer-events-none"
+                                    className="w-full h-full"
                                     frameBorder="0"
                                     allow="autoplay; fullscreen; picture-in-picture"
                                     allowFullScreen
                                 />
-                                {/* Overlay to intercept clicks */}
-                                <div className="absolute inset-0" />
                             </div>
                         ) : (
                             <button
@@ -107,6 +106,7 @@ export default function PostBlocks({ post }) {
                                 {block.content}
                             </button>
                         );
+                    }
 
                     default:
                         return null;

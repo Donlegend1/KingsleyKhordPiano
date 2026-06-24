@@ -5,7 +5,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
-import { Bookmark, BookmarkMinus, } from "lucide-react";
+import { Bookmark, BookmarkMinus, Check } from "lucide-react";
 
 const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
@@ -292,29 +292,11 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
 
     return (
         <div className="p-6 bg-white dark:bg-black rounded shadow-lg">
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6">
                 {/* Course Title */}
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {course.title}
                 </h2>
-
-                {/* Bookmark Button */}
-
-                <button
-                    onClick={toggleBookmark}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-md transition duration-300 ${
-                        isBookmarked
-                            ? "bg-yellow-400 text-black hover:bg-yellow-300"
-                            : "bg-gray-200 text-gray-700 hover:bg-yellow-200"
-                    }`}
-                >
-                    {isBookmarked ? (
-                        <Bookmark className="w-4 h-4" />
-                    ) : (
-                        <BookmarkMinus className="w-4 h-4" />
-                    )}
-                    <span>{isBookmarked ? "Bookmarked" : "Bookmark"}</span>
-                </button>
             </div>
 
             <div class="mb-4">{renderVideoPlayer()}</div>
@@ -338,17 +320,33 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
                 </div>
             )}
 
-            <div className="text-center mt-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 mt-6">
+                <button
+                    onClick={toggleBookmark}
+                    className={`px-5 py-2.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 border transition duration-200 whitespace-nowrap ${
+                        isBookmarked
+                            ? "border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                    }`}
+                >
+                    {isBookmarked ? (
+                        <Bookmark className="w-4 h-4" />
+                    ) : (
+                        <BookmarkMinus className="w-4 h-4" />
+                    )}
+                    <span>{isBookmarked ? "Bookmarked" : "Bookmark"}</span>
+                </button>
+
                 <button
                     onClick={handleMarkAsCompleted}
                     disabled={loading || course.progress?.course_id}
-                    className={`px-6 py-2 rounded-full text-sm font-semibold shadow-md transition duration-300 ${
+                    className={`px-5 py-2.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 whitespace-nowrap ${
                         course.progress?.course_id
                             ? "bg-green-500 text-white cursor-not-allowed"
-                            : "bg-gradient-to-r from-black to-gray-900 text-white hover:from-yellow-500 hover:to-yellow-400 hover:text-black"
+                            : "bg-gray-900 text-white hover:bg-gray-800"
                     }`}
                 >
-                    <span className="fa fa-check mr-2"></span>
+                    <Check className="w-4 h-4 flex-shrink-0" />
                     {course.progress?.course_id
                         ? "Completed"
                         : "Mark as Completed"}
@@ -625,17 +623,6 @@ const CoursesPage = () => {
         }
     }, []);
 
-    const toggleDarkMode = () => {
-        const newMode = !darkMode;
-        setDarkMode(newMode);
-        if (newMode) {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-        localStorage.setItem("darkMode", newMode);
-    };
-
     const handleSidebarToggle = () => {
         setSidebarCollapsed((prev) => !prev);
     };
@@ -699,62 +686,101 @@ const CoursesPage = () => {
         return total === 0 ? 0 : Math.round((completed / total) * 100);
     };
 
+    const FolderIcon = ({ className }) => (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+        </svg>
+    );
+
+    const FileIcon = ({ className }) => (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
+            <path d="M14 2v6h6" />
+            <path d="M9 13h6M9 17h6" />
+        </svg>
+    );
+
+    const ChevronIcon = ({ open, className }) => (
+        <svg
+            className={`${className} transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        >
+            <path d="M6 9l6 6 6-6" />
+        </svg>
+    );
+
     const CourseList = () => (
-        <div className="p-2">
+        <div className="p-3 space-y-3">
             {courses.map((categoryObj) => (
                 <div
                     key={categoryObj.id || categoryObj.category}
-                    className="mb-6"
                 >
                     <div
-                        className="px-4 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-t-lg font-bold text-lg text-gray-800 dark:text-gray-100 shadow cursor-pointer flex justify-between items-center"
+                        className="px-4 py-3.5 bg-gray-100 dark:bg-gray-800 rounded-2xl font-bold text-base text-gray-800 dark:text-gray-100 cursor-pointer flex justify-between items-center transition hover:bg-gray-200/70 dark:hover:bg-gray-700"
                         onClick={() => toggleCategory(categoryObj.category)}
                     >
-                        <span className="flex items-center gap-2 text-sm">
-                            <i className="fa fa-folder text-blue-500"></i>
+                        <span className="flex items-center gap-3">
+                            <FolderIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
                             {categoryObj.category}
                         </span>
-                        <i
-                            className={`fa fa-chevron-${
-                                expandedCategories[categoryObj.category]
-                                    ? "up"
-                                    : "down"
-                            } text-gray-600 dark:text-gray-300 transition-transform`}
-                        ></i>
+                        <ChevronIcon
+                            open={!!expandedCategories[categoryObj.category]}
+                            className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0"
+                        />
                     </div>
                     {expandedCategories[categoryObj.category] && (
-                        <div className="bg-white dark:bg-gray-900 rounded-b-lg shadow-inner border border-t-0 border-gray-200 dark:border-gray-700 p-2 space-y-2">
+                        <div className="mt-3 space-y-2.5">
                             {categoryObj.courses &&
                             categoryObj.courses.length > 0 ? (
-                                categoryObj.courses.map((course) => (
-                                    <div
-                                        key={course.id}
-                                        className={`flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-sm transition cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 ${
-                                            selectedCourse &&
-                                            selectedCourse.id === course.id
-                                                ? "ring-2 ring-blue-500 bg-blue-100 dark:bg-blue-900"
-                                                : ""
-                                        }`}
-                                        onClick={() => {
-                                            setSelectedCourse(course);
-                                            setShowCourseModal(false);
-                                            setExpandedCategories((prev) => ({
-                                                ...prev,
-                                                __mobile: false,
-                                            }));
-                                        }}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <i className="fa fa-book text-gray-400 dark:text-gray-500"></i>
-                                            <span className="text-xs text-gray-800 dark:text-gray-100 truncate font-medium">
-                                                {course.title}
-                                            </span>
+                                categoryObj.courses.map((course) => {
+                                    const isSelected =
+                                        selectedCourse &&
+                                        selectedCourse.id === course.id;
+                                    return (
+                                        <div
+                                            key={course.id}
+                                            className={`flex items-center justify-between px-4 py-3.5 rounded-2xl transition cursor-pointer ${
+                                                isSelected
+                                                    ? "bg-indigo-50 dark:bg-indigo-900/30 border-l-[3px] border-indigo-500 pl-[13px]"
+                                                    : "bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+                                            }`}
+                                            onClick={() => {
+                                                setSelectedCourse(course);
+                                                setShowCourseModal(false);
+                                                setExpandedCategories(
+                                                    (prev) => ({
+                                                        ...prev,
+                                                        __mobile: false,
+                                                    }),
+                                                );
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <FileIcon
+                                                    className={`w-4 h-4 flex-shrink-0 ${
+                                                        isSelected
+                                                            ? "text-indigo-500"
+                                                            : "text-gray-400 dark:text-gray-500"
+                                                    }`}
+                                                />
+                                                <span
+                                                    className={`text-[15px] truncate font-medium ${
+                                                        isSelected
+                                                            ? "text-indigo-600 dark:text-indigo-400"
+                                                            : "text-gray-800 dark:text-gray-100"
+                                                    }`}
+                                                >
+                                                    {course.title}
+                                                </span>
+                                            </div>
+                                            {course.progress?.course_id && (
+                                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 flex-shrink-0">
+                                                    <i className="fa fa-check text-white text-[10px]"></i>
+                                                </span>
+                                            )}
                                         </div>
-                                        {course.progress?.course_id && (
-                                            <i className="fa fa-check-circle text-green-500 text-xs"></i>
-                                        )}
-                                    </div>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <div className="text-sm text-gray-500 dark:text-gray-400 italic p-2">
                                     No courses available in this category
@@ -835,120 +861,71 @@ const CoursesPage = () => {
                 <div
                     className={`hidden md:block ${
                         sidebarCollapsed ? "w-20" : "w-1/3"
-                    } transition-all duration-300 bg-gray-100 dark:bg-black`}
+                    } transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800`}
                     style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
                 >
-                    <div className="flex justify-between items-center p-2 mb-2">
+                    <button
+                        onClick={handleSidebarToggle}
+                        className="w-full flex items-center gap-3 px-4 py-5 font-bold text-lg text-gray-900 dark:text-gray-100 focus:outline-none"
+                    >
+                        <svg
+                            className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
+                                sidebarCollapsed ? "rotate-180" : ""
+                            }`}
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        >
+                            <path d="M15 18l-6-6 6-6" />
+                        </svg>
                         {!sidebarCollapsed && (
-                            <h2 className="text-lg font-bold flex items-center gap-2">
-                                <span className="fa fa-book"></span>{" "}
+                            <span className="truncate">
                                 {lastSegment.charAt(0).toUpperCase() +
                                     lastSegment.slice(1)}{" "}
-                                Piano Road-map
-                            </h2>
+                                Piano Roadmap
+                            </span>
                         )}
-                        <button
-                            onClick={handleSidebarToggle}
-                            className="text-gray-600 hover:text-blue-500"
-                        >
-                            <i
-                                className={`fa ${
-                                    sidebarCollapsed
-                                        ? "fa-chevron-right"
-                                        : "fa-chevron-left"
-                                }`}
-                            ></i>
-                        </button>
-                    </div>
+                    </button>
                     {!sidebarCollapsed && <CourseList />}
                 </div>
 
                 {/* Mobile Course List */}
-                <div className="md:hidden w-full mb-4">
-                    <div className="bg-gray-100 dark:bg-black rounded-lg shadow p-2">
-                        <button
-                            className="w-full flex justify-between items-center px-4 py-2 font-bold text-lg text-gray-800 dark:text-gray-100 focus:outline-none"
-                            onClick={() =>
-                                setExpandedCategories((prev) => ({
-                                    ...prev,
-                                    __mobile: !prev.__mobile,
-                                }))
-                            }
-                        >
-                            <span>
-                                <i className="fa fa-book mr-2"></i>Select a
-                                Course
-                            </span>
-                            <i
-                                className={`fa fa-chevron-${
-                                    expandedCategories.__mobile ? "up" : "down"
-                                }`}
-                            ></i>
-                        </button>
-                        {expandedCategories.__mobile && <CourseList />}
-                    </div>
+                <div className="md:hidden w-full mb-4 bg-gray-50 dark:bg-gray-900">
+                    <button
+                        className="w-full flex items-center gap-3 px-4 py-5 font-bold text-lg text-gray-900 dark:text-gray-100 focus:outline-none"
+                        onClick={() =>
+                            setExpandedCategories((prev) => ({
+                                ...prev,
+                                __mobile: !prev.__mobile,
+                            }))
+                        }
+                    >
+                        <svg className="w-5 h-5 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                        <span className="truncate">
+                            {lastSegment.charAt(0).toUpperCase() +
+                                lastSegment.slice(1)}{" "}
+                            Piano Roadmap
+                        </span>
+                    </button>
+                    {expandedCategories.__mobile && <CourseList />}
                 </div>
 
                 {/* Course Details */}
                 <div
-                    className={`p-4 transition-all duration-300 ${
+                    className={`px-4 pb-4 pt-1 transition-all duration-300 ${
                         sidebarCollapsed ? "md:w-full" : "md:w-2/3"
                     }`}
                     style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
                 >
-                    <div className="flex justify-between items-center bg-white dark:bg-gray-600 p-4 shadow rounded w-full max-w-7xl mx-auto my-2">
-                        {/* Progress area - Centered */}
-                        <div className="flex-1 flex justify-center pr-4 ">
-                            <div className="w-full max-w-md">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        {calculateGeneralProgress()}% Completed
-                                    </span>
-                                    {/* <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        {(() => {
-                                            const allCourses =
-                                                Object.values(courses).flat();
-                                            const completed = allCourses.filter(
-                                                (c) => c.completed
-                                            ).length;
-                                            return `${completed}/${allCourses.length}`;
-                                        })()}
-                                        <span className="mx-2 fa fa-info-circle"></span>
-                                    </span> */}
-                                </div>
-                                <div className="w-full bg-gray-300 rounded-full h-2">
-                                    <div
-                                        className="bg-black h-2 rounded-full transition-all duration-300"
-                                        style={{ width: `${generalProgress}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Night mode + avatar - Right aligned */}
-                        <div className="flex items-center justify-end space-x-4">
-                            <button
-                                onClick={toggleDarkMode}
-                                className="text-gray-600 dark:text-gray-300 focus:outline-none text-lg"
-                                aria-label="Toggle Dark Mode"
-                            >
-                                <i
-                                    className={`fas ${
-                                        darkMode ? "fa-sun" : "fa-moon"
-                                    }`}
-                                ></i>
-                            </button>
-
-                            <a
-                                href="/member/profile"
-                                className="flex items-center"
-                            >
-                                <img
-                                    src="/avatar1.jpg"
-                                    alt="User Avatar"
-                                    className="w-8 h-8 rounded-full border-2 border-gray-300 dark:border-gray-600"
-                                />
-                            </a>
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-5 w-full max-w-7xl mx-auto mb-2">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                            {calculateGeneralProgress()}% Completed
+                        </span>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+                            <div
+                                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${generalProgress}%` }}
+                            ></div>
                         </div>
                     </div>
                     {selectedCourse ? (

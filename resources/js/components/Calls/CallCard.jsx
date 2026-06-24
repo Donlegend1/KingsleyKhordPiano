@@ -24,25 +24,25 @@ const CallCard = () => {
     return (
         <>
             <a
-                href="/member/my-library"
+                href="/member/live-coaching"
                 onClick={handleClick}
                 className="block transition-shadow hover:shadow-md"
             >
-                <div className="min-h-[120px] h-full flex justify-between items-center p-6 bg-[#F3F5F6] rounded-lg shadow-sm border">
-                    <div className="flex items-center space-x-4">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-md bg-[#F3F5F6] border shadow-sm">
+                <div className="min-h-[120px] h-full flex justify-between items-center gap-3 p-6 bg-[#F3F5F6] rounded-lg shadow-sm border">
+                    <div className="flex items-center space-x-4 min-w-0">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-md bg-[#F3F5F6] border shadow-sm flex-shrink-0">
                             <KeyboardMusic className="w-6 h-6 text-[#435065]" />
                         </div>
-                        <div>
-                            <div className="flex items-center justify-center gap-2">
-                                <h4 className="font-semibold text-[#435065] text-[20px] font-sf">
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                                <h4 className="font-semibold text-[#435065] text-[20px] font-sf truncate">
                                     Piano Coaching
                                 </h4>
 
                                 <img
                                     src="/icons/diamondred.png"
                                     alt="Premium Icon"
-                                    className="w-4 h-4"
+                                    className="w-4 h-4 flex-shrink-0"
                                 />
                             </div>
 
@@ -52,7 +52,7 @@ const CallCard = () => {
                         </div>
                     </div>
 
-                    <i className="fa fa-angle-right text-gray-400 text-lg"></i>
+                    <i className="fa fa-angle-right text-gray-400 text-lg flex-shrink-0"></i>
                 </div>
             </a>
         </>

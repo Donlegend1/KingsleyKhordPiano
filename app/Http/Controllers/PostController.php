@@ -27,7 +27,8 @@ class PostController extends Controller
             'likes.user',
             'user',
             'media',
-            'blocks'
+            'blocks',
+            'bookmarks'
         ]);
 
         if ($request->filled('subcategory')) {
@@ -195,12 +196,13 @@ class PostController extends Controller
     public function postByUser(Request $request, Community $community)
     {
          $query = Post::where('user_id', $community->user_id)->with([
-            'comments.user',          
-            'comments.replies.user',  
-            'likes.user',             
-            'user' ,                 
+            'comments.user',
+            'comments.replies.user',
+            'likes.user',
+            'user' ,
             'media',
-            'blocks'
+            'blocks',
+            'bookmarks'
         ]);
 
         $query->orderByDesc('is_pinned');
@@ -231,7 +233,8 @@ class PostController extends Controller
             'likes.user',
             'user',
             'media',
-            'blocks'
+            'blocks',
+            'bookmarks'
         ]);
 
         $query->orderByDesc('is_pinned');
@@ -259,11 +262,11 @@ class PostController extends Controller
     {
         $user = auth()->user();
 
-        // if ($user->email !== 'kingsleykhord@gmail.com') {
-        //     return response()->json([
-        //         'message' => 'You are not authorized to pin this post'
-        //     ], 403);
-        // }
+        if ($user->email !== 'kingsleykhord@gmail.com') {
+            return response()->json([
+                'message' => 'You are not authorized to pin this post'
+            ], 403);
+        }
 
         $post->update([
             'is_pinned' => ! $post->is_pinned,

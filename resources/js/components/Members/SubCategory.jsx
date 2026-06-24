@@ -332,13 +332,28 @@ const SubCategory = () => {
         };
 
         try {
-            await axios.post("/api/member/comment", comment, {
+            const res = await axios.post("/api/member/comment", comment, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            // After adding a comment refresh first page so the post's comments are in sync
-            await fetchPostsByCategory(1);
+
+            const created = res.data?.data || res.data;
+
+            if (created && created.id) {
+                setPosts((prev) =>
+                    prev.map((p) =>
+                        p.id === selectedPost.id
+                            ? {
+                                  ...p,
+                                  comments: [...(p.comments || []), created],
+                              }
+                            : p,
+                    ),
+                );
+            } else {
+                await fetchPostsByCategory(1);
+            }
 
             showMessage("Comment posted.", "success");
             setNewComment("");

@@ -150,9 +150,10 @@ Route::post('/contact/send', [ContactController::class, 'create']);
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::get('roadmap', [GetstartedController::class, 'roadmap'])->name('member.roadmap');
-    Route::get('library', [GetstartedController::class, 'library'])->name('member.library');
-    Route::get('my-library', [LiveCoachingBookingController::class, 'index'])->name('member.my-library');
-    Route::post('my-library/book', [LiveCoachingBookingController::class, 'store'])->name('member.my-library.book');
+    Route::get('course-library', [GetstartedController::class, 'library'])->name('member.course-library');
+    Route::view('application', 'memberpages.application')->name('member.application');
+    Route::get('live-coaching', [LiveCoachingBookingController::class, 'index'])->name('member.live-coaching');
+    Route::post('live-coaching/book', [LiveCoachingBookingController::class, 'store'])->name('member.live-coaching.book');
     Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
@@ -160,7 +161,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
     Route::redirect('dashboard', '/home');
     Route::get('piano-exercise/finger', [ExerciseController::class, 'fingerExercises'])->name('piano.exercise.finger');
-    Route::get('piano-exercise/musical-application', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
+    Route::get('piano-exercise/technique-drills', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
     Route::get('piano-exercise/player', [ExerciseController::class, 'pianoExercisePlayer'])->name('piano.exercise.player');
     Route::post('piano-exercise/comment', [ExerciseController::class, 'storeComment'])->name('piano.exercise.comment');
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
@@ -184,8 +185,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/shop', [ShopController::class, 'index']);
     Route::get('support', [HomeController::class, 'support']);
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
-    Route::get('/community', [CommunityIndexController::class, 'index'])->name('community.index');
-    Route::get('/library', [CommunityIndexController::class, 'index'])->name('member.library');
+    Route::get('/my-library', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
     Route::get('/community/leaderboard', [CommunityIndexController::class, 'leaderboard'])->name('community.leaderboard');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
@@ -196,6 +196,10 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community/space/pdf/view/{pDFDownload}', [PDFDownloadController::class, 'view'])->name('community.pdf-view');
 
 
+    Route::get('/community/tutorials/{tutorial}', [CommunityIndexController::class, 'tutorialShow'])->name('community.tutorials.show');
+    Route::post('/community/tutorials/comment', [CommunityIndexController::class, 'storeTutorialComment'])->name('community.tutorials.comment');
+    Route::put('/community/tutorials/comment/{comment}', [CommunityIndexController::class, 'updateTutorialComment'])->name('community.tutorials.comment.update');
+    Route::delete('/community/tutorials/comment/{comment}', [CommunityIndexController::class, 'destroyTutorialComment'])->name('community.tutorials.comment.destroy');
     Route::get('/community/space/midi-downloads', [CommunityIndexController::class, 'midiDownloads'])->name('community.midi-downloads');
     Route::get('/community/space/midi-download/{MidiFile}', [MidiFileController::class, 'single'])->name('community.midi-downloads.single');
     Route::get('/midi-files/{midiFile}/download-midi', [MidiFileController::class, 'downloadMidi'])

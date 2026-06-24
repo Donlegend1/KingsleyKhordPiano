@@ -47,6 +47,7 @@ const ZoomMeetingBooking = () => {
         try {
             const response = await axios.get('/guest-booking/all-slots');
             // Group slots by date
+            console.log(response, "bookingslot")
             const grouped = response.data.reduce((acc, slot) => {
                 if (!acc[slot.date]) acc[slot.date] = [];
                 acc[slot.date].push(slot);

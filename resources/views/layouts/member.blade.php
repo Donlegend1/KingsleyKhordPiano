@@ -102,7 +102,7 @@
                     <a href="/member/getstarted" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-play-circle"></i> Get Started
                     </a>
-                    <a href="/member/library" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="/member/my-library" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-book"></i> Library
                     </a>
                     <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
@@ -243,7 +243,7 @@
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg'],
                         // ['url' => 'member/quick-lessons',   'label' => 'Quick Lesson',  'icon' => 'quick lession.svg'],
                         ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'songs.svg'],
-                        ['url' => 'member/live-session',    'label' => 'Live Session',  'icon' => 'livesession.svg'],
+                        ['url' => 'member/live-session',    'label' => 'Live Shows',  'icon' => 'livesession.svg'],
                     ];
                 @endphp
                 @foreach($subNav as $item)
@@ -283,6 +283,9 @@
                 <div class="flex flex-col gap-1">
                     <a href="/member/getstarted" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-play-circle w-4"></i> Get Started
+                    </a>
+                    <a href="/member/my-library" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
+                        <i class="fa fa-book w-4"></i> Library
                     </a>
                     <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-users w-4"></i> Community

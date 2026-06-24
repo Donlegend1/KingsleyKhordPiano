@@ -34,9 +34,10 @@ class PostReplyController extends Controller
         $validatedData = $request->validated();
         $validatedData['user_id'] = auth()->id();
         $validatedData['comment_id'] = $postComment->id;
-        PostReply::create($validatedData);
-        
-        return response()->json($validatedData, 200);
+        $reply = PostReply::create($validatedData);
+        $reply->load('user');
+
+        return response()->json($reply, 200);
     }
 
     /**
@@ -60,9 +61,12 @@ class PostReplyController extends Controller
      */
     public function update(UpdatePostReplyRequest $request, PostReply $postReply)
     {
-        $validatedData = $request->validated();
-        $postReply->update($validatedData);
-        return redirect()->route('post_replies.index')->with('success', 'Post Reply updated successfully.');
+        abort_if($postReply->user_id !== auth()->id(), 403);
+
+        $postReply->update($request->validated());
+        $postReply->load('user');
+
+        return response()->json($postReply, 200);
     }
 
     /**
@@ -70,7 +74,10 @@ class PostReplyController extends Controller
      */
     public function destroy(PostReply $postReply)
     {
+        abort_if($postReply->user_id !== auth()->id(), 403);
+
         $postReply->delete();
-        return redirect()->route('post_replies.index')->with('success', 'Post Reply deleted successfully.');
+
+        return response()->json(['message' => 'Reply deleted successfully'], 200);
     }
 }

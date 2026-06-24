@@ -22,8 +22,6 @@ class UpdatePostCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'post_id' => 'required|exists:posts,id',
-            'user_id' => 'required|exists:users,id',
             'body' => 'required|string|max:1000',
         ];
     }
