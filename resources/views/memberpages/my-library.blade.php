@@ -100,7 +100,7 @@
             let dateKey = this.dateKeyFor(this.selectedDay);
             let time = this.selectedSlotTime;
             try {
-                const response = await fetch('{{ route('member.my-library.book') }}', {
+                const response = await fetch('{{ route('member.live-coaching.book') }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

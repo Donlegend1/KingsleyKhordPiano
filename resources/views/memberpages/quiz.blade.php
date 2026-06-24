@@ -71,6 +71,7 @@
     nextQuestion() {
       if (this.currentQuestionIndex < this.questions.length - 1) {
         this.currentQuestionIndex++;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         this.submitQuiz();
       }
@@ -78,6 +79,7 @@
     prevQuestion() {
       if (this.currentQuestionIndex > 0) {
         this.currentQuestionIndex--;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     },
     submitQuiz() {

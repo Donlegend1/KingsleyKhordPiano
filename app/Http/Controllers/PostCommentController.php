@@ -37,11 +37,12 @@ class PostCommentController extends Controller
         $post = Post::find($request->post_id);
 
         $comment = PostComment::create($validatedData);
+        $comment->load('user');
 
         if ($post->user_id !== auth()->id()) {
             $post->user->notify(new NewCommentNotification($comment));
         }
-        return response()->json($validatedData, 200,);
+        return response()->json($comment, 200);
     }
 
     /**
@@ -65,9 +66,12 @@ class PostCommentController extends Controller
      */
     public function update(UpdatePostCommentRequest $request, PostComment $postComment)
     {
-        $validatedData = $request->validated();
-        $postComment->update($validatedData);
-        return redirect()->route('post_comments.index')->with('success', 'Post Comment updated successfully.');
+        abort_if($postComment->user_id !== auth()->id(), 403);
+
+        $postComment->update($request->validated());
+        $postComment->load('user');
+
+        return response()->json($postComment, 200);
     }
 
     /**

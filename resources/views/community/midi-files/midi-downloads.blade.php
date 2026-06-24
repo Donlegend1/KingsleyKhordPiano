@@ -1,40 +1,19 @@
 @extends('layouts.community')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <!-- Breadcrumbs & Header Section -->
-    <div class="mb-8">
-        <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
-            <a href="/member/community" class="hover:text-[#FF6B35] transition-colors flex items-center gap-1 font-medium">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
-                Overview
-            </a>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="text-gray-900 font-semibold">MIDI Files</span>
-        </div>
-        
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm">
-            <div class="space-y-1">
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">MIDI Resources Library</h1>
-                <p class="text-gray-500 text-sm sm:text-base">Download premium MIDI files organized to help you practice, learn, and master songs.</p>
-            </div>
-            <div class="flex items-center gap-2 self-start md:self-center bg-orange-50/80 text-[#FF6B35] font-bold px-4 py-2.5 rounded-2xl text-sm border border-orange-100/50 shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                <span>{{ $midiFiles->count() }} Files</span>
-            </div>
-        </div>
+
+<!-- Header Section -->
+<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+    <div class="px-6 py-5">
+        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">MIDI Files</h1>
     </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- MIDI Files Grid -->
     @if($midiFiles->count() > 0)
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             @php
                 $gradients = [
                     'from-slate-900 via-indigo-950 to-slate-900',
@@ -72,9 +51,6 @@
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                             >
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent"></div>
-                            <div class="absolute left-4 top-4 rounded-full bg-white/20 backdrop-blur-md border border-white/25 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white shadow-sm">
-                                MIDI File
-                            </div>
                         @else
                             {{-- No Image, use premium pattern --}}
                             <div class="w-full h-full bg-gradient-to-br {{ $grad }} flex items-center justify-center p-6 relative">
@@ -87,10 +63,6 @@
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
                                     </svg>
-                                </div>
-
-                                <div class="absolute left-4 top-4 rounded-full bg-white/10 backdrop-blur-md border border-white/15 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white shadow-sm">
-                                    MIDI File
                                 </div>
                             </div>
                         @endif

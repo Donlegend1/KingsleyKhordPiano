@@ -144,7 +144,7 @@ const SinglePost = () => {
             setPosts([]);
             setPage(1);
             setHasMore(true);
-            window.location = "/member/community";
+            window.location = "/member/my-library";
             showMessage("Post deleted.", "success");
         } catch (error) {
             showMessage(error.response?.data?.message, "error");
@@ -175,12 +175,28 @@ const SinglePost = () => {
         };
 
         try {
-            await axios.post("/api/member/comment", comment, {
+            const res = await axios.post("/api/member/comment", comment, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            await fetchPostsByMember();
+
+            const created = res.data?.data || res.data;
+
+            if (created && created.id) {
+                setPosts((prev) =>
+                    prev.map((p) =>
+                        p.id === selectedPost.id
+                            ? {
+                                  ...p,
+                                  comments: [...(p.comments || []), created],
+                              }
+                            : p,
+                    ),
+                );
+            } else {
+                await fetchPostsByMember();
+            }
 
             showMessage("Comment posted.", "success");
             setNewComment("");

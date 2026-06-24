@@ -130,12 +130,12 @@ const PlanSwitchAndCurrencySelect = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
                 {filteredPlans &&
                     filteredPlans.map((plan) => (
                         <div
                             key={plan.id}
-                            className="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full sm:w-[48%] lg:w-[32%]"
+                            className="bg-white border border-[#C2D3DD73] rounded-xl shadow-lg p-6 w-full"
                             style={{ backgroundImage: `url(${plan.background})` }}
                         >
                             <img

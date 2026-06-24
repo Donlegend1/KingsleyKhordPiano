@@ -42,27 +42,60 @@
         ];
     @endphp
 
+    <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
+            <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
+            <span>/</span>
+            <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
+            <span>/</span>
+            <span class="text-[#6366F1] font-medium">Technique Drills</span>
+        </div>
+    </section>
+
     <div class="min-h-screen bg-[#F8FAFC] py-8 px-4 sm:px-6 lg:px-8 font-sans">
         <div class="max-w-6xl mx-auto">
 
-            <!-- Breadcrumbs -->
-            <div class="flex items-center gap-2 text-sm text-gray-500 mb-8">
-                <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
-                <span>/</span>
-                <span class="text-[#6366F1] font-medium">Musical Application</span>
-            </div>
-
             <!-- Choose Your Level -->
             <div class="mb-12">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">Choose Your Level</h2>
-                <div class="flex flex-wrap gap-4">
+                <!-- Mobile: Dropdown -->
+                <div class="sm:hidden relative" x-data="{ open: false }" @click.outside="open = false">
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        class="w-full flex items-center justify-between px-6 py-2.5 rounded-full font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transition-all duration-300"
+                    >
+                        <span>{{ $skillLevel }}</span>
+                        <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div
+                        x-show="open"
+                        x-transition
+                        x-cloak
+                        class="absolute left-0 right-0 mt-2 rounded-2xl bg-white border border-gray-100 shadow-xl overflow-hidden z-20"
+                    >
+                        @foreach ($skillLevels as $level)
+                            <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
+                                class="block px-6 py-3 font-semibold transition-colors duration-150
+                           {{ $skillLevel === $level
+                               ? 'bg-indigo-600 text-white'
+                               : 'text-gray-600 hover:bg-gray-50' }}">
+                                {{ $level }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Desktop: Pills -->
+                <div class="hidden sm:flex flex-wrap items-center gap-6">
                     @foreach ($skillLevels as $level)
                         <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
-                            class="flex items-center gap-2 px-6 py-2.5 rounded-full border transition-all duration-300 font-medium
+                            class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
                        {{ $skillLevel === $level
-                           ? 'bg-[#0FA9A0] border-[#0FA9A0] text-white shadow-md shadow-[#0fa9a0]/20'
-                           : 'bg-white border-gray-200 text-gray-500 hover:border-[#0fa9a0] hover:text-[#0fa9a0]' }}">
-                            <i class="fa-solid fa-chart-simple text-sm"></i>
+                           ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                           : 'text-gray-500 hover:text-gray-700' }}">
                             {{ $level }}
                         </a>
                     @endforeach
@@ -71,7 +104,6 @@
 
             <!-- Courses Included -->
             <div>
-                <h2 class="text-xl font-bold text-gray-900 mb-8">Courses Included</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @forelse($applications as $seriesName => $items)
                         @php $firstItem = $items->first(); @endphp
@@ -83,20 +115,20 @@
                                     alt="{{ $seriesName }}"
                                     class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                                 <div
-                                    class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-bold text-[#0FA9A0] uppercase tracking-wider shadow-sm">
+                                    class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-bold text-[#2563EB] uppercase tracking-wider shadow-sm">
                                     {{ count($items) }} Lessons
                                 </div>
                             </div>
 
                             <!-- Course Info -->
-                            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#0FA9A0] transition-colors">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#2563EB] transition-colors">
                                 {{ $seriesName }}
                             </h3>
                             <p class="text-gray-500 text-sm mb-8 leading-relaxed line-clamp-2">
                                 {{ $firstItem->description ?? 'Apply your technique in real musical contexts and sound great.' }}
                             </p>
                             <a href="{{ route('piano.exercise.player', ['series' => $seriesName, 'skill_level' => strtolower($skillLevel)]) }}"
-                                class="mt-auto w-full max-w-[140px] py-2.5 border border-gray-200 rounded-lg text-gray-700 font-semibold hover:bg-[#0FA9A0] hover:text-white hover:border-[#0FA9A0] transition-all duration-200 text-center">
+                                class="mt-auto w-full max-w-[140px] mx-auto py-2.5 border border-gray-200 rounded-lg text-gray-700 font-semibold hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-200 text-center">
                                 Watch Now
                             </a>
                         </div>

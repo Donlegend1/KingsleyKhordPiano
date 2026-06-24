@@ -7,42 +7,47 @@
     $cards = [
         [
             'id' => 'independence',
-            'title' => 'Independence',
+            'title' => 'Hand Independence',
             'desc' => 'Develop the ability to move each hand independently with control.',
-            'img' => '/images/hand-independence.jpeg'
+            'bg' => 'bg-blue-50',
+            'stroke' => 'text-blue-500',
         ],
         [
             'id' => 'flexibility',
-            'title' => 'Flexibility',
+            'title' => 'Hand Flexibility',
             'desc' => 'Improve your range of motion and adapt to different musical situations.',
-            'img' => '/images/hand-flexibility.jpeg'
+            'bg' => 'bg-blue-50',
+            'stroke' => 'text-blue-500',
         ],
         [
             'id' => 'dexterity',
-            'title' => 'Dexterity',
+            'title' => 'Hand Dexterity',
             'desc' => 'Enhance finger agility and coordination for smooth execution.',
-            'img' => '/images/hands-dexterity.jpeg'
+            'bg' => 'bg-orange-50',
+            'stroke' => 'text-orange-500',
         ],
         [
             'id' => 'strength',
-            'title' => 'Strength',
+            'title' => 'Finger Strength',
             'desc' => 'Build finger strength and endurance for powerful playing.',
-            'img' => '/images/finger-strength.jpeg'
+            'bg' => 'bg-green-50',
+            'stroke' => 'text-green-500',
         ],
     ];
 @endphp
 
-<div class="min-h-screen bg-[#F4F5F7] py-10 px-4">
-    <div class="max-w-4xl mx-auto">
+<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
+    <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
+        <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
+        <span>/</span>
+        <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
+        <span>/</span>
+        <span class="text-[#6366F1] font-medium">Finger Exercises</span>
+    </div>
+</section>
 
-        <!-- Breadcrumb -->
-        <div class="flex items-center gap-2 text-sm text-gray-500 mb-8">
-            <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
-            <span>/</span>
-            <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
-            <span>/</span>
-            <span class="text-[#6366F1] font-medium">Finger Exercises</span>
-        </div>
+<div class="min-h-screen bg-[#F4F5F7] py-10 px-4">
+    <div class="max-w-6xl mx-auto">
 
         <!-- Skill Level Toggle -->
         <div class="flex justify-center mb-10">
@@ -69,27 +74,29 @@
             <p class="text-gray-400 text-sm">Select the skill you want to develop</p>
         </div>
 
-        <!-- 2x2 Card Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <!-- Card Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach($cards as $card)
-            <div class="flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 group">
+            <div class="flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 p-6">
 
-                <!-- Image -->
-                <div class="w-full overflow-hidden" style="height: 180px;">
-                    <img src="{{ $card['img'] }}" alt="{{ $card['title'] }}"
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <!-- Icon Badge -->
+                <div class="w-20 h-20 rounded-full {{ $card['bg'] }} flex items-center justify-center mb-5">
+                    <svg class="w-9 h-9 {{ $card['stroke'] }}" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 11V6a2 2 0 0 0-4 0v0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+                    </svg>
                 </div>
 
                 <!-- Content -->
-                <div class="p-5 flex flex-col flex-1">
-                    <h2 class="text-base font-bold text-gray-900 mb-1">{{ $card['title'] }}</h2>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-5 flex-1">{{ $card['desc'] }}</p>
+                <h2 class="text-base font-bold text-gray-900 mb-2">{{ $card['title'] }}</h2>
+                <p class="text-gray-400 text-sm leading-relaxed mb-5 flex-1">{{ $card['desc'] }}</p>
 
-                    <a href="{{ route('piano.exercise.player', ['level' => $card['id'], 'skill_level' => strtolower($skillLevel)]) }}"
-                       class="w-full text-center bg-[#6366F1] hover:bg-[#4F46E5] text-white font-semibold text-sm py-2.5 rounded-xl transition-colors duration-200">
-                        Watch Now
-                    </a>
-                </div>
+                <a href="{{ route('piano.exercise.player', ['level' => $card['id'], 'skill_level' => strtolower($skillLevel)]) }}"
+                   class="w-full flex items-center justify-center gap-2 border border-indigo-200 text-[#6366F1] font-semibold text-sm py-2.5 rounded-xl hover:bg-indigo-50 transition-colors duration-200">
+                    Watch Now
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </a>
             </div>
             @endforeach
         </div>

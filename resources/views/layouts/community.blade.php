@@ -48,10 +48,10 @@
     {{-- ===================== SIDEBAR ===================== --}}
     <aside
         x-cloak
-        x-show="showSidebar || window.innerWidth >= 768"
-        @click.away="if (window.innerWidth < 768) showSidebar = false"
-        :class="{ '-translate-x-full': !showSidebar && window.innerWidth < 768 }"
-        class="fixed inset-y-0 left-0 z-40 w-72 bg-gray-100 border-r border-gray-200 transform transition-transform duration-200 md:relative md:translate-x-0 flex flex-col" style="box-shadow: 4px 0 24px rgba(0,0,0,0.06);"
+        x-show="showSidebar || window.innerWidth >= 1024"
+        @click.away="if (window.innerWidth < 1024) showSidebar = false"
+        :class="{ '-translate-x-full': !showSidebar && window.innerWidth < 1024 }"
+        class="fixed inset-y-0 left-0 z-40 w-72 bg-gray-100 border-r border-gray-200 transform transition-transform duration-200 lg:relative lg:translate-x-0 flex flex-col" style="box-shadow: 4px 0 24px rgba(0,0,0,0.06);"
     >
         {{-- Logo --}}
         <div class="px-6 py-5 border-b border-gray-200 flex justify-center">
@@ -61,46 +61,58 @@
         </div>
 
         {{-- Nav --}}
-        <div class="flex-1 overflow-y-auto scrollbar-hide px-4 py-5 space-y-0.5 mt-10 md:mt-0">
+        <div class="flex-1 overflow-y-auto scrollbar-hide px-4 py-5 space-y-1.5 mt-10 md:mt-0">
 
             @php
-                $li = 'group flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-150';
-                $active = $li . ' bg-indigo-600 text-white shadow-sm shadow-indigo-200';
-                $inactive = $li . ' text-gray-500 hover:bg-gray-200 hover:text-gray-900';
+                $li = 'group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-base font-medium transition-all duration-150';
+                $active = $li . ' bg-indigo-50 text-indigo-700';
+                $inactive = $li . ' text-gray-500 hover:bg-gray-50 hover:text-gray-900';
+                $iconActive = 'flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white flex-shrink-0';
+                $iconInactive = 'flex items-center justify-center w-9 h-9 flex-shrink-0 text-gray-400 group-hover:text-gray-600';
             @endphp
 
-            <a href="/member/community" class="{{ Request::is('member/community') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
-                </svg>
+            <a href="/member/my-library" class="{{ Request::is('member/my-library') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/my-library') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                    </svg>
+                </span>
                 Overview
             </a>
 
             <a href="/member/community/space/lessons" class="{{ Request::is('member/community/space/lessons') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/>
-                </svg>
+                <span class="{{ Request::is('member/community/space/lessons') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/>
+                    </svg>
+                </span>
                 Tutorial
             </a>
 
             <a href="/member/community/space/progress-report" class="{{ Request::is('member/community/space/progress-report') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.25c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 0 1 3 18.375v-5.25ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-9.75ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
-                </svg>
+                <span class="{{ Request::is('member/community/space/progress-report') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.25c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 0 1 3 18.375v-5.25ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-9.75ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+                    </svg>
+                </span>
                 Progress Report
             </a>
 
             <a href="/member/bookmark" class="{{ Request::is('member/bookmark') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
-                </svg>
+                <span class="{{ Request::is('member/bookmark') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
+                    </svg>
+                </span>
                 Bookmarks
             </a>
 
             <a href="/member/community/leaderboard" class="{{ Request::is('member/community/leaderboard') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3-3h.75a3 3 0 0 0 3-3v-1.5a3 3 0 0 0-3-3H18M16.5 18.75V21m-9 0V18.75m0 0a3 3 0 0 0-3-3H3.75a3 3 0 0 1-3-3v-1.5a3 3 0 0 1 3-3H6m10.5-3V3a.75.75 0 0 0-.75-.75h-7.5a.75.75 0 0 0-.75.75v3h9Z"/>
-                </svg>
+                <span class="{{ Request::is('member/community/leaderboard') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3-3h.75a3 3 0 0 0 3-3v-1.5a3 3 0 0 0-3-3H18M16.5 18.75V21m-9 0V18.75m0 0a3 3 0 0 0-3-3H3.75a3 3 0 0 1-3-3v-1.5a3 3 0 0 1 3-3H6m10.5-3V3a.75.75 0 0 0-.75-.75h-7.5a.75.75 0 0 0-.75.75v3h9Z"/>
+                    </svg>
+                </span>
                 Leaderboard
             </a>
 
@@ -110,81 +122,91 @@
             </div>
 
             <a href="/member/community/space/pdf-downloads" class="{{ Request::is('member/community/space/pdf-downloads') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
-                </svg>
+                <span class="{{ Request::is('member/community/space/pdf-downloads') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                    </svg>
+                </span>
                 PDF Files
             </a>
 
             <a href="/member/community/space/audio-downloads" class="{{ Request::is('member/community/space/audio-downloads') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 0v11.25m0-11.25L9 9m0 0v11.25m0-11.25L19.5 6m0 0v11.25M9 20.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm10.5-3a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                </svg>
+                <span class="{{ Request::is('member/community/space/audio-downloads') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 0v11.25m0-11.25L9 9m0 0v11.25m0-11.25L19.5 6m0 0v11.25M9 20.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm10.5-3a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                    </svg>
+                </span>
                 Audio Files
             </a>
 
             <a href="/member/community/space/midi-downloads" class="{{ Request::is('member/community/space/midi-downloads') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/>
-                </svg>
+                <span class="{{ Request::is('member/community/space/midi-downloads') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/>
+                    </svg>
+                </span>
                 MIDI Files
             </a>
 
-            {{-- Divider --}}
-            <div class="pt-4 pb-1">
+            <a href="/member/application" class="{{ Request::is('member/application') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/application') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5 7.5 12M12 16.5V3"/>
+                    </svg>
+                </span>
+                Application
+            </a>
+
+            {{-- Mobile-only: top header nav links --}}
+            <div class="lg:hidden pt-4 pb-1">
                 <div class="border-t border-gray-200"></div>
             </div>
 
-            <a href="/home" class="{{ Request::is('home') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
+            <a href="/home" class="lg:hidden {{ Request::is('home') ? $active : $inactive }}">
+                <span class="{{ Request::is('home') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </span>
                 Dashboard
             </a>
 
-            <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="{{ $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                </svg>
+            <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="lg:hidden {{ $inactive }}">
+                <span class="{{ $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                </span>
                 Shop Plugins
             </a>
 
-            <a href="/member/community/members" class="{{ Request::is('member/community/members') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
-                </svg>
+            <a href="/member/community/members" class="lg:hidden {{ Request::is('member/community/members') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/community/members') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+                    </svg>
+                </span>
                 Community
             </a>
 
-            <a href="/member/profile" class="{{ Request::is('member/profile') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
+            <a href="/member/profile" class="lg:hidden {{ Request::is('member/profile') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/profile') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </span>
                 Profile
             </a>
 
-            <a href="/member/support" class="{{ Request::is('member/support') ? $active : $inactive }}">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                </svg>
+            <a href="/member/support" class="lg:hidden {{ Request::is('member/support') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/support') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </span>
                 Support
             </a>
 
-        </div>
-
-        {{-- Logout --}}
-        <div class="px-4 py-4 border-t border-gray-200">
-            <form method="POST" action="{{ route('community.logout') }}">
-                @csrf
-                <button type="submit" class="group flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-base font-medium text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all duration-150">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                        <path d="m16 17 5-5-5-5"/>
-                        <path d="M21 12H9"/>
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    </svg>
-                    Logout
-                </button>
-            </form>
         </div>
 
     </aside>
@@ -193,30 +215,64 @@
     <div class="flex-1 flex flex-col min-w-0">
 
         <!-- Header -->
-        <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <header class="bg-gray-100 border-b border-gray-200 sticky top-0 z-50">
             <div class="px-6 py-0 flex items-center justify-between h-20">
 
                 <!-- Mobile: Hamburger -->
-                <button @click="showSidebar = !showSidebar" class="md:hidden text-gray-500 p-1">
+                <button @click="showSidebar = !showSidebar" class="lg:hidden text-gray-500 p-1">
                     <i class="fa fa-bars text-xl"></i>
                 </button>
 
                 <!-- Mobile: Logo -->
-                <a href="/member/community" class="md:hidden">
+                <a href="/member/my-library" class="lg:hidden">
                     <img src="/logo/logoblack.png" alt="Logo" class="h-8 w-auto">
                 </a>
 
-                <!-- Desktop: Title -->
-                <h1 class="hidden md:block text-lg font-semibold text-gray-900 tracking-tight">My Library</h1>
+                <!-- Desktop: Top nav -->
+                @php
+                    $topLi = 'flex items-center gap-1.5 px-3 py-2 rounded-xl text-base font-medium transition-all duration-150';
+                    $topActive = $topLi . ' bg-indigo-50 text-indigo-700';
+                    $topInactive = $topLi . ' text-gray-500 hover:bg-gray-50 hover:text-gray-900';
+                @endphp
+                <nav class="hidden lg:flex items-center gap-8">
+                    <a href="/home" class="{{ Request::is('home') ? $topActive : $topInactive }}">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Dashboard
+                    </a>
+
+                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="{{ $topInactive }}">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                        Shop Plugins
+                    </a>
+
+                    <a href="/member/community/members" class="{{ Request::is('member/community/members') ? $topActive : $topInactive }}">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+                        </svg>
+                        Community
+                    </a>
+
+                    <a href="/member/profile" class="{{ Request::is('member/profile') ? $topActive : $topInactive }}">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Profile
+                    </a>
+
+                    <a href="/member/support" class="{{ Request::is('member/support') ? $topActive : $topInactive }}">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        Support
+                    </a>
+                </nav>
 
                 <!-- Right: Actions -->
                 <div class="flex items-center gap-1">
-
-                    <a href="#" class="p-2.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all duration-150" aria-label="Search">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                        </svg>
-                    </a>
 
                     <!-- Notifications -->
                     @php
@@ -229,11 +285,11 @@
 
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                         <button type="button" @click="open = !open"
-                            class="relative p-2.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all duration-150"
+                            class="relative p-2.5 rounded-xl text-red-500 hover:text-red-600 hover:bg-gray-50 transition-all duration-150"
                             aria-label="Notifications">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9"
-                                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             @if($unreadCount > 0)
                                 <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">

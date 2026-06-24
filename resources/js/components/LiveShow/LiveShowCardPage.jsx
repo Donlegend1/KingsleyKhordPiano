@@ -16,6 +16,7 @@ const PremiumVideoSection = () => {
     const [fileId, setFileId] = useState(null);
     const [selectedVideo, setSelectedVideo] = useState(null);
     const [countdowns, setCountdowns] = useState({});
+    const [notifySubscribed, setNotifySubscribed] = useState(false);
     const { showMessage } = useFlashMessage();
 
     const authUser = window.authUser || {};
@@ -98,8 +99,11 @@ const PremiumVideoSection = () => {
     };
 
     const handleCreateLiveShowNotification = async () => {
+        if (notifySubscribed) return;
+
         try {
             await axios.post("/api/notifications/subscribe-live-shows");
+            setNotifySubscribed(true);
             showMessage("You'll be notified about upcoming live shows!", "success");
         } catch (error) {
             console.error("Failed to subscribe to live show notifications:", error);
@@ -183,12 +187,17 @@ const PremiumVideoSection = () => {
                     <p className="text-gray-500 text-sm max-w-xs mb-7">Check back later for upcoming live sessions and workshops.</p>
                     <button
                         onClick={() => handleCreateLiveShowNotification()}
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-6 py-3 rounded-xl shadow-md shadow-indigo-200 transition-all duration-150 hover:scale-[1.02] active:scale-95"
+                        disabled={notifySubscribed}
+                        className={`flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-xl shadow-md transition-all duration-150 ${
+                            notifySubscribed
+                                ? "bg-gray-200 text-gray-500 shadow-none cursor-not-allowed"
+                                : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 hover:scale-[1.02] active:scale-95"
+                        }`}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
-                        Notify Me
+                        {notifySubscribed ? "You'll be notified" : "Notify Me"}
                     </button>
                 </div>
             )}

@@ -154,6 +154,60 @@ class CommunityIndexController extends Controller
       ));
    }
 
+   public function tutorialShow(\App\Models\Tutorial $tutorial)
+   {
+      $user = auth()->user();
+
+      if (!$user || !$user->hasActiveSubscription()) {
+         return redirect('/member/plan');
+      }
+
+      $comments = \App\Models\TutorialComment::where('tutorial_id', $tutorial->id)
+         ->with('user')
+         ->latest()
+         ->get();
+
+      return view('community.tutorial-show', compact('tutorial', 'comments'));
+   }
+
+   public function storeTutorialComment(\Illuminate\Http\Request $request)
+   {
+      $request->validate([
+         'tutorial_id' => 'required|exists:tutorials,id',
+         'comment' => 'required|string|max:2000',
+      ]);
+
+      \App\Models\TutorialComment::create([
+         'tutorial_id' => $request->tutorial_id,
+         'user_id' => auth()->id(),
+         'comment' => $request->comment,
+      ]);
+
+      return back()->with('success', 'Comment added.');
+   }
+
+   public function updateTutorialComment(\Illuminate\Http\Request $request, \App\Models\TutorialComment $comment)
+   {
+      abort_if($comment->user_id !== auth()->id(), 403);
+
+      $request->validate([
+         'comment' => 'required|string|max:2000',
+      ]);
+
+      $comment->update(['comment' => $request->comment]);
+
+      return back()->with('success', 'Comment updated.');
+   }
+
+   public function destroyTutorialComment(\App\Models\TutorialComment $comment)
+   {
+      abort_if($comment->user_id !== auth()->id(), 403);
+
+      $comment->delete();
+
+      return back()->with('success', 'Comment deleted.');
+   }
+
    public function singlePost(Post $post)
    {
       return view('community.single-post', compact('post'));

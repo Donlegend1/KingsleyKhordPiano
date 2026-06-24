@@ -63,7 +63,17 @@ const PostWithComments = ({
     const [commentsVisible, setCommentsVisible] = useState(false);
     const [likes, setLikes] = useState(post.likes || []);
     const [liked, setLiked] = useState(post.liked_by_user || false);
+    const [isBookmarked, setIsBookmarked] = useState(post.is_bookmarked || false);
     const [replySectionFor, setReplySectionFor] = useState(null);
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editCommentText, setEditCommentText] = useState("");
+    const [editingReplyId, setEditingReplyId] = useState(null);
+    const [editReplyText, setEditReplyText] = useState("");
+
+    const totalCommentCount = (comments || []).reduce(
+        (sum, comment) => sum + 1 + (comment.replies?.length || 0),
+        0,
+    );
 
     const [showReplySection, setShowReplySection] = useState(false);
     const [newReply, setNewReply] = useState("");
@@ -101,9 +111,48 @@ const PostWithComments = ({
         .getAttribute("content");
 
     const handleEditComment = (comment) => {
-        setNewComment(comment.body);
-        setSelectedPost(post); // or use a dedicated `selectedComment`
-        // Open comment box in edit mode
+        setEditingCommentId(comment.id);
+        setEditCommentText(comment.body);
+    };
+
+    const handleCancelEditComment = () => {
+        setEditingCommentId(null);
+        setEditCommentText("");
+    };
+
+    const handleSaveEditComment = async (commentId) => {
+        if (!editCommentText.trim()) {
+            showMessage("Comment can't be empty", "error");
+            return;
+        }
+
+        try {
+            const res = await axios.put(`/api/member/comments/${commentId}`, {
+                body: editCommentText,
+            });
+
+            const updated = res.data?.data || res.data;
+
+            setComments((prev) =>
+                prev.map((c) =>
+                    c.id === commentId ? { ...c, body: updated.body } : c,
+                ),
+            );
+
+            if (typeof onUpdatePost === "function") {
+                onUpdatePost(post.id, {
+                    comments: (comments || []).map((c) =>
+                        c.id === commentId ? { ...c, body: updated.body } : c,
+                    ),
+                });
+            }
+
+            setEditingCommentId(null);
+            setEditCommentText("");
+            showMessage("Comment updated", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message, "error");
+        }
     };
 
     const handleDeleteComment = async (commentId) => {
@@ -180,6 +229,85 @@ const PostWithComments = ({
         }
     };
 
+    const handleEditReply = (reply) => {
+        setEditingReplyId(reply.id);
+        setEditReplyText(reply.body);
+    };
+
+    const handleCancelEditReply = () => {
+        setEditingReplyId(null);
+        setEditReplyText("");
+    };
+
+    const handleSaveEditReply = async (commentId, replyId) => {
+        if (!editReplyText.trim()) {
+            showMessage("Reply can't be empty", "error");
+            return;
+        }
+
+        try {
+            const res = await axios.put(`/api/member/reply/${replyId}`, {
+                body: editReplyText,
+            });
+
+            const updated = res.data?.data || res.data;
+
+            const applyUpdate = (c) =>
+                c.id === commentId
+                    ? {
+                          ...c,
+                          replies: (c.replies || []).map((r) =>
+                              r.id === replyId
+                                  ? { ...r, body: updated.body }
+                                  : r,
+                          ),
+                      }
+                    : c;
+
+            setComments((prev) => prev.map(applyUpdate));
+
+            if (typeof onUpdatePost === "function") {
+                onUpdatePost(post.id, {
+                    comments: (comments || []).map(applyUpdate),
+                });
+            }
+
+            setEditingReplyId(null);
+            setEditReplyText("");
+            showMessage("Reply updated", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message, "error");
+        }
+    };
+
+    const handleDeleteReply = async (commentId, replyId) => {
+        try {
+            await axios.delete(`/api/member/reply/${replyId}`);
+
+            const applyDelete = (c) =>
+                c.id === commentId
+                    ? {
+                          ...c,
+                          replies: (c.replies || []).filter(
+                              (r) => r.id !== replyId,
+                          ),
+                      }
+                    : c;
+
+            setComments((prev) => prev.map(applyDelete));
+
+            if (typeof onUpdatePost === "function") {
+                onUpdatePost(post.id, {
+                    comments: (comments || []).map(applyDelete),
+                });
+            }
+
+            showMessage("Reply deleted", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message, "error");
+        }
+    };
+
     // keep comments in sync when parent updates
     useEffect(() => {
         setComments(post.comments || []);
@@ -187,7 +315,7 @@ const PostWithComments = ({
 
     const toggleBookmark = async (id) => {
         try {
-            await axios.post(
+            const { data } = await axios.post(
                 `/member/bookmark/toggle`,
                 {
                     bookmarkable_id: id,
@@ -198,7 +326,9 @@ const PostWithComments = ({
                     withCredentials: true,
                 },
             );
-            showMessage("Added to bookmarks!", "success");
+            const saved = data.status === "added";
+            setIsBookmarked(saved);
+            showMessage(saved ? "Added to bookmarks!" : "Removed from bookmarks", "success");
         } catch (err) {
             console.error("Bookmark toggle failed:", err);
             showMessage("Error toggling bookmark", "error");
@@ -233,7 +363,7 @@ const PostWithComments = ({
                         <AuthorNameWithVerification author={author} />
 
                         <div className="flex items-center gap-1">
-                            <span className="text-xs text-[#6B7280] dark:text-gray-300">
+                            <span className="text-xs text-gray-900 dark:text-gray-100">
                                 posted an update
                             </span>
                             <span className="text-xs text-[#9CA3AF] dark:text-gray-400">
@@ -289,21 +419,27 @@ const PostWithComments = ({
                                     toggleBookmark(post.id);
                                     setShowPostAction(false);
                                 }}
-                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                                className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition ${
+                                    isBookmarked
+                                        ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30"
+                                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                }`}
                             >
-                                <Bookmark className="w-4 h-4" />
-                                <span>Save post</span>
+                                <Bookmark className={`w-4 h-4 ${isBookmarked ? "fill-indigo-600" : ""}`} />
+                                <span>{isBookmarked ? "Saved post" : "Save post"}</span>
                             </button>
-                            <button
-                                onClick={() => {
-                                    togglePinPost(post.id);
-                                    setShowPostAction(false);
-                                }}
-                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                            >
-                                <PinIcon className="w-4 h-4" />
-                                <span>Pin Post</span>
-                            </button>
+                            {window.authUser?.email === "kingsleykhord@gmail.com" && (
+                                <button
+                                    onClick={() => {
+                                        togglePinPost(post.id);
+                                        setShowPostAction(false);
+                                    }}
+                                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                                >
+                                    <PinIcon className="w-4 h-4" />
+                                    <span>Pin Post</span>
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -368,7 +504,7 @@ const PostWithComments = ({
                         <MessageCircle className="w-4 h-4" />
 
                         <span className="font-medium">
-                            Comment({comments.length})
+                            Comment({totalCommentCount})
                         </span>
                     </button>
                 </div>
@@ -414,6 +550,25 @@ const PostWithComments = ({
                                             >
                                                 Reply
                                             </button>
+                                            {comment.user_id ===
+                                                window.authUser?.id && (
+                                                <button
+                                                    onClick={() =>
+                                                        editingCommentId ===
+                                                        comment.id
+                                                            ? handleCancelEditComment()
+                                                            : handleEditComment(
+                                                                  comment,
+                                                              )
+                                                    }
+                                                    className="text-xs text-indigo-600"
+                                                >
+                                                    {editingCommentId ===
+                                                    comment.id
+                                                        ? "Cancel"
+                                                        : "Edit"}
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={() => {
                                                     if (
@@ -433,9 +588,34 @@ const PostWithComments = ({
                                         </div>
                                     </div>
 
-                                    <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                        {renderTextWithLinks(comment.body)}
-                                    </div>
+                                    {editingCommentId === comment.id ? (
+                                        <div className="mt-2 flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                value={editCommentText}
+                                                onChange={(e) =>
+                                                    setEditCommentText(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                className="flex-1 px-3 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm dark:text-gray-200"
+                                            />
+                                            <button
+                                                onClick={() =>
+                                                    handleSaveEditComment(
+                                                        comment.id,
+                                                    )
+                                                }
+                                                className="px-3 py-1.5 bg-indigo-600 text-white rounded-full text-sm font-semibold"
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                                            {renderTextWithLinks(comment.body)}
+                                        </div>
+                                    )}
 
                                     {/* Replies for this comment */}
                                     {comment.replies &&
@@ -444,22 +624,91 @@ const PostWithComments = ({
                                                 {comment.replies.map((r) => (
                                                     <div
                                                         key={r.id}
-                                                        className="text-sm bg-gray-50 dark:bg-gray-900 rounded px-3 py-2 dark:text-gray-200"
+                                                        className="text-sm bg-gray-50 dark:bg-gray-900 rounded px-3 py-2 text-gray-800 dark:text-gray-200"
                                                     >
-                                                        <div className="text-[13px] font-semibold">
-                                                            {r.user?.first_name}{" "}
-                                                            {r.user?.last_name}
-                                                        </div>
-                                                        <div className="text-xs text-gray-400">
-                                                            {formatRelativeTime(
-                                                                r.created_at,
+                                                        <div className="flex items-center justify-between">
+                                                            <div>
+                                                                <div className="text-[13px] font-semibold text-gray-800 dark:text-gray-200">
+                                                                    {r.user?.first_name}{" "}
+                                                                    {r.user?.last_name}
+                                                                </div>
+                                                                <div className="text-xs text-gray-400">
+                                                                    {formatRelativeTime(
+                                                                        r.created_at,
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            {r.user_id ===
+                                                                window.authUser?.id && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            editingReplyId ===
+                                                                            r.id
+                                                                                ? handleCancelEditReply()
+                                                                                : handleEditReply(
+                                                                                      r,
+                                                                                  )
+                                                                        }
+                                                                        className="text-xs text-indigo-600"
+                                                                    >
+                                                                        {editingReplyId ===
+                                                                        r.id
+                                                                            ? "Cancel"
+                                                                            : "Edit"}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (
+                                                                                !confirm(
+                                                                                    "Delete this reply?",
+                                                                                )
+                                                                            )
+                                                                                return;
+                                                                            handleDeleteReply(
+                                                                                comment.id,
+                                                                                r.id,
+                                                                            );
+                                                                        }}
+                                                                        className="text-xs text-red-500"
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                </div>
                                                             )}
                                                         </div>
-                                                        <div className="mt-1">
-                                                            {renderTextWithLinks(
-                                                                r.body,
-                                                            )}
-                                                        </div>
+
+                                                        {editingReplyId === r.id ? (
+                                                            <div className="mt-1 flex items-center gap-2">
+                                                                <input
+                                                                    type="text"
+                                                                    value={editReplyText}
+                                                                    onChange={(e) =>
+                                                                        setEditReplyText(
+                                                                            e.target.value,
+                                                                        )
+                                                                    }
+                                                                    className="flex-1 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm dark:text-gray-200"
+                                                                />
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleSaveEditReply(
+                                                                            comment.id,
+                                                                            r.id,
+                                                                        )
+                                                                    }
+                                                                    className="px-3 py-1.5 bg-indigo-600 text-white rounded-full text-xs font-semibold"
+                                                                >
+                                                                    Save
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="mt-1">
+                                                                {renderTextWithLinks(
+                                                                    r.body,
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>

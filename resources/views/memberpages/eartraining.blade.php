@@ -2,45 +2,11 @@
 
 @section('content')
 
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-2 px-4">
-  <div class="max-w-7xl mx-auto space-y-1">
-
-    <!-- Breadcrumb & User -->
-    <div class="flex justify-between items-center my-2">
-      <div class="flex items-center gap-2 text-sm text-gray-500">
-        <a href="/home" class="hover:text-gray-700">Dashboard</a>
-        <span>/</span>
-        <span class="text-[#6366F1] font-medium">Ear Training</span>
-      </div>
-      {{-- <div class="flex items-center space-x-2">
-          <form method="GET" action="{{ route('ear.training') }}" class="mb-2 flex justify-end">
-            <div class="relative w-full max-w-xs">
-              <!-- Input Field -->
-              <input 
-                type="text" 
-                name="search" 
-                id="name" 
-                value="{{ request('search') }}" 
-                class="w-full border border-gray-300 rounded-full pl-4 pr-12 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                placeholder="Search..."
-              >
-
-              <!-- Search Button with Icon -->
-              <button 
-                type="submit" 
-                class="absolute my-4 right-1 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              >
-                <i class="fa fa-search"></i>
-              </button>
-            </div>
-          </form>
-          <i class="fa fa-user-circle text-xl"></i>
-      </div> --}}
-    </div>
-
-    {{-- <div>
-       <h1 class="text-xl font-bold">Ear Training</h1>
-    </div> --}}
+<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
+  <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
+    <a href="/home" class="hover:text-gray-700">Dashboard</a>
+    <span>/</span>
+    <span class="text-[#6366F1] font-medium">Ear Training</span>
   </div>
 </section>
 

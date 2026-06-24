@@ -60,7 +60,6 @@
 <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
     <div class="px-6 py-5">
         <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Your Growth at a Glance</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Track your skills assessment, progress metrics, and continue your music learning journey.</p>
     </div>
 </div>
 
@@ -69,7 +68,7 @@
     <div class="space-y-8">
 
             {{-- Profile + Stats: side by side --}}
-            <div class="flex gap-6">
+            <div class="flex flex-col sm:flex-row gap-6">
 
                 {{-- Profile Card --}}
                 <div class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
@@ -185,7 +184,7 @@
 
             {{-- Assigned Level / Retake Quiz --}}
             @if($assessment)
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-10 py-12 shadow-sm flex items-center gap-10 min-h-[300px]">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-8 sm:px-10 sm:py-12 shadow-sm flex flex-col md:flex-row items-center gap-8 md:gap-10">
                     <!-- Circular Gauge -->
                     <div class="relative w-44 h-44 flex-shrink-0">
                         <svg class="w-44 h-44 transform -rotate-90" viewBox="0 0 120 120">
@@ -202,8 +201,8 @@
                     </div>
 
                     <!-- Level & Breakdown -->
-                    <div class="flex-grow min-w-0">
-                        <div class="flex items-center justify-between gap-2 mb-6">
+                    <div class="flex-grow min-w-0 w-full">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
                             <span class="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Assigned Level</span>
                             <span class="text-sm font-black uppercase bg-{{ $levelBg }} text-{{ $levelText }} dark:bg-{{ $levelColor }}/10 dark:text-{{ $levelColor }} border border-{{ $levelBorder }} dark:border-{{ $levelColor }}/20 px-4 py-1.5 rounded-full">
                                 {{ $assessment->skill_level }}
@@ -211,7 +210,7 @@
                         </div>
 
                         <!-- Breakdown bars: 2 per row -->
-                        <div class="flex gap-8 mb-6">
+                        <div class="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-6">
                             <div class="flex-1">
                                 <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
                                     <span>Fundamentals</span><span class="font-bold">{{ $assessment->fundamentals_score }}%</span>
@@ -226,7 +225,7 @@
                                     <div class="h-2 rounded-full" style="width:{{ $assessment->chords_harmony_score }}%;background-color:#8B5CF6"></div>
                                 </div>
                             </div>
-                            <div class="w-px bg-gray-100 dark:bg-gray-700 self-stretch"></div>
+                            <div class="hidden sm:block w-px bg-gray-100 dark:bg-gray-700 self-stretch"></div>
                             <div class="flex-1">
                                 <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
                                     <span>Ear Training</span><span class="font-bold">{{ $assessment->ear_training_score }}%</span>

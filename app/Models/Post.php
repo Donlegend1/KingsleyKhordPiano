@@ -47,4 +47,17 @@ class Post extends Model
     {
         return $this->hasMany(PostBlock::class);
     }
+
+    protected $appends = ['is_bookmarked'];
+
+    public function getIsBookmarkedAttribute(): bool
+    {
+        $userId = auth()->id();
+
+        if (!$userId) {
+            return false;
+        }
+
+        return $this->bookmarks->contains('user_id', $userId);
+    }
 }

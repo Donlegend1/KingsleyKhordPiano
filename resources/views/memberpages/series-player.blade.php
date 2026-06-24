@@ -40,12 +40,12 @@
     <div class="min-h-screen bg-white">
 
         {{-- Breadcrumb --}}
-        <div class="px-6 py-3 border-b border-gray-100">
-            <div class="max-w-[1280px] mx-auto flex items-center gap-2 text-sm text-gray-500">
+        <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center gap-x-2 gap-y-1 min-h-8 text-sm text-gray-500">
                 <a href="/home" class="hover:text-gray-700">Dashboard</a>
                 <span>/</span>
                 @if($series)
-                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-gray-700">Musical Application</a>
+                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-gray-700">Technique Drills</a>
                 @else
                     <a href="{{ route('piano.exercise.finger') }}" class="hover:text-gray-700">Finger Exercises</a>
                 @endif
@@ -57,7 +57,7 @@
                     <span class="text-[#6366F1] font-medium">{{ Str::title($activeVideo->title) }}</span>
                 @endif
             </div>
-        </div>
+        </section>
 
         @if ($activeVideo)
 
@@ -105,7 +105,7 @@
 
                         @if($nextVideo)
                             <a href="{{ request()->fullUrlWithQuery(['video_id' => $nextVideo->id]) }}" 
-                               class="flex items-center gap-2 bg-[#0FA9A0]/10 hover:bg-[#0FA9A0]/20 text-[#0FA9A0] text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                               class="flex items-center gap-2 bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 Next Lesson <i class="fa-solid fa-arrow-right text-[14px]"></i>
                             </a>
                         @endif --}}
@@ -113,7 +113,7 @@
                         <form action="/member/course/{{ $activeVideo->id }}/complete" method="POST">
                             @csrf
                             <button type="submit"
-                                class="flex items-center gap-2 bg-[#0FA9A0] hover:bg-[#0c9088] text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                                class="flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 <i class="fa-regular fa-circle-check text-[15px]"></i>
                                 Complete
                             </button>
@@ -139,7 +139,7 @@
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
-                                {{-- <a href="#" class="text-[#0FA9A0] text-[13px] font-semibold hover:underline">View
+                                {{-- <a href="#" class="text-[#2563EB] text-[13px] font-semibold hover:underline">View
                                     All</a> --}}
                             </div>
 
@@ -172,7 +172,7 @@
                                             {{-- Play button center --}}
                                             <div class="absolute inset-0 flex items-center justify-center">
                                                 <div
-                                                    class="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-[#0FA9A0] transition-colors">
+                                                    class="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-[#2563EB] transition-colors">
                                                     <i class="fa-solid fa-play text-white text-xs ml-0.5"></i>
                                                 </div>
                                             </div>
@@ -186,7 +186,7 @@
                                             </p>
                                             <div class="flex justify-center">
                                                 <span
-                                                    class="bg-[#0FA9A0]/10 text-[#0FA9A0] text-[11px] font-bold px-3 py-1 rounded-full">
+                                                    class="bg-[#2563EB]/10 text-[#2563EB] text-[11px] font-bold px-3 py-1 rounded-full">
                                                     {{ ucfirst($skillLevel) }}
                                                 </span>
                                             </div>
@@ -204,17 +204,17 @@
                             <input type="hidden" name="course_id" value="{{ $activeVideo->id }}">
                             <input type="hidden" name="category" value="piano exercise">
                             <textarea name="comment" placeholder="What did you learn from this lesson?" 
-                                class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#0FA9A0] focus:border-transparent transition-all outline-none" rows="3"></textarea>
+                                class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all outline-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">
-                                <button type="submit" class="bg-[#0FA9A0] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#0c9088] transition-all">Comment</button>
+                                <button type="submit" class="bg-[#2563EB] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#1D4ED8] transition-all">Comment</button>
                             </div>
                         </form>
 
                         <div class="space-y-6">
                             @foreach($comments as $comment)
                                 <div class="flex gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                                    <div class="w-10 h-10 bg-[#0FA9A0]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <span class="text-[#0FA9A0] font-bold text-sm">{{ substr($comment->user->name, 0, 1) }}</span>
+                                    <div class="w-10 h-10 bg-[#2563EB]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-[#2563EB] font-bold text-sm">{{ substr($comment->user->name, 0, 1) }}</span>
                                     </div>
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-1">
@@ -246,27 +246,15 @@
                         @foreach ($playlist as $item)
                             @php $isActive = $activeVideo && $item->id == $activeVideo->id; @endphp
                             <a href="{{ request()->fullUrlWithQuery(['video_id' => $item->id]) }}"
-                                class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                    {{ $isActive ? 'bg-[#0FA9A0]' : 'bg-white hover:bg-gray-50' }}">
+                                class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
+                    {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
 
-                                {{-- Play icon --}}
-                                <div class="shrink-0 mt-0.5">
-                                    @if ($isActive)
-                                        <i class="fa-solid fa-circle-play text-white text-[18px]"></i>
-                                    @else
-                                        <i class="fa-regular fa-circle-play text-gray-300 text-[18px]"></i>
-                                    @endif
-                                </div>
-
-                                {{-- Title + duration --}}
+                                {{-- Title --}}
                                 <div class="flex-1 min-w-0">
                                     <p
                                         class="text-[12px] font-bold uppercase tracking-wide leading-snug
-                         {{ $isActive ? 'text-white' : 'text-gray-800' }}">
+                         {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
                                         {{ $item->title }}
-                                    </p>
-                                    <p class="text-[11px] mt-1.5 {{ $isActive ? 'text-teal-100' : 'text-gray-400' }}">
-                                        {{ $item->duration ?? '05:00' }}
                                     </p>
                                 </div>
                             </a>
@@ -277,14 +265,14 @@
                     <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
                         @if ($previousVideo)
                             <a href="{{ request()->fullUrlWithQuery(['video_id' => $previousVideo->id]) }}"
-                                class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                 <i class="fa-solid fa-arrow-left text-sm"></i> Prev
                             </a>
                         @endif
 
                         @if ($nextVideo)
                             <a href="{{ request()->fullUrlWithQuery(['video_id' => $nextVideo->id]) }}"
-                                class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-gray-50 hover:border-gray-300 transition-all">
+                                class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                 Next <i class="fa-solid fa-arrow-right text-sm"></i>
                             </a>
                         @else
@@ -305,7 +293,7 @@
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">No exercises found</h2>
                 <p class="text-gray-400 mb-7">There are currently no exercises available for this level.</p>
                 <a href="{{ route('piano.exercise.finger') }}"
-                    class="inline-block bg-[#0FA9A0] text-white px-7 py-2.5 rounded-lg font-semibold hover:bg-[#0d928a] transition-colors">
+                    class="inline-block bg-[#2563EB] text-white px-7 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-colors">
                     Go Back
                 </a>
             </div>

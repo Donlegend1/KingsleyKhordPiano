@@ -33,4 +33,9 @@ class Tutorial extends Model
     {
         return $this->author_avatar ? asset($this->author_avatar) : null;
     }
+
+    public function comments()
+    {
+        return $this->hasMany(TutorialComment::class)->latest();
+    }
 }

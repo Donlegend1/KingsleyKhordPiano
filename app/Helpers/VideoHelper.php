@@ -58,9 +58,22 @@ class VideoHelper
             return "https://player.twitch.tv/?channel={$m[1]}&parent=yourdomain.com";
         }
 
-        // TikTok
+        // TikTok — shortlinks (vm.tiktok.com, vt.tiktok.com, tiktok.com/t/...) redirect to the full video URL
+        if (preg_match('#(?:vm|vt)\.tiktok\.com/|tiktok\.com/t/#', $url)) {
+            $resolved = self::resolveRedirect($url);
+            if ($resolved && preg_match('/tiktok\.com\/.+\/video\/(\d+)/', $resolved, $m)) {
+                return "https://www.tiktok.com/embed/v2/{$m[1]}";
+            }
+        }
+
+        // TikTok — standard video URL
         if (preg_match('/tiktok\.com\/.+\/video\/(\d+)/', $url, $m)) {
             return "https://www.tiktok.com/embed/v2/{$m[1]}";
+        }
+
+        // Instagram (post, reel, or tv)
+        if (preg_match('#instagram\.com/(?:p|reel|tv)/([^/?&]+)#', $url, $m)) {
+            return "https://www.instagram.com/p/{$m[1]}/embed/";
         }
 
         // Direct video file — no embed needed, flag it
@@ -76,7 +89,7 @@ class VideoHelper
     {
         if (
             self::extractGoogleDriveFileId($url) ||
-            preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos/', $url)
+            preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|vm\.tiktok\.com|vt\.tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos|instagram\.com\/(p|reel|tv)\//', $url)
         ) {
             return 'embed'; // use <iframe>
         }
@@ -90,6 +103,28 @@ class VideoHelper
         }
 
         return 'iframe'; // generic iframe or modal
+    }
+
+    private static function resolveRedirect(string $url): ?string
+    {
+        try {
+            $headers = get_headers($url, true, stream_context_create([
+                'http' => ['method' => 'HEAD', 'timeout' => 5, 'follow_location' => 1, 'max_redirects' => 5],
+            ]));
+
+            if (!$headers) {
+                return null;
+            }
+
+            if (!empty($headers['Location'])) {
+                return is_array($headers['Location']) ? end($headers['Location']) : $headers['Location'];
+            }
+
+            // No redirect header means we already landed on the final URL
+            return $url;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     private static function extractGoogleDriveFileId(string $url): ?string

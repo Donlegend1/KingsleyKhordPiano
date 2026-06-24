@@ -8,6 +8,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scrollbar-gutter: stable;
+}
+
 @layer base {
   .theme {
     --font-heading: var(--font-sans);

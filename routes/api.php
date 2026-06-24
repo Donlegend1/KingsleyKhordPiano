@@ -143,10 +143,13 @@ use App\Http\Controllers\LiveShowNotificationController;
 
         Route::delete('/comments/{postComment}', [PostCommentController::class, 'destroy'])->name('comment.destroy');
         Route::post('/comment', [PostCommentController::class, 'store'])->name('comment.store');
+        Route::put('/comments/{postComment}', [PostCommentController::class, 'update'])->name('comment.update');
         Route::post('/like', [PostLikeController::class, 'store'])->name('like.toggle');
         Route::post('/community/{user}/status', [AdminController::class, 'updateUserStatus']);
 
         Route::post('/comment/reply/{postComment}', [PostReplyController::class, 'store'])->name('reply.post');
+        Route::put('/reply/{postReply}', [PostReplyController::class, 'update'])->name('reply.update');
+        Route::delete('/reply/{postReply}', [PostReplyController::class, 'destroy'])->name('reply.destroy');
         Route::get('/profile', [UserController::class, 'getProfile'])->name('profile.get');
 
     });

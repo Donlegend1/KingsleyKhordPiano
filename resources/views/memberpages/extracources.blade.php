@@ -3,7 +3,7 @@
 @section('content')
 
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
-  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center min-h-8 gap-4">
     <div class="flex items-center gap-2 text-sm text-gray-500">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
@@ -17,10 +17,10 @@
             type="text"
             name="search"
             value="{{ request('search') }}"
-            class="w-full border border-gray-200 rounded-full pl-4 pr-10 py-2 text-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
+            class="w-full h-8 border border-gray-200 rounded-full pl-4 pr-10 text-sm leading-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
             placeholder="Search courses..."
           >
-          <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1">
+          <button type="submit" class="absolute inset-y-0 right-3 flex items-center justify-center text-gray-400 hover:text-gray-600">
             <i class="fa fa-search text-sm"></i>
           </button>
         </div>
@@ -90,23 +90,23 @@
     </div>
 
     <!-- Desktop Tabs -->
-    <div class="hidden lg:flex items-center justify-center gap-2 mb-10">
+    <div class="hidden lg:flex flex-wrap items-center justify-center gap-6 mb-10">
       @php
         $tabs = [
-          'all'          => ['label' => 'All',          'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>'],
-          'beginner'     => ['label' => 'Beginner',     'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>'],
-          'intermediate' => ['label' => 'Intermediate', 'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>'],
-          'advanced'     => ['label' => 'Advanced',     'icon' => '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>'],
+          'all'          => 'ALL',
+          'beginner'     => 'Beginner',
+          'intermediate' => 'Intermediate',
+          'advanced'     => 'Advanced',
         ];
       @endphp
 
-      @foreach($tabs as $key => $tab)
+      @foreach($tabs as $key => $label)
         <a href="?tab={{ $key }}{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}"
-           class="px-6 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200
+           class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
              {{ request('tab', 'all') === $key
-               ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-200'
-               : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100' }}">
-          {{ $tab['label'] }}
+               ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+               : 'text-gray-500 hover:text-gray-700' }}">
+          {{ $label }}
         </a>
       @endforeach
     </div>
