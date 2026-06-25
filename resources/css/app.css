@@ -8,6 +8,16 @@
 @tailwind components;
 @tailwind utilities;
 
+select.no-native-arrow {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: none !important;
+}
+select.no-native-arrow::-ms-expand {
+  display: none !important;
+}
+
 html {
   scrollbar-gutter: stable;
 }
