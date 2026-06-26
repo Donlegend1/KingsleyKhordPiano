@@ -15,9 +15,9 @@ class CheckPaymentStatus
      */
     public function handle(Request $request, Closure $next)
     {
-        if (app()->environment('local')) {
-            return $next($request);
-        }
+        // if (app()->environment('local')) {
+        //     return $next($request);
+        // }
 
         $user = Auth::user();
 

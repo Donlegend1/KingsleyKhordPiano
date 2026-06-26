@@ -47,7 +47,9 @@ private $gateway;
             'status' => 'pending',
             'notified_at' => null,
             'starts_at' => now(),
-            'ends_at' =>  $request->duration ==="monthly" ? now()->addMonth(1) : now()->addYear(),
+            'ends_at' => $request->duration === "monthly"
+                ? now()->addMonth(1)
+                : ($request->duration === "quarterly" ? now()->addMonths(3) : now()->addYear()),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

@@ -51,13 +51,16 @@ class SyncStripeSubscribers extends Command
 
             $price = $stripeItem->price;
             $interval = $price->recurring->interval ?? null;
+            $intervalCount = $price->recurring->interval_count ?? 1;
             $amount = $price->unit_amount / 100;
             $status = $stripeSub->status;
 
             $startDate = Carbon::createFromTimestamp($stripeSub->current_period_start);
             $endDate = match ($interval) {
-                'month' => $startDate->copy()->addMonth(),
-                'year'  => $startDate->copy()->addYear(),
+                'month' => $startDate->copy()->addMonths($intervalCount),
+                'year'  => $startDate->copy()->addYears($intervalCount),
+                'week'  => $startDate->copy()->addWeeks($intervalCount),
+                'day'   => $startDate->copy()->addDays($intervalCount),
                 default => null,
             };
 
@@ -80,8 +83,8 @@ class SyncStripeSubscribers extends Command
             $user->update([
                 'payment_status' => $status === 'active' ? 'successful' : 'failed',
                 'amount' => $amount,
-                'premium' => $plan?->tier === 'Premium' ? 1 : 0,
-                'plan_id' => $plan?->id,
+                'premium' => (isset($plan->tier) && stripos($plan->tier, 'premium') !== false) ? 1 : 0,
+                'plan' => $plan?->id,
             ]);
 
             $this->info("Updated {$user->email}: {$status}, plan={$plan?->id}, amount={$amount}, ends_at={$endDate}");

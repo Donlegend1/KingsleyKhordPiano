@@ -144,7 +144,7 @@ const PlanSwitchAndCurrencySelect = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 {filteredPlans &&
                     filteredPlans.map((plan) => {
-                        const isPremium = plan.tier?.toLowerCase() === "premium";
+                        const isPremium = plan.tier?.toLowerCase().includes("premium");
                         return (
                             <div
                                 key={plan.id}
@@ -180,7 +180,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </div>
 
                                 <h3 className="text-lg font-bold text-gray-900">
-                                    {plan.tier?.charAt(0).toUpperCase() + plan.tier?.slice(1)} Plan
+                                    {plan.tier?.toLowerCase().includes("premium") ? "Premium" : "Standard"} Plan
                                 </h3>
 
                                 <div className="flex items-baseline gap-1.5 mt-3 mb-1">
@@ -237,7 +237,7 @@ const PlanSwitchAndCurrencySelect = () => {
                         <p className="text-center text-white mb-4">
                             {currencySigns[currency]}
                             {matchAmountToCurrency(selectedPlanDetails)}
-                             {" for "}{ selectedPlanDetails.tier} Plan
+                             {" for "}{selectedPlanDetails.tier?.toLowerCase().includes("premium") ? "Premium" : "Standard"} Plan
                         </p>
 
                         <div className="flex flex-col gap-6">
