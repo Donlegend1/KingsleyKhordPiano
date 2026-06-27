@@ -35,11 +35,33 @@
                 $relatedLessons = $otherLessons->take(3);
             }
         }
+
+        $completableType = $series ? 'musical_applications' : 'uploads';
+        $completableClass = $series ? \App\Models\MusicalApplication::class : \App\Models\Upload::class;
+
+        $isCompleted = $activeVideo && \App\Models\LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_id', $activeVideo->id)
+            ->where('completable_type', $completableClass)
+            ->exists();
+
+        $completedIds = \App\Models\LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_type', $completableClass)
+            ->pluck('completable_id')
+            ->all();
     @endphp
 
     <div class="min-h-screen bg-white">
 
         {{-- Breadcrumb --}}
+        @php
+            $fingerLevelLabels = [
+                'independence' => 'Hand Independence',
+                'flexibility' => 'Hand Flexibility',
+                'dexterity' => 'Hand Dexterity',
+                'strength' => 'Finger Strength',
+            ];
+            $courseLabel = $series ?: ($fingerLevelLabels[$level] ?? Str::title($level));
+        @endphp
         <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center gap-x-2 gap-y-1 min-h-8 text-sm text-gray-500">
                 <a href="/home" class="hover:text-gray-700">Dashboard</a>
@@ -52,9 +74,9 @@
                 <span>/</span>
                 <a href="{{ url()->current() . '?' . http_build_query(request()->except('video_id')) }}"
                     class="hover:text-gray-700">{{ ucfirst($skillLevel) }}</a>
-                @if ($activeVideo)
+                @if ($courseLabel)
                     <span>/</span>
-                    <span class="text-[#6366F1] font-medium">{{ Str::title($activeVideo->title) }}</span>
+                    <span class="text-[#6366F1] font-medium">{{ $courseLabel }}</span>
                 @endif
             </div>
         </section>
@@ -65,7 +87,7 @@
             <div class="max-w-[1280px] mx-auto px-6 pt-6 pb-16 flex flex-col lg:flex-row gap-8 items-start">
 
                 {{-- ── LEFT COLUMN ── --}}
-                <div class="flex-1 min-w-0">
+                <div class="flex-1 min-w-0 w-full">
 
                     {{-- Video Player --}}
                     {{-- <div class="w-full bg-black rounded-xl overflow-hidden aspect-video mb-5 shadow"> --}}
@@ -110,19 +132,24 @@
                             </a>
                         @endif --}}
 
-                        <form action="/member/course/{{ $activeVideo->id }}/complete" method="POST">
+                        <form action="{{ route('lesson.complete') }}" method="POST" class="complete-form">
                             @csrf
-                            <button type="submit"
-                                class="flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
-                                <i class="fa-regular fa-circle-check text-[15px]"></i>
-                                Complete
+                            <input type="hidden" name="completable_id" value="{{ $activeVideo->id }}">
+                            <input type="hidden" name="completable_type" value="{{ $completableType }}">
+                            <button type="submit" {{ $isCompleted ? 'disabled' : '' }}
+                                class="complete-btn flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
+                                {{ $isCompleted
+                                    ? 'bg-green-50 border-green-200 text-green-600 cursor-not-allowed'
+                                    : 'bg-[#2563EB] border-[#2563EB] hover:bg-[#1D4ED8] text-white' }}">
+                                <i class="fa-solid fa-circle-check text-[15px]"></i>
+                                {{ $isCompleted ? 'Completed' : 'Complete' }}
                             </button>
                         </form>
 
                         <form action="{{ route('bookmark.toggle') }}" method="POST" class="bookmark-form">
                             @csrf
                             <input type="hidden" name="bookmarkable_id" value="{{ $activeVideo->id }}">
-                            <input type="hidden" name="bookmarkable_type" value="uploads">
+                            <input type="hidden" name="bookmarkable_type" value="{{ $completableType }}">
                             <button type="submit"
                                 class="bookmark-btn flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
                    {{ $isBookmarked
@@ -134,6 +161,11 @@
                         </form>
                     </div>
 
+                    {{-- Lessons in this course (mobile & tablet only) --}}
+                    <div class="lg:hidden mb-10">
+                        @include('memberpages.partials.lesson-playlist')
+                    </div>
+
                     {{-- Related Lessons --}}
                     @if ($relatedLessons->count() > 0)
                         <div>
@@ -143,7 +175,7 @@
                                     All</a> --}}
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($relatedLessons as $related)
                                     @php
                                         // If it's an Upload, we need to ensure level and skill_level are in the URL
@@ -230,59 +262,9 @@
 
                 </div>
 
-                {{-- ── RIGHT COLUMN: Sidebar Playlist ── --}}
-                <aside
-                    class="w-full lg:w-[360px] flex-shrink-0 border border-gray-100 rounded-xl overflow-hidden shadow-sm sticky top-6 bg-white">
-
-                    {{-- Header --}}
-                    <div class="px-5 py-4 border-b border-gray-100">
-                        <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
-                            Lessons in this course:
-                        </p>
-                    </div>
-
-                    {{-- Scrollable list --}}
-                    <div class="overflow-y-auto" style="max-height: 520px;">
-                        @foreach ($playlist as $item)
-                            @php $isActive = $activeVideo && $item->id == $activeVideo->id; @endphp
-                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $item->id]) }}"
-                                class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                    {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
-
-                                {{-- Title --}}
-                                <div class="flex-1 min-w-0">
-                                    <p
-                                        class="text-[12px] font-bold uppercase tracking-wide leading-snug
-                         {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
-                                        {{ $item->title }}
-                                    </p>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-
-                    {{-- Next Lesson button --}}
-                    <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
-                        @if ($previousVideo)
-                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $previousVideo->id]) }}"
-                                class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
-                                <i class="fa-solid fa-arrow-left text-sm"></i> Prev
-                            </a>
-                        @endif
-
-                        @if ($nextVideo)
-                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $nextVideo->id]) }}"
-                                class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
-                                Next <i class="fa-solid fa-arrow-right text-sm"></i>
-                            </a>
-                        @else
-                            <button disabled
-                                class="w-full py-3 border border-gray-100 rounded-lg text-gray-400 font-bold text-[14px] bg-gray-50 cursor-not-allowed">
-                                Course Completed
-                            </button>
-                        @endif
-                    </div>
-
+                {{-- ── RIGHT COLUMN: Sidebar Playlist (desktop only) ── --}}
+                <aside class="hidden lg:block w-[360px] flex-shrink-0 sticky top-6">
+                    @include('memberpages.partials.lesson-playlist')
                 </aside>
 
             </div>
@@ -307,6 +289,30 @@
             window.uploadData = @json($activeVideo);
         </script>
         <script>
+            document.querySelectorAll('.complete-form').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('.complete-btn');
+                    try {
+                        const res = await fetch(this.action, {
+                            method: 'POST',
+                            body: new FormData(this),
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value
+                            }
+                        });
+                        await res.json();
+                        btn.disabled = true;
+                        btn.classList.remove('bg-[#2563EB]', 'border-[#2563EB]', 'hover:bg-[#1D4ED8]', 'text-white');
+                        btn.classList.add('bg-green-50', 'border-green-200', 'text-green-600', 'cursor-not-allowed');
+                        btn.innerHTML = '<i class="fa-solid fa-circle-check text-[15px]"></i> Completed';
+                    } catch (err) {
+                        console.error('Failed to mark course as completed:', err);
+                    }
+                });
+            });
+
             document.querySelectorAll('.bookmark-form').forEach(form => {
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();

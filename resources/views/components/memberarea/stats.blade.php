@@ -168,7 +168,7 @@
       {{-- Resume Last Lesson --}}
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
+          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
             <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z"/>
             </svg>
@@ -180,27 +180,18 @@
           @php
             $thumbnail = $resumeLesson->thumbnail ? asset($resumeLesson->thumbnail) : ($resumeLesson->thumbnail_url ?? asset('images/featured1.jpeg'));
           @endphp
-          <div class="flex items-start gap-4">
-            <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl shadow-sm border border-gray-100 flex-shrink-0">
+          <div class="flex items-center gap-6">
+            <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-40 sm:w-48 h-28 sm:h-32 object-cover rounded-xl shadow-sm border border-gray-100 flex-shrink-0">
             <div class="flex-grow min-w-0">
-              <h4 class="text-base font-bold text-gray-900 truncate mb-0.5">{{ $resumeLesson->title }}</h4>
-              <p class="text-xs text-gray-400 mb-2">{{ ucfirst($resumeLesson->level ?? 'Beginner') }} Lesson</p>
-              
-              {{-- Progress bar --}}
-              <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1">
-                <div class="bg-violet-600 h-1.5 rounded-full" style="width: 50%"></div>
-              </div>
-              <div class="flex justify-end text-[10px] text-gray-400 font-semibold mb-3">
-                <span>50% Complete</span>
-              </div>
-              <div>
-                <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold transition duration-200 shadow-sm">
-                  <span>Continue Learning</span>
-                  <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </a>
-              </div>
+              <h4 class="text-xl font-extrabold text-gray-900 truncate mb-1">{{ $resumeLesson->title }}</h4>
+              <p class="text-sm text-gray-400 mb-4">{{ ucfirst($resumeLesson->level ?? 'Beginner') }} Lesson</p>
+
+              <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-full text-sm font-bold transition duration-200 shadow-sm">
+                <span>Continue Learning</span>
+                <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </a>
             </div>
           </div>
         @else

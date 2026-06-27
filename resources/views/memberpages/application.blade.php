@@ -3,7 +3,7 @@
 @section('content')
 
 <!-- Header Section -->
-<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
     <div class="px-6 py-5">
         <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Application</h1>
     </div>
@@ -27,27 +27,27 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         @foreach ($apps as $app)
-            <div class="bg-white border border-gray-200 rounded-2xl p-5">
+            <div class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-5">
                 <div class="flex items-start gap-3">
                     <div class="w-12 h-12 rounded-xl {{ $app['bg'] }} text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
                         {{ $app['initial'] }}
                     </div>
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="font-semibold text-gray-900">{{ $app['name'] }}</h3>
-                            <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{{ $app['badge'] }}</span>
+                            <h3 class="font-semibold text-gray-900 dark:text-white">{{ $app['name'] }}</h3>
+                            <span class="text-xs font-medium text-indigo-600 dark:text-blue-400 bg-indigo-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full">{{ $app['badge'] }}</span>
                         </div>
-                        <p class="text-sm text-gray-500 mt-1">{{ $app['desc'] }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $app['desc'] }}</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 mt-5">
-                    <a href="{{ $app['link'] }}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-50 transition">
+                    <a href="{{ $app['link'] }}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-gray-300 dark:border-white/10 rounded-lg text-sm font-semibold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition">
                         Download
                     </a>
-                    <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md">Windows</span>
+                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-md">Windows</span>
                     @if($app['macos'] ?? true)
-                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md">macOS</span>
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-md">macOS</span>
                     @endif
                 </div>
             </div>

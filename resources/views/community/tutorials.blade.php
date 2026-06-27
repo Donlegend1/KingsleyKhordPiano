@@ -3,11 +3,11 @@
 @section('content')
 
 <div
-  class="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12"
+  class="min-h-screen bg-gray-50 dark:bg-black pb-12"
 >
   
   {{-- Header --}}
-  <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+  <div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
     <div class="px-6 py-5">
       <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Tutorial</h1>
     </div>
@@ -25,7 +25,7 @@
           $avatar = $t->author_avatar ? asset($t->author_avatar) : '/images/featured1.jpeg';
         @endphp
         
-        <div class="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition duration-300 overflow-hidden flex flex-col justify-between">
+        <div class="group bg-white dark:bg-[#161617] rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-md transition duration-300 overflow-hidden flex flex-col justify-between">
           
           {{-- Thumbnail Area --}}
           <a
@@ -74,7 +74,7 @@
         </div>
       @empty
         <div class="col-span-full py-16 text-center">
-          <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+          <div class="w-16 h-16 bg-gray-100 dark:bg-[#161617] rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
             <i class="fa fa-video text-2xl"></i>
           </div>
           <h3 class="text-lg font-bold text-gray-800 dark:text-white">No Tutorials Available</h3>

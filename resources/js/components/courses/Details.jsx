@@ -890,7 +890,7 @@ const CoursesPage = () => {
                 {/* Mobile Course List */}
                 <div className="md:hidden w-full mb-4 bg-gray-50 dark:bg-gray-900">
                     <button
-                        className="w-full flex items-center gap-3 px-4 py-5 font-bold text-lg text-gray-900 dark:text-gray-100 focus:outline-none"
+                        className="w-full flex items-center justify-between gap-3 px-4 py-5 font-bold text-lg text-gray-900 dark:text-gray-100 focus:outline-none"
                         onClick={() =>
                             setExpandedCategories((prev) => ({
                                 ...prev,
@@ -898,14 +898,24 @@ const CoursesPage = () => {
                             }))
                         }
                     >
-                        <svg className="w-5 h-5 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M15 18l-6-6 6-6" />
-                        </svg>
                         <span className="truncate">
                             {lastSegment.charAt(0).toUpperCase() +
                                 lastSegment.slice(1)}{" "}
                             Piano Roadmap
                         </span>
+                        <svg
+                            className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
+                                expandedCategories.__mobile ? "rotate-180" : ""
+                            }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
                     </button>
                     {expandedCategories.__mobile && <CourseList />}
                 </div>
