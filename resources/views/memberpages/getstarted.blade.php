@@ -240,6 +240,7 @@
           </li>
         </ul>
 
+        @if(auth()->user()->premium)
         <button 
           @click="showDiscoveryCallModal = true"
           type="button"
@@ -250,6 +251,17 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
           </svg>
         </button>
+        @else
+         <button 
+         
+          type="button"
+          class="mt-auto w-full flex items-center justify-center space-x-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-4 rounded-xl transition text-sm"
+        >
+          <span>This is for premium users only</span>
+         
+        </button>
+        @endif
+
       </div>
 
     </div>
