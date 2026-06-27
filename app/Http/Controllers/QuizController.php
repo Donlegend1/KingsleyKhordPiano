@@ -335,15 +335,15 @@ class QuizController extends Controller
             [
                 'id' => 14,
                 'category' => 'Experience & Confidence',
-                'question' => 'How do you explore and refine your personal sound?',
+                'question' => 'Can you play on all 12 keys?',
                 'points' => 5,
                 'type' => 'single',
                 'options' => [
-                    ['text' => 'Focus on emotional impact', 'points' => 5, 'subtext' => 'I select voicings and dynamics to create specific moods and expressions.'],
-                    ['text' => 'Experiment with techniques', 'points' => 4, 'subtext' => 'I try different runs, fills, and rhythms to see what sounds good.'],
-                    ['text' => 'Learn chords/scales/patterns', 'points' => 2, 'subtext' => 'I focus on building my library of shapes and mechanical patterns.'],
+                    ['text' => 'Yes I Can', 'points' => 5, 'subtext' => 'I can comfortably play in any of the 12 keys.'],
+                    ['text' => 'I Know Some Keys', 'points' => 3, 'subtext' => 'I can play in a few keys but not all of them yet.'],
+                    ['text' => "No I Can't", 'points' => 1, 'subtext' => 'I mostly stick to one or two familiar keys.'],
                 ],
-                'tip' => 'Refining your sound is a creative journey of finding what resonates most with you.'
+                'tip' => 'Playing across all 12 keys builds true mastery and frees you to play any song in any key.'
             ],
             [
                 'id' => 15,
