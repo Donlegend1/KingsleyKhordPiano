@@ -2,14 +2,14 @@
 
 @section('content')
 <!-- Header Section -->
-<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
     <div class="px-6 py-5">
         <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">PDF Downloads</h1>
     </div>
 </div>
 
 <!-- Main Content Section -->
-<section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-gray-900">
+<section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-black">
     <div class="max-w-7xl mx-auto">
         
         <!-- Tabs Navigation -->
@@ -23,7 +23,7 @@
                 @if($pdfList->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($pdfList as $pdf)
-                        <div class="group bg-white dark:bg-gray-800 rounded-[28px] border border-gray-200/70 dark:border-gray-700 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
+                        <div class="group bg-white dark:bg-[#161617] rounded-[28px] border border-gray-200/70 dark:border-white/10 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
                             <div class="relative h-52 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%),linear-gradient(135deg,_#4F8DF7,_#3267D6)] flex items-center justify-center overflow-hidden">
                                 @if($pdf->thumbnail)
                                     <img src="/{{ $pdf->thumbnail }}" alt="{{ $pdf->title }}" class="w-full h-full object-cover">
@@ -48,7 +48,7 @@
                                 </div>
                                 
                                 <div class="grid grid-cols-2 gap-3 mt-auto">
-                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-100/90 dark:bg-gray-700/80 px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 transition-all duration-200 hover:border-gray-400 hover:bg-white dark:hover:bg-gray-600">
+                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 dark:border-white/10 bg-gray-100/90 dark:bg-white/5 px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 transition-all duration-200 hover:border-gray-400 hover:bg-white dark:hover:bg-white/10">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         View
                                     </a>

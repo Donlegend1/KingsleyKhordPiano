@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- Header Section -->
-    <div class="flex justify-between items-center mx-auto border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-500 px-10 py-4">
+    <div class="flex justify-between items-center mx-auto border bg-white dark:bg-[#161617] border-gray-200 dark:border-white/10 px-10 py-4">
         <!-- Breadcrumb -->
         <div class="flex gap-2 items-center">
             <a 

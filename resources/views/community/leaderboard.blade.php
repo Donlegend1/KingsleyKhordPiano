@@ -12,7 +12,7 @@
 
     $rankStyles = [
         0 => ['badge' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300', 'label' => '1st'],
-        1 => ['badge' => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300', 'label' => '2nd'],
+        1 => ['badge' => 'bg-slate-100 text-slate-600 dark:bg-[#1f2021] dark:text-slate-300', 'label' => '2nd'],
         2 => ['badge' => 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300', 'label' => '3rd'],
     ];
 @endphp
@@ -39,7 +39,7 @@
         }
     }"
     x-init="syncHeights(); window.addEventListener('resize', () => syncHeights())"
-    class="min-h-full bg-gray-50 px-4 py-6 dark:bg-slate-950 sm:px-6 lg:px-8"
+    class="min-h-full bg-gray-50 px-4 py-6 dark:bg-black sm:px-6 lg:px-8"
 >
     <div class="mx-auto max-w-6xl space-y-6">
 
@@ -48,17 +48,17 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-slate-500">Community Rankings</p>
                 <h1 class="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Leaderboards</h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-slate-400 max-w-xl">
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-xl">
                     Leaderboard shows the highest point earners this month, Top Members ranks all-time totals.
                 </p>
             </div>
 
-            <div class="w-full rounded-xl bg-gray-100 p-1 dark:bg-slate-900 sm:w-auto">
+            <div class="w-full rounded-xl bg-gray-100 p-1 dark:bg-[#161617] sm:w-auto">
                 <div class="grid grid-cols-2 gap-1">
                     <button
                         type="button"
                         @click="activeTab = 'leaderboard'"
-                        :class="activeTab === 'leaderboard' ? 'bg-white text-gray-900 shadow-sm dark:bg-slate-800 dark:text-white' : 'text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-white'"
+                        :class="activeTab === 'leaderboard' ? 'bg-white text-gray-900 shadow-sm dark:bg-[#1f2021] dark:text-white' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'"
                         class="rounded-lg px-4 py-2 text-sm font-semibold transition"
                     >
                         Leaderboard
@@ -66,7 +66,7 @@
                     <button
                         type="button"
                         @click="activeTab = 'top-members'"
-                        :class="activeTab === 'top-members' ? 'bg-white text-gray-900 shadow-sm dark:bg-slate-800 dark:text-white' : 'text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-white'"
+                        :class="activeTab === 'top-members' ? 'bg-white text-gray-900 shadow-sm dark:bg-[#1f2021] dark:text-white' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'"
                         class="rounded-lg px-4 py-2 text-sm font-semibold transition"
                     >
                         Top Members
@@ -122,7 +122,7 @@
                     x-show="activeTab === 'top-members'"
                     x-transition.opacity.duration.200ms
                     x-cloak
-                    class="absolute inset-0 flex flex-col rounded-2xl bg-gray-900 p-6 text-white dark:bg-slate-800"
+                    class="absolute inset-0 flex flex-col rounded-2xl bg-gray-900 p-6 text-white dark:bg-[#1f2021]"
                 >
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">All-Time Standout</p>
                     @if ($topMembers->isNotEmpty())
@@ -167,15 +167,15 @@
                 >
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">Leaderboard</h2>
-                        <p class="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Highest point totals for {{ now()->format('F Y') }}.</p>
+                        <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Highest point totals for {{ now()->format('F Y') }}.</p>
                     </div>
 
-                    <div class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                    <div class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-[#161617]">
                         @forelse ($monthlyLeaders as $index => $member)
                             @php $rankStyle = $rankStyles[$index] ?? null; @endphp
-                            <div class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5 {{ $loop->last ? '' : 'border-b border-gray-100 dark:border-slate-800' }}">
+                            <div class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5 {{ $loop->last ? '' : 'border-b border-gray-100 dark:border-white/10' }}">
                                 <div class="flex min-w-0 flex-1 items-center gap-3">
-                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold {{ $rankStyle['badge'] ?? 'bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400' }}">
+                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold {{ $rankStyle['badge'] ?? 'bg-gray-100 text-gray-500 dark:bg-[#1f2021] dark:text-gray-400' }}">
                                         {{ $index + 1 }}
                                     </div>
                                     <img
@@ -209,7 +209,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="px-6 py-12 text-center text-sm text-gray-500 dark:text-slate-400">
+                            <div class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
                                 No monthly community activity yet.
                             </div>
                         @endforelse
@@ -225,15 +225,15 @@
                 >
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white">Top Members</h2>
-                        <p class="mt-0.5 text-sm text-gray-500 dark:text-slate-400">Highest point totals across all-time community activity.</p>
+                        <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Highest point totals across all-time community activity.</p>
                     </div>
 
-                    <div class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                    <div class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-[#161617]">
                         @forelse ($topMembers as $index => $member)
                             @php $rankStyle = $rankStyles[$index] ?? null; @endphp
-                            <div class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5 {{ $loop->last ? '' : 'border-b border-gray-100 dark:border-slate-800' }}">
+                            <div class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5 {{ $loop->last ? '' : 'border-b border-gray-100 dark:border-white/10' }}">
                                 <div class="flex min-w-0 flex-1 items-center gap-3">
-                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold {{ $rankStyle['badge'] ?? 'bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400' }}">
+                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold {{ $rankStyle['badge'] ?? 'bg-gray-100 text-gray-500 dark:bg-[#1f2021] dark:text-gray-400' }}">
                                         {{ $index + 1 }}
                                     </div>
                                     <img
@@ -267,7 +267,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="px-6 py-12 text-center text-sm text-gray-500 dark:text-slate-400">
+                            <div class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
                                 No overall community activity yet.
                             </div>
                         @endforelse

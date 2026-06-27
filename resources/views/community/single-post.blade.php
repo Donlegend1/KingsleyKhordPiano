@@ -2,7 +2,7 @@
 
 @section('content')
 <!-- Header Section -->
-<div class="flex justify-between items-center mx-auto border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-500 px-10 py-4">
+<div class="flex justify-between items-center mx-auto border bg-white dark:bg-[#161617] border-gray-200 dark:border-white/10 px-10 py-4">
     
     <!-- Left: Breadcrumb -->
     <div>
@@ -18,7 +18,7 @@
 
 <!-- Main Content -->
 <!-- Main Feed Section -->
-<section class="bg-gray-100 dark:bg-gray-900 py-6 px-2 md:px-10 ">
+<section class="bg-gray-100 dark:bg-black py-6 px-2 md:px-10 ">
   <div class="flex flex-col lg:flex-row gap-6 ">
 
     <!-- Left: Main Feed Area -->
