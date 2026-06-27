@@ -2,7 +2,7 @@
 
 @section('content')
 <!-- Header Section -->
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-6 px-4">
+<section class="bg-white dark:bg-black text-gray-900 dark:text-white py-6 px-4">
  <div class="max-w-7xl mx-auto space-y-3">
    
    <!-- Top Row -->

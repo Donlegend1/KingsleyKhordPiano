@@ -41,7 +41,7 @@
     </style>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 h-screen overflow-hidden">
+<body class="bg-gray-100 dark:bg-black h-screen overflow-hidden">
 
 <div class="flex h-screen">
 
@@ -51,12 +51,12 @@
         x-show="showSidebar || window.innerWidth >= 1024"
         @click.away="if (window.innerWidth < 1024) showSidebar = false"
         :class="{ '-translate-x-full': !showSidebar && window.innerWidth < 1024 }"
-        class="fixed inset-y-0 left-0 z-40 w-72 bg-gray-100 border-r border-gray-200 transform transition-transform duration-200 lg:relative lg:translate-x-0 flex flex-col" style="box-shadow: 4px 0 24px rgba(0,0,0,0.06);"
+        class="fixed inset-y-0 left-0 z-40 w-72 bg-gray-100 dark:bg-[#0B0B0C] border-r border-gray-200 dark:border-white/10 transform transition-transform duration-200 lg:relative lg:translate-x-0 flex flex-col" style="box-shadow: 4px 0 24px rgba(0,0,0,0.06);"
     >
         {{-- Logo --}}
-        <div class="px-6 py-5 border-b border-gray-200 flex justify-center">
+        <div class="px-6 py-5 border-b border-gray-200 dark:border-white/10 flex justify-center">
             <a href="/home" class="flex items-center gap-2">
-                <img src="/logo/logoblack.png" alt="Kingsley Khord" class="h-10 w-auto">
+                <img src="/logo/logo-transparent-white.png" alt="Kingsley Khord" class="h-10 w-auto">
             </a>
         </div>
 
@@ -64,11 +64,11 @@
         <div class="flex-1 overflow-y-auto scrollbar-hide px-4 py-5 space-y-1.5 mt-10 md:mt-0">
 
             @php
-                $li = 'group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-base font-medium transition-all duration-150';
-                $active = $li . ' bg-indigo-50 text-indigo-700';
-                $inactive = $li . ' text-gray-500 hover:bg-gray-50 hover:text-gray-900';
-                $iconActive = 'flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white flex-shrink-0';
-                $iconInactive = 'flex items-center justify-center w-9 h-9 flex-shrink-0 text-gray-400 group-hover:text-gray-600';
+                $li = 'group flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-base font-medium transition-all duration-150 border-l-2';
+                $active = $li . ' bg-indigo-50 text-indigo-700 border-indigo-600 dark:bg-amber-400/5 dark:text-amber-400 dark:border-amber-400';
+                $inactive = $li . ' border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white';
+                $iconActive = 'flex items-center justify-center w-6 h-6 flex-shrink-0 text-indigo-600 dark:text-amber-400';
+                $iconInactive = 'flex items-center justify-center w-6 h-6 flex-shrink-0 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300';
             @endphp
 
             <a href="/member/my-library" class="{{ Request::is('member/my-library') ? $active : $inactive }}">
@@ -118,7 +118,7 @@
 
             {{-- Divider --}}
             <div class="pt-4 pb-1">
-                <div class="border-t border-gray-200"></div>
+                <div class="border-t border-gray-200 dark:border-white/10"></div>
             </div>
 
             <a href="/member/community/space/pdf-downloads" class="{{ Request::is('member/community/space/pdf-downloads') ? $active : $inactive }}">
@@ -159,7 +159,7 @@
 
             {{-- Mobile-only: top header nav links --}}
             <div class="lg:hidden pt-4 pb-1">
-                <div class="border-t border-gray-200"></div>
+                <div class="border-t border-gray-200 dark:border-white/10"></div>
             </div>
 
             <a href="/home" class="lg:hidden {{ Request::is('home') ? $active : $inactive }}">
@@ -215,24 +215,24 @@
     <div class="flex-1 flex flex-col min-w-0">
 
         <!-- Header -->
-        <header class="bg-gray-100 border-b border-gray-200 sticky top-0 z-50">
+        <header class="bg-gray-100 dark:bg-black border-b border-gray-200 dark:border-white/10 sticky top-0 z-50">
             <div class="px-6 py-0 flex items-center justify-between h-20">
 
                 <!-- Mobile: Hamburger -->
-                <button @click="showSidebar = !showSidebar" class="lg:hidden text-gray-500 p-1">
+                <button @click="showSidebar = !showSidebar" class="lg:hidden text-gray-500 dark:text-gray-400 p-1">
                     <i class="fa fa-bars text-xl"></i>
                 </button>
 
                 <!-- Mobile: Logo -->
                 <a href="/member/my-library" class="lg:hidden">
-                    <img src="/logo/logoblack.png" alt="Logo" class="h-8 w-auto">
+                    <img src="/logo/logo-transparent-white.png" alt="Logo" class="h-8 w-auto">
                 </a>
 
                 <!-- Desktop: Top nav -->
                 @php
                     $topLi = 'flex items-center gap-1.5 px-3 py-2 rounded-xl text-base font-medium transition-all duration-150';
-                    $topActive = $topLi . ' bg-indigo-50 text-indigo-700';
-                    $topInactive = $topLi . ' text-gray-500 hover:bg-gray-50 hover:text-gray-900';
+                    $topActive = $topLi . ' bg-indigo-50 text-indigo-700 dark:bg-transparent dark:text-amber-400';
+                    $topInactive = $topLi . ' text-gray-500 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white';
                 @endphp
                 <nav class="hidden lg:flex items-center gap-8">
                     <a href="/home" class="{{ Request::is('home') ? $topActive : $topInactive }}">
@@ -285,14 +285,14 @@
 
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                         <button type="button" @click="open = !open"
-                            class="relative p-2.5 rounded-xl text-red-500 hover:text-red-600 hover:bg-gray-50 transition-all duration-150"
+                            class="relative p-2.5 rounded-xl text-red-500 dark:text-gray-300 hover:text-red-600 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-150"
                             aria-label="Notifications">
                             <svg class="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9"
                                       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             @if($unreadCount > 0)
-                                <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
+                                <span class="absolute -top-0.5 -right-0.5 bg-red-500 dark:bg-amber-400 text-white dark:text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
                                     {{ $unreadCount > 99 ? '99+' : $unreadCount }}
                                 </span>
                             @endif
@@ -411,7 +411,7 @@
         </header>
 
         <!-- Page Content -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-black">
             @yield('content')
         </main>
 
@@ -421,11 +421,11 @@
 <script>
     function themeToggle() {
         return {
-            isDark: false,
+            isDark: true,
             showSidebar: false,
             init() {
-                localStorage.setItem('color-theme', 'light');
-                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'dark');
+                document.documentElement.classList.add('dark');
             },
             toggle() {},
         }

@@ -26,11 +26,11 @@
     }
 
     // Colors mapping for skill level
-    $levelColor = 'indigo-600';
-    $levelBg = 'indigo-50';
-    $levelBorder = 'indigo-100';
-    $levelText = 'indigo-700';
-    $strokeColor = '#4F46E5';
+    $levelColor = 'blue-600';
+    $levelBg = 'blue-50';
+    $levelBorder = 'blue-100';
+    $levelText = 'blue-700';
+    $strokeColor = '#2563EB';
 
     if ($assessment) {
         $levelLower = strtolower($assessment->skill_level);
@@ -57,7 +57,7 @@
 @endphp
 
 <!-- Header Section -->
-<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
     <div class="px-6 py-5">
         <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Your Growth at a Glance</h1>
     </div>
@@ -71,11 +71,11 @@
             <div class="flex flex-col sm:flex-row gap-6">
 
                 {{-- Profile Card --}}
-                <div class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
+                <div class="flex-1 bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
                     @if($user->passport)
-                        <img src="{{ asset($user->passport) }}" alt="Avatar" class="w-20 h-20 rounded-full object-cover ring-4 ring-indigo-100 dark:ring-indigo-900/30">
+                        <img src="{{ asset($user->passport) }}" alt="Avatar" class="w-20 h-20 rounded-full object-cover ring-4 ring-indigo-100 dark:ring-blue-500/20">
                     @else
-                        <div class="w-20 h-20 rounded-full bg-indigo-50 dark:bg-indigo-900/20 ring-4 ring-indigo-100 dark:ring-indigo-900/30 flex items-center justify-center text-indigo-300 text-xs font-semibold">
+                        <div class="w-20 h-20 rounded-full bg-indigo-50 dark:bg-blue-500/10 ring-4 ring-indigo-100 dark:ring-blue-500/20 flex items-center justify-center text-indigo-300 dark:text-blue-400 text-xs font-semibold">
                             Avatar
                         </div>
                     @endif
@@ -89,11 +89,11 @@
                         @endif
                     </h2>
 
-                    <p class="text-sm font-semibold text-indigo-500 dark:text-indigo-400 mt-0.5">
+                    <p class="text-sm font-semibold text-indigo-500 dark:text-blue-400 mt-0.5">
                         {{ !empty($user->biography) ? $user->biography : 'Gospel Piano Enthusiast' }}
                     </p>
 
-                    <div class="mt-3 inline-flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 px-3 py-1.5 rounded-full">
+                    <div class="mt-3 inline-flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-3 py-1.5 rounded-full">
                         <svg class="w-3.5 h-3.5 text-red-500 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                         </svg>
@@ -106,12 +106,12 @@
                 </div>
 
                 {{-- Academy Stats Card --}}
-                <div class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+                <div class="flex-1 bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
                     <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Academy Stats</p>
                     <div class="flex flex-col gap-4">
-                        <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 text-center">
-                            <span class="text-2xl font-black text-indigo-600 dark:text-indigo-400">{{ $totalCompleted }}</span>
-                            <p class="text-[10px] font-semibold text-indigo-400 dark:text-indigo-500 mt-1">Lessons</p>
+                        <div class="bg-indigo-50 dark:bg-blue-500/10 rounded-xl p-4 text-center">
+                            <span class="text-2xl font-black text-indigo-600 dark:text-blue-400">{{ $totalCompleted }}</span>
+                            <p class="text-[10px] font-semibold text-indigo-400 dark:text-blue-400 mt-1">Lessons</p>
                         </div>
                         <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 text-center">
                             <span class="text-2xl font-black text-amber-500 dark:text-amber-400">{{ $achievedCount }}</span>
@@ -125,7 +125,7 @@
             {{-- 3. Feedback Widget --}}
             <div
                 x-data="{ rating: 0, hoverRating: 0, comment: '', submitted: false }"
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-sm"
+                class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-8 shadow-sm"
             >
                 <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-2">Help Us Improve</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">How has your academy experience been? Share your thoughts below.</p>
@@ -160,13 +160,13 @@
                 <textarea
                     x-model="comment"
                     placeholder="Suggest courses, report bugs, or share positive feedback..."
-                    class="w-full text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 mb-4 resize-none h-24"
+                    class="w-full text-sm bg-gray-50 dark:bg-[#0F0F10] border border-gray-200 dark:border-white/10 rounded-xl p-4 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 mb-4 resize-none h-24"
                 ></textarea>
 
                 <button
                     type="button"
                     @click="if(rating > 0 || comment.trim() !== '') { submitted = true; rating = 0; comment = ''; setTimeout(() => submitted = false, 5000) }"
-                    class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition shadow-sm"
+                    class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition shadow-sm"
                 >
                     Submit Feedback
                 </button>
@@ -184,7 +184,7 @@
 
             {{-- Assigned Level / Retake Quiz --}}
             @if($assessment)
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-8 sm:px-10 sm:py-12 shadow-sm flex flex-col md:flex-row items-center gap-8 md:gap-10">
+                <div class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl px-6 py-8 sm:px-10 sm:py-12 shadow-sm flex flex-col md:flex-row items-center gap-8 md:gap-10">
                     <!-- Circular Gauge -->
                     <div class="relative w-44 h-44 flex-shrink-0">
                         <svg class="w-44 h-44 transform -rotate-90" viewBox="0 0 120 120">
@@ -215,42 +215,42 @@
                                 <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
                                     <span>Fundamentals</span><span class="font-bold">{{ $assessment->fundamentals_score }}%</span>
                                 </div>
-                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                                <div class="w-full bg-gray-100 dark:bg-white/10 rounded-full h-2">
                                     <div class="h-2 rounded-full" style="width:{{ $assessment->fundamentals_score }}%;background-color:#3B82F6"></div>
                                 </div>
                                 <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2 mt-5">
                                     <span>Chords & Harmony</span><span class="font-bold">{{ $assessment->chords_harmony_score }}%</span>
                                 </div>
-                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                                <div class="w-full bg-gray-100 dark:bg-white/10 rounded-full h-2">
                                     <div class="h-2 rounded-full" style="width:{{ $assessment->chords_harmony_score }}%;background-color:#8B5CF6"></div>
                                 </div>
                             </div>
-                            <div class="hidden sm:block w-px bg-gray-100 dark:bg-gray-700 self-stretch"></div>
+                            <div class="hidden sm:block w-px bg-gray-100 dark:bg-white/10 self-stretch"></div>
                             <div class="flex-1">
                                 <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
                                     <span>Ear Training</span><span class="font-bold">{{ $assessment->ear_training_score }}%</span>
                                 </div>
-                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                                <div class="w-full bg-gray-100 dark:bg-white/10 rounded-full h-2">
                                     <div class="h-2 rounded-full" style="width:{{ $assessment->ear_training_score }}%;background-color:#10B981"></div>
                                 </div>
                                 <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2 mt-5">
                                     <span>Experience</span><span class="font-bold">{{ $assessment->experience_score }}%</span>
                                 </div>
-                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                                <div class="w-full bg-gray-100 dark:bg-white/10 rounded-full h-2">
                                     <div class="h-2 rounded-full" style="width:{{ $assessment->experience_score }}%;background-color:#F59E0B"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex justify-end">
-                            <a href="/member/quiz" class="text-sm text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 font-bold inline-flex items-center gap-1.5 transition">
+                            <a href="/member/quiz" class="text-sm text-indigo-500 hover:text-indigo-600 dark:text-blue-400 font-bold inline-flex items-center gap-1.5 transition">
                                 Retake Assessment <i class="fa fa-arrow-right"></i>
                             </a>
                         </div>
                     </div>
                 </div>
             @else
-                <div class="bg-gradient-to-r from-indigo-900 to-violet-800 text-white rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 border border-indigo-700/20">
+                <div class="bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 border border-blue-700/20">
                     <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-3xl flex-shrink-0">🏆</div>
                     <div class="flex-grow">
                         <h3 class="text-lg font-bold text-white mb-1.5">Evaluate Your Piano Skill Level</h3>
@@ -267,9 +267,9 @@
             {{-- 1. Quick Links Row --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <!-- Get Started Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                <div class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
                     <div>
-                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-blue-500/10 rounded-xl flex items-center justify-center text-xl mb-4">
                             🧭
                         </div>
                         <h4 class="text-base font-bold text-gray-900 dark:text-white mb-1">Get Started</h4>
@@ -277,13 +277,13 @@
                             Get familiar with the platform and follow our step-by-step setup guides to start smoothly.
                         </p>
                     </div>
-                    <a href="/member/getstarted" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-gray-600 hover:border-indigo-500 dark:hover:border-indigo-400 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl text-xs font-bold transition">
+                    <a href="/member/getstarted" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-white/10 hover:border-indigo-500 dark:hover:border-blue-400 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-blue-400 rounded-xl text-xs font-bold transition">
                         <span>Continue Setup</span>
                     </a>
                 </div>
 
                 <!-- Community Space Card -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                <div class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
                     <div>
                         <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl flex items-center justify-center text-xl mb-4">
                             👥
@@ -293,16 +293,16 @@
                             Explore shared files, PDF resources, backing tracks, MIDI downloads, and connect with other students.
                         </p>
                     </div>
-                    <a href="/member/community/space/lessons" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-gray-600 hover:border-emerald-500 dark:hover:border-emerald-400 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl text-xs font-bold transition">
+                    <a href="/member/community/space/lessons" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-gray-300 dark:border-white/10 hover:border-emerald-500 dark:hover:border-emerald-400 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl text-xs font-bold transition">
                         <span>Visit Space</span>
                     </a>
                 </div>
             </div>
 
             {{-- 3. Continue Learning Widget --}}
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+            <div class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
                 <div class="flex items-center gap-2 mb-4">
-                    <div class="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center text-violet-600 dark:text-violet-400">
+                    <div class="w-8 h-8 rounded-full bg-violet-100 dark:bg-blue-500/10 flex items-center justify-center text-violet-600 dark:text-blue-400">
                         <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z"/>
                         </svg>
@@ -315,18 +315,18 @@
                         $thumbnail = $resumeLesson->thumbnail ? asset($resumeLesson->thumbnail) : ($resumeLesson->thumbnail_url ?? asset('images/featured1.jpeg'));
                     @endphp
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-24 h-24 object-cover rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex-shrink-0">
+                        <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-24 h-24 object-cover rounded-xl shadow-sm border border-gray-100 dark:border-white/10 flex-shrink-0">
                         <div class="flex-grow min-w-0 w-full">
                             <h4 class="text-base font-bold text-gray-900 dark:text-white truncate mb-0.5">{{ $resumeLesson->title }}</h4>
                             <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">{{ ucfirst($resumeLesson->level ?? 'Beginner') }} Lesson</p>
                             
                             {{-- Progress bar --}}
-                            <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 mb-1.5">
-                                <div class="bg-violet-600 dark:bg-violet-500 h-1.5 rounded-full" style="width: 45%"></div>
+                            <div class="w-full bg-gray-100 dark:bg-white/10 rounded-full h-1.5 mb-1.5">
+                                <div class="bg-violet-600 dark:bg-blue-500 h-1.5 rounded-full" style="width: 45%"></div>
                             </div>
                             <div class="flex justify-between items-center text-[10px] text-gray-400 dark:text-gray-500 font-semibold">
                                 <span>45% Completed</span>
-                                <a href="{{ $resumeUrl }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
+                                <a href="{{ $resumeUrl }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600 hover:bg-violet-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
                                     <span>Resume</span>
                                     <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
                                         <path d="M8 5v14l11-7z"/>
@@ -348,7 +348,7 @@
                     { text: 'The community spacing is awesome. Downloading PDF sheets and MIDI files directly to practice on has helped me save hours.', author: 'David E.', role: 'Worship Director' }
                 ] }"
                 x-init="setInterval(() => active = (active + 1) % reviews.length, 5000)"
-                class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm"
+                class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm"
             >
                 <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Student Spotlights</h4>
                 <div class="min-h-[100px] flex flex-col justify-between">
@@ -356,14 +356,14 @@
                     <div class="mt-4 flex items-center justify-between">
                         <div>
                             <p class="text-xs font-bold text-gray-900 dark:text-white" x-text="reviews[active].author"></p>
-                            <p class="text-[10px] text-indigo-500 dark:text-indigo-400" x-text="reviews[active].role"></p>
+                            <p class="text-[10px] text-indigo-500 dark:text-blue-400" x-text="reviews[active].role"></p>
                         </div>
                         <div class="flex gap-1.5">
                             <template x-for="(rev, idx) in reviews">
                                 <button 
                                     @click="active = idx" 
                                     class="w-2 h-2 rounded-full transition-all focus:outline-none"
-                                    :class="active === idx ? 'bg-indigo-600 dark:bg-indigo-400 w-4' : 'bg-gray-200 dark:bg-gray-700'"
+                                    :class="active === idx ? 'bg-indigo-600 dark:bg-blue-400 w-4' : 'bg-gray-200 dark:bg-white/10'"
                                 ></button>
                             </template>
                         </div>

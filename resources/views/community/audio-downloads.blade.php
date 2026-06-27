@@ -2,14 +2,14 @@
 
 @section('content')
 <!-- Header Section -->
-<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
     <div class="px-6 py-5">
         <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Audio Downloads</h1>
     </div>
 </div>
 
 <!-- Main Content Section -->
-<section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-gray-900">
+<section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-black">
     <div class="max-w-7xl mx-auto">
         
         <!-- Tabs Navigation -->
@@ -22,7 +22,7 @@
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
                 <button
                     @click="activeTab = 'all'"
-                    :class="activeTab === 'all' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                    :class="activeTab === 'all' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-[#161617] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'"
                     class="flex-1 px-8 py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm"
                 >
                     All Files
@@ -30,7 +30,7 @@
 
                   <button
                     @click="activeTab = 'intermediate'"
-                    :class="activeTab === 'intermediate' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                    :class="activeTab === 'intermediate' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-[#161617] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'"
                     class="flex-1 px-8 py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm"
                 >
                     Piano Plays
@@ -38,7 +38,7 @@
 
                 <button
                     @click="activeTab = 'beginners'"
-                    :class="activeTab === 'beginners' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                    :class="activeTab === 'beginners' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-[#161617] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'"
                     class="flex-1 px-8 py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm"
                 >
                     Track & Loops

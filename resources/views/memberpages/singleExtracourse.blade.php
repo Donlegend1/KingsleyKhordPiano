@@ -16,6 +16,11 @@
             ->where('completable_type', get_class($lesson))
             ->exists();
 
+        $completedIds = $lesson ? \App\Models\LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_type', get_class($lesson))
+            ->pluck('completable_id')
+            ->all() : [];
+
         // Fetch playlist based on category
         $playlist = collect();
         if ($lessonType === 'learn_songs') {
@@ -104,9 +109,9 @@
                 @else
                     <a href="{{ route('extra.courses') }}" class="hover:text-gray-700">Extra Courses</a>
                 @endif
-                @if ($lesson)
+                @if ($lesson?->category)
                     <span>/</span>
-                    <span class="text-[#6366F1] font-medium">{{ Str::title($lesson->title) }}</span>
+                    <span class="text-[#6366F1] font-medium">{{ $lesson->category->category }}</span>
                 @endif
             </div>
         </section>
@@ -201,6 +206,9 @@
                                                 {{ $item->title }}
                                             </p>
                                         </div>
+                                        @if (in_array($item->id, $completedIds))
+                                            <i class="fa-solid fa-circle-check text-green-500 text-sm flex-shrink-0"></i>
+                                        @endif
                                     </a>
                                 @endforeach
                             </div>
@@ -236,7 +244,7 @@
                                 <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($relatedLessons as $related)
                                     @php
                                         $relatedLink = "/member/lesson/{$related->id}";
@@ -349,6 +357,9 @@
                                             {{ $item->title }}
                                         </p>
                                     </div>
+                                    @if (in_array($item->id, $completedIds))
+                                        <i class="fa-solid fa-circle-check text-green-500 text-sm flex-shrink-0"></i>
+                                    @endif
                                 </a>
                             @endforeach
                         </div>

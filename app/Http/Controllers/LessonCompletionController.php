@@ -61,6 +61,7 @@ class LessonCompletionController extends Controller
             'learn_songs' => \App\Models\LearnSong::class,
             'extra_courses' => \App\Models\ExtraCourse::class,
             'quizzes' => \App\Models\Quiz::class,
+            'musical_applications' => \App\Models\MusicalApplication::class,
             default => null,
         };
     }

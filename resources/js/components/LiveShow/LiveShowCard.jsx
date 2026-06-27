@@ -250,17 +250,17 @@ const LiveShowCard = () => {
                         );
                     })
                 ) : (
-                    <div className="col-span-full py-16 flex flex-col items-center justify-center bg-[#F3F0FF] rounded-2xl border border-[#E5DEFF] text-center">
+                    <div className="col-span-full py-16 flex flex-col items-center justify-center bg-[#EFF6FF] rounded-2xl border border-[#DBEAFE] text-center">
                         {/* Calendar illustration */}
                         <div className="relative mb-6 flex items-end justify-center">
                             {/* Left cloud */}
-                            <svg className="absolute left-0 bottom-4 w-14 h-10 text-[#DDD6FE] opacity-80" viewBox="0 0 80 50" fill="currentColor">
+                            <svg className="absolute left-0 bottom-4 w-14 h-10 text-[#BFDBFE] opacity-80" viewBox="0 0 80 50" fill="currentColor">
                                 <ellipse cx="40" cy="35" rx="35" ry="15"/>
                                 <ellipse cx="25" cy="28" rx="18" ry="14"/>
                                 <ellipse cx="55" cy="25" rx="20" ry="16"/>
                             </svg>
                             {/* Right cloud */}
-                            <svg className="absolute right-0 bottom-6 w-12 h-8 text-[#DDD6FE] opacity-60" viewBox="0 0 80 50" fill="currentColor">
+                            <svg className="absolute right-0 bottom-6 w-12 h-8 text-[#BFDBFE] opacity-60" viewBox="0 0 80 50" fill="currentColor">
                                 <ellipse cx="40" cy="35" rx="30" ry="13"/>
                                 <ellipse cx="28" cy="26" rx="16" ry="13"/>
                                 <ellipse cx="52" cy="23" rx="18" ry="14"/>
@@ -269,25 +269,25 @@ const LiveShowCard = () => {
                             <div className="relative z-10">
                                 <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     {/* Calendar body */}
-                                    <rect x="8" y="18" width="68" height="60" rx="8" fill="white" stroke="#C4B5FD" strokeWidth="2"/>
+                                    <rect x="8" y="18" width="68" height="60" rx="8" fill="white" stroke="#93C5FD" strokeWidth="2"/>
                                     {/* Calendar header */}
-                                    <rect x="8" y="18" width="68" height="20" rx="8" fill="#7C3AED"/>
-                                    <rect x="8" y="30" width="68" height="8" fill="#7C3AED"/>
+                                    <rect x="8" y="18" width="68" height="20" rx="8" fill="#2563EB"/>
+                                    <rect x="8" y="30" width="68" height="8" fill="#2563EB"/>
                                     {/* Hooks */}
-                                    <rect x="25" y="10" width="6" height="16" rx="3" fill="#A78BFA"/>
-                                    <rect x="59" y="10" width="6" height="16" rx="3" fill="#A78BFA"/>
+                                    <rect x="25" y="10" width="6" height="16" rx="3" fill="#60A5FA"/>
+                                    <rect x="59" y="10" width="6" height="16" rx="3" fill="#60A5FA"/>
                                     {/* Grid dots */}
                                     {[0,1,2,3,4,5,6,7,8].map((i) => (
-                                        <rect key={i} x={20 + (i % 3) * 18} y={48 + Math.floor(i / 3) * 12} width="10" height="6" rx="2" fill="#DDD6FE"/>
+                                        <rect key={i} x={20 + (i % 3) * 18} y={48 + Math.floor(i / 3) * 12} width="10" height="6" rx="2" fill="#BFDBFE"/>
                                     ))}
                                     {/* Live badge */}
-                                    <circle cx="68" cy="65" r="14" fill="#7C3AED"/>
+                                    <circle cx="68" cy="65" r="14" fill="#2563EB"/>
                                     <text x="68" y="70" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">((•))</text>
                                 </svg>
                             </div>
                             {/* Sparkles */}
-                            <span className="absolute top-0 left-8 text-[#C4B5FD] text-lg">✦</span>
-                            <span className="absolute top-4 right-6 text-[#C4B5FD] text-sm">✦</span>
+                            <span className="absolute top-0 left-8 text-[#93C5FD] text-lg">✦</span>
+                            <span className="absolute top-4 right-6 text-[#93C5FD] text-sm">✦</span>
                         </div>
 
                         <h3 className="text-2xl font-bold text-[#1E1B4B] mb-2">No Live Shows Available</h3>
@@ -296,7 +296,7 @@ const LiveShowCard = () => {
                         </p>
                         <button
                             onClick={() => alert("You'll be notified when a live show is scheduled!")}
-                            className="flex items-center gap-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold px-7 py-3 rounded-xl shadow-md shadow-purple-200 transition-all duration-150 hover:scale-[1.02] active:scale-95"
+                            className="flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-semibold px-7 py-3 rounded-xl shadow-md shadow-blue-200 transition-all duration-150 hover:scale-[1.02] active:scale-95"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>

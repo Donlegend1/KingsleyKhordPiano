@@ -3,7 +3,7 @@
 @section('content')
 
 <!-- Header Section -->
-<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6">
+<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
     <div class="px-6 py-4 flex items-center gap-2 text-sm font-medium">
         <a href="{{ route('community.index') }}" class="text-gray-400 hover:text-gray-700 dark:hover:text-white transition">Overview</a>
         <span class="text-gray-300">/</span>
@@ -53,7 +53,7 @@
 
         {{-- Right: Comments sidebar --}}
         <aside class="w-full lg:w-[380px] flex-shrink-0">
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 lg:sticky lg:top-6">
+            <div class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-5 lg:sticky lg:top-6">
                 <h3 class="text-base font-bold text-gray-900 dark:text-white mb-4">
                     Comments <span class="text-gray-400 font-medium">({{ $comments->count() }})</span>
                 </h3>
@@ -65,7 +65,7 @@
                         name="comment"
                         rows="3"
                         placeholder="Share your thoughts on this tutorial..."
-                        class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                        class="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-white/10 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                         required
                     ></textarea>
                     <div class="flex justify-end mt-2">
@@ -110,7 +110,7 @@
                                         <textarea
                                             name="comment"
                                             rows="2"
-                                            class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                                            class="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-white/10 rounded-lg p-2 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                                             required
                                         >{{ $comment->comment }}</textarea>
                                         <div class="flex justify-end mt-1.5">

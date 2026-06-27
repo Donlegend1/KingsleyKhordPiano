@@ -170,14 +170,14 @@ const PremiumVideoSection = () => {
 
             {/* Empty State */}
             {videos.length === 0 && (
-                <div className="flex flex-col items-center justify-center bg-indigo-50/60 rounded-2xl py-20 px-8 text-center">
+                <div className="flex flex-col items-center justify-center bg-blue-50/60 rounded-2xl py-20 px-8 text-center">
                     <div className="relative mb-6">
-                        <div className="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center">
-                            <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center">
+                            <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center">
+                        <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center">
                             <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.536 8.464a5 5 0 010 7.072M12 18v2m0-18v2m6.364 1.636l-1.414 1.414M7.05 7.05L5.636 5.636M21 12h-2M5 12H3"/>
                             </svg>
@@ -191,7 +191,7 @@ const PremiumVideoSection = () => {
                         className={`flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-xl shadow-md transition-all duration-150 ${
                             notifySubscribed
                                 ? "bg-gray-200 text-gray-500 shadow-none cursor-not-allowed"
-                                : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 hover:scale-[1.02] active:scale-95"
+                                : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200 hover:scale-[1.02] active:scale-95"
                         }`}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
