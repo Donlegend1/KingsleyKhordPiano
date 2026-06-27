@@ -339,11 +339,11 @@ class QuizController extends Controller
                 'points' => 5,
                 'type' => 'single',
                 'options' => [
-                    ['text' => 'Yes I can', 'points' => 6, 'subtext' => 'Well experienced with it'],
-                    ['text' => 'I know some keys', 'points' => 4, 'subtext' => 'I try but not well experienced'],
-                    ['text' => 'no i cant', 'points' => 1, 'subtext' => 'I am not experienced'],
+                    ['text' => 'Yes I Can', 'points' => 5, 'subtext' => 'I can comfortably play in any of the 12 keys.'],
+                    ['text' => 'I Know Some Keys', 'points' => 3, 'subtext' => 'I can play in a few keys but not all of them yet.'],
+                    ['text' => "No I Can't", 'points' => 1, 'subtext' => 'I mostly stick to one or two familiar keys.'],
                 ],
-                'tip' => 'Refining your sound is a creative journey of finding what resonates most with you.'
+                'tip' => 'Playing across all 12 keys builds true mastery and frees you to play any song in any key.'
             ],
             [
                 'id' => 15,
