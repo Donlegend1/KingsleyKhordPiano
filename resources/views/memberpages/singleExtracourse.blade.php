@@ -48,46 +48,6 @@
         $nextVideo = $playlist->values()->get($currentIndex + 1);
         $previousVideo = $currentIndex > 0 ? $playlist->values()->get($currentIndex - 1) : null;
 
-        // Priority: Use explicitly linked related courses if provided, otherwise fallback to playlist neighbors
-        if (isset($relatedUploads) && $relatedUploads->count() > 0) {
-            $relatedLessons = $relatedUploads;
-        } else {
-            // Get related lessons (excluding the active video) from the playlist
-            $otherLessons = $playlist
-                ->filter(function ($item) use ($lesson) {
-                    return $lesson ? $item->id != $lesson->id : true;
-                })
-                ->values();
-
-            // Try to get next 3 lessons in sequence, wrap around if needed
-            $relatedLessons = $otherLessons->slice($currentIndex, 3);
-            if ($relatedLessons->count() < 3 && $otherLessons->count() > 0) {
-                $relatedLessons = $relatedLessons->merge($otherLessons->take(3 - $relatedLessons->count()))->unique('id');
-            }
-        }
-
-        // Fallback: If still empty (no playlist and no tags), get other uploads in the same category
-        if ($relatedLessons->isEmpty()) {
-            if ($lessonType === 'learn_songs') {
-                $relatedLessons = \App\Models\LearnSong::where('level', $lesson->level)
-                    ->where('id', '!=', $lesson->id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            } elseif ($lessonType === 'extra_courses') {
-                $relatedLessons = \App\Models\ExtraCourse::where('level', $lesson->level)
-                    ->where('id', '!=', $lesson->id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            } else {
-                $relatedLessons = \App\Models\Upload::where('category', $lesson->category)
-                    ->where('id', '!=', $lesson->id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            }
-        }
 
         // Get comments specifically for this lesson
         $lessonComments = \App\Models\CourseVideoComment::where('course_id', $lesson->id)
@@ -238,14 +198,14 @@
                     @endif
 
                     {{-- Related Lessons (Only visible at the bottom if playlist is in sidebar) --}}
-                    @if ($playlist->count() > 1 && $relatedLessons->count() > 0)
+                    @if ($playlist->count() > 1 && $relatedUploads->count() > 0)
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach ($relatedLessons as $related)
+                                @foreach ($relatedUploads as $related)
                                     @php
                                         $relatedLink = "/member/lesson/{$related->id}";
                                     @endphp
@@ -395,7 +355,7 @@
 
                         {{-- Scrollable list --}}
                         <div class="overflow-y-auto" style="max-height: 520px;">
-                            @foreach ($relatedLessons as $item)
+                            @foreach ($relatedUploads as $item)
                                 <a href="/member/lesson/{{ $item->id }}"
                                     class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors bg-white hover:bg-gray-50">
 

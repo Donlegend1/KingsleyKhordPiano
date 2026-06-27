@@ -566,12 +566,13 @@ const DraggableCategoryList = ({
                                 <option value="iframe">Iframe</option>
                             </select>
                         </div>
-                        <input
+                        <textarea
                             name="video_url"
                             placeholder="Video URL"
                             defaultValue={selectedCourse?.video_url}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
+                            rows="2"
                         />
 
                         <select
@@ -774,12 +775,13 @@ const DraggableCategoryList = ({
                     >
                         Video URL
                     </label>
-                    <input
+                    <textarea
                         id="video_url"
                         name="video_url"
                         value={course.video_url}
                         onChange={handleChangeNewCourse}
                         className="w-full p-3 border rounded-lg"
+                        rows="2"
                     />
                 </div>
                 <div>

@@ -79,6 +79,43 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
         setIsBookmarked(course.isBookmarked || false);
     }, [course]);
 
+    useEffect(() => {
+        if (!course || !course.video_url) return;
+
+        // Parse any script tags in the video_url and inject them into the document
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(course.video_url, "text/html");
+        const scripts = doc.querySelectorAll("script");
+
+        scripts.forEach((script) => {
+            const src = script.getAttribute("src");
+            if (src) {
+                // Check if script is already in document to avoid duplicates
+                const existingScript = document.querySelector(`script[src="${src}"]`);
+                if (!existingScript) {
+                    const newScript = document.createElement("script");
+                    newScript.src = src;
+                    newScript.async = true;
+                    
+                    const type = script.getAttribute("type");
+                    if (type) {
+                        newScript.type = type;
+                    }
+
+                    newScript.onload = () => {
+                        console.log(`Successfully loaded script: ${src}`);
+                    };
+
+                    newScript.onerror = (e) => {
+                        console.error(`Failed to load script: ${src}`, e);
+                    };
+                    
+                    document.head.appendChild(newScript);
+                }
+            }
+        });
+    }, [course?.video_url]);
+
     const fetchComments = async () => {
         try {
             const response = await axios.get(
@@ -299,7 +336,7 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
                 </h2>
             </div>
 
-            <div class="mb-4">{renderVideoPlayer()}</div>
+            <div className="mb-4">{renderVideoPlayer()}</div>
 
             {course.description && (
                 <div className="mt-4 mb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
@@ -643,8 +680,6 @@ const CoursesPage = () => {
                         withCredentials: true,
                     }
                 );
-
-                console.log(response.data);
                 setCourses(response.data);
             } catch (error) {
                 console.error("Error fetching courses:", error);

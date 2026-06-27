@@ -402,6 +402,7 @@
             el.textContent = `${localDate} ${localTime} (${tzLabel})`;
         });
     </script>
+    <script src="https://fast.wistia.com/player.js" async></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

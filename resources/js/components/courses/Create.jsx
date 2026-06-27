@@ -210,13 +210,14 @@ const CourseForm = () => {
                         >
                             Video URL / ID
                         </label>
-                        <input
+                        <textarea
                             id="video_url"
                             name="video_url"
                             value={course.video_url}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             required
+                            rows="2"
                         />
                     </div>
 
