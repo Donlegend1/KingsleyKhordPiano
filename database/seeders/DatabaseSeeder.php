@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
         ChatRoomSeeder::class,
         EarTrainingSeeder::class,
+        LearnSongSeeder::class,
     ]);
     }
 }

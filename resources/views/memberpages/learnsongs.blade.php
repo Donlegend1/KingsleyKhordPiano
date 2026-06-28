@@ -1,29 +1,149 @@
 @extends('layouts.member')
 
 @section('content')
+@php
+  $selectedLevels = collect($levelFilter ?? []);
+  $selectedKeys = collect($keyFilter ?? []);
+@endphp
 
-<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
-  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center min-h-8 gap-4">
+<section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-5 px-4 border-b border-gray-150 dark:border-gray-800">
+  <div class="max-w-7xl mx-auto flex flex-col gap-3">
     <div class="flex items-center gap-2 text-sm text-gray-500">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
       <span class="text-[#6366F1] font-medium">Learn Songs</span>
     </div>
-    <div class="w-full sm:w-auto">
-      <form method="GET" action="{{ route('learn.songs') }}" class="flex">
-        <input type="hidden" name="tab" value="{{ request('tab', 'all') }}">
-        <div class="relative w-full sm:w-72">
+    <div class="w-full">
+      <form method="GET" action="{{ route('learn.songs') }}" class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3 shadow-sm lg:flex-row lg:items-center dark:border-gray-800 dark:bg-gray-900">
+        <div class="relative min-w-0 flex-1">
+          <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <i class="fa fa-search text-sm"></i>
+          </span>
           <input
             type="text"
             name="search"
             value="{{ request('search') }}"
-            class="w-full h-8 border border-gray-200 rounded-full pl-4 pr-10 text-sm leading-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
+            class="h-11 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-800 shadow-sm transition placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100"
             placeholder="Search songs..."
           >
-          <button type="submit" class="absolute inset-y-0 right-3 flex items-center justify-center text-gray-400 hover:text-gray-600">
-            <i class="fa fa-search text-sm"></i>
-          </button>
         </div>
+        <div
+          class="relative lg:w-64"
+          x-data="{
+            open: false,
+            search: '',
+            options: @js($levels),
+            selected: @js($selectedLevels->values()->all()),
+            filteredOptions() {
+              return this.options.filter((option) => option.toLowerCase().includes(this.search.toLowerCase()));
+            },
+            toggleLevel(level) {
+              if (level === 'All') {
+                this.selected = ['All'];
+                return;
+              }
+
+              const next = this.selected.includes(level)
+                ? this.selected.filter((selectedLevel) => selectedLevel !== level)
+                : [...this.selected.filter((selectedLevel) => selectedLevel !== 'All'), level];
+
+              this.selected = next.length ? next : [];
+            },
+            label() {
+              const selectedLevels = this.selected.filter((level) => level !== 'All');
+              if (!selectedLevels.length) return 'All levels';
+              if (selectedLevels.length <= 2) return selectedLevels.join(', ');
+              return `${selectedLevels.length} levels selected`;
+            }
+          }"
+          @click.outside="open = false"
+        >
+          <template x-for="level in selected" :key="level">
+            <input type="hidden" name="level[]" :value="level">
+          </template>
+          <button
+            type="button"
+            @click="open = !open"
+            class="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-slate-300 bg-white px-3 text-left text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+          >
+            <span class="truncate" x-text="label()"></span>
+            <i class="fa fa-chevron-down text-xs text-slate-400"></i>
+          </button>
+          <div x-cloak x-show="open" x-transition class="absolute right-0 z-30 mt-2 w-full rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+            <div class="relative mb-2">
+              <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                <i class="fa fa-search text-xs"></i>
+              </span>
+              <input type="text" x-model="search" placeholder="Find level..." class="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 text-sm text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100">
+            </div>
+            <div class="max-h-56 space-y-1 overflow-y-auto">
+              <template x-for="level in filteredOptions()" :key="level">
+                <label class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50">
+                  <span x-text="level"></span>
+                  <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" :checked="selected.includes(level)" @change="toggleLevel(level)">
+                </label>
+              </template>
+              <p x-show="filteredOptions().length === 0" class="px-3 py-2 text-sm text-slate-500">No levels found.</p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="relative lg:w-64"
+          x-data="{
+            open: false,
+            search: '',
+            keys: @js($keys),
+            selected: @js($selectedKeys->values()->all()),
+            filteredKeys() {
+              return this.keys.filter((key) => key.toLowerCase().includes(this.search.toLowerCase()));
+            },
+            toggleKey(key) {
+              this.selected = this.selected.includes(key)
+                ? this.selected.filter((selectedKey) => selectedKey !== key)
+                : [...this.selected, key];
+            },
+            label() {
+              if (!this.selected.length) return 'All keys';
+              if (this.selected.length <= 3) return this.selected.join(', ');
+              return `${this.selected.length} keys selected`;
+            }
+          }"
+          @click.outside="open = false"
+        >
+          <template x-for="key in selected" :key="key">
+            <input type="hidden" name="key[]" :value="key">
+          </template>
+          <button type="button" @click="open = !open" class="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-slate-300 bg-white px-3 text-left text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100">
+            <span class="truncate" x-text="label()"></span>
+            <i class="fa fa-chevron-down text-xs text-slate-400"></i>
+          </button>
+          <div x-cloak x-show="open" x-transition class="absolute right-0 z-30 mt-2 w-full rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+            <div class="relative mb-2">
+              <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                <i class="fa fa-search text-xs"></i>
+              </span>
+              <input type="text" x-model="search" placeholder="Find key..." class="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 text-sm text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100">
+            </div>
+            <div class="max-h-56 space-y-1 overflow-y-auto">
+              <template x-for="key in filteredKeys()" :key="key">
+                <label class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-indigo-50">
+                  <span x-text="key"></span>
+                  <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" :checked="selected.includes(key)" @change="toggleKey(key)">
+                </label>
+              </template>
+              <p x-show="filteredKeys().length === 0" class="px-3 py-2 text-sm text-slate-500">No keys found.</p>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100">
+          <i class="fa fa-sliders text-sm"></i>
+          <span>Filter</span>
+        </button>
+        @if (request()->hasAny(['search', 'level', 'key']))
+          <a href="{{ route('learn.songs') }}" class="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100">
+            Clear
+          </a>
+        @endif
       </form>
     </div>
   </div>
@@ -43,84 +163,11 @@
 @endphp
 
 <section class="bg-gray-50 dark:bg-gray-950 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-  <div class="w-full max-w-7xl mx-auto" x-data="{ activeTab: '{{ request('tab', 'all') }}' }">
-
-    <!-- Mobile Dropdown -->
-    <div class="block lg:hidden mb-6" x-data="{ open: false, selected: '{{ request('tab', 'all') }}',
-      options: [
-        { value: 'all',          label: 'All' },
-        { value: 'beginner',     label: 'Beginner' },
-        { value: 'intermediate', label: 'Intermediate' },
-        { value: 'advanced',     label: 'Advanced' },
-      ],
-      get selectedLabel() { return this.options.find(o => o.value === this.selected)?.label ?? 'All'; },
-      pick(val) { this.selected = val; this.open = false; window.location.href = '?tab=' + val + '{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}'; }
-    }" @click.outside="open = false">
-
-      <!-- Trigger -->
-      <button @click="open = !open" type="button"
-        class="w-full flex items-center justify-between rounded-2xl px-5 py-4 shadow-sm transition-all duration-200 bg-[#6366F1]">
-        <p class="text-base font-bold text-white" x-text="selectedLabel"></p>
-        <svg class="w-5 h-5 text-white transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
-        </svg>
-      </button>
-
-      <!-- Dropdown Panel -->
-      <div x-show="open"
-        x-transition:enter="transition ease-out duration-150"
-        x-transition:enter-start="opacity-0 -translate-y-2"
-        x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition ease-in duration-100"
-        x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 -translate-y-2"
-        style="display:none;"
-        class="mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-50">
-        <template x-for="opt in options" :key="opt.value">
-          <button @click="pick(opt.value)" type="button"
-            class="w-full flex items-center justify-between px-5 py-3.5 transition-colors duration-150 border-b border-gray-50 last:border-0"
-            :class="selected === opt.value ? 'bg-[#6366F1]' : 'hover:bg-gray-50'">
-            <span class="text-sm font-semibold" :class="selected === opt.value ? 'text-white' : 'text-gray-700'" x-text="opt.label"></span>
-            <svg x-show="selected === opt.value" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-            </svg>
-          </button>
-        </template>
-      </div>
-    </div>
-
-    <!-- Desktop Tabs -->
-    <div class="hidden lg:flex flex-wrap items-center justify-center gap-6 mb-10">
-      @php
-        $tabs = [
-          'all'          => 'ALL',
-          'beginner'     => 'Beginner',
-          'intermediate' => 'Intermediate',
-          'advanced'     => 'Advanced',
-        ];
-      @endphp
-
-      @foreach($tabs as $key => $label)
-        <a href="?tab={{ $key }}{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}"
-           class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
-             {{ request('tab', 'all') === $key
-               ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-               : 'text-gray-500 hover:text-gray-700' }}">
-          {{ $label }}
-        </a>
-      @endforeach
-    </div>
+  <div class="w-full max-w-7xl mx-auto">
 
     <!-- Song Cards -->
     @php
-      $activeTab = request('tab', 'all');
-
-      $groups = match($activeTab) {
-        'beginner'     => $beginnerGroups,
-        'intermediate' => $intermediateGroups,
-        'advanced'     => $advancedGroups,
-        default        => $allGroups,
-      };
+      $groups = $allGroups;
 
       $levelMap = [];
       foreach($beginnerCategories as $cat)     $levelMap[$cat->id] = 'beginner';
@@ -168,12 +215,18 @@
               {{ $cat->category }}
             </h3>
 
-            <!-- Level Badge -->
-            <div>
+            <!-- Metadata Badges -->
+            <div class="flex flex-wrap items-center gap-2">
               <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 {{ $levelLabel }}
               </span>
+              @if($firstSong->song_key)
+                <span class="inline-flex items-center gap-1.5 bg-slate-50 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-200">
+                  <i class="fa fa-music text-[10px]"></i>
+                  Key: {{ $firstSong->song_key }}
+                </span>
+              @endif
             </div>
 
             <!-- Watch Now Button -->

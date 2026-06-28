@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("ALTER TABLE posts MODIFY category VARCHAR(50) NOT NULL");
         DB::statement("ALTER TABLE posts MODIFY subcategory VARCHAR(50) NOT NULL");
     }
@@ -21,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("ALTER TABLE posts MODIFY category ENUM('get_started','others','forum') NOT NULL");
         DB::statement("ALTER TABLE posts MODIFY subcategory ENUM('say_hello','ask_question','post_progress','beginner','intermediate','advance','lessons') NOT NULL");
     }

@@ -37,6 +37,7 @@ const LearnSongsAdmin = () => {
         description: "",
         video_type: "iframe",
         video_url: "",
+        song_key: "",
         status: "active",
         related_songs: [],
     });
@@ -54,6 +55,7 @@ const LearnSongsAdmin = () => {
 
     const { showMessage } = useFlashMessage();
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+    const songKeys = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 
     const fetchSongs = async () => {
         setLoading(true);
@@ -180,6 +182,7 @@ const LearnSongsAdmin = () => {
             description: "",
             video_type: "iframe",
             video_url: "",
+            song_key: "",
             status: "active",
             related_songs: [],
         });
@@ -200,6 +203,7 @@ const LearnSongsAdmin = () => {
         formData.append("level", selectedLevel);
         formData.append("video_type", newSong.video_type);
         formData.append("video_url", newSong.video_url);
+        formData.append("song_key", newSong.song_key || "");
         formData.append("status", newSong.status);
         if (thumbnailFile) {
             formData.append("thumbnail", thumbnailFile);
@@ -250,6 +254,7 @@ const LearnSongsAdmin = () => {
         formData.append("description", editingSong.description || "");
         formData.append("video_type", editingSong.video_type);
         formData.append("video_url", editingSong.video_url);
+        formData.append("song_key", editingSong.song_key || "");
         formData.append("status", editingSong.status);
         if (thumbnailFile) {
             formData.append("thumbnail", thumbnailFile);
@@ -530,6 +535,19 @@ const LearnSongsAdmin = () => {
                             </select>
                         </div>
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Key</label>
+                            <select
+                                value={newSong.song_key}
+                                onChange={(e) => setNewSong({ ...newSong, song_key: e.target.value })}
+                                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none"
+                            >
+                                <option value="">Select key</option>
+                                {songKeys.map((songKey) => (
+                                    <option key={songKey} value={songKey}>{songKey}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail</label>
                             <input
                                 type="file"
@@ -641,6 +659,19 @@ const LearnSongsAdmin = () => {
                                 >
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Key</label>
+                                <select
+                                    value={editingSong.song_key || ""}
+                                    onChange={(e) => setEditingSong({ ...editingSong, song_key: e.target.value })}
+                                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none"
+                                >
+                                    <option value="">Select key</option>
+                                    {songKeys.map((songKey) => (
+                                        <option key={songKey} value={songKey}>{songKey}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div>

@@ -17,6 +17,7 @@ class LearnSong extends Model
         'video_url',
         'thumbnail',
         'level',
+        'song_key',
         'status',
         'position',
         'related_songs',

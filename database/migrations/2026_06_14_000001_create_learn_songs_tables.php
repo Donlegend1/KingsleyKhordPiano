@@ -31,6 +31,7 @@ return new class extends Migration
                 $table->text('video_url');
                 $table->string('thumbnail')->nullable();
                 $table->string('level')->default('beginner');
+                $table->string('song_key')->nullable();
                 $table->string('status')->default('active');
                 $table->integer('position')->default(0);
                 $table->json('related_songs')->nullable();
@@ -83,6 +84,7 @@ return new class extends Migration
                         'video_url' => $upload->video_url,
                         'thumbnail' => $upload->thumbnail,
                         'level' => $level,
+                        'song_key' => $upload->song_key ?? null,
                         'status' => $upload->status ?: 'active',
                         'position' => $maxSongPos + 1,
                         'related_songs' => $related,
