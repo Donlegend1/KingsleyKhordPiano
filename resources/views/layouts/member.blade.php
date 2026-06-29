@@ -235,14 +235,26 @@
         <div class="hidden lg:flex bg-[#28303C] dark:bg-gray-800 overflow-x-auto">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-2 flex-nowrap">
                 @php
+                    $newSince = now()->subDays(7);
+                    $userId = auth()->id();
+
+                    $pianoExerciseSeenAt = \App\Models\CategoryView::lastViewedAt($userId, 'piano_exercise');
+                    $extraCoursesSeenAt = \App\Models\CategoryView::lastViewedAt($userId, 'extra_courses');
+                    $learnSongsSeenAt = \App\Models\CategoryView::lastViewedAt($userId, 'learn_songs');
+
+                    $hasNewPianoExercise = \App\Models\Upload::where('category', 'piano exercise')->where('created_at', '>=', $newSince)->where('created_at', '>', $pianoExerciseSeenAt)->exists()
+                        || \App\Models\MusicalApplication::where('created_at', '>=', $newSince)->where('created_at', '>', $pianoExerciseSeenAt)->exists();
+                    $hasNewExtraCourses = \App\Models\ExtraCourse::where('created_at', '>=', $newSince)->where('created_at', '>', $extraCoursesSeenAt)->exists();
+                    $hasNewLearnSongs = \App\Models\LearnSong::where('created_at', '>=', $newSince)->where('created_at', '>', $learnSongsSeenAt)->exists();
+
                     $subNav = [
                         ['url' => 'home',                   'label' => 'Dashboard',     'icon' => 'dashboard.svg'],
                         ['url' => 'member/roadmap',         'label' => 'Roadmap',       'icon' => 'roadmap2.png'],
-                        ['url' => 'member/piano-exercise',  'label' => 'Piano Exercise','icon' => 'piano2.png'],
+                        ['url' => 'member/piano-exercise',  'label' => 'Piano Exercise','icon' => 'piano2.png', 'new' => $hasNewPianoExercise],
                         ['url' => 'member/ear-training',    'label' => 'Ear Training',  'icon' => 'eartraning.svg'],
-                        ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg'],
+                        ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
                         // ['url' => 'member/quick-lessons',   'label' => 'Quick Lesson',  'icon' => 'quick lession.svg'],
-                        ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'songs.svg'],
+                        ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'songs.svg', 'new' => $hasNewLearnSongs],
                         ['url' => 'member/live-session',    'label' => 'Live Shows',  'icon' => 'livesession.svg'],
                     ];
                 @endphp
@@ -252,6 +264,9 @@
                             {{ Request::is($item['url']) ? 'bg-gray-700' : 'hover:text-[#FFD736]' }}">
                         <img src="/icons/{{ $item['icon'] }}" class="h-4 w-auto" alt="">
                         {{ $item['label'] }}
+                        @if(!empty($item['new']))
+                            <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">NEW</span>
+                        @endif
                     </a>
                 @endforeach
             </div>
@@ -275,6 +290,9 @@
                                 {{ Request::is($item['url']) ? 'bg-gray-700 text-white' : 'hover:text-[#FFD736]' }}">
                             <img src="/icons/{{ $item['icon'] }}" class="h-5 w-auto" alt="">
                             {{ $item['label'] }}
+                            @if(!empty($item['new']))
+                                <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">NEW</span>
+                            @endif
                         </a>
                     @endforeach
                 </div>

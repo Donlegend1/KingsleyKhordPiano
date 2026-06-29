@@ -69,6 +69,8 @@ class LessonController extends Controller
 
     public function learnSongs(Request $request)
     {
+        \App\Models\CategoryView::markViewed(auth()->id(), 'learn_songs');
+
         $search = $request->input('search');
         $activeTab = $request->input('tab', 'beginner');
 

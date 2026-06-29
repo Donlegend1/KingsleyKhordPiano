@@ -87,13 +87,10 @@
                     {{-- Video Player --}}
                     <div id="uploads-single" class="w-full h-full"></div>
 
-                    {{-- Title + Description --}}
-                    <h1 class="text-[22px] font-bold text-gray-900 mb-1 mt-5">
+                    {{-- Title --}}
+                    <h1 class="text-[22px] font-bold text-gray-900 mt-5 mb-5">
                         {{ Str::title($lesson->title) }}
                     </h1>
-                    <p class="text-gray-500 text-[14px] leading-relaxed mb-5">
-                        {{ $lesson->description ?? 'Learn how to play and improve your piano skills with this comprehensive extra course.' }}
-                    </p>
 
                     @if (!empty($lesson->images) && is_array($lesson->images))
                         <div class="mt-6 mb-8">
@@ -125,15 +122,15 @@
                             </button>
                         </form>
 
-                        <form action="{{ route('lesson.complete') }}" method="POST">
+                        <form action="{{ route('lesson.complete') }}" method="POST" class="complete-form">
                             @csrf
                             <input type="hidden" name="completable_id" value="{{ $lesson->id }}">
                             <input type="hidden" name="completable_type" value="{{ $lessonType }}">
                             <button type="submit" {{ $isCompleted ? 'disabled' : '' }}
-                                class="flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
+                                class="complete-btn flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
                                 {{ $isCompleted
                                     ? 'bg-green-50 border-green-200 text-green-600 cursor-not-allowed'
-                                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50' }}">
+                                    : 'bg-black border-black text-white hover:bg-gray-800' }}">
                                 <i class="fa-solid fa-check text-[15px]"></i>
                                 {{ $isCompleted ? 'Completed' : 'Mark as Complete' }}
                             </button>
@@ -153,7 +150,12 @@
                             {{-- Scrollable list --}}
                             <div class="overflow-y-auto" style="max-height: 300px;">
                                 @foreach ($playlist as $item)
-                                    @php $isActive = $item->id == $lesson->id; @endphp
+                                    @php
+                                        $isActive = $item->id == $lesson->id;
+                                        $itemIsNew = $item->created_at
+                                            && $item->created_at->gt(now()->subDays(7))
+                                            && !\App\Models\LessonView::hasViewed(auth()->id(), $item);
+                                    @endphp
                                     <a href="/member/lesson/{{ $item->id }}"
                                         class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
                                         {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
@@ -161,9 +163,12 @@
                                         {{-- Title --}}
                                         <div class="flex-1 min-w-0">
                                             <p
-                                                class="text-[12px] font-bold uppercase tracking-wide leading-snug
+                                                class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
                                                 {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
-                                                {{ $item->title }}
+                                                <span class="truncate">{{ $item->title }}</span>
+                                                @if ($itemIsNew)
+                                                    <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
+                                                @endif
                                             </p>
                                         </div>
                                         @if (in_array($item->id, $completedIds))
@@ -187,11 +192,6 @@
                                         class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                         Next <i class="fa-solid fa-arrow-right text-sm"></i>
                                     </a>
-                                @else
-                                    <button disabled
-                                        class="w-full py-3 border border-gray-100 rounded-lg text-gray-400 font-bold text-[14px] bg-gray-50 cursor-not-allowed">
-                                        Course Completed
-                                    </button>
                                 @endif
                             </div>
                         </div>
@@ -208,6 +208,9 @@
                                 @foreach ($relatedUploads as $related)
                                     @php
                                         $relatedLink = "/member/lesson/{$related->id}";
+                                        $relatedIsNew = $related->created_at
+                                            && $related->created_at->gt(now()->subDays(7))
+                                            && !\App\Models\LessonView::hasViewed(auth()->id(), $related);
                                     @endphp
                                     <a href="{{ $relatedLink }}"
                                         class="group bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
@@ -216,6 +219,12 @@
                                         <div class="relative aspect-video bg-black overflow-hidden">
                                             <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
                                                 class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+
+                                            @if ($relatedIsNew)
+                                                <div class="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded tracking-wide">
+                                                    NEW
+                                                </div>
+                                            @endif
 
                                             {{-- Duration badge top-left --}}
                                             <div
@@ -252,40 +261,24 @@
                     @endif
 
                     {{-- Discussion / Comments --}}
-                    <div class="mt-8">
+                    <div class="mt-8" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
                         <h2 class="text-[18px] font-bold text-gray-900 mb-6">Discussion</h2>
-                        <form action="{{ route('piano.exercise.comment') }}" method="POST" class="mb-8">
-                            @csrf
-                            <input type="hidden" name="course_id" value="{{ $lesson->id }}">
-                            <input type="hidden" name="category" value="others">
-                            <textarea name="comment" placeholder="What did you learn from this lesson?" 
+                        <form id="comment-form" class="mb-8">
+                            <textarea name="comment" placeholder="What did you learn from this lesson?"
                                 class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all outline-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">
                                 <button type="submit" class="bg-[#2563EB] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#1D4ED8] transition-all">Comment</button>
                             </div>
                         </form>
 
-                        <div class="space-y-6">
+                        <div class="space-y-6" id="comment-list">
                             @foreach($lessonComments as $comment)
-                                <div class="flex gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                                    <div class="w-10 h-10 bg-[#2563EB]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <span class="text-[#2563EB] font-bold text-sm">
-                                            {{ $comment->user ? substr($comment->user->first_name ?? $comment->user->name ?? 'U', 0, 1) : 'U' }}
-                                        </span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <p class="text-[14px] font-bold text-gray-900">
-                                                {{ $comment->user ? ($comment->user->first_name . ' ' . $comment->user->last_name) : 'User' }}
-                                            </p>
-                                            <span class="text-[11px] text-gray-400">• {{ $comment->created_at->diffForHumans() }}</span>
-                                        </div>
-                                        <p class="text-[13px] text-gray-600 leading-relaxed">{{ $comment->comment }}</p>
-                                    </div>
-                                </div>
+                                @include('memberpages.partials.course-video-comment', ['comment' => $comment])
                             @endforeach
                         </div>
                     </div>
+
+                    @include('memberpages.partials.course-resources', ['lesson' => $lesson])
 
                 </div>
 
@@ -304,7 +297,12 @@
                         {{-- Scrollable list --}}
                         <div class="overflow-y-auto" style="max-height: 520px;">
                             @foreach ($playlist as $item)
-                                @php $isActive = $item->id == $lesson->id; @endphp
+                                @php
+                                    $isActive = $item->id == $lesson->id;
+                                    $itemIsNew = $item->created_at
+                                        && $item->created_at->gt(now()->subDays(7))
+                                        && !\App\Models\LessonView::hasViewed(auth()->id(), $item);
+                                @endphp
                                 <a href="/member/lesson/{{ $item->id }}"
                                     class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
                                     {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
@@ -312,9 +310,12 @@
                                     {{-- Title --}}
                                     <div class="flex-1 min-w-0">
                                         <p
-                                            class="text-[12px] font-bold uppercase tracking-wide leading-snug
+                                            class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
                                             {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
-                                            {{ $item->title }}
+                                            <span class="truncate">{{ $item->title }}</span>
+                                            @if ($itemIsNew)
+                                                <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
+                                            @endif
                                         </p>
                                     </div>
                                     @if (in_array($item->id, $completedIds))
@@ -338,11 +339,6 @@
                                     class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                     Next <i class="fa-solid fa-arrow-right text-sm"></i>
                                 </a>
-                            @else
-                                <button disabled
-                                    class="w-full py-3 border border-gray-100 rounded-lg text-gray-400 font-bold text-[14px] bg-gray-50 cursor-not-allowed">
-                                    Course Completed
-                                </button>
                             @endif
                         </div>
                     @else
@@ -355,7 +351,12 @@
 
                         {{-- Scrollable list --}}
                         <div class="overflow-y-auto" style="max-height: 520px;">
-                            @foreach ($relatedUploads as $item)
+                            @foreach ($relatedLessons as $item)
+                                @php
+                                    $itemIsNew = $item->created_at
+                                        && $item->created_at->gt(now()->subDays(7))
+                                        && !\App\Models\LessonView::hasViewed(auth()->id(), $item);
+                                @endphp
                                 <a href="/member/lesson/{{ $item->id }}"
                                     class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors bg-white hover:bg-gray-50">
 
@@ -366,8 +367,11 @@
 
                                     {{-- Title + duration --}}
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-[12px] font-bold uppercase tracking-wide leading-snug text-gray-800">
-                                            {{ $item->title }}
+                                        <p class="text-[12px] font-bold uppercase tracking-wide leading-snug text-gray-800 flex items-center gap-2">
+                                            <span class="truncate">{{ $item->title }}</span>
+                                            @if ($itemIsNew)
+                                                <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
+                                            @endif
                                         </p>
                                         <p class="text-[11px] mt-1.5 text-gray-400">
                                             {{ $item->duration ?? '05:00' }}
@@ -430,7 +434,37 @@
                     }
                 });
             });
+
+            document.querySelectorAll('.complete-form').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('.complete-btn');
+                    if (btn.disabled) return;
+                    btn.disabled = true;
+                    try {
+                        const res = await fetch(this.action, {
+                            method: 'POST',
+                            body: new FormData(this),
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value
+                            }
+                        });
+                        if (!res.ok) {
+                            throw new Error('Request failed with status ' + res.status);
+                        }
+                        btn.classList.remove('bg-black', 'border-black', 'hover:bg-gray-800', 'text-white');
+                        btn.classList.add('bg-green-50', 'border-green-200', 'text-green-600', 'cursor-not-allowed');
+                        btn.innerHTML = '<i class="fa-solid fa-check text-[15px]"></i> Completed';
+                    } catch (err) {
+                        console.error('Failed to mark lesson as completed:', err);
+                        btn.disabled = false;
+                    }
+                });
+            });
         </script>
+
+        @include('memberpages.partials.course-video-comment-script')
     @endif
 
 @endsection

@@ -104,36 +104,69 @@
 
             <!-- Courses Included -->
             <div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     @forelse($applications as $seriesName => $items)
-                        @php $firstItem = $items->first(); @endphp
-                        <div
-                            class="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 border border-gray-50 flex flex-col group">
-                            <!-- Course Thumbnail -->
-                            <div class="relative w-full h-48 rounded-xl overflow-hidden mb-6 bg-gray-100 shadow-sm">
-                                <img src="{{ $firstItem->thumbnail_url ?? 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=800&auto=format&fit=crop' }}"
-                                    alt="{{ $seriesName }}"
-                                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-                                <div
-                                    class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-bold text-[#2563EB] uppercase tracking-wider shadow-sm">
-                                    {{ count($items) }} Lessons
-                                </div>
-                            </div>
+                        @php
+                            $firstItem = $items->first();
+                            $lessonCount = count($items);
+                            $playerUrl = route('piano.exercise.player', ['series' => $seriesName, 'skill_level' => strtolower($firstItem->skill_level)]);
+                            $isNew = !\App\Models\LessonView::hasViewed(auth()->id(), $firstItem)
+                                && $items->contains(fn ($i) => $i->created_at && $i->created_at->gt(now()->subDays(7)));
+                        @endphp
+                        <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
-                            <!-- Course Info -->
-                            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#2563EB] transition-colors">
-                                {{ $seriesName }}
-                            </h3>
-                            <p class="text-gray-500 text-sm mb-8 leading-relaxed line-clamp-2">
-                                {{ $firstItem->description ?? 'Apply your technique in real musical contexts and sound great.' }}
-                            </p>
-                            <a href="{{ route('piano.exercise.player', ['series' => $seriesName, 'skill_level' => strtolower($skillLevel)]) }}"
-                                class="mt-auto w-full max-w-[140px] mx-auto py-2.5 border border-gray-200 rounded-lg text-gray-700 font-semibold hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-200 text-center">
-                                Watch Now
+                            <!-- Thumbnail -->
+                            <a href="{{ $playerUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+                                @if($firstItem->thumbnail_url ?? null)
+                                    <img src="{{ $firstItem->thumbnail_url }}" alt="{{ $seriesName }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900 to-purple-900">
+                                        <i class="fa fa-music text-5xl text-white/30"></i>
+                                    </div>
+                                @endif
+
+                                @if($isNew)
+                                    <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wide">
+                                        NEW
+                                    </div>
+                                @endif
+
+                                <!-- Lesson count badge -->
+                                <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
+                                    {{ $lessonCount }} {{ Str::plural('Lesson', $lessonCount) }}
+                                </div>
+
+                                <!-- Play overlay -->
+                                <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
+                                        <i class="fa fa-play text-indigo-600 text-sm ml-0.5"></i>
+                                    </div>
+                                </div>
                             </a>
+
+                            <!-- Card Body -->
+                            <div class="p-5 flex flex-col gap-3 flex-1">
+                                <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug">
+                                    {{ $seriesName }}
+                                </h3>
+
+                                <!-- Level Badge -->
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                        {{ $firstItem->skill_level }}
+                                    </span>
+                                </div>
+
+                                <!-- Watch Now Button -->
+                                <a href="{{ $playerUrl }}"
+                                   class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
+                                    Watch Now
+                                </a>
+                            </div>
                         </div>
                     @empty
-                        <div class="col-span-full py-20 text-center">
+                        <div class="col-span-full text-center py-20 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100">
                             <i class="fa-regular fa-folder-open text-gray-200 text-6xl block mb-4"></i>
                             <h3 class="text-xl font-bold text-gray-800">No applications found</h3>
                             <p class="text-gray-400">Try selecting a different skill level or check back later.</p>

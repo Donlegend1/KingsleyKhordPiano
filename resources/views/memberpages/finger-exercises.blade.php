@@ -77,7 +77,26 @@
         <!-- Card Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach($cards as $card)
-            <div class="flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 p-6">
+            @php
+                $newCardLesson = \App\Models\Upload::where('category', 'piano exercise')
+                    ->where('level', $card['id'])
+                    ->where('created_at', '>=', now()->subDays(7))
+                    ->orderByDesc('created_at')
+                    ->first();
+                $firstCardLesson = \App\Models\Upload::where('category', 'piano exercise')
+                    ->where('level', $card['id'])
+                    ->where('skill_level', $skillLevel)
+                    ->orderBy('id')
+                    ->first();
+                $isNew = $newCardLesson && !\App\Models\LessonView::hasViewed(auth()->id(), $firstCardLesson ?? $newCardLesson);
+            @endphp
+            <div class="relative flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 p-6">
+
+                @if($isNew)
+                    <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wide">
+                        NEW
+                    </div>
+                @endif
 
                 <!-- Icon Badge -->
                 <div class="w-20 h-20 rounded-full {{ $card['bg'] }} flex items-center justify-center mb-5">

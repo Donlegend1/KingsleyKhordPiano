@@ -1,9 +1,4 @@
-<section class="relative bg-[#0d1b2a] overflow-hidden">
-
-  <!-- Background image -->
-  <div class="absolute inset-0">
-    <img src="/images/paysec.webp" alt="" class="w-full h-full object-cover object-center">
-  </div>
+<section class="relative bg-[#121212] overflow-hidden">
 
   <!-- Content -->
   <div class="relative z-10 max-w-3xl mx-auto px-6 text-center pt-36 pb-16">

@@ -35,6 +35,8 @@ class UpdateUploadRequest extends FormRequest
             'series' => 'nullable|string|max:255',
             'images' => 'nullable|array',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+            'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
+            'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
         ];
     }
 }

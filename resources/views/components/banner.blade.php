@@ -1,15 +1,15 @@
 <section class="bg-black text-white -mt-[72px]">
 
   {{-- ===== MOBILE LAYOUT (hidden md+) ===== --}}
-  <div class="md:hidden relative">
+  <div class="md:hidden relative overflow-hidden">
 
     {{-- Image: absolute so its height never affects section height --}}
-    <div class="absolute inset-x-0" style="top: 48px; height: 80vh; z-index: 0;">
+    <div class="absolute inset-x-0" style="top: 48px; height: 95vh; z-index: 0;">
       <img
         src="/images/first-p.png"
         alt="Kingsley Khord at the piano"
         class="w-full h-full object-cover"
-        style="object-position: 65% 0%;"
+        style="object-position: 65% 0%; filter: contrast(1.08) saturate(1.1); image-rendering: -webkit-optimize-contrast;"
       >
       {{-- Gradient fade into black --}}
       <div class="absolute inset-x-0 bottom-0" style="height: 65%; background: linear-gradient(to top, #000000 0%, #000000 25%, rgba(0,0,0,0.75) 60%, rgba(0,0,0,0) 100%);"></div>
@@ -41,15 +41,6 @@
         </svg>
       </a>
 
-    </div>
-
-    {{-- Mobile wave transition --}}
-    <div class="w-full" style="line-height: 0; margin-bottom: -2px;">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 414 60" preserveAspectRatio="none" class="w-full block">
-        <path d="M0,0 L414,0 L414,10 C310,50 104,50 0,10 Z" fill="#000000"/>
-        <path d="M0,10 C104,50 310,50 414,10 L414,60 L0,60 Z" fill="#FFD736" opacity="0.35"/>
-        <path d="M0,20 C104,55 310,55 414,20 L414,60 L0,60 Z" fill="#f0f0ee"/>
-      </svg>
     </div>
 
   </div>

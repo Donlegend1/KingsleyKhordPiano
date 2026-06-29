@@ -114,6 +114,34 @@ class UploadController extends Controller
             }
         }
 
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/audio');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $audio->move($destination, $filename);
+            $validated['audio_resource'] = 'uploads/resources/audio/' . $filename;
+        }
+
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
+        }
+
         $upload = Upload::create([
             'title'        => $validated['title'],
             'category'     => $validated['category'],
@@ -127,6 +155,8 @@ class UploadController extends Controller
             'thumbnail'    => $validated['thumbnail'] ?? null,
             'series'       => $validated['series'] ?? null,
             'images'       => $descriptionImages,
+            'audio_resource' => $validated['audio_resource'] ?? null,
+            'pdf_resource' => $validated['pdf_resource'] ?? null,
         ]);
 
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -239,6 +269,42 @@ class UploadController extends Controller
             }
         }
 
+        /* ---------------- AUDIO / PDF RESOURCE UPLOAD ---------------- */
+
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/audio');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($upload->audio_resource && file_exists(public_path($upload->audio_resource))) {
+                @unlink(public_path($upload->audio_resource));
+            }
+            $audio->move($destination, $filename);
+            $validated['audio_resource'] = 'uploads/resources/audio/' . $filename;
+        }
+
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($upload->pdf_resource && file_exists(public_path($upload->pdf_resource))) {
+                @unlink(public_path($upload->pdf_resource));
+            }
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
+        }
+
         /* ---------------- UPDATE MODEL ---------------- */
 
         $upload->update([
@@ -254,6 +320,8 @@ class UploadController extends Controller
             'thumbnail'    => $validated['thumbnail'] ?? $upload->thumbnail,
             'series'       => $validated['series'] ?? $upload->series,
             'images'       => $descriptionImages,
+            'audio_resource' => $validated['audio_resource'] ?? $upload->audio_resource,
+            'pdf_resource' => $validated['pdf_resource'] ?? $upload->pdf_resource,
         ]);
         logger()->info(['video' => $validated['video_type']]);
         

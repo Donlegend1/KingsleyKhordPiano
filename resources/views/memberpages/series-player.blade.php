@@ -71,9 +71,6 @@
                 @else
                     <a href="{{ route('piano.exercise.finger') }}" class="hover:text-gray-700">Finger Exercises</a>
                 @endif
-                <span>/</span>
-                <a href="{{ url()->current() . '?' . http_build_query(request()->except('video_id')) }}"
-                    class="hover:text-gray-700">{{ ucfirst($skillLevel) }}</a>
                 @if ($courseLabel)
                     <span>/</span>
                     <span class="text-[#6366F1] font-medium">{{ $courseLabel }}</span>
@@ -94,13 +91,10 @@
                         <div id="uploads-single" class="w-full h-full"></div>
                     {{-- </div> --}}
 
-                    {{-- Title + Description --}}
-                    <h1 class="text-[22px] font-bold text-gray-900 mb-1">
+                    {{-- Title --}}
+                    <h1 class="text-[22px] font-bold text-gray-900 mt-5 mb-5">
                         {{ Str::title($activeVideo->title) }}
                     </h1>
-                    <p class="text-gray-500 text-[14px] leading-relaxed mb-5">
-                        {{ $activeVideo->description ?? 'Learn how to use the up-down principle to create smooth, musical embellishments.' }}
-                    </p>
 
                     @if (!empty($activeVideo->images) && is_array($activeVideo->images))
                         <div class="mt-6 mb-8">
@@ -132,20 +126,6 @@
                             </a>
                         @endif --}}
 
-                        <form action="{{ route('lesson.complete') }}" method="POST" class="complete-form">
-                            @csrf
-                            <input type="hidden" name="completable_id" value="{{ $activeVideo->id }}">
-                            <input type="hidden" name="completable_type" value="{{ $completableType }}">
-                            <button type="submit" {{ $isCompleted ? 'disabled' : '' }}
-                                class="complete-btn flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
-                                {{ $isCompleted
-                                    ? 'bg-green-50 border-green-200 text-green-600 cursor-not-allowed'
-                                    : 'bg-[#2563EB] border-[#2563EB] hover:bg-[#1D4ED8] text-white' }}">
-                                <i class="fa-solid fa-circle-check text-[15px]"></i>
-                                {{ $isCompleted ? 'Completed' : 'Complete' }}
-                            </button>
-                        </form>
-
                         <form action="{{ route('bookmark.toggle') }}" method="POST" class="bookmark-form">
                             @csrf
                             <input type="hidden" name="bookmarkable_id" value="{{ $activeVideo->id }}">
@@ -157,6 +137,20 @@
                        : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50' }}">
                                 <i class="fa-regular fa-bookmark text-[15px]"></i>
                                 {{ $isBookmarked ? 'Bookmarked' : 'Bookmark' }}
+                            </button>
+                        </form>
+
+                        <form action="{{ route('lesson.complete') }}" method="POST" class="complete-form">
+                            @csrf
+                            <input type="hidden" name="completable_id" value="{{ $activeVideo->id }}">
+                            <input type="hidden" name="completable_type" value="{{ $completableType }}">
+                            <button type="submit" {{ $isCompleted ? 'disabled' : '' }}
+                                class="complete-btn flex items-center gap-2 text-[14px] font-semibold px-5 py-2.5 rounded-lg border transition-colors
+                                {{ $isCompleted
+                                    ? 'bg-green-50 border-green-200 text-green-600 cursor-not-allowed'
+                                    : 'bg-black border-black text-white hover:bg-gray-800' }}">
+                                <i class="fa-solid fa-check text-[15px]"></i>
+                                {{ $isCompleted ? 'Completed' : 'Mark as Complete' }}
                             </button>
                         </form>
                     </div>
@@ -229,36 +223,24 @@
                         </div>
                     @endif
 
-                    <div class="mt-8">
+                    <div class="mt-8" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
                         <h2 class="text-[18px] font-bold text-gray-900 mb-6">Discussion</h2>
-                        <form action="{{ route('piano.exercise.comment') }}" method="POST" class="mb-8">
-                            @csrf
-                            <input type="hidden" name="course_id" value="{{ $activeVideo->id }}">
-                            <input type="hidden" name="category" value="piano exercise">
-                            <textarea name="comment" placeholder="What did you learn from this lesson?" 
+                        <form id="comment-form" class="mb-8">
+                            <textarea name="comment" placeholder="What did you learn from this lesson?"
                                 class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all outline-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">
                                 <button type="submit" class="bg-[#2563EB] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#1D4ED8] transition-all">Comment</button>
                             </div>
                         </form>
 
-                        <div class="space-y-6">
+                        <div class="space-y-6" id="comment-list">
                             @foreach($comments as $comment)
-                                <div class="flex gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                                    <div class="w-10 h-10 bg-[#2563EB]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <span class="text-[#2563EB] font-bold text-sm">{{ substr($comment->user->name, 0, 1) }}</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <p class="text-[14px] font-bold text-gray-900">{{ $comment->user->name }}</p>
-                                            <span class="text-[11px] text-gray-400">• {{ $comment->created_at->diffForHumans() }}</span>
-                                        </div>
-                                        <p class="text-[13px] text-gray-600 leading-relaxed">{{ $comment->comment }}</p>
-                                    </div>
-                                </div>
+                                @include('memberpages.partials.course-video-comment', ['comment' => $comment])
                             @endforeach
                         </div>
                     </div>
+
+                    @include('memberpages.partials.course-resources', ['lesson' => $activeVideo])
 
                 </div>
 
@@ -293,6 +275,8 @@
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const btn = this.querySelector('.complete-btn');
+                    if (btn.disabled) return;
+                    btn.disabled = true;
                     try {
                         const res = await fetch(this.action, {
                             method: 'POST',
@@ -302,13 +286,15 @@
                                 'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value
                             }
                         });
-                        await res.json();
-                        btn.disabled = true;
-                        btn.classList.remove('bg-[#2563EB]', 'border-[#2563EB]', 'hover:bg-[#1D4ED8]', 'text-white');
+                        if (!res.ok) {
+                            throw new Error('Request failed with status ' + res.status);
+                        }
+                        btn.classList.remove('bg-black', 'border-black', 'hover:bg-gray-800', 'text-white');
                         btn.classList.add('bg-green-50', 'border-green-200', 'text-green-600', 'cursor-not-allowed');
-                        btn.innerHTML = '<i class="fa-solid fa-circle-check text-[15px]"></i> Completed';
+                        btn.innerHTML = '<i class="fa-solid fa-check text-[15px]"></i> Completed';
                     } catch (err) {
                         console.error('Failed to mark course as completed:', err);
+                        btn.disabled = false;
                     }
                 });
             });
@@ -342,6 +328,8 @@
                 });
             });
         </script>
+
+        @include('memberpages.partials.course-video-comment-script')
     @endif
 
 @endsection

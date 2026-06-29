@@ -21,6 +21,7 @@ const PDFFiles = () => {
     const [form, setForm] = useState({
         title: "",
         category: "",
+        type: "",
         file_url: null,
         thumbnail: "",
     });
@@ -59,6 +60,7 @@ const PDFFiles = () => {
         const fd = new FormData();
         fd.append("title", form.title);
         fd.append("category", form.category);
+        fd.append("type", form.type);
 
         if (form.file_url instanceof File) {
             fd.append("file_url", form.file_url);
@@ -82,6 +84,7 @@ const PDFFiles = () => {
             setForm({
                 title: "",
                 category: "",
+                type: "",
                 file_url: null,
                 thumbnail: "",
             });
@@ -106,6 +109,7 @@ const PDFFiles = () => {
         const fd = new FormData();
         fd.append("title", selectedFile.title);
         fd.append("category", selectedFile.category);
+        fd.append("type", selectedFile.type || "");
 
         if (selectedFile.file_url instanceof File) {
             fd.append("file_url", selectedFile.file_url);
@@ -225,10 +229,15 @@ const PDFFiles = () => {
                                 {file.title}
                             </h3>
 
-                            <p className="text-sm text-gray-500 mb-3">
+                            <p className="text-sm text-gray-500 mb-3 flex gap-2">
                                 <span className="inline-block bg-gray-200 px-2 py-1 rounded text-xs font-medium capitalize">
                                     {file.category}
                                 </span>
+                                {file.type && (
+                                    <span className="inline-block bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-medium capitalize">
+                                        {file.type}
+                                    </span>
+                                )}
                             </p>
 
                             <div className="mt-4 flex justify-end gap-2">
@@ -301,6 +310,28 @@ const PDFFiles = () => {
                                     Intermediate
                                 </option>
                                 <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+
+                        {/* Type Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Type *
+                            </label>
+                            <select
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white"
+                                value={form.type}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        type: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value="">Select Type</option>
+                                <option value="chords">Chords</option>
+                                <option value="scales">Scales</option>
+                                <option value="exercise">Exercise</option>
                             </select>
                         </div>
 
@@ -412,6 +443,28 @@ const PDFFiles = () => {
                                     Intermediate
                                 </option>
                                 <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+
+                        {/* Type Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Type *
+                            </label>
+                            <select
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition bg-white"
+                                value={selectedFile.type || ""}
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        type: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value="">Select Type</option>
+                                <option value="chords">Chords</option>
+                                <option value="scales">Scales</option>
+                                <option value="exercise">Exercise</option>
                             </select>
                         </div>
 

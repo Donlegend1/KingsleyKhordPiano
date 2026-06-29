@@ -12,6 +12,7 @@ class PDFDownload extends Model
     protected $fillable = [
         'title',
         'category',
+        'type',
         'thumbnail',
         'file_url',
     ];

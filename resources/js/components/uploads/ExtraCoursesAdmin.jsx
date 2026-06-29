@@ -50,6 +50,10 @@ const ExtraCoursesAdmin = () => {
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
+    const [audioResourceFile, setAudioResourceFile] = useState(null);
+    const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
+    const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const fileInputRef = useRef(null);
 
     const { showMessage } = useFlashMessage();
@@ -210,6 +214,12 @@ const ExtraCoursesAdmin = () => {
         newCourse.related_courses.forEach((id, idx) => {
             formData.append(`related_courses[${idx}]`, id);
         });
+        if (audioResourceFile) {
+            formData.append("audio_resource", audioResourceFile);
+        }
+        if (pdfResourceFile) {
+            formData.append("pdf_resource", pdfResourceFile);
+        }
 
         try {
             await axios.post("/api/admin/extra-courses/store", formData, {
@@ -220,6 +230,8 @@ const ExtraCoursesAdmin = () => {
             });
             showMessage("Course added successfully", "success");
             setIsCreateCourseModalOpen(false);
+            setAudioResourceFile(null);
+            setPdfResourceFile(null);
             fetchCourses();
             fetchAllCoursesDropdown();
         } catch (error) {
@@ -238,6 +250,8 @@ const ExtraCoursesAdmin = () => {
         setPreviewUrl(course.thumbnail_url);
         setThumbnailFile(null);
         setDescriptionImageFiles([]);
+        setEditAudioResourceFile(null);
+        setEditPdfResourceFile(null);
         setIsEditCourseModalOpen(true);
     };
 
@@ -260,6 +274,12 @@ const ExtraCoursesAdmin = () => {
         editingCourse.related_courses.forEach((id, idx) => {
             formData.append(`related_courses[${idx}]`, id);
         });
+        if (editAudioResourceFile) {
+            formData.append("audio_resource", editAudioResourceFile);
+        }
+        if (editPdfResourceFile) {
+            formData.append("pdf_resource", editPdfResourceFile);
+        }
 
         try {
             await axios.post(`/api/admin/extra-courses/update/${editingCourse.id}`, formData, {
@@ -565,6 +585,24 @@ const ExtraCoursesAdmin = () => {
                                 placeholder="Select related courses..."
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                            <input
+                                type="file"
+                                accept="audio/*"
+                                onChange={(e) => setAudioResourceFile(e.target.files[0] || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                            <input
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(e) => setPdfResourceFile(e.target.files[0] || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                            />
+                        </div>
                         <div className="col-span-1 sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                             <textarea
@@ -687,6 +725,30 @@ const ExtraCoursesAdmin = () => {
                                     classNamePrefix="select"
                                     placeholder="Select related courses..."
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => setEditAudioResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                {editingCourse.audio_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">Audio track already uploaded.</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => setEditPdfResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                {editingCourse.pdf_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">PDF already uploaded.</div>
+                                )}
                             </div>
                             <div className="col-span-1 sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>

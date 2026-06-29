@@ -1,22 +1,33 @@
 @extends('layouts.community')
 
+@section('page-title')
+    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight truncate">Audio Downloads</h1>
+@endsection
+
 @section('content')
-<!-- Header Section -->
-<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
-    <div class="px-6 py-5">
-        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Audio Downloads</h1>
-    </div>
-</div>
 
 <!-- Main Content Section -->
-<section class="px-4 sm:px-6 pb-6 bg-gray-50 dark:bg-black">
+<section class="px-4 sm:px-6 pt-6 pb-6 bg-gray-50 dark:bg-black">
     <div class="max-w-7xl mx-auto">
         
         <!-- Tabs Navigation -->
         @php
             $allAudio = $pianoPlays->concat($tracksAndLoops)->sortByDesc('created_at')->values();
         @endphp
-        <div class="mb-8" x-data="{ activeTab: 'all' }">
+        <div class="mb-8" x-data="{ activeTab: 'all', search: '' }">
+
+            <!-- Search Bar -->
+            <div class="relative mb-6 max-w-md">
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+                </svg>
+                <input
+                    type="text"
+                    x-model="search"
+                    placeholder="Search audio files..."
+                    class="w-full pl-11 pr-4 py-2.5 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#161617] text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition"
+                >
+            </div>
 
             <!-- Tab Buttons - Spread out on Desktop, Stacked on Mobile -->
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
@@ -56,7 +67,9 @@
                     @if($allAudio->count() > 0)
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             @foreach($allAudio as $audio)
-                                @include('community.partials.audio-card', ['audio' => $audio])
+                                <div x-show="search === '' || {{ \Illuminate\Support\Js::from(Str::lower($audio->title)) }}.includes(search.toLowerCase())">
+                                    @include('community.partials.audio-card', ['audio' => $audio])
+                                </div>
                             @endforeach
                         </div>
                     @else
@@ -73,7 +86,9 @@
                     @if($tracksAndLoops->count() > 0)
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             @foreach($tracksAndLoops as $audio)
-                                @include('community.partials.audio-card', ['audio' => $audio])
+                                <div x-show="search === '' || {{ \Illuminate\Support\Js::from(Str::lower($audio->title)) }}.includes(search.toLowerCase())">
+                                    @include('community.partials.audio-card', ['audio' => $audio])
+                                </div>
                             @endforeach
                         </div>
                     @else
@@ -90,7 +105,9 @@
                     @if($pianoPlays->count() > 0)
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             @foreach($pianoPlays as $audio)
-                                @include('community.partials.audio-card', ['audio' => $audio])
+                                <div x-show="search === '' || {{ \Illuminate\Support\Js::from(Str::lower($audio->title)) }}.includes(search.toLowerCase())">
+                                    @include('community.partials.audio-card', ['audio' => $audio])
+                                </div>
                             @endforeach
                         </div>
                     @else

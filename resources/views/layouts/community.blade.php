@@ -51,25 +51,83 @@
         x-show="showSidebar || window.innerWidth >= 1024"
         @click.away="if (window.innerWidth < 1024) showSidebar = false"
         :class="{ '-translate-x-full': !showSidebar && window.innerWidth < 1024 }"
-        class="fixed inset-y-0 left-0 z-40 w-72 bg-gray-100 dark:bg-[#0B0B0C] border-r border-gray-200 dark:border-white/10 transform transition-transform duration-200 lg:relative lg:translate-x-0 flex flex-col" style="box-shadow: 4px 0 24px rgba(0,0,0,0.06);"
+        class="fixed inset-y-0 left-0 z-40 w-72 bg-[#0B1229] dark:bg-[#0B0B0C] border-r border-white/10 dark:border-white/10 transform transition-transform duration-200 lg:relative lg:translate-x-0 flex flex-col" style="box-shadow: 4px 0 24px rgba(0,0,0,0.06);"
     >
         {{-- Logo --}}
-        <div class="px-6 py-5 border-b border-gray-200 dark:border-white/10 flex justify-center">
-            <a href="/home" class="flex items-center gap-2">
-                <img src="/logo/logo-transparent-white.png" alt="Kingsley Khord" class="h-10 w-auto">
+        <div class="px-6 py-5 border-b border-white/10 dark:border-white/10 flex items-center gap-3">
+            <a href="/member/my-library" class="flex items-center gap-3">
+                <span class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+                    </svg>
+                </span>
+                <span class="text-white font-semibold text-base">My Library</span>
             </a>
         </div>
 
         {{-- Nav --}}
-        <div class="flex-1 overflow-y-auto scrollbar-hide px-4 py-5 space-y-1.5 mt-10 md:mt-0">
+        <div class="flex-1 overflow-y-auto scrollbar-hide px-4 py-5 space-y-1.5">
 
             @php
                 $li = 'group flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-base font-medium transition-all duration-150 border-l-2';
-                $active = $li . ' bg-indigo-50 text-indigo-700 border-indigo-600 dark:bg-amber-400/5 dark:text-amber-400 dark:border-amber-400';
-                $inactive = $li . ' border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white';
-                $iconActive = 'flex items-center justify-center w-6 h-6 flex-shrink-0 text-indigo-600 dark:text-amber-400';
-                $iconInactive = 'flex items-center justify-center w-6 h-6 flex-shrink-0 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300';
+                $active = $li . ' bg-white/10 text-white border-amber-400 dark:bg-amber-400/5 dark:text-white dark:border-amber-400';
+                $inactive = $li . ' border-transparent text-gray-300 hover:bg-white/5 hover:text-white dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white';
+                $iconActive = 'flex items-center justify-center w-6 h-6 flex-shrink-0 text-amber-400 dark:text-amber-400';
+                $iconInactive = 'flex items-center justify-center w-6 h-6 flex-shrink-0 text-gray-400 group-hover:text-gray-200 dark:text-gray-500 dark:group-hover:text-gray-300';
+                $sectionLabel = 'px-3.5 text-[11px] font-bold text-amber-400/80 uppercase tracking-wider mb-1.5';
             @endphp
+
+            <p class="{{ $sectionLabel }}">Main</p>
+
+            <a href="/home" class="{{ Request::is('home') ? $active : $inactive }}">
+                <span class="{{ Request::is('home') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </span>
+                Dashboard
+            </a>
+
+            <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="{{ $inactive }}">
+                <span class="{{ $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                </span>
+                Shop Plugins
+            </a>
+
+            <a href="/member/community/members" class="{{ Request::is('member/community/members') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/community/members') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+                    </svg>
+                </span>
+                Community
+            </a>
+
+            <a href="/member/profile" class="{{ Request::is('member/profile') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/profile') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </span>
+                Profile
+            </a>
+
+            <a href="/member/support" class="{{ Request::is('member/support') ? $active : $inactive }}">
+                <span class="{{ Request::is('member/support') ? $iconActive : $iconInactive }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </span>
+                Support
+            </a>
+
+            {{-- Divider --}}
+            <div class="pt-4 pb-1">
+                <p class="{{ $sectionLabel }}">General</p>
+            </div>
 
             <a href="/member/my-library" class="{{ Request::is('member/my-library') ? $active : $inactive }}">
                 <span class="{{ Request::is('member/my-library') ? $iconActive : $iconInactive }}">
@@ -118,7 +176,7 @@
 
             {{-- Divider --}}
             <div class="pt-4 pb-1">
-                <div class="border-t border-gray-200 dark:border-white/10"></div>
+                <p class="{{ $sectionLabel }}">Files</p>
             </div>
 
             <a href="/member/community/space/pdf-downloads" class="{{ Request::is('member/community/space/pdf-downloads') ? $active : $inactive }}">
@@ -157,56 +215,6 @@
                 Application
             </a>
 
-            {{-- Mobile-only: top header nav links --}}
-            <div class="lg:hidden pt-4 pb-1">
-                <div class="border-t border-gray-200 dark:border-white/10"></div>
-            </div>
-
-            <a href="/home" class="lg:hidden {{ Request::is('home') ? $active : $inactive }}">
-                <span class="{{ Request::is('home') ? $iconActive : $iconInactive }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                </span>
-                Dashboard
-            </a>
-
-            <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="lg:hidden {{ $inactive }}">
-                <span class="{{ $iconInactive }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                    </svg>
-                </span>
-                Shop Plugins
-            </a>
-
-            <a href="/member/community/members" class="lg:hidden {{ Request::is('member/community/members') ? $active : $inactive }}">
-                <span class="{{ Request::is('member/community/members') ? $iconActive : $iconInactive }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
-                    </svg>
-                </span>
-                Community
-            </a>
-
-            <a href="/member/profile" class="lg:hidden {{ Request::is('member/profile') ? $active : $inactive }}">
-                <span class="{{ Request::is('member/profile') ? $iconActive : $iconInactive }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                </span>
-                Profile
-            </a>
-
-            <a href="/member/support" class="lg:hidden {{ Request::is('member/support') ? $active : $inactive }}">
-                <span class="{{ Request::is('member/support') ? $iconActive : $iconInactive }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                    </svg>
-                </span>
-                Support
-            </a>
-
         </div>
 
     </aside>
@@ -215,64 +223,21 @@
     <div class="flex-1 flex flex-col min-w-0">
 
         <!-- Header -->
-        <header class="bg-gray-100 dark:bg-black border-b border-gray-200 dark:border-white/10 sticky top-0 z-50">
+        <header class="bg-[#0B1229] lg:bg-gray-100 dark:bg-black border-b border-white/10 lg:border-gray-200 dark:lg:border-white/10 sticky top-0 z-50">
             <div class="px-6 py-0 flex items-center justify-between h-20">
 
                 <!-- Mobile: Hamburger -->
-                <button @click="showSidebar = !showSidebar" class="lg:hidden text-gray-500 dark:text-gray-400 p-1">
+                <button @click="showSidebar = !showSidebar" class="lg:hidden text-gray-300 lg:text-gray-500 dark:text-gray-400 p-1">
                     <i class="fa fa-bars text-xl"></i>
                 </button>
 
-                <!-- Mobile: Logo -->
-                <a href="/member/my-library" class="lg:hidden">
-                    <img src="/logo/logo-transparent-white.png" alt="Logo" class="h-8 w-auto">
-                </a>
-
-                <!-- Desktop: Top nav -->
-                @php
-                    $topLi = 'flex items-center gap-1.5 px-3 py-2 rounded-xl text-base font-medium transition-all duration-150';
-                    $topActive = $topLi . ' bg-indigo-50 text-indigo-700 dark:bg-transparent dark:text-amber-400';
-                    $topInactive = $topLi . ' text-gray-500 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white';
-                @endphp
-                <nav class="hidden lg:flex items-center gap-8">
-                    <a href="/home" class="{{ Request::is('home') ? $topActive : $topInactive }}">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                        </svg>
-                        Dashboard
-                    </a>
-
-                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="{{ $topInactive }}">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                        </svg>
-                        Shop Plugins
-                    </a>
-
-                    <a href="/member/community/members" class="{{ Request::is('member/community/members') ? $topActive : $topInactive }}">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
-                        </svg>
-                        Community
-                    </a>
-
-                    <a href="/member/profile" class="{{ Request::is('member/profile') ? $topActive : $topInactive }}">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        Profile
-                    </a>
-
-                    <a href="/member/support" class="{{ Request::is('member/support') ? $topActive : $topInactive }}">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                        </svg>
-                        Support
-                    </a>
-                </nav>
+                <!-- Desktop: Page Title -->
+                <div class="hidden lg:block min-w-0">
+                    @yield('page-title')
+                </div>
 
                 <!-- Right: Actions -->
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1 ml-auto">
 
                     <!-- Notifications -->
                     @php
@@ -285,14 +250,14 @@
 
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                         <button type="button" @click="open = !open"
-                            class="relative p-2.5 rounded-xl text-red-500 dark:text-gray-300 hover:text-red-600 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-150"
+                            class="relative p-2.5 rounded-xl text-gray-300 lg:text-gray-700 dark:text-gray-300 hover:text-white lg:hover:text-gray-900 dark:hover:text-white hover:bg-white/5 lg:hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-150"
                             aria-label="Notifications">
-                            <svg class="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9"
                                       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             @if($unreadCount > 0)
-                                <span class="absolute -top-0.5 -right-0.5 bg-red-500 dark:bg-amber-400 text-white dark:text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
+                                <span class="absolute -top-0.5 -right-0.5 bg-amber-500 dark:bg-amber-400 text-white dark:text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
                                     {{ $unreadCount > 99 ? '99+' : $unreadCount }}
                                 </span>
                             @endif
@@ -410,6 +375,11 @@
             </div>
         </header>
 
+        <!-- Mobile: Page Title (below header, not inside it) -->
+        <div class="lg:hidden bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 px-6 py-4">
+            @yield('page-title')
+        </div>
+
         <!-- Page Content -->
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-black">
             @yield('content')
@@ -421,11 +391,11 @@
 <script>
     function themeToggle() {
         return {
-            isDark: true,
+            isDark: false,
             showSidebar: false,
             init() {
-                localStorage.setItem('color-theme', 'dark');
-                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'light');
+                document.documentElement.classList.remove('dark');
             },
             toggle() {},
         }

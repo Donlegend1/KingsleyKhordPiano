@@ -66,6 +66,8 @@ class AdminExtraCourseController extends Controller
             'related_courses' => 'nullable|array',
             'images' => 'nullable|array',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+            'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
+            'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
         ]);
 
         $level = strtolower($request->input('level'));
@@ -119,6 +121,36 @@ class AdminExtraCourseController extends Controller
             }
         }
 
+        $audioResourcePath = null;
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/audio');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $audio->move($destination, $filename);
+            $audioResourcePath = 'uploads/resources/audio/' . $filename;
+        }
+
+        $pdfResourcePath = null;
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $pdf->move($destination, $filename);
+            $pdfResourcePath = 'uploads/resources/pdf/' . $filename;
+        }
+
         $maxPos = ExtraCourse::where('extra_course_category_id', $category->id)->max('position') ?: 0;
 
         $course = ExtraCourse::create([
@@ -133,6 +165,8 @@ class AdminExtraCourseController extends Controller
             'position' => $maxPos + 1,
             'related_courses' => $request->input('related_courses'),
             'images' => $descriptionImages,
+            'audio_resource' => $audioResourcePath,
+            'pdf_resource' => $pdfResourcePath,
         ]);
 
         return response()->json($course, 201);
@@ -152,6 +186,8 @@ class AdminExtraCourseController extends Controller
             'related_courses' => 'nullable|array',
             'images' => 'nullable|array',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+            'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
+            'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
         ]);
 
         $videoType = $request->input('video_type') ?? $course->video_type;
@@ -212,6 +248,42 @@ class AdminExtraCourseController extends Controller
             }
         }
 
+        $audioResourcePath = $course->audio_resource;
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/audio');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($course->audio_resource && file_exists(public_path($course->audio_resource))) {
+                @unlink(public_path($course->audio_resource));
+            }
+            $audio->move($destination, $filename);
+            $audioResourcePath = 'uploads/resources/audio/' . $filename;
+        }
+
+        $pdfResourcePath = $course->pdf_resource;
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($course->pdf_resource && file_exists(public_path($course->pdf_resource))) {
+                @unlink(public_path($course->pdf_resource));
+            }
+            $pdf->move($destination, $filename);
+            $pdfResourcePath = 'uploads/resources/pdf/' . $filename;
+        }
+
         $course->update([
             'title' => $request->input('title') ?? $course->title,
             'description' => $request->input('description') ?? $course->description,
@@ -221,6 +293,8 @@ class AdminExtraCourseController extends Controller
             'status' => $request->input('status') ?? $course->status,
             'related_courses' => $request->input('related_courses') ?? $course->related_courses,
             'images' => $descriptionImages,
+            'audio_resource' => $audioResourcePath,
+            'pdf_resource' => $pdfResourcePath,
         ]);
 
         return response()->json($course, 200);

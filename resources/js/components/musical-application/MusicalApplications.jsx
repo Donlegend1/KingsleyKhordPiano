@@ -19,6 +19,10 @@ const MusicalApplicationList = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const perPage = 10;
     const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [audioResourceFile, setAudioResourceFile] = useState(null);
+    const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
+    const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const { showMessage } = useFlashMessage();
 
     const [tagOptions, setTagOptions] = useState([]);
@@ -159,6 +163,8 @@ const MusicalApplicationList = () => {
             setSelectedTags([]);
         }
         
+        setEditAudioResourceFile(null);
+        setEditPdfResourceFile(null);
         setIsEditModalOpen(true);
     };
 
@@ -186,6 +192,12 @@ const MusicalApplicationList = () => {
 
         if (thumbnailFile instanceof File) {
             formData.append("thumbnail", thumbnailFile);
+        }
+        if (editAudioResourceFile instanceof File) {
+            formData.append("audio_resource", editAudioResourceFile);
+        }
+        if (editPdfResourceFile instanceof File) {
+            formData.append("pdf_resource", editPdfResourceFile);
         }
 
         try {
@@ -218,6 +230,12 @@ const MusicalApplicationList = () => {
         const formData = new FormData();
         if (thumbnailFile) {
             formData.append("thumbnail", thumbnailFile);
+        }
+        if (audioResourceFile instanceof File) {
+            formData.append("audio_resource", audioResourceFile);
+        }
+        if (pdfResourceFile instanceof File) {
+            formData.append("pdf_resource", pdfResourceFile);
         }
 
         Object.entries(upload).forEach(([key, value]) => {
@@ -252,6 +270,8 @@ const MusicalApplicationList = () => {
             setSelectedTags([]);
             setThumbnailFile(null);
             setPreview(null);
+            setAudioResourceFile(null);
+            setPdfResourceFile(null);
             fetchUploads();
             setIsCreateModalOpen(false);
         } catch (error) {
@@ -394,6 +414,14 @@ const MusicalApplicationList = () => {
                                 classNamePrefix="select"
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                            <input type="file" accept="audio/*" onChange={(e) => setAudioResourceFile(e.target.files[0] || null)} className="w-full text-sm" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                            <input type="file" accept="application/pdf" onChange={(e) => setPdfResourceFile(e.target.files[0] || null)} className="w-full text-sm" />
+                        </div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -457,6 +485,20 @@ const MusicalApplicationList = () => {
                                 className="basic-multi-select"
                                 classNamePrefix="select"
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                            <input type="file" accept="audio/*" onChange={(e) => setEditAudioResourceFile(e.target.files[0] || null)} className="w-full text-sm" />
+                            {selectedUpload.audio_resource_url && (
+                                <div className="text-xs text-gray-500 mt-1">Audio track already uploaded.</div>
+                            )}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                            <input type="file" accept="application/pdf" onChange={(e) => setEditPdfResourceFile(e.target.files[0] || null)} className="w-full text-sm" />
+                            {selectedUpload.pdf_resource_url && (
+                                <div className="text-xs text-gray-500 mt-1">PDF already uploaded.</div>
+                            )}
                         </div>
                     </div>
                     <div>
