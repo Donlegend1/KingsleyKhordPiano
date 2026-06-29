@@ -212,6 +212,43 @@ const ShowEartraining = () => {
         fetchQuiz();
     }, [lastSegment]);
 
+    useEffect(() => {
+        if (!quiz || !quiz.video_url) return;
+
+        // Parse any script tags in the video_url and inject them into the document
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(quiz.video_url, "text/html");
+        const scripts = doc.querySelectorAll("script");
+
+        scripts.forEach((script) => {
+            const src = script.getAttribute("src");
+            if (src) {
+                // Check if script is already in document to avoid duplicates
+                const existingScript = document.querySelector(`script[src="${src}"]`);
+                if (!existingScript) {
+                    const newScript = document.createElement("script");
+                    newScript.src = src;
+                    newScript.async = true;
+                    
+                    const type = script.getAttribute("type");
+                    if (type) {
+                        newScript.type = type;
+                    }
+
+                    newScript.onload = () => {
+                        console.log(`Successfully loaded script: ${src}`);
+                    };
+
+                    newScript.onerror = (e) => {
+                        console.error(`Failed to load script: ${src}`, e);
+                    };
+                    
+                    document.head.appendChild(newScript);
+                }
+            }
+        });
+    }, [quiz?.video_url]);
+
     if (!quiz || !quiz.questions?.length) {
         return (
             <div className="text-center p-6">
@@ -304,42 +341,7 @@ const ShowEartraining = () => {
         return match ? match[1] : null;
     };
 
-    useEffect(() => {
-        if (!quiz || !quiz.video_url) return;
 
-        // Parse any script tags in the video_url and inject them into the document
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(quiz.video_url, "text/html");
-        const scripts = doc.querySelectorAll("script");
-
-        scripts.forEach((script) => {
-            const src = script.getAttribute("src");
-            if (src) {
-                // Check if script is already in document to avoid duplicates
-                const existingScript = document.querySelector(`script[src="${src}"]`);
-                if (!existingScript) {
-                    const newScript = document.createElement("script");
-                    newScript.src = src;
-                    newScript.async = true;
-                    
-                    const type = script.getAttribute("type");
-                    if (type) {
-                        newScript.type = type;
-                    }
-
-                    newScript.onload = () => {
-                        console.log(`Successfully loaded script: ${src}`);
-                    };
-
-                    newScript.onerror = (e) => {
-                        console.error(`Failed to load script: ${src}`, e);
-                    };
-                    
-                    document.head.appendChild(newScript);
-                }
-            }
-        });
-    }, [quiz?.video_url]);
 
     const renderVideo = () => {
         if (!quiz.video_url) {

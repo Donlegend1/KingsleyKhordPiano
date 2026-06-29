@@ -266,11 +266,13 @@ const UploadList = () => {
             showMessage("Record Saved successfully.", "success");
             setUpload({
                 title: "",
+                category: category,
                 description: "",
                 video_url: "",
                 level: "",
                 skill_level: "",
                 status: "active",
+                video_type: "",
                 series: "",
             });
             setSelectedTags([]);
