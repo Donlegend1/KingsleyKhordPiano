@@ -2,29 +2,27 @@
 
 @section('content')
 
+<div x-data="{ search: '' }">
+
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
-  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center min-h-8 gap-4">
-    <div class="flex items-center gap-2 text-sm text-gray-500">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm text-gray-500 min-h-8">
+    <div class="flex items-center gap-2">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
       <span class="text-[#6366F1] font-medium">Extra Courses</span>
     </div>
-    <div class="w-full sm:w-auto">
-      <form method="GET" action="{{ route('extra.courses') }}" class="flex">
-        <input type="hidden" name="tab" value="{{ request('tab', 'all') }}">
-        <div class="relative w-full sm:w-72">
-          <input
+
+    <!-- Search Bar -->
+    <div class="relative w-full sm:w-72">
+        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+        </svg>
+        <input
             type="text"
-            name="search"
-            value="{{ request('search') }}"
-            class="w-full h-8 border border-gray-200 rounded-full pl-4 pr-10 text-sm leading-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
+            x-model="search"
             placeholder="Search courses..."
-          >
-          <button type="submit" class="absolute inset-y-0 right-3 flex items-center justify-center text-gray-400 hover:text-gray-600">
-            <i class="fa fa-search text-sm"></i>
-          </button>
-        </div>
-      </form>
+            class="w-full h-9 pl-10 pr-4 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#161617] text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition"
+        >
     </div>
   </div>
 </section>
@@ -53,7 +51,7 @@
         'advanced'     => 'Advanced',
       ];
       $activeTabKey = request('tab', 'all');
-      $tabQuery = fn($key) => '?tab=' . $key . (request('search') ? '&search=' . urlencode(request('search')) : '');
+      $tabQuery = fn($key) => '?tab=' . $key;
     @endphp
 
     <!-- Choose Tab -->
@@ -129,9 +127,12 @@
           $levelLabel  = $levelLabels[$level];
           $isNew       = !\App\Models\LessonView::hasViewed(auth()->id(), $firstCourse)
               && $cat->courses->contains(fn ($c) => $c->created_at && $c->created_at->gt(now()->subDays(7)));
+          $searchableText = Str::lower($cat->category . ' ' . $cat->courses->pluck('title')->implode(' '));
         @endphp
 
-        <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+        <div
+          x-show="search === '' || {{ \Illuminate\Support\Js::from($searchableText) }}.includes(search.toLowerCase())"
+          class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
           <!-- Thumbnail -->
           <a href="/member/lesson/{{ $firstCourse->id }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
@@ -194,6 +195,8 @@
 
   </div>
 </section>
+
+</div>
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');

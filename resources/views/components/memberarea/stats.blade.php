@@ -225,13 +225,13 @@
           @php
             $thumbnail = $resumeLesson->thumbnail ? asset($resumeLesson->thumbnail) : ($resumeLesson->thumbnail_url ?? asset('images/featured1.jpeg'));
           @endphp
-          <div class="flex items-center gap-6">
-            <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-40 sm:w-48 h-28 sm:h-32 object-cover rounded-xl shadow-sm border border-gray-100 flex-shrink-0">
-            <div class="flex-grow min-w-0">
-              <h4 class="text-xl font-extrabold text-gray-900 truncate mb-1">{{ $resumeLesson->title }}</h4>
+          <div class="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 text-center sm:text-left">
+            <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-full sm:w-48 h-40 sm:h-32 object-cover rounded-xl shadow-sm border border-gray-100 flex-shrink-0">
+            <div class="flex-grow min-w-0 w-full">
+              <h4 class="text-xl font-extrabold text-gray-900 line-clamp-2 sm:truncate mb-1">{{ $resumeLesson->title }}</h4>
               <p class="text-sm text-gray-400 mb-4">{{ ucfirst($resumeLesson->level ?? 'Beginner') }} Lesson</p>
 
-              <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-full text-sm font-bold transition duration-200 shadow-sm">
+              <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-full text-sm font-bold transition duration-200 shadow-sm">
                 <span>Continue Learning</span>
                 <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>

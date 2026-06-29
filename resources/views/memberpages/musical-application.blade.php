@@ -42,13 +42,30 @@
         ];
     @endphp
 
+    <div x-data="{ search: '' }">
+
     <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
-        <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
-            <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
-            <span>/</span>
-            <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
-            <span>/</span>
-            <span class="text-[#6366F1] font-medium">Technique Drills</span>
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm text-gray-500 min-h-8">
+            <div class="flex items-center gap-2">
+                <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
+                <span>/</span>
+                <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
+                <span>/</span>
+                <span class="text-[#6366F1] font-medium">Technique Drills</span>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full sm:w-72">
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+                </svg>
+                <input
+                    type="text"
+                    x-model="search"
+                    placeholder="Search drills..."
+                    class="w-full h-9 pl-10 pr-4 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#161617] text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition"
+                >
+            </div>
         </div>
     </section>
 
@@ -112,8 +129,11 @@
                             $playerUrl = route('piano.exercise.player', ['series' => $seriesName, 'skill_level' => strtolower($firstItem->skill_level)]);
                             $isNew = !\App\Models\LessonView::hasViewed(auth()->id(), $firstItem)
                                 && $items->contains(fn ($i) => $i->created_at && $i->created_at->gt(now()->subDays(7)));
+                            $searchableText = Str::lower($seriesName);
                         @endphp
-                        <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+                        <div
+                            x-show="search === '' || {{ \Illuminate\Support\Js::from($searchableText) }}.includes(search.toLowerCase())"
+                            class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
                             <!-- Thumbnail -->
                             <a href="{{ $playerUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
@@ -176,6 +196,8 @@
             </div>
 
         </div>
+    </div>
+
     </div>
 
     <style>

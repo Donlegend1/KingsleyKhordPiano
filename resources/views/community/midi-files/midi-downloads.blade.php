@@ -4,12 +4,8 @@
     <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight truncate">MIDI Files</h1>
 @endsection
 
-@section('content')
-
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8" x-data="{ search: '' }">
-
-    <!-- Search Bar -->
-    <div class="relative mb-8 max-w-md">
+@section('page-search')
+    <div class="relative">
         <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
         </svg>
@@ -20,6 +16,11 @@
             class="w-full pl-11 pr-4 py-2.5 rounded-full border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition"
         >
     </div>
+@endsection
+
+@section('content')
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
 
     <!-- MIDI Files Grid -->
     @if($midiFiles->count() > 0)

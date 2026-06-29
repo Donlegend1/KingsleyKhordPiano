@@ -91,10 +91,12 @@
             <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="{{ $inactive }}">
                 <span class="{{ $iconInactive }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 10a4 4 0 0 1-8 0"/>
                     </svg>
                 </span>
-                Shop Plugins
+                Shop
             </a>
 
             <a href="/member/community/members" class="{{ Request::is('member/community/members') ? $active : $inactive }}">
@@ -220,7 +222,7 @@
     </aside>
 
     {{-- ===================== MAIN AREA ===================== --}}
-    <div class="flex-1 flex flex-col min-w-0">
+    <div class="flex-1 flex flex-col min-w-0" x-data="{ search: '' }">
 
         <!-- Header -->
         <header class="bg-[#0B1229] lg:bg-gray-100 dark:bg-black border-b border-white/10 lg:border-gray-200 dark:lg:border-white/10 sticky top-0 z-50">
@@ -235,6 +237,12 @@
                 <div class="hidden lg:block min-w-0">
                     @yield('page-title')
                 </div>
+
+                @hasSection('page-search')
+                    <div class="hidden lg:block flex-1 max-w-xs mx-6">
+                        @yield('page-search')
+                    </div>
+                @endif
 
                 <!-- Right: Actions -->
                 <div class="flex items-center gap-1 ml-auto">
@@ -378,6 +386,11 @@
         <!-- Mobile: Page Title (below header, not inside it) -->
         <div class="lg:hidden bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 px-6 py-4">
             @yield('page-title')
+            @hasSection('page-search')
+                <div class="mt-4">
+                    @yield('page-search')
+                </div>
+            @endif
         </div>
 
         <!-- Page Content -->
