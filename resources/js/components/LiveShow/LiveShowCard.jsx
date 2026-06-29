@@ -15,6 +15,7 @@ import { calculateCountdown, formatLocalTime } from "@/utils/formatRelativeTime"
 const LiveShowCard = () => {
     const [shows, setShows] = useState([]);
     const [countdowns, setCountdowns] = useState({});
+    const [notifyClicked, setNotifyClicked] = useState(false);
     const { showMessage } = useFlashMessage();
 
     const authUser = window.authUser || {};
@@ -295,13 +296,24 @@ const LiveShowCard = () => {
                             Check back later for upcoming live sessions<br/>and workshops.
                         </p>
                         <button
-                            onClick={() => alert("You'll be notified when a live show is scheduled!")}
-                            className="flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-semibold px-7 py-3 rounded-xl shadow-md shadow-blue-200 transition-all duration-150 hover:scale-[1.02] active:scale-95"
+                            onClick={() => {
+                                if (notifyClicked) return;
+                                setNotifyClicked(true);
+                                showMessage
+                                    ? showMessage("You'll be notified when a live show is scheduled!", "success")
+                                    : alert("You'll be notified when a live show is scheduled!");
+                            }}
+                            disabled={notifyClicked}
+                            className={`flex items-center gap-2 text-sm font-semibold px-7 py-3 rounded-xl shadow-md transition-all duration-150 ${
+                                notifyClicked
+                                    ? "bg-gray-200 text-gray-500 shadow-none cursor-not-allowed"
+                                    : "bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-blue-200 hover:scale-[1.02] active:scale-95"
+                            }`}
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
-                            Notify Me
+                            {notifyClicked ? "You'll be notified" : "Notify Me"}
                         </button>
                     </div>
                 )}

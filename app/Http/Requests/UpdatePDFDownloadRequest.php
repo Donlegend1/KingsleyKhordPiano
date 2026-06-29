@@ -24,6 +24,7 @@ class UpdatePDFDownloadRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'category' => 'required|string',
+            'type' => 'nullable|string',
             'file_url' => 'nullable|file',
             'thumbnail' => 'nullable|file',
         ];

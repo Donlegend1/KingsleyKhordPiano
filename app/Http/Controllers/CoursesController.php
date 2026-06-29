@@ -20,6 +20,8 @@ class CoursesController extends Controller
      */
     public function extraCourses(Request $request)
     {
+        \App\Models\CategoryView::markViewed(auth()->id(), 'extra_courses');
+
         $search = $request->input('name');
         $activeTab = $request->input('tab', 'beginner');
 
@@ -78,6 +80,8 @@ class CoursesController extends Controller
             $lesson = Upload::findOrFail($id);
             $type = 'upload';
         }
+
+        \App\Models\LessonView::record(auth()->id(), $lesson);
 
         $comments = CourseVideoComment::where('category', 'others')
             ->whereNot('course_id', $id)

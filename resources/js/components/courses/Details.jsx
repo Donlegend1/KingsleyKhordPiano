@@ -129,6 +129,7 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
                     comment: comment,
                     category: "course",
                     course_id: course.id,
+                    url: window.location.href,
                 },
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },
@@ -418,42 +419,44 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
                                     </div>
 
                                     {/* Menu */}
-                                    <div className="relative">
-                                        <button
-                                            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
-                                            onClick={() =>
-                                                handleMenuToggle(c.id)
-                                            }
-                                        >
-                                            <i className="fa fa-ellipsis-v"></i>
-                                        </button>
-
-                                        {activeMenuId === c.id && (
-                                            <div
-                                                className="absolute right-0 mt-2 bg-white dark:bg-gray-900 
-                                                border dark:border-gray-700 rounded shadow-md z-10 w-32"
+                                    {c.user_id === window.authUser?.id && (
+                                        <div className="relative">
+                                            <button
+                                                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+                                                onClick={() =>
+                                                    handleMenuToggle(c.id)
+                                                }
                                             >
-                                                <button
-                                                    onClick={() =>
-                                                        handleEdit(c)
-                                                    }
-                                                    className="block w-full px-4 py-2 text-left text-sm 
+                                                <i className="fa fa-ellipsis-v"></i>
+                                            </button>
+
+                                            {activeMenuId === c.id && (
+                                                <div
+                                                    className="absolute right-0 mt-2 bg-white dark:bg-gray-900
+                                                border dark:border-gray-700 rounded shadow-md z-10 w-32"
+                                                >
+                                                    <button
+                                                        onClick={() =>
+                                                            handleEdit(c)
+                                                        }
+                                                        className="block w-full px-4 py-2 text-left text-sm
                                                    hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(c.id)
-                                                    }
-                                                    className="block w-full px-4 py-2 text-left text-sm 
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(c.id)
+                                                        }
+                                                        className="block w-full px-4 py-2 text-left text-sm
                                                    text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Comment Text or Edit */}
@@ -661,21 +664,26 @@ const CoursesPage = () => {
     };
 
     const handleCourseCompletion = (completedCourse) => {
-        setCourses((prevCourses) => {
-            const updatedCourses = { ...prevCourses };
+        setCourses((prevCourses) =>
+            prevCourses.map((cat) =>
+                cat.category === completedCourse.category
+                    ? {
+                          ...cat,
+                          courses: cat.courses.map((course) =>
+                              course.id === completedCourse.id
+                                  ? { ...course, progress: { course_id: course.id } }
+                                  : course
+                          ),
+                      }
+                    : cat
+            )
+        );
 
-            const category = completedCourse.category;
-
-            if (!updatedCourses[category]) return prevCourses;
-
-            updatedCourses[category] = updatedCourses[category].map((course) =>
-                course.id === completedCourse.id
-                    ? { ...course, completed: !course.progress }
-                    : course
-            );
-
-            return updatedCourses;
-        });
+        setSelectedCourse((prev) =>
+            prev && prev.id === completedCourse.id
+                ? { ...prev, progress: { course_id: prev.id } }
+                : prev
+        );
     };
 
     const calculateGeneralProgress = () => {

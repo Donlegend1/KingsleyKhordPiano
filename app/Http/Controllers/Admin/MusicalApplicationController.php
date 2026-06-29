@@ -32,6 +32,8 @@ class MusicalApplicationController extends Controller
             'status' => 'required|in:active,inactive,draft',
             'thumbnail' => 'nullable|image|max:2048',
             'tags' => 'nullable|array',
+            'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
+            'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
         ]);
 
         $videoPath = $validated['video_url'];
@@ -49,6 +51,28 @@ class MusicalApplicationController extends Controller
 
             $thumbnail->move($destination, $filename);
             $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
+        }
+
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $audio->move($destination, $filename);
+            $validated['audio_resource'] = 'uploads/resources/audio/' . $filename;
+        }
+
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
         }
 
         $upload = MusicalApplication::create($validated);
@@ -77,6 +101,8 @@ class MusicalApplicationController extends Controller
             'status' => 'required|in:active,inactive,draft',
             'thumbnail' => 'nullable|image|max:2048',
             'tags' => 'nullable|array',
+            'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
+            'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
         ]);
 
         if (isset($validated['video_type'])) {
@@ -100,6 +126,34 @@ class MusicalApplicationController extends Controller
 
             $thumbnail->move($destination, $filename);
             $validated['thumbnail'] = 'uploads/thumbnails/' . $filename;
+        }
+
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($musicalApplication->audio_resource && file_exists(public_path($musicalApplication->audio_resource))) {
+                @unlink(public_path($musicalApplication->audio_resource));
+            }
+            $audio->move($destination, $filename);
+            $validated['audio_resource'] = 'uploads/resources/audio/' . $filename;
+        }
+
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($musicalApplication->pdf_resource && file_exists(public_path($musicalApplication->pdf_resource))) {
+                @unlink(public_path($musicalApplication->pdf_resource));
+            }
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
         }
 
         $musicalApplication->update($validated);

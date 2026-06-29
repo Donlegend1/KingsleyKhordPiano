@@ -73,14 +73,16 @@ class HomeController extends Controller
 
         $latestCourses = [];
 
-            foreach (['piano exercise', 'quick lessons'] as $category) {
-                $course = Upload::where('category', $category)
-                    ->orderBy('created_at', 'desc')
-                    ->first();
+            $latestFingerExercise = Upload::where('category', 'piano exercise')
+                ->orderBy('created_at', 'desc')
+                ->first();
+            if ($latestFingerExercise) {
+                $latestCourses['finger exercise'] = $latestFingerExercise;
+            }
 
-                if ($course) {
-                    $latestCourses[$category] = $course;
-                }
+            $latestTechniqueDrill = \App\Models\MusicalApplication::orderBy('created_at', 'desc')->first();
+            if ($latestTechniqueDrill) {
+                $latestCourses['technique drills'] = $latestTechniqueDrill;
             }
 
             $latestLearnSong = \App\Models\LearnSong::orderBy('created_at', 'desc')->first();
@@ -92,9 +94,8 @@ class HomeController extends Controller
             if ($latestExtraCourse) {
                 $latestCourses['extra courses'] = $latestExtraCourse;
             }
-            $latestComments = \App\Models\CourseVideoComment::with(['user', 'course'])->latest()->take(4)->get();
 
-            return view('home', compact('progress', 'levels', 'latestCourses', 'latestComments', 'assessment'));
+            return view('home', compact('progress', 'levels', 'latestCourses', 'assessment'));
         }
     }
 

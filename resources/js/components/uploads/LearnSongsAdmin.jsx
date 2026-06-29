@@ -50,6 +50,10 @@ const LearnSongsAdmin = () => {
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
+    const [audioResourceFile, setAudioResourceFile] = useState(null);
+    const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
+    const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const fileInputRef = useRef(null);
 
     const { showMessage } = useFlashMessage();
@@ -210,6 +214,12 @@ const LearnSongsAdmin = () => {
         newSong.related_songs.forEach((id, idx) => {
             formData.append(`related_songs[${idx}]`, id);
         });
+        if (audioResourceFile) {
+            formData.append("audio_resource", audioResourceFile);
+        }
+        if (pdfResourceFile) {
+            formData.append("pdf_resource", pdfResourceFile);
+        }
 
         try {
             await axios.post("/api/admin/learn-songs/store", formData, {
@@ -220,6 +230,8 @@ const LearnSongsAdmin = () => {
             });
             showMessage("Song added successfully", "success");
             setIsCreateSongModalOpen(false);
+            setAudioResourceFile(null);
+            setPdfResourceFile(null);
             fetchSongs();
             fetchAllSongsDropdown();
         } catch (error) {
@@ -238,6 +250,8 @@ const LearnSongsAdmin = () => {
         setPreviewUrl(song.thumbnail_url);
         setThumbnailFile(null);
         setDescriptionImageFiles([]);
+        setEditAudioResourceFile(null);
+        setEditPdfResourceFile(null);
         setIsEditSongModalOpen(true);
     };
 
@@ -260,6 +274,12 @@ const LearnSongsAdmin = () => {
         editingSong.related_songs.forEach((id, idx) => {
             formData.append(`related_songs[${idx}]`, id);
         });
+        if (editAudioResourceFile) {
+            formData.append("audio_resource", editAudioResourceFile);
+        }
+        if (editPdfResourceFile) {
+            formData.append("pdf_resource", editPdfResourceFile);
+        }
 
         try {
             await axios.post(`/api/admin/learn-songs/update/${editingSong.id}`, formData, {
@@ -565,6 +585,24 @@ const LearnSongsAdmin = () => {
                                 placeholder="Select related songs..."
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                            <input
+                                type="file"
+                                accept="audio/*"
+                                onChange={(e) => setAudioResourceFile(e.target.files[0] || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                            <input
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(e) => setPdfResourceFile(e.target.files[0] || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                            />
+                        </div>
                         <div className="col-span-1 sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                             <textarea
@@ -687,6 +725,30 @@ const LearnSongsAdmin = () => {
                                     classNamePrefix="select"
                                     placeholder="Select related songs..."
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => setEditAudioResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                {editingSong.audio_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">Audio track already uploaded.</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => setEditPdfResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                {editingSong.pdf_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">PDF already uploaded.</div>
+                                )}
                             </div>
                             <div className="col-span-1 sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>

@@ -16,6 +16,8 @@ class ExerciseController extends Controller
     
     public function pianoExercise(Request $request)
     {
+        \App\Models\CategoryView::markViewed(auth()->id(), 'piano_exercise');
+
         $level = $request->query('level');
         $skillLevel = $request->query('skill_level');
         $search = $request->query('search');
@@ -87,7 +89,11 @@ class ExerciseController extends Controller
 
         $activeVideoId = $request->query('video_id');
         $activeVideo = $activeVideoId ? $playlist->firstWhere('id', $activeVideoId) : $playlist->first();
-        
+
+        if ($activeVideo) {
+            \App\Models\LessonView::record(auth()->id(), $activeVideo);
+        }
+
         $service = app(\App\Services\BookmarkService::class);
         $isBookmarked = $activeVideo ? $service->isBookmarked($activeVideo) : false;
 

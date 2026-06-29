@@ -72,6 +72,10 @@ const UploadList = () => {
     );
     const [thumbnail, setThumbnail] = useState(null);
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
+    const [audioResourceFile, setAudioResourceFile] = useState(null);
+    const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
+    const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const fileInputRef = useRef(null);
     const handleChangeCreate = (e) => {
         const { name, value } = e.target;
@@ -163,6 +167,8 @@ const UploadList = () => {
         setSelectedCourse(course);
         setThumbnail(null);
         setDescriptionImageFiles([]);
+        setEditAudioResourceFile(null);
+        setEditPdfResourceFile(null);
         setIsEditModalOpen(true);
     };
 
@@ -211,6 +217,12 @@ const UploadList = () => {
         descriptionImageFiles.forEach((file, idx) => {
             formData.append(`images[${idx}]`, file);
         });
+        if (editAudioResourceFile instanceof File) {
+            formData.append("audio_resource", editAudioResourceFile);
+        }
+        if (editPdfResourceFile instanceof File) {
+            formData.append("pdf_resource", editPdfResourceFile);
+        }
 
         try {
             const response = await axios.post(
@@ -247,6 +259,12 @@ const UploadList = () => {
         descriptionImageFiles.forEach((file, idx) => {
             formData.append(`images[${idx}]`, file);
         });
+        if (audioResourceFile instanceof File) {
+            formData.append("audio_resource", audioResourceFile);
+        }
+        if (pdfResourceFile instanceof File) {
+            formData.append("pdf_resource", pdfResourceFile);
+        }
 
         // Upload fields
         Object.entries(upload).forEach(([key, value]) =>
@@ -274,6 +292,8 @@ const UploadList = () => {
                 series: "",
             });
             setSelectedTags([]);
+            setAudioResourceFile(null);
+            setPdfResourceFile(null);
             fetchCourses();
             closeCreateModal();
         } catch (error) {
@@ -548,6 +568,34 @@ const UploadList = () => {
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Course Resources (Optional) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => setEditAudioResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                                {selectedCourse?.audio_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">Audio track already uploaded.</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => setEditPdfResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                                {selectedCourse?.pdf_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">PDF already uploaded.</div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Submit Button */}
@@ -853,6 +901,28 @@ const UploadList = () => {
                                     {descriptionImageFiles.length} file(s) selected
                                 </div>
                             )}
+                        </div>
+
+                        {/* Course Resources (Optional) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => setAudioResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => setPdfResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                            </div>
                         </div>
 
                         {/* Submit Button */}

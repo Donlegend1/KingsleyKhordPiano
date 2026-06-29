@@ -24,6 +24,7 @@ class StorePDFDownloadRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'category' => 'required|string',
+            'type' => 'nullable|string',
             'file_url' => 'required|file',
             'thumbnail' => 'nullable|file',
         ];

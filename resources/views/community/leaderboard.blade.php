@@ -1,5 +1,9 @@
 @extends('layouts.community')
 
+@section('page-title')
+    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight truncate">Leaderboards</h1>
+@endsection
+
 @section('content')
 @php
     $displayName = static function ($member) {
@@ -47,7 +51,6 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-slate-500">Community Rankings</p>
-                <h1 class="mt-1 text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Leaderboards</h1>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-xl">
                     Leaderboard shows the highest point earners this month, Top Members ranks all-time totals.
                 </p>

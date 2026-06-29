@@ -2,7 +2,13 @@
 
   {{-- ===== Your Piano Journey ===== --}}
   @php
-    $totalCompleted = collect($progress)->sum('completed');
+    // "Mark as Complete" on roadmap lessons writes to course_progress; every other
+    // lesson type (finger exercise, technique drill, extra course, learn song) writes
+    // to lesson_completions via the shared LessonCompletion model. Both need to count
+    // toward the same stats so completing any lesson on the site moves the needle here.
+    $lessonCompletionCount = \App\Models\LessonCompletion::where('user_id', Auth::id())->count();
+
+    $totalCompleted = collect($progress)->sum('completed') + $lessonCompletionCount;
     $totalCourses   = collect($progress)->sum('total');
     $overallPct     = $totalCourses > 0 ? round(($totalCompleted / $totalCourses) * 100) : 0;
     $currentLevel = isset($assessment) && $assessment ? $assessment->skill_level : 'Nil';
@@ -93,14 +99,31 @@
         $cursor->subDay();
     }
 
-    // Recent Activity query
-    $recentActivity = DB::table('course_progress')
+    // Recent Activity query — combine roadmap completions (course_progress) with
+    // every other lesson type's completions (lesson_completions), so any "Mark as
+    // Complete" anywhere on the site shows up here, not just on roadmap lessons.
+    $courseActivity = DB::table('course_progress')
         ->join('courses', 'course_progress.course_id', '=', 'courses.id')
         ->where('course_progress.user_id', Auth::id())
-        ->select('courses.id', 'courses.title', 'course_progress.created_at')
-        ->orderBy('course_progress.created_at', 'desc')
+        ->select('courses.title', 'course_progress.created_at')
+        ->get()
+        ->map(fn ($row) => (object) [
+            'title' => $row->title,
+            'created_at' => \Carbon\Carbon::parse($row->created_at),
+        ]);
+
+    $lessonActivity = \App\Models\LessonCompletion::where('user_id', Auth::id())
+        ->with('completable')
+        ->get()
+        ->map(fn ($lc) => (object) [
+            'title' => $lc->completable?->title ?? 'Untitled Lesson',
+            'created_at' => $lc->created_at,
+        ]);
+
+    $recentActivity = $courseActivity->concat($lessonActivity)
+        ->sortByDesc('created_at')
         ->take(3)
-        ->get();
+        ->values();
 
     if ($recentActivity->isEmpty()) {
         $recentActivity = Auth::user()->bookmarks()
@@ -117,20 +140,42 @@
             });
     }
 
-    // Find last lesson to resume
+    // Find last lesson to resume.
+    // Two competing signals: an explicit Course bookmark (roadmap lessons, the
+    // existing working path) and a LessonView (auto-recorded whenever the user
+    // opens a finger exercise, technique drill, extra course, or learn song
+    // page). Whichever happened more recently wins.
     $resumeLesson = null;
     $resumeUrl = '#';
-    $lastBookmark = Auth::user()->bookmarks()
-        ->whereIn('bookmarkable_type', ['App\Models\Upload', 'App\Models\LearnSong', 'App\Models\ExtraCourse', 'App\Models\Course'])
+
+    $lastCourseBookmark = Auth::user()->bookmarks()
+        ->where('bookmarkable_type', 'App\Models\Course')
         ->latest()
         ->first();
 
-    if ($lastBookmark && $lastBookmark->bookmarkable) {
-        $resumeLesson = $lastBookmark->bookmarkable;
-        $resumeType = $lastBookmark->bookmarkable_type;
-        $resumeUrl = ($resumeType === 'App\Models\Course') 
-            ? '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id 
+    $lastLessonView = \App\Models\LessonView::where('user_id', Auth::id())
+        ->whereIn('viewable_type', [
+            'App\Models\Upload',
+            'App\Models\MusicalApplication',
+            'App\Models\ExtraCourse',
+            'App\Models\LearnSong',
+        ])
+        ->latest('updated_at')
+        ->first();
+
+    $useLessonView = $lastLessonView
+        && (!$lastCourseBookmark || $lastLessonView->updated_at->gt($lastCourseBookmark->updated_at));
+
+    if ($useLessonView && $lastLessonView->viewable) {
+        $resumeLesson = $lastLessonView->viewable;
+        $resumeType = $lastLessonView->viewable_type;
+        $resumeUrl = ($resumeType === 'App\Models\MusicalApplication')
+            ? '/member/piano-exercise/player?series=' . $resumeLesson->series . '&video_id=' . $resumeLesson->id
             : '/member/lesson/' . $resumeLesson->id;
+    } elseif ($lastCourseBookmark && $lastCourseBookmark->bookmarkable) {
+        $resumeLesson = $lastCourseBookmark->bookmarkable;
+        $resumeType = $lastCourseBookmark->bookmarkable_type;
+        $resumeUrl = '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id;
     } else {
         // Fallback to first active lesson
         $resumeLesson = \App\Models\LearnSong::where('status', 'active')->first() 

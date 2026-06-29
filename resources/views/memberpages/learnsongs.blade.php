@@ -42,73 +42,65 @@
   ];
 @endphp
 
-<section class="bg-gray-50 dark:bg-gray-950 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-  <div class="w-full max-w-7xl mx-auto" x-data="{ activeTab: '{{ request('tab', 'all') }}' }">
+<section class="bg-gray-50 dark:bg-gray-950 min-h-screen py-8 px-4 sm:px-6 lg:px-8 font-sans">
+  <div class="w-full max-w-6xl mx-auto">
 
-    <!-- Mobile Dropdown -->
-    <div class="block lg:hidden mb-6" x-data="{ open: false, selected: '{{ request('tab', 'all') }}',
-      options: [
-        { value: 'all',          label: 'All' },
-        { value: 'beginner',     label: 'Beginner' },
-        { value: 'intermediate', label: 'Intermediate' },
-        { value: 'advanced',     label: 'Advanced' },
-      ],
-      get selectedLabel() { return this.options.find(o => o.value === this.selected)?.label ?? 'All'; },
-      pick(val) { this.selected = val; this.open = false; window.location.href = '?tab=' + val + '{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}'; }
-    }" @click.outside="open = false">
+    @php
+      $tabs = [
+        'all'          => 'ALL',
+        'beginner'     => 'Beginner',
+        'intermediate' => 'Intermediate',
+        'advanced'     => 'Advanced',
+      ];
+      $activeTabKey = request('tab', 'all');
+      $tabQuery = fn($key) => '?tab=' . $key . (request('search') ? '&search=' . urlencode(request('search')) : '');
+    @endphp
 
-      <!-- Trigger -->
-      <button @click="open = !open" type="button"
-        class="w-full flex items-center justify-between rounded-2xl px-5 py-4 shadow-sm transition-all duration-200 bg-[#6366F1]">
-        <p class="text-base font-bold text-white" x-text="selectedLabel"></p>
-        <svg class="w-5 h-5 text-white transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
-        </svg>
-      </button>
-
-      <!-- Dropdown Panel -->
-      <div x-show="open"
-        x-transition:enter="transition ease-out duration-150"
-        x-transition:enter-start="opacity-0 -translate-y-2"
-        x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition ease-in duration-100"
-        x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 -translate-y-2"
-        style="display:none;"
-        class="mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-50">
-        <template x-for="opt in options" :key="opt.value">
-          <button @click="pick(opt.value)" type="button"
-            class="w-full flex items-center justify-between px-5 py-3.5 transition-colors duration-150 border-b border-gray-50 last:border-0"
-            :class="selected === opt.value ? 'bg-[#6366F1]' : 'hover:bg-gray-50'">
-            <span class="text-sm font-semibold" :class="selected === opt.value ? 'text-white' : 'text-gray-700'" x-text="opt.label"></span>
-            <svg x-show="selected === opt.value" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-            </svg>
+    <!-- Choose Tab -->
+    <div class="mb-12">
+      <!-- Mobile: Dropdown -->
+      <div class="sm:hidden relative" x-data="{ open: false }" @click.outside="open = false">
+          <button
+              type="button"
+              @click="open = !open"
+              class="w-full flex items-center justify-between px-6 py-2.5 rounded-full font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transition-all duration-300"
+          >
+              <span>{{ $tabs[$activeTabKey] }}</span>
+              <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              </svg>
           </button>
-        </template>
+
+          <div
+              x-show="open"
+              x-transition
+              x-cloak
+              class="absolute left-0 right-0 mt-2 rounded-2xl bg-white border border-gray-100 shadow-xl overflow-hidden z-20"
+          >
+              @foreach ($tabs as $key => $label)
+                  <a href="{{ $tabQuery($key) }}"
+                      class="block px-6 py-3 font-semibold transition-colors duration-150
+                 {{ $activeTabKey === $key
+                     ? 'bg-indigo-600 text-white'
+                     : 'text-gray-600 hover:bg-gray-50' }}">
+                      {{ $label }}
+                  </a>
+              @endforeach
+          </div>
       </div>
-    </div>
 
-    <!-- Desktop Tabs -->
-    <div class="hidden lg:flex flex-wrap items-center justify-center gap-6 mb-10">
-      @php
-        $tabs = [
-          'all'          => 'ALL',
-          'beginner'     => 'Beginner',
-          'intermediate' => 'Intermediate',
-          'advanced'     => 'Advanced',
-        ];
-      @endphp
-
-      @foreach($tabs as $key => $label)
-        <a href="?tab={{ $key }}{{ request('search') ? '&search=' . urlencode(request('search')) : '' }}"
-           class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
-             {{ request('tab', 'all') === $key
-               ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-               : 'text-gray-500 hover:text-gray-700' }}">
-          {{ $label }}
-        </a>
-      @endforeach
+      <!-- Desktop: Pills -->
+      <div class="hidden sm:flex flex-wrap items-center gap-6">
+          @foreach ($tabs as $key => $label)
+              <a href="{{ $tabQuery($key) }}"
+                  class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
+             {{ $activeTabKey === $key
+                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                 : 'text-gray-500 hover:text-gray-700' }}">
+                  {{ $label }}
+              </a>
+          @endforeach
+      </div>
     </div>
 
     <!-- Song Cards -->
@@ -135,6 +127,8 @@
           $songCount   = $cat->songs->count();
           $level       = $levelMap[$cat->id] ?? 'beginner';
           $levelLabel  = $levelLabels[$level];
+          $isNew       = !\App\Models\LessonView::hasViewed(auth()->id(), $firstSong)
+              && $cat->songs->contains(fn ($s) => $s->created_at && $s->created_at->gt(now()->subDays(7)));
         @endphp
 
         <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
@@ -146,6 +140,12 @@
             @else
               <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900 to-purple-900">
                 <i class="fa fa-music text-5xl text-white/30"></i>
+              </div>
+            @endif
+
+            @if($isNew)
+              <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wide">
+                NEW
               </div>
             @endif
 
@@ -195,4 +195,11 @@
   </div>
 </section>
 
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+    .font-sans {
+        font-family: 'Outfit', sans-serif;
+    }
+</style>
 @endsection
