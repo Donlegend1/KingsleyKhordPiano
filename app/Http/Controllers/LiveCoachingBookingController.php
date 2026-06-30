@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\LiveCoachingBooking;
+use App\Services\SubscriptionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\AdminCoachingBookingNotification;
 
 class LiveCoachingBookingController extends Controller
 {
@@ -23,19 +26,19 @@ class LiveCoachingBookingController extends Controller
 
     private const WINDOW_DAYS = 14;
 
-    public function index()
+    public function index(SubscriptionService $subscriptionService)
     {
         $user = Auth::user();
 
-        $monthStart = now()->startOfMonth()->toDateString();
-        $monthEnd = now()->endOfMonth()->toDateString();
+        $cycle = $subscriptionService->getBillingCycleRange($user);
+        $monthStart = $cycle['start'];
+        $monthEnd = $cycle['end'];
+        $nextResetLabel = $cycle['reset_label'];
 
         $sessionsIncluded = 1;
         $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
             ->whereBetween('date', [$monthStart, $monthEnd])
             ->count();
-
-        $nextResetLabel = now()->startOfMonth()->addMonthNoOverflow()->format('F j, Y');
 
         $windowStart = now()->toDateString();
         $windowEnd = now()->addDays(self::WINDOW_DAYS - 1)->toDateString();
@@ -61,7 +64,7 @@ class LiveCoachingBookingController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, SubscriptionService $subscriptionService)
     {
         $request->validate([
             'date' => 'required|date_format:Y-m-d',
@@ -94,14 +97,15 @@ class LiveCoachingBookingController extends Controller
             return response()->json(['error' => 'Bookings must be made at least 24 hours in advance.'], 422);
         }
 
-        // 4) User must still have their free session available this month.
-        $monthStart = now()->startOfMonth()->toDateString();
-        $monthEnd = now()->endOfMonth()->toDateString();
+        // 4) User must still have their free session available this billing cycle.
+        $cycle = $subscriptionService->getBillingCycleRange($user);
+        $monthStart = $cycle['start'];
+        $monthEnd = $cycle['end'];
         $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
             ->whereBetween('date', [$monthStart, $monthEnd])
             ->count();
         if ($sessionsUsed >= 1) {
-            return response()->json(['error' => 'You have already used your free session this month.'], 422);
+            return response()->json(['error' => 'You have already used your free session this billing cycle.'], 422);
         }
 
         // 5) Slot must not already be booked by anyone else.
@@ -125,12 +129,14 @@ class LiveCoachingBookingController extends Controller
             $user->notify(new \App\Notifications\CoachingBookingNotification($booking));
 
             // Send notification to the admin
-            \Illuminate\Support\Facades\Notification::route('mail', 'Kingsleykhord@gmail.com')
-                ->notify(new \App\Notifications\AdminCoachingBookingNotification($booking));
+            Notification::route('mail', 'Kingsleykhord@gmail.com')
+                ->notify(new AdminCoachingBookingNotification($booking));
         } catch (\Exception $e) {
             logger()->warning('Failed to send live coaching session booking emails: ' . $e->getMessage());
         }
 
         return response()->json(['success' => true, 'booking' => $booking]);
     }
+
+
 }

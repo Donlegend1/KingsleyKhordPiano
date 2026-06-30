@@ -350,7 +350,7 @@
                         </div>
 
                         {{-- Scrollable list --}}
-                        <div class="overflow-y-auto" style="max-height: 520px;">
+                        {{-- <div class="overflow-y-auto" style="max-height: 520px;">
                             @foreach ($relatedLessons as $item)
                                 @php
                                     $itemIsNew = $item->created_at
@@ -360,12 +360,11 @@
                                 <a href="/member/lesson/{{ $item->id }}"
                                     class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors bg-white hover:bg-gray-50">
 
-                                    {{-- Play icon --}}
+                                    
                                     <div class="shrink-0 mt-0.5">
                                         <i class="fa-regular fa-circle-play text-gray-300 text-[18px]"></i>
                                     </div>
 
-                                    {{-- Title + duration --}}
                                     <div class="flex-1 min-w-0">
                                         <p class="text-[12px] font-bold uppercase tracking-wide leading-snug text-gray-800 flex items-center gap-2">
                                             <span class="truncate">{{ $item->title }}</span>
@@ -379,7 +378,7 @@
                                     </div>
                                 </a>
                             @endforeach
-                        </div>
+                        </div> --}}
                     @endif
 
                 </aside>

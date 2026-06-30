@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
 
         // Application Emails
         $schedule->command('email:welcome')->dailyAt('07:00');
-        $schedule->command('email:reengagement')->dailyAt('08:00');
+        // $schedule->command('email:reengagement')->dailyAt('08:00');
         $schedule->command('email:send-skill-assessment')->dailyAt('09:00');
         $schedule->command('email:send-song-breakdowns')->dailyAt('10:00');
 

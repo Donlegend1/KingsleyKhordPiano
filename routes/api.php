@@ -50,7 +50,6 @@ use App\Http\Controllers\LiveShowNotificationController;
     });
 
     Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
-    Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
     Route::post('/notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
     
 

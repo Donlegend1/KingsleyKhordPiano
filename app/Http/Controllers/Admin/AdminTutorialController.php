@@ -50,8 +50,14 @@ class AdminTutorialController extends Controller
         // Extract ID for specific video types if needed
         $videoType = $request->input('video_type');
         $videoPath = $request->input('video_url');
-        if (class_exists(\App\Helpers\VideoHelper::class)) {
-          VideoHelper::class::linkToEmbed($videoPath);
+        if ($videoType === 'youtube') {
+            $data['video_url'] = $this->extractYoutubeId($videoPath);
+        } elseif ($videoType === 'google') {
+            $data['video_url'] = $this->extractGoogleDriveId($videoPath);
+        } elseif ($videoType === 'vimeo') {
+            $data['video_url'] = $this->extractVimeoId($videoPath);
+        } else {
+            $data['video_url'] = $videoPath;
         }
 
         // Move thumbnail file
@@ -127,15 +133,14 @@ class AdminTutorialController extends Controller
         // Extract ID for specific video types
         $videoType = $request->input('video_type');
         $videoPath = $request->input('video_url');
-        if (class_exists(\App\Helpers\VideoHelper::class)) {
-            switch ($videoType) {
-                case 'youtube':
-                    $data['video_url'] = VideoHelper::extractYoutubeId($videoPath);
-                    break;
-                case 'google':
-                    $data['video_url'] = VideoHelper::extractGoogleDriveId($videoPath);
-                    break;
-            }
+        if ($videoType === 'youtube') {
+            $data['video_url'] = $this->extractYoutubeId($videoPath);
+        } elseif ($videoType === 'google') {
+            $data['video_url'] = $this->extractGoogleDriveId($videoPath);
+        } elseif ($videoType === 'vimeo') {
+            $data['video_url'] = $this->extractVimeoId($videoPath);
+        } else {
+            $data['video_url'] = $videoPath;
         }
 
         // Move thumbnail file if present
@@ -185,5 +190,36 @@ class AdminTutorialController extends Controller
     {
         $tutorial->delete();
         return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial deleted successfully!');
+    }
+
+    private function extractYoutubeId($url)
+    {
+        if (preg_match('/youtu\.be\/([^\?]+)|youtube\.com\/watch\?v=([^\&]+)|youtube\.com\/embed\/([^\?&]+)|youtube\.com\/shorts\/([^\?&]+)/', $url, $matches)) {
+            return !empty($matches[1]) ? $matches[1] : (!empty($matches[2]) ? $matches[2] : (!empty($matches[3]) ? $matches[3] : ($matches[4] ?? $url)));
+        }
+        return $url;
+    }
+
+    private function extractGoogleDriveId($url)
+    {
+        if (preg_match('/drive\.google\.com\/(?:u\/\d+\/)?file\/d\/([^\/\?\&]+)/', $url, $matches)) {
+            return $matches[1];
+        }
+        $query = parse_url($url, PHP_URL_QUERY);
+        if ($query) {
+            parse_str($query, $params);
+            if (isset($params['id'])) {
+                return $params['id'];
+            }
+        }
+        return $url;
+    }
+
+    private function extractVimeoId($url)
+    {
+        if (preg_match('/vimeo\.com\/(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+        return $url;
     }
 }

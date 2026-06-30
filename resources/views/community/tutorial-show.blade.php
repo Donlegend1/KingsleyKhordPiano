@@ -38,6 +38,10 @@
                         allow="autoplay"
                         allowfullscreen
                     ></iframe>
+                @elseif($tutorial->video_type === 'iframe')
+                    <div class="w-full h-full flex items-center justify-center bg-black">
+                        {!! $tutorial->video_url !!}
+                    </div>
                 @else
                     <video src="{{ $tutorial->video_url }}" class="w-full h-full" controls></video>
                 @endif
@@ -131,5 +135,38 @@
 
     </div>
 </div>
+
+@if($tutorial->video_type === 'iframe')
+<script>
+    function initVideoScripts() {
+        const container = document.querySelector('.aspect-video');
+        if (container) {
+            const scripts = container.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const src = oldScript.getAttribute("src");
+                if (src) {
+                    const existingScript = document.querySelector(`script[src="${src}"]`);
+                    if (!existingScript) {
+                        const newScript = document.createElement("script");
+                        newScript.src = src;
+                        newScript.async = true;
+                        const type = oldScript.getAttribute("type");
+                        if (type) {
+                            newScript.type = type;
+                        }
+                        document.head.appendChild(newScript);
+                    }
+                }
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", initVideoScripts);
+    } else {
+        initVideoScripts();
+    }
+</script>
+@endif
 
 @endsection
