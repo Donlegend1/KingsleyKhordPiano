@@ -160,9 +160,9 @@ class ExerciseController extends Controller
 
         $seriesPage = $baseQuery()
             ->select('series')
-            ->selectRaw('MIN(id) as first_id')
+            ->selectRaw('MAX(created_at) as latest_created_at')
             ->groupBy('series')
-            ->orderBy('first_id')
+            ->orderByDesc('latest_created_at')
             ->paginate(9, ['*'], 'page', $page)
             ->appends(['skill_level' => $skillLevel]);
 

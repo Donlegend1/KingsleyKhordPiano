@@ -92,8 +92,10 @@ class LessonController extends Controller
                            ->orWhere('description', 'like', "%{$search}%");
                   });
             })
-            ->orderBy('level')
-            ->orderBy('position');
+            ->withMax(['songs as latest_song_at' => function($q) {
+                $q->where('status', 'active');
+            }], 'created_at')
+            ->orderByDesc('latest_song_at');
 
         $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
 

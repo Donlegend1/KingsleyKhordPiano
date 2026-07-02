@@ -43,8 +43,10 @@ class CoursesController extends Controller
                            ->orWhere('description', 'like', "%{$search}%");
                   });
             })
-            ->orderBy('level')
-            ->orderBy('position');
+            ->withMax(['courses as latest_course_at' => function($q) {
+                $q->where('status', 'active');
+            }], 'created_at')
+            ->orderByDesc('latest_course_at');
 
         $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
 
