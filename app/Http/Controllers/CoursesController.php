@@ -51,11 +51,26 @@ class CoursesController extends Controller
         return view('memberpages.extracources', compact('categories', 'search', 'activeTab'));
     }
 
-    public function singleCourse($id, BookmarkService $service) 
+    public function singleCourse($id, BookmarkService $service, Request $request)
     {
-        // Try ExtraCourse
-        $lesson = \App\Models\ExtraCourse::find($id);
-        $type = 'extra_course';
+        // ExtraCourse, LearnSong, and Upload each have their own auto-incrementing
+        // id, so the same numeric id can legitimately belong to all three. Links
+        // built after this fix always pass ?type=... to resolve unambiguously;
+        // older/untyped links fall back to the previous try-each-model guess.
+        $type = $request->query('type');
+
+        $lesson = match ($type) {
+            'extra_course' => \App\Models\ExtraCourse::find($id),
+            'learn_song'   => \App\Models\LearnSong::find($id),
+            'upload'       => Upload::find($id),
+            default        => null,
+        };
+
+        if (!$lesson) {
+            // Try ExtraCourse
+            $lesson = \App\Models\ExtraCourse::find($id);
+            $type = 'extra_course';
+        }
 
         if (!$lesson) {
             // Try LearnSong

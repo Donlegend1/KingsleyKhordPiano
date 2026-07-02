@@ -29,7 +29,7 @@ class NewUploadCreated extends Notification
         return [
             'post_id' => $this->post->id,
             'title'   => $this->post->title,
-            'url' => "/member/lesson/{$this->post->id}",
+            'url' => "/member/lesson/{$this->post->id}?type=upload",
             'message' => $this->post->title,
             'section' => $section,
             'body'    => $this->post->body,

@@ -176,6 +176,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('live-session/{liveshow}/book', [LiveSessionController::class, 'bookSlot'])->name('member.live-session.book');
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
+    Route::post('/course/{course}/view', [CourseController::class, 'recordView']);
 });
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {

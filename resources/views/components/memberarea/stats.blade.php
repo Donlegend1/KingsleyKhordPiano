@@ -141,10 +141,13 @@
     }
 
     // Find last lesson to resume.
-    // Two competing signals: an explicit Course bookmark (roadmap lessons, the
-    // existing working path) and a LessonView (auto-recorded whenever the user
-    // opens a finger exercise, technique drill, extra course, or learn song
-    // page). Whichever happened more recently wins.
+    // Two competing signals: an explicit Course bookmark (a fallback for older
+    // roadmap bookmarks made before view-tracking existed) and a LessonView
+    // (auto-recorded whenever the user opens a finger exercise, technique
+    // drill, extra course, learn song, or roadmap course lesson). Whichever
+    // happened more recently wins. If neither exists, the user has never
+    // opened a lesson yet, so the card shows a blank state — no fallback to
+    // an arbitrary "first active lesson" in the catalog.
     $resumeLesson = null;
     $resumeUrl = '#';
 
@@ -159,6 +162,7 @@
             'App\Models\MusicalApplication',
             'App\Models\ExtraCourse',
             'App\Models\LearnSong',
+            'App\Models\Course',
         ])
         ->latest('updated_at')
         ->first();
@@ -169,25 +173,28 @@
     if ($useLessonView && $lastLessonView->viewable) {
         $resumeLesson = $lastLessonView->viewable;
         $resumeType = $lastLessonView->viewable_type;
-        $resumeUrl = ($resumeType === 'App\Models\MusicalApplication')
-            ? '/member/piano-exercise/player?series=' . $resumeLesson->series . '&video_id=' . $resumeLesson->id
-            : '/member/lesson/' . $resumeLesson->id;
+        $resumeUrl = match ($resumeType) {
+            'App\Models\MusicalApplication' => '/member/piano-exercise/player?series=' . $resumeLesson->series . '&video_id=' . $resumeLesson->id,
+            'App\Models\Course' => '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id,
+            'App\Models\ExtraCourse' => '/member/lesson/' . $resumeLesson->id . '?type=extra_course',
+            'App\Models\LearnSong' => '/member/lesson/' . $resumeLesson->id . '?type=learn_song',
+            'App\Models\Upload' => '/member/lesson/' . $resumeLesson->id . '?type=upload',
+            default => '/member/lesson/' . $resumeLesson->id,
+        };
     } elseif ($lastCourseBookmark && $lastCourseBookmark->bookmarkable) {
         $resumeLesson = $lastCourseBookmark->bookmarkable;
         $resumeType = $lastCourseBookmark->bookmarkable_type;
         $resumeUrl = '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id;
-    } else {
-        // Fallback to first active lesson
-        $resumeLesson = \App\Models\LearnSong::where('status', 'active')->first() 
-            ?? \App\Models\ExtraCourse::where('status', 'active')->first() 
-            ?? \App\Models\Course::where('status', 'active')->first();
-        if ($resumeLesson) {
-            $resumeType = get_class($resumeLesson);
-            $resumeUrl = ($resumeType === 'App\Models\Course') 
-                ? '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id 
-                : '/member/lesson/' . $resumeLesson->id;
-        }
     }
+
+    $resumeSectionLabel = match ($resumeType ?? null) {
+        'App\Models\ExtraCourse' => 'Extra Courses',
+        'App\Models\LearnSong' => 'Learn Songs',
+        'App\Models\MusicalApplication' => 'Piano Exercise',
+        'App\Models\Course' => 'Roadmap',
+        'App\Models\Upload' => $resumeLesson->category ? \Illuminate\Support\Str::title($resumeLesson->category) : 'Quick Lessons',
+        default => null,
+    };
   @endphp
 
   <div class="flex flex-col gap-6">
@@ -212,35 +219,35 @@
 
       {{-- Resume Last Lesson --}}
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
-        <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-            <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-          <span class="text-sm font-bold text-gray-900">Resume Last Lesson</span>
-        </div>
-        
-        @if($resumeLesson)
-          @php
-            $thumbnail = $resumeLesson->thumbnail ? asset($resumeLesson->thumbnail) : ($resumeLesson->thumbnail_url ?? asset('images/featured1.jpeg'));
-          @endphp
-          <div class="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 text-center sm:text-left">
-            <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-full sm:w-48 h-40 sm:h-32 object-cover rounded-xl shadow-sm border border-gray-100 flex-shrink-0">
-            <div class="flex-grow min-w-0 w-full">
-              <h4 class="text-xl font-extrabold text-gray-900 line-clamp-2 sm:truncate mb-1">{{ $resumeLesson->title }}</h4>
-              <p class="text-sm text-gray-400 mb-4">{{ ucfirst($resumeLesson->level ?? 'Beginner') }} Lesson</p>
-
-              <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-full text-sm font-bold transition duration-200 shadow-sm">
-                <span>Continue Learning</span>
-                <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
-              </a>
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+              <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
             </div>
+            <span class="text-sm font-bold text-gray-900">Resume Last Lesson</span>
           </div>
-        @else
-          <p class="text-xs text-gray-400 py-6 text-center">No lessons found.</p>
+
+          @if($resumeLesson)
+            <h4 class="text-xl font-extrabold text-gray-900 line-clamp-2 mb-2">{{ $resumeLesson->title }}</h4>
+            @if($resumeSectionLabel)
+              <span class="inline-block text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
+                {{ $resumeSectionLabel }}
+              </span>
+            @endif
+          @else
+            <p class="text-xs text-gray-400 py-6 text-center">No lessons started yet. Watch a lesson to see it here.</p>
+          @endif
+        </div>
+
+        @if($resumeLesson)
+          <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-center gap-1.5 w-fit px-5 py-2.5 mt-6 bg-gray-900 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors duration-200">
+            <span>Continue Learning</span>
+            <svg class="w-3.5 h-3.5 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
         @endif
       </div>
 

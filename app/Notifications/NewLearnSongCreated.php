@@ -26,7 +26,7 @@ class NewLearnSongCreated extends Notification
             'title'   => $this->song->title,
             'message' => $this->song->title,
             'section' => 'Learn Songs',
-            'url'     => "/member/lesson/{$this->song->id}",
+            'url'     => "/member/lesson/{$this->song->id}?type=learn_song",
         ];
     }
 }

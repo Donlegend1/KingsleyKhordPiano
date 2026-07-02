@@ -122,7 +122,7 @@
           class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
           <!-- Thumbnail -->
-          <a href="/member/lesson/{{ $firstSong->id }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+          <a href="/member/lesson/{{ $firstSong->id }}?type=learn_song" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
             @if($firstSong->thumbnail_url)
               <img src="{{ $firstSong->thumbnail_url }}" alt="{{ $cat->category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
             @else
@@ -165,7 +165,7 @@
             </div>
 
             <!-- Watch Now Button -->
-            <a href="/member/lesson/{{ $firstSong->id }}"
+            <a href="/member/lesson/{{ $firstSong->id }}?type=learn_song"
                class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
               Watch Now
             </a>

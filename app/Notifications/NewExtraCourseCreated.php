@@ -26,7 +26,7 @@ class NewExtraCourseCreated extends Notification
             'title'     => $this->course->title,
             'message'   => $this->course->title,
             'section'   => 'Extra Courses',
-            'url'       => "/member/lesson/{$this->course->id}",
+            'url'       => "/member/lesson/{$this->course->id}?type=extra_course",
         ];
     }
 }

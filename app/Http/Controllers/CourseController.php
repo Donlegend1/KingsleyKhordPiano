@@ -269,6 +269,14 @@ class CourseController extends Controller
         // Fetch courses based on the level
         return view('memberpages.course.details', compact('level'));
     }
+
+    public function recordView(Course $course)
+    {
+        \App\Models\LessonView::record(auth()->id(), $course);
+
+        return response()->json(['status' => 'ok']);
+    }
+
     public function membershowAPI($level)
     {
         $userId = auth()->id();

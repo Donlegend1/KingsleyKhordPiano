@@ -813,6 +813,23 @@ const CoursesPage = () => {
         }
     }, [selectedCourse, courses]);
 
+    // Record a lesson view so "Resume Last Lesson" on the dashboard can pick
+    // up roadmap lessons the same way it already does for other lesson types.
+    useEffect(() => {
+        if (!selectedCourse) return;
+
+        axios
+            .post(
+                `/member/course/${selectedCourse.id}/view`,
+                {},
+                {
+                    headers: { "X-CSRF-TOKEN": csrfToken },
+                    withCredentials: true,
+                }
+            )
+            .catch(() => {});
+    }, [selectedCourse]);
+
     const handleNextCourse = () => {
         if (
             selectedCourse &&

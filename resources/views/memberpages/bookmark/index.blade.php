@@ -30,10 +30,14 @@
                         '/member/course/' . $item?->level
                         . '?selected_course=' . $item?->id,
 
-                    'App\Models\Upload',
-                    'App\Models\LearnSong',
+                    'App\Models\Upload' =>
+                        '/member/lesson/' . $item?->id . '?type=upload',
+
+                    'App\Models\LearnSong' =>
+                        '/member/lesson/' . $item?->id . '?type=learn_song',
+
                     'App\Models\ExtraCourse' =>
-                        '/member/lesson/' . $item?->id,
+                        '/member/lesson/' . $item?->id . '?type=extra_course',
 
                     'App\Models\Post' =>
                         '/member/post/' . $item?->id,
