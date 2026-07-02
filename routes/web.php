@@ -161,7 +161,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
     Route::redirect('dashboard', '/home');
     Route::get('piano-exercise/finger', [ExerciseController::class, 'fingerExercises'])->name('piano.exercise.finger');
-    Route::get('piano-exercise/technique-drills', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
+    Route::get('piano-exercise/harmonic-drills', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
     Route::get('piano-exercise/player', [ExerciseController::class, 'pianoExercisePlayer'])->name('piano.exercise.player');
     Route::post('piano-exercise/comment', [ExerciseController::class, 'storeComment'])->name('piano.exercise.comment');
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');

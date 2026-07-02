@@ -250,11 +250,12 @@
                     $subNav = [
                         ['url' => 'home',                   'label' => 'Dashboard',     'icon' => 'dashboard.svg'],
                         ['url' => 'member/roadmap',         'label' => 'Roadmap',       'icon' => 'roadmap2.png'],
-                        ['url' => 'member/piano-exercise',  'label' => 'Piano Exercise','icon' => 'piano2.png', 'new' => $hasNewPianoExercise],
+                        ['url' => 'member/piano-exercise/finger', 'label' => 'Piano Exercise','icon' => 'piano2.png', 'new' => $hasNewPianoExercise],
+                        ['url' => 'member/piano-exercise/harmonic-drills', 'label' => 'Harmonic Drills', 'icon' => 'piano.svg'],
                         ['url' => 'member/ear-training',    'label' => 'Ear Training',  'icon' => 'eartraning.svg'],
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
                         // ['url' => 'member/quick-lessons',   'label' => 'Quick Lesson',  'icon' => 'quick lession.svg'],
-                        ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'songs.svg', 'new' => $hasNewLearnSongs],
+                        ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'music-note.svg', 'new' => $hasNewLearnSongs],
                         ['url' => 'member/live-session',    'label' => 'Live Shows',  'icon' => 'livesession.svg'],
                     ];
                 @endphp

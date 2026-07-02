@@ -51,7 +51,7 @@
                 <span>/</span>
                 <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
                 <span>/</span>
-                <span class="text-[#6366F1] font-medium">Technique Drills</span>
+                <span class="text-[#6366F1] font-medium">Harmonic Drills</span>
             </div>
 
             <!-- Search Bar -->

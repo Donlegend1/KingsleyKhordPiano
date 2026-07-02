@@ -67,7 +67,7 @@
                 <a href="/home" class="hover:text-gray-700">Dashboard</a>
                 <span>/</span>
                 @if($series)
-                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-gray-700">Technique Drills</a>
+                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-gray-700">Harmonic Drills</a>
                 @else
                     <a href="{{ route('piano.exercise.finger') }}" class="hover:text-gray-700">Finger Exercises</a>
                 @endif
