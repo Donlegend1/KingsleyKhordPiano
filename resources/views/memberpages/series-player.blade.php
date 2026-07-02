@@ -157,7 +157,7 @@
 
                     {{-- Lessons in this course (mobile & tablet only) --}}
                     <div class="lg:hidden mb-10">
-                        @include('memberpages.partials.lesson-playlist')
+                        @include($level ? 'memberpages.partials.lesson-playlist-grouped' : 'memberpages.partials.lesson-playlist')
                     </div>
 
                     {{-- Related Lessons --}}
@@ -246,7 +246,7 @@
 
                 {{-- ── RIGHT COLUMN: Sidebar Playlist (desktop only) ── --}}
                 <aside class="hidden lg:block w-[360px] flex-shrink-0 sticky top-6">
-                    @include('memberpages.partials.lesson-playlist')
+                    @include($level ? 'memberpages.partials.lesson-playlist-grouped' : 'memberpages.partials.lesson-playlist')
                 </aside>
 
             </div>
