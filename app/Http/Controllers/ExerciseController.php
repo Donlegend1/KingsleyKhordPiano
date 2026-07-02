@@ -153,14 +153,35 @@ class ExerciseController extends Controller
     {
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
-        
-        $query = \App\Models\MusicalApplication::where('status', 'active');
-        if ($skillLevel !== 'ALL') {
-            $query->where('skill_level', $skillLevel);
-        }
-        
-        $applications = $query->get()->groupBy('series');
+        $page = $request->query('page', 1);
 
-        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications'));
+        $baseQuery = fn() => \App\Models\MusicalApplication::where('status', 'active')
+            ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel));
+
+        $seriesPage = $baseQuery()
+            ->select('series')
+            ->selectRaw('MIN(id) as first_id')
+            ->groupBy('series')
+            ->orderBy('first_id')
+            ->paginate(9, ['*'], 'page', $page)
+            ->appends(['skill_level' => $skillLevel]);
+
+        $seriesNames = collect($seriesPage->items())->pluck('series');
+
+        $applications = $baseQuery()
+            ->where(function($q) use ($seriesNames) {
+                $named = $seriesNames->filter()->values();
+                if ($named->isNotEmpty()) {
+                    $q->whereIn('series', $named);
+                }
+                if ($seriesNames->contains(null)) {
+                    $q->orWhereNull('series');
+                }
+            })
+            ->get()
+            ->groupBy('series')
+            ->sortBy(fn($items, $series) => $seriesNames->search($series));
+
+        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage'));
     }
 }

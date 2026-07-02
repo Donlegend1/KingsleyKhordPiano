@@ -105,16 +105,23 @@
                     </div>
                 </div>
 
-                <!-- Desktop: Pills -->
-                <div class="hidden sm:flex flex-wrap items-center gap-6">
+                <!-- Desktop: Segmented Control -->
+                <div class="hidden sm:flex items-stretch bg-gray-100 rounded-xl p-1.5">
                     @foreach ($skillLevels as $level)
                         <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
-                            class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
+                            class="flex-1 flex items-center justify-center text-center px-6 py-4 rounded-lg font-semibold transition-all duration-300
                        {{ $skillLevel === $level
                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                           : 'text-gray-500 hover:text-gray-700' }}">
+                           : 'text-gray-700 hover:text-gray-900' }}">
                             {{ $level }}
                         </a>
+                        @php
+                          $nextLevel = $skillLevels[$loop->index + 1] ?? null;
+                          $showDivider = $nextLevel && $skillLevel !== $level && $skillLevel !== $nextLevel;
+                        @endphp
+                        @if ($showDivider)
+                          <div class="w-px my-3 bg-gray-300"></div>
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -193,6 +200,12 @@
                         </div>
                     @endforelse
                 </div>
+
+                @if ($seriesPage->hasPages())
+                    <div class="flex justify-center py-8">
+                        {{ $seriesPage->links('components.pagination') }}
+                    </div>
+                @endif
             </div>
 
         </div>

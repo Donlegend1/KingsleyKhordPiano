@@ -23,44 +23,32 @@ class CoursesController extends Controller
         \App\Models\CategoryView::markViewed(auth()->id(), 'extra_courses');
 
         $search = $request->input('name');
-        $activeTab = $request->input('tab', 'beginner');
+        $activeTab = $request->input('tab', 'all');
+        $page = $request->input('page', 1);
 
-        $fetchLevelCategories = function($level) use ($search) {
-            $query = \App\Models\ExtraCourseCategory::where('level', $level)
-                ->orderBy('position');
-
-            $query->with(['courses' => function($q) use ($search, $level) {
-                $q->where('level', $level)
-                  ->where('status', 'active')
+        $query = \App\Models\ExtraCourseCategory::query()
+            ->when($activeTab !== 'all', fn($q) => $q->where('level', $activeTab))
+            ->with(['courses' => function($q) use ($search) {
+                $q->where('status', 'active')
                   ->when($search, function($subQ) use ($search) {
                       $subQ->where('title', 'like', "%{$search}%")
                            ->orWhere('description', 'like', "%{$search}%");
                   })
                   ->orderBy('position');
-            }]);
+            }])
+            ->whereHas('courses', function($q) use ($search) {
+                $q->where('status', 'active')
+                  ->when($search, function($subQ) use ($search) {
+                      $subQ->where('title', 'like', "%{$search}%")
+                           ->orWhere('description', 'like', "%{$search}%");
+                  });
+            })
+            ->orderBy('level')
+            ->orderBy('position');
 
-            $categories = $query->get();
+        $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
 
-            if ($search) {
-                $categories = $categories->filter(function($category) {
-                    return $category->courses->isNotEmpty();
-                });
-            }
-
-            return $categories;
-        };
-
-        $beginnerCategories = $fetchLevelCategories('beginner');
-        $intermediateCategories = $fetchLevelCategories('intermediate');
-        $advancedCategories = $fetchLevelCategories('advanced');
-
-        return view('memberpages.extracources', compact(
-            'beginnerCategories',
-            'intermediateCategories',
-            'advancedCategories',
-            'search',
-            'activeTab'
-        ));
+        return view('memberpages.extracources', compact('categories', 'search', 'activeTab'));
     }
 
     public function singleCourse($id, BookmarkService $service) 

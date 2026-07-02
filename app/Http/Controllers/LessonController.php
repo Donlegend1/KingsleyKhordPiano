@@ -72,43 +72,31 @@ class LessonController extends Controller
         \App\Models\CategoryView::markViewed(auth()->id(), 'learn_songs');
 
         $search = $request->input('search');
-        $activeTab = $request->input('tab', 'beginner');
+        $activeTab = $request->input('tab', 'all');
+        $page = $request->input('page', 1);
 
-        $fetchLevelCategories = function($level) use ($search) {
-            $query = \App\Models\LearnSongCategory::where('level', $level)
-                ->orderBy('position');
-
-            $query->with(['songs' => function($q) use ($search, $level) {
-                $q->where('level', $level)
-                  ->where('status', 'active')
+        $query = \App\Models\LearnSongCategory::query()
+            ->when($activeTab !== 'all', fn($q) => $q->where('level', $activeTab))
+            ->with(['songs' => function($q) use ($search) {
+                $q->where('status', 'active')
                   ->when($search, function($subQ) use ($search) {
                       $subQ->where('title', 'like', "%{$search}%")
                            ->orWhere('description', 'like', "%{$search}%");
                   })
                   ->orderBy('position');
-            }]);
+            }])
+            ->whereHas('songs', function($q) use ($search) {
+                $q->where('status', 'active')
+                  ->when($search, function($subQ) use ($search) {
+                      $subQ->where('title', 'like', "%{$search}%")
+                           ->orWhere('description', 'like', "%{$search}%");
+                  });
+            })
+            ->orderBy('level')
+            ->orderBy('position');
 
-            $categories = $query->get();
+        $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
 
-            if ($search) {
-                $categories = $categories->filter(function($category) {
-                    return $category->songs->isNotEmpty();
-                });
-            }
-
-            return $categories;
-        };
-
-        $beginnerCategories = $fetchLevelCategories('beginner');
-        $intermediateCategories = $fetchLevelCategories('intermediate');
-        $advancedCategories = $fetchLevelCategories('advanced');
-
-        return view('memberpages.learnsongs', compact(
-            'beginnerCategories',
-            'intermediateCategories',
-            'advancedCategories',
-            'search',
-            'activeTab'
-        ));
+        return view('memberpages.learnsongs', compact('categories', 'search', 'activeTab'));
     }
 }

@@ -28,11 +28,6 @@
 </section>
 
 @php
-  $beginnerGroups    = $beginnerCategories->filter(fn($cat) => $cat->courses->isNotEmpty());
-  $intermediateGroups = $intermediateCategories->filter(fn($cat) => $cat->courses->isNotEmpty());
-  $advancedGroups    = $advancedCategories->filter(fn($cat) => $cat->courses->isNotEmpty());
-  $allGroups         = $beginnerGroups->merge($intermediateGroups)->merge($advancedGroups);
-
   $levelLabels = [
     'beginner'     => 'Beginner',
     'intermediate' => 'Intermediate',
@@ -87,44 +82,36 @@
           </div>
       </div>
 
-      <!-- Desktop: Pills -->
-      <div class="hidden sm:flex flex-wrap items-center gap-6">
+      <!-- Desktop: Segmented Control -->
+      @php $tabKeys = array_keys($tabs); @endphp
+      <div class="hidden sm:flex items-stretch bg-gray-100 rounded-xl p-1.5">
           @foreach ($tabs as $key => $label)
               <a href="{{ $tabQuery($key) }}"
-                  class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
+                  class="flex-1 flex items-center justify-center text-center px-6 py-4 rounded-lg font-semibold transition-all duration-300
              {{ $activeTabKey === $key
                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                 : 'text-gray-500 hover:text-gray-700' }}">
+                 : 'text-gray-700 hover:text-gray-900' }}">
                   {{ $label }}
               </a>
+              @php
+                $nextKey = $tabKeys[$loop->index + 1] ?? null;
+                $showDivider = $nextKey && $activeTabKey !== $key && $activeTabKey !== $nextKey;
+              @endphp
+              @if ($showDivider)
+                <div class="w-px my-3 bg-gray-300"></div>
+              @endif
           @endforeach
       </div>
     </div>
 
     <!-- Course Cards -->
-    @php
-      $activeTab = request('tab', 'all');
-
-      $groups = match($activeTab) {
-        'beginner'     => $beginnerGroups,
-        'intermediate' => $intermediateGroups,
-        'advanced'     => $advancedGroups,
-        default        => $allGroups,
-      };
-
-      $levelMap = [];
-      foreach($beginnerCategories as $cat)     $levelMap[$cat->id] = 'beginner';
-      foreach($intermediateCategories as $cat) $levelMap[$cat->id] = 'intermediate';
-      foreach($advancedCategories as $cat)     $levelMap[$cat->id] = 'advanced';
-    @endphp
-
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @forelse($groups as $cat)
+      @forelse($categories as $cat)
         @php
           $firstCourse = $cat->courses->first();
           $lessonCount = $cat->courses->count();
-          $level       = $levelMap[$cat->id] ?? 'beginner';
-          $levelLabel  = $levelLabels[$level];
+          $level       = $cat->level;
+          $levelLabel  = $levelLabels[$level] ?? ucfirst($level);
           $isNew       = !\App\Models\LessonView::hasViewed(auth()->id(), $firstCourse)
               && $cat->courses->contains(fn ($c) => $c->created_at && $c->created_at->gt(now()->subDays(7)));
           $searchableText = Str::lower($cat->category . ' ' . $cat->courses->pluck('title')->implode(' '));
@@ -192,6 +179,12 @@
         </div>
       @endforelse
     </div>
+
+    @if ($categories->hasPages())
+      <div class="flex justify-center py-8">
+        {{ $categories->links('components.pagination') }}
+      </div>
+    @endif
 
   </div>
 </section>
