@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\LearnSong;
 use App\Models\LearnSongCategory;
+use App\Models\User;
+use App\Notifications\NewLearnSongCreated;
+use App\Enums\Roles\UserRoles;
 use App\Helpers\VideoHelper;
 use Illuminate\Support\Facades\DB;
 
@@ -168,6 +171,11 @@ class AdminLearnSongController extends Controller
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
         ]);
+
+        $members = User::where('role', UserRoles::MEMBER->value)->get();
+        foreach ($members as $member) {
+            $member->notify(new NewLearnSongCreated($song));
+        }
 
         return response()->json($song, 201);
     }

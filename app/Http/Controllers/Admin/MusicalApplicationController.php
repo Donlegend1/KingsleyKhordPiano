@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MusicalApplication;
+use App\Models\User;
+use App\Notifications\NewMusicalApplicationCreated;
+use App\Enums\Roles\UserRoles;
 use Illuminate\Http\Request;
 use App\Helpers\VideoHelper;
 
@@ -76,6 +79,11 @@ class MusicalApplicationController extends Controller
         }
 
         $upload = MusicalApplication::create($validated);
+
+        $members = User::where('role', UserRoles::MEMBER->value)->get();
+        foreach ($members as $member) {
+            $member->notify(new NewMusicalApplicationCreated($upload));
+        }
 
         if ($request->ajax()) {
             return response()->json($upload, 201);
