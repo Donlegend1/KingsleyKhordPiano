@@ -1,8 +1,8 @@
 @extends('layouts.community')
 
-@section('page-title')
-    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight truncate">PDF Downloads</h1>
-@endsection
+@section('breadcrumb-parent', 'Overview')
+@section('breadcrumb-parent-url', '/member/my-library')
+@section('breadcrumb', 'PDF Files')
 
 @section('page-search')
     <div class="relative">
@@ -80,7 +80,6 @@
                             <div class="p-5 flex flex-col gap-4">
                                 <div class="space-y-2">
                                     <h3 class="text-xl font-semibold leading-tight text-gray-900 dark:text-white line-clamp-2">{{ $pdf->title }}</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Preview in-browser or download a copy for practice.</p>
                                 </div>
                                 
                                 <div class="grid grid-cols-2 gap-3 mt-auto">
