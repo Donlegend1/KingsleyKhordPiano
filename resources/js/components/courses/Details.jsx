@@ -11,7 +11,15 @@ const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
     .getAttribute("content");
 
-const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
+const CourseDetails = ({
+    course,
+    onComplete,
+    onSelectCourse,
+    onPrevLesson,
+    onNextLesson,
+    hasPrevLesson,
+    hasNextLesson,
+}) => {
     const [loading, setLoading] = useState(false);
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
@@ -559,6 +567,25 @@ const CourseDetails = ({ course, onComplete, onSelectCourse }) => {
                 </div>
             </div>
 
+            {/* Lesson Navigation */}
+            <div className="flex items-center justify-between mt-8 border-t pt-6 dark:border-gray-700">
+                <button
+                    onClick={onPrevLesson}
+                    disabled={!hasPrevLesson}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    <i className="fa fa-chevron-left"></i>
+                    Previous
+                </button>
+                <button
+                    onClick={onNextLesson}
+                    disabled={!hasNextLesson}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 bg-gray-900 text-white hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    Next
+                    <i className="fa fa-chevron-right"></i>
+                </button>
+            </div>
 
             {/* Related Courses Section */}
             {course.related && course.related.length > 0 && (
@@ -749,7 +776,7 @@ const CoursesPage = () => {
                                             key={course.id}
                                             className={`flex items-center justify-between px-4 py-3.5 rounded-2xl transition cursor-pointer ${
                                                 isSelected
-                                                    ? "bg-indigo-50 dark:bg-indigo-900/30 border-l-[3px] border-indigo-500 pl-[13px]"
+                                                    ? "bg-sky-50 dark:bg-sky-900/30 border-l-[3px] border-sky-400 pl-[13px]"
                                                     : "bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
                                             }`}
                                             onClick={() => {
@@ -767,14 +794,14 @@ const CoursesPage = () => {
                                                 <FileIcon
                                                     className={`w-4 h-4 flex-shrink-0 ${
                                                         isSelected
-                                                            ? "text-indigo-500"
+                                                            ? "text-sky-400"
                                                             : "text-gray-400 dark:text-gray-500"
                                                     }`}
                                                 />
                                                 <span
                                                     className={`text-[15px] truncate font-medium ${
                                                         isSelected
-                                                            ? "text-indigo-600 dark:text-indigo-400"
+                                                            ? "text-sky-600 dark:text-sky-400"
                                                             : "text-gray-800 dark:text-gray-100"
                                                     }`}
                                                 >
@@ -803,15 +830,10 @@ const CoursesPage = () => {
 
     const generalProgress = calculateGeneralProgress();
 
-    const [currentIndex, setCurrentIndex] = useState(null);
-    useEffect(() => {
-        if (selectedCourse && courses[selectedCourse.category]) {
-            const idx = courses[selectedCourse.category].findIndex(
-                (c) => c.id === selectedCourse.id
-            );
-            setCurrentIndex(idx);
-        }
-    }, [selectedCourse, courses]);
+    const flatCourses = courses.flatMap((cat) => cat.courses || []);
+    const currentIndex = selectedCourse
+        ? flatCourses.findIndex((c) => c.id === selectedCourse.id)
+        : -1;
 
     // Record a lesson view so "Resume Last Lesson" on the dashboard can pick
     // up roadmap lessons the same way it already does for other lesson types.
@@ -830,26 +852,23 @@ const CoursesPage = () => {
             .catch(() => {});
     }, [selectedCourse]);
 
+    const goToLesson = (lesson) => {
+        if (!lesson) return;
+        setSelectedCourse(lesson);
+        setExpandedCategories((prev) => ({
+            ...prev,
+            [lesson.category]: true,
+        }));
+    };
+
     const handleNextCourse = () => {
-        if (
-            selectedCourse &&
-            courses[selectedCourse.category] &&
-            currentIndex < courses[selectedCourse.category].length - 1
-        ) {
-            setSelectedCourse(
-                courses[selectedCourse.category][currentIndex + 1]
-            );
+        if (currentIndex > -1 && currentIndex < flatCourses.length - 1) {
+            goToLesson(flatCourses[currentIndex + 1]);
         }
     };
     const handlePrevCourse = () => {
-        if (
-            selectedCourse &&
-            courses[selectedCourse.category] &&
-            currentIndex > 0
-        ) {
-            setSelectedCourse(
-                courses[selectedCourse.category][currentIndex - 1]
-            );
+        if (currentIndex > 0) {
+            goToLesson(flatCourses[currentIndex - 1]);
         }
     };
 
@@ -964,37 +983,18 @@ const CoursesPage = () => {
                         </div>
                     </div>
                     {selectedCourse ? (
-                        <>
-                            <div className="flex justify-between items-center mb-2">
-                                {/* <button
-                                    onClick={handlePrevCourse}
-                                    disabled={currentIndex === 0}
-                                    className="px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-50"
-                                >
-                                    <i className="fa fa-chevron-left"></i>{" "}
-                                    Previous
-                                </button> */}
-                                {/* <button
-                                    onClick={handleNextCourse}
-                                    disabled={
-                                        !selectedCourse ||
-                                        !courses[selectedCourse.category] ||
-                                        currentIndex ===
-                                            courses[selectedCourse.category]
-                                                .length -
-                                                1
-                                    }
-                                    className="px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-50"
-                                >
-                                    Next <i className="fa fa-chevron-right"></i>
-                                </button> */}
-                            </div>
-                            <CourseDetails
-                                course={selectedCourse}
-                                onComplete={handleCourseCompletion}
-                                onSelectCourse={setSelectedCourse}
-                            />
-                        </>
+                        <CourseDetails
+                            course={selectedCourse}
+                            onComplete={handleCourseCompletion}
+                            onSelectCourse={setSelectedCourse}
+                            onPrevLesson={handlePrevCourse}
+                            onNextLesson={handleNextCourse}
+                            hasPrevLesson={currentIndex > 0}
+                            hasNextLesson={
+                                currentIndex > -1 &&
+                                currentIndex < flatCourses.length - 1
+                            }
+                        />
                     ) : (
                         <div className="p-6 bg-white dark:bg-gray-500 rounded shadow-lg text-center">
                             <h2 className="text-xl font-bold mb-4">
