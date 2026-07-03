@@ -33,6 +33,7 @@
                     'chords'   => 'Chords',
                     'scales'   => 'Scales',
                     'exercise' => 'Exercise',
+                    'handouts' => 'Handouts',
                 ];
             @endphp
 

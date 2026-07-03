@@ -63,7 +63,7 @@
 
     $topLinks = [
         ['url' => 'home', 'label' => 'Dashboard', 'icon' => 'M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z'],
-        ['url' => 'member/community/members', 'label' => 'Community', 'icon' => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z'],
+        ['url' => 'https://discord.com/invite/gFXnRnaf5N', 'label' => 'Community', 'external' => true, 'icon' => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z'],
         ['url' => 'https://khordsounds.com/product-category/piano-best-sellers/', 'label' => 'Shop', 'external' => true, 'icon' => 'M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z M3 6h18 M16 10a4 4 0 0 1-8 0'],
     ];
 @endphp
@@ -276,18 +276,6 @@
         </div>
 
         <div class="flex flex-col gap-1">
-            @foreach ($topLinks as $link)
-                <a href="{{ Str::startsWith($link['url'], 'http') ? $link['url'] : '/' . $link['url'] }}"
-                    @if(!empty($link['external'])) target="_blank" @endif
-                    class="px-3 py-2.5 rounded-lg text-sm font-medium transition {{ !str_starts_with($link['url'], 'http') && Request::is($link['url']) ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white' }}">
-                    {{ $link['label'] }}
-                </a>
-            @endforeach
-            <a href="/member/profile" class="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition">My Profile</a>
-            <button type="button" @click="showLogoutModal = true" class="text-left px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-white/5 transition">Logout</button>
-        </div>
-
-        <div class="border-t border-white/10 pt-4 flex flex-col gap-1">
             @foreach ($subNav as $item)
                 <a href="/{{ $item['url'] }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
@@ -298,6 +286,18 @@
                     {{ $item['label'] }}
                 </a>
             @endforeach
+        </div>
+
+        <div class="border-t border-white/10 pt-4 flex flex-col gap-1">
+            @foreach ($topLinks as $link)
+                <a href="{{ Str::startsWith($link['url'], 'http') ? $link['url'] : '/' . $link['url'] }}"
+                    @if(!empty($link['external'])) target="_blank" @endif
+                    class="px-3 py-2.5 rounded-lg text-sm font-medium transition {{ !str_starts_with($link['url'], 'http') && Request::is($link['url']) ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white' }}">
+                    {{ $link['label'] }}
+                </a>
+            @endforeach
+            <a href="/member/profile" class="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition">My Profile</a>
+            <button type="button" @click="showLogoutModal = true" class="text-left px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-white/5 transition">Logout</button>
         </div>
     </div>
 </div>
