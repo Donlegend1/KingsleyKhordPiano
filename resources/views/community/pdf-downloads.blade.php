@@ -21,11 +21,11 @@
 @section('content')
 
 <!-- Main Content Section -->
-<section class="px-4 sm:px-6 pt-6 pb-6 bg-gray-50 dark:bg-black">
+<section class="px-4 sm:px-6 pt-1 pb-6 bg-gray-50 dark:bg-black">
     <div class="max-w-7xl mx-auto">
 
         <!-- Tabs Navigation -->
-        <div class="mb-8" x-data="{ activeType: 'all' }">
+        <div class="mb-8" x-data="{ activeType: 'all', tabsOpen: false }">
 
             @php
                 $typeTabs = [
@@ -37,7 +37,30 @@
                 ];
             @endphp
 
-            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8">
+            <!-- Mobile: Dropdown accordion -->
+            <div class="sm:hidden relative mb-8" @click.outside="tabsOpen = false">
+                <button type="button" @click="tabsOpen = !tabsOpen"
+                    class="w-full flex items-center justify-between px-6 py-3 rounded-lg font-semibold text-sm bg-[#FF6B35] text-white shadow-sm transition-all duration-200">
+                    <span x-text="({{ \Illuminate\Support\Js::from($typeTabs) }})[activeType]"></span>
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="tabsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <div x-show="tabsOpen" x-transition x-cloak
+                    class="absolute left-0 right-0 mt-2 rounded-xl bg-white dark:bg-[#161617] border border-gray-100 dark:border-white/10 shadow-xl overflow-hidden z-20">
+                    @foreach ($typeTabs as $key => $label)
+                        <button type="button" @click="activeType = '{{ $key }}'; tabsOpen = false"
+                            class="block w-full text-left px-6 py-3 font-semibold text-sm transition-colors duration-150"
+                            :class="activeType === '{{ $key }}' ? 'bg-[#FF6B35] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'">
+                            {{ $label }}
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Desktop: Pill row -->
+            <div class="hidden sm:flex gap-4 mb-8">
                 @foreach ($typeTabs as $key => $label)
                     <button
                         type="button"
