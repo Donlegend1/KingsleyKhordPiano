@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Enums\Notification\NotificationSectionEnum;
 
 class NewLikeNotification extends Notification implements ShouldQueue
 {
@@ -35,11 +36,13 @@ class NewLikeNotification extends Notification implements ShouldQueue
     public function toDatabase($notifiable): array
     {
         return [
-            'type' => 'like',
-            'post_id' => $this->like->post_id,
-            'by_user_id' => $this->like->user->id,
-            'first_name' => $this->like->user->first_name,
-            'last_name' => $this->like->user->last_name,
+            'data' => [
+                'user' => $this->like->user->full_name,
+                'type' => 'like',
+                'section' => NotificationSectionEnum::COMMUNITY->value,
+                'url' => route('singlePost', $this->like->post_id),
+                'by_user_avatar' => $this->like->user->passport ? asset($this->like->user->passport) : null,
+            ],
         ];
     }
 

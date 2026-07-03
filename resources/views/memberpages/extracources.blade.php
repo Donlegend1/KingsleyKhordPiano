@@ -112,8 +112,7 @@
           $lessonCount = $cat->courses->count();
           $level       = $cat->level;
           $levelLabel  = $levelLabels[$level] ?? ucfirst($level);
-          $isNew       = !\App\Models\LessonView::hasViewed(auth()->id(), $firstCourse)
-              && $cat->courses->contains(fn ($c) => $c->created_at && $c->created_at->gt(now()->subDays(7)));
+          $isNew       = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $cat->courses);
           $searchableText = Str::lower($cat->category . ' ' . $cat->courses->pluck('title')->implode(' '));
         @endphp
 

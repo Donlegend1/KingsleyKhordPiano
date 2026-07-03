@@ -58,4 +58,30 @@ class LessonView extends Model
             ->where('viewable_type', get_class($viewable))
             ->exists();
     }
+
+    /**
+     * Whether any model in the given collection was created within the last
+     * $sinceDays and has not yet been viewed by the user — used to drive the
+     * "NEW" badge on course/category thumbnails and nav menu items.
+     */
+    public static function anyNewUnviewed($userId, $viewables, int $sinceDays = 7): bool
+    {
+        $viewables = collect($viewables)->filter();
+
+        $newOnes = $viewables->filter(
+            fn ($v) => $v->created_at && $v->created_at->gt(now()->subDays($sinceDays))
+        );
+
+        if (!$userId || $newOnes->isEmpty()) {
+            return false;
+        }
+
+        $viewedIds = static::query()
+            ->where('user_id', $userId)
+            ->where('viewable_type', get_class($newOnes->first()))
+            ->whereIn('viewable_id', $newOnes->pluck('id'))
+            ->pluck('viewable_id');
+
+        return $newOnes->pluck('id')->diff($viewedIds)->isNotEmpty();
+    }
 }

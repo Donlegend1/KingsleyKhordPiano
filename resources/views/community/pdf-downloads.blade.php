@@ -25,7 +25,7 @@
     <div class="max-w-7xl mx-auto">
 
         <!-- Tabs Navigation -->
-        <div class="mb-8" x-data="{ activeType: 'all', tabsOpen: false }">
+        <div class="mb-8" x-data="{ activeType: 'all', tabsOpen: false, viewingPdfUrl: null, viewingPdfTitle: '' }">
 
             @php
                 $typeTabs = [
@@ -107,11 +107,13 @@
                                 </div>
                                 
                                 <div class="grid grid-cols-2 gap-3 mt-auto">
-                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 dark:border-white/10 bg-gray-100/90 dark:bg-white/5 px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 transition-all duration-200 hover:border-gray-400 hover:bg-white dark:hover:bg-white/10">
+                                    <button type="button"
+                                        @click="viewingPdfUrl = {{ \Illuminate\Support\Js::from(route('community.pdf-view', $pdf)) }}; viewingPdfTitle = {{ \Illuminate\Support\Js::from($pdf->title) }}"
+                                        class="flex items-center justify-center gap-2 rounded-2xl border border-gray-300 dark:border-white/10 bg-gray-100/90 dark:bg-white/5 px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100 transition-all duration-200 hover:border-gray-400 hover:bg-white dark:hover:bg-white/10">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         View
-                                    </a>
-                                    <a href="/member/community/space/pdf/downloads/{{ $pdf->id }}" class="flex items-center justify-center gap-2 rounded-2xl bg-[#FF6B35] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E55A2B]">
+                                    </button>
+                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl bg-[#FF6B35] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E55A2B]">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path></svg>
                                         Download
                                     </a>
@@ -127,6 +129,23 @@
                         <p class="text-gray-500 dark:text-gray-400 mt-2">Check back soon for beginner resources</p>
                     </div>
                 @endif
+            </div>
+
+            <!-- In-page PDF viewer modal -->
+            <div x-show="viewingPdfUrl" x-cloak x-transition.opacity
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
+                @keydown.escape.window="viewingPdfUrl = null">
+                <div @click.outside="viewingPdfUrl = null"
+                    class="relative w-full max-w-4xl h-[85vh] bg-white dark:bg-[#161617] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-white/10">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate" x-text="viewingPdfTitle"></h3>
+                        <button type="button" @click="viewingPdfUrl = null"
+                            class="text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                        </button>
+                    </div>
+                    <iframe :src="viewingPdfUrl" class="flex-1 w-full" title="PDF preview"></iframe>
+                </div>
             </div>
         </div>
         </div>

@@ -168,13 +168,7 @@
                         @forelse($notifications as $notification)
                         @php
                             $data      = $notification->data;
-                            $firstName = $data['data']['user'] ?? 'Someone';  // adjust to your actual key
-                            $postId    = null;
-                            // extract post ID from the URL
-                            if (!empty($data['data']['url'])) {
-                                preg_match('/\/post\/(\d+)/', $data['data']['url'], $m);
-                                $postId = $m[1] ?? null;
-                            }
+                            $firstName = $data['data']['user'] ?? 'Someone';
                             $type      = $data['data']['type'] ?? '';
                             $avatar    = $data['data']['by_user_avatar'] ?? null;
                             $isUnread  = is_null($notification->read_at);
@@ -188,7 +182,7 @@
                                 <!-- Avatar -->
                                 <div class="flex-shrink-0 mt-0.5">
                                     @if(!empty($avatar))
-                                        <img src="{{ $avatar }}" alt="{{ trim("$firstName $lastName") }}"
+                                        <img src="{{ $avatar }}" alt="{{ $firstName }}"
                                              class="w-9 h-9 rounded-full object-cover ring-2 ring-white dark:ring-gray-800">
                                     @else
                                         <div class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400 ring-2 ring-white dark:ring-gray-800">
@@ -227,15 +221,6 @@
                             </div>
                         @endforelse
                     </div>
-
-                    <!-- Footer -->
-                    @if($notifications->count() > 0)
-                        <div class="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 text-center">
-                            <a href="/member/notifications" class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
-                                View all notifications
-                            </a>
-                        </div>
-                    @endif
                 </div>
             </div>
 

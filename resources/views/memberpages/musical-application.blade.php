@@ -134,8 +134,7 @@
                             $firstItem = $items->first();
                             $lessonCount = count($items);
                             $playerUrl = route('piano.exercise.player', ['series' => $seriesName, 'skill_level' => strtolower($firstItem->skill_level)]);
-                            $isNew = !\App\Models\LessonView::hasViewed(auth()->id(), $firstItem)
-                                && $items->contains(fn ($i) => $i->created_at && $i->created_at->gt(now()->subDays(7)));
+                            $isNew = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $items);
                             $searchableText = Str::lower($seriesName);
                         @endphp
                         <div

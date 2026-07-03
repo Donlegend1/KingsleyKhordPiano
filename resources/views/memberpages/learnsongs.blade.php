@@ -112,8 +112,7 @@
           $songCount   = $cat->songs->count();
           $level       = $cat->level;
           $levelLabel  = $levelLabels[$level] ?? ucfirst($level);
-          $isNew       = !\App\Models\LessonView::hasViewed(auth()->id(), $firstSong)
-              && $cat->songs->contains(fn ($s) => $s->created_at && $s->created_at->gt(now()->subDays(7)));
+          $isNew       = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $cat->songs);
           $searchableText = Str::lower($cat->category . ' ' . $cat->songs->pluck('title')->implode(' '));
         @endphp
 

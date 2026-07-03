@@ -77,11 +77,7 @@
                 $firstLesson = $cardLessons->first();
                 $lessonCount = $cardLessons->count();
 
-                $newCardLesson = $cardLessons
-                    ->filter(fn($l) => $l->created_at && $l->created_at->gt(now()->subDays(7)))
-                    ->sortByDesc('created_at')
-                    ->first();
-                $isNew = $newCardLesson && !\App\Models\LessonView::hasViewed(auth()->id(), $newCardLesson);
+                $isNew = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $cardLessons);
 
                 $watchUrl = route('piano.exercise.player', ['level' => $card['id']]);
             @endphp

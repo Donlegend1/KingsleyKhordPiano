@@ -781,6 +781,11 @@ const CoursesPage = () => {
                         <span className="flex items-center gap-3">
                             <FolderIcon className="w-5 h-5 text-sky-400 flex-shrink-0" />
                             {categoryObj.category}
+                            {categoryObj.hasNewLessons && (
+                                <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full tracking-wide flex-shrink-0">
+                                    NEW
+                                </span>
+                            )}
                         </span>
                         <ChevronIcon
                             open={!!expandedCategories[categoryObj.category]}

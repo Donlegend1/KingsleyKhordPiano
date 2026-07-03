@@ -338,7 +338,9 @@ class CourseController extends Controller
         }
 
         // Add `isBookmarked` flag to each course and load related courses if any
-        $categories->each(function ($category) {
+        $categories->each(function ($category) use ($userId) {
+            $category->hasNewLessons = \App\Models\LessonView::anyNewUnviewed($userId, $category->courses);
+
             $category->courses->transform(function ($course) {
                 $course->isBookmarked = $course->bookmarks->isNotEmpty();
                 unset($course->bookmarks); // optional, remove bookmarks relation to clean response
@@ -348,7 +350,7 @@ class CourseController extends Controller
                 } else {
                     $course->related = [];
                 }
-                
+
                 return $course;
             });
         });
