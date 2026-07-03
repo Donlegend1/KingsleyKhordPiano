@@ -75,6 +75,8 @@
         @endforeach
     </div>
 
+    @include('memberpages.partials.sidebar-downloads', ['lesson' => $activeVideo])
+
     {{-- Prev / Next Lesson buttons (walks the combined list across all skill levels) --}}
     <div class="p-3 bg-white border-t border-gray-100 flex gap-2">
         @if ($previousVideo)

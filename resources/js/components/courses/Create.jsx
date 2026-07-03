@@ -82,6 +82,9 @@ const CourseForm = () => {
             if (course.thumbnail_file) {
                 formData.append("thumbnail", course.thumbnail_file);
             }
+            if (course.pdf_resource_file) {
+                formData.append("pdf_resource", course.pdf_resource_file);
+            }
             descriptionImageFiles.forEach((file, idx) => {
                 formData.append(`images[${idx}]`, file);
             });
@@ -112,6 +115,7 @@ const CourseForm = () => {
                 dislikes: 0,
                 related_courses: [],
                 thumbnail_file: null,
+                pdf_resource_file: null,
             });
             setDescriptionImageFiles([]);
         } catch (error) {
@@ -271,6 +275,27 @@ const CourseForm = () => {
                             }}
                             className="w-full p-2 border rounded-lg text-sm"
                         />
+                    </div>
+                    <div className="col-span-1 sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Lesson PDF (Optional)
+                        </label>
+                        <input
+                            type="file"
+                            accept="application/pdf"
+                            onChange={(e) => {
+                                setCourse({
+                                    ...course,
+                                    pdf_resource_file: e.target.files[0]
+                                });
+                            }}
+                            className="w-full p-2 border rounded-lg text-sm"
+                        />
+                        {course.pdf_resource_file && (
+                            <div className="text-xs text-gray-500 mt-1">
+                                {course.pdf_resource_file.name}
+                            </div>
+                        )}
                     </div>
                     <div className="col-span-1 sm:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">

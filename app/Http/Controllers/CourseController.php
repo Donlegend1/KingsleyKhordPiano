@@ -93,6 +93,20 @@ class CourseController extends Controller
             $validated['images'] = $descriptionImages;
         }
 
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
+        }
+
         $course = Course::create($validated);
         $members = User::where('role', UserRoles::MEMBER->value)->get();
 
@@ -194,6 +208,26 @@ class CourseController extends Controller
                 $descriptionImages[] = 'uploads/descriptions/' . $filename;
             }
             $validated['images'] = $descriptionImages;
+        }
+
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Delete old PDF if it exists
+            if ($course->pdf_resource && file_exists(public_path($course->pdf_resource))) {
+                @unlink(public_path($course->pdf_resource));
+            }
+
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
         }
 
         /* ---------------------------------------

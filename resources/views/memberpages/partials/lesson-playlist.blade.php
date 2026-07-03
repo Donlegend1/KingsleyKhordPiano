@@ -39,6 +39,8 @@
         @endforeach
     </div>
 
+    @include('memberpages.partials.sidebar-downloads', ['lesson' => $activeVideo])
+
     {{-- Next Lesson button --}}
     <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
         @if ($previousVideo)

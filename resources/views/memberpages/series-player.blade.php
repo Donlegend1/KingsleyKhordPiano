@@ -240,8 +240,6 @@
                         </div>
                     </div>
 
-                    @include('memberpages.partials.course-resources', ['lesson' => $activeVideo])
-
                 </div>
 
                 {{-- ── RIGHT COLUMN: Sidebar Playlist (desktop only) ── --}}

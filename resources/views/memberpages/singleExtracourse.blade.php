@@ -227,6 +227,8 @@
                                 @endforeach
                             </div>
 
+                            @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
+
                             {{-- Next/Prev Lesson buttons --}}
                             <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
                                 @if ($previousVideo)
@@ -327,8 +329,6 @@
                         </div>
                     </div>
 
-                    @include('memberpages.partials.course-resources', ['lesson' => $lesson])
-
                 </div>
 
                 {{-- ── RIGHT COLUMN: Sidebar (Playlist or Related Lessons) ── --}}
@@ -373,6 +373,8 @@
                                 </a>
                             @endforeach
                         </div>
+
+                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
 
                         {{-- Next Lesson button --}}
                         <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
@@ -429,6 +431,8 @@
                                 </a>
                             @endforeach
                         </div>
+
+                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
                     @endif
 
                 </aside>

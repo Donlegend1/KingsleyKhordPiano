@@ -587,6 +587,30 @@ const CourseDetails = ({
                 </button>
             </div>
 
+            {/* Downloads for this lesson */}
+            {course.pdf_resource_url && (
+                <div className="mt-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="bg-gray-900 dark:bg-black px-5 py-3">
+                        <h3 className="text-white text-sm font-bold tracking-wide uppercase">
+                            Downloads for this lesson
+                        </h3>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-800 px-5 py-4 flex items-center gap-4">
+                        <div className="w-16 h-10 rounded bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            PDF
+                        </div>
+                        <a
+                            href={course.pdf_resource_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-red-500 hover:text-red-600 font-bold"
+                        >
+                            View the Chart
+                        </a>
+                    </div>
+                </div>
+            )}
+
             {/* Related Courses Section */}
             {course.related && course.related.length > 0 && (
                 <div className="mt-12 border-t pt-8">
@@ -755,7 +779,7 @@ const CoursesPage = () => {
                         onClick={() => toggleCategory(categoryObj.category)}
                     >
                         <span className="flex items-center gap-3">
-                            <FolderIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
+                            <FolderIcon className="w-5 h-5 text-sky-400 flex-shrink-0" />
                             {categoryObj.category}
                         </span>
                         <ChevronIcon
