@@ -36,9 +36,7 @@
     <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
         <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
         <span>/</span>
-        <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
-        <span>/</span>
-        <span class="text-[#6366F1] font-medium">Finger Exercises</span>
+        <span class="text-[#6366F1] font-medium">Piano Exercise</span>
     </div>
 </section>
 
@@ -47,20 +45,16 @@
 
         <!-- Tabs -->
         <div class="flex justify-center mb-10">
-            <div class="inline-flex items-center gap-8 border-b border-gray-200">
+            <div class="inline-flex items-stretch bg-gray-100 rounded-xl p-1.5">
                 <button type="button" @click="activeTab = 'finger'"
-                    class="relative pb-3 text-sm font-medium transition-colors duration-200"
-                    :class="activeTab === 'finger' ? 'text-[#6366F1] font-semibold' : 'text-gray-400 hover:text-gray-600'">
+                    class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
+                    :class="activeTab === 'finger' ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-600/20' : 'text-gray-500 hover:text-gray-700'">
                     Finger Exercise
-                    <span class="absolute left-0 right-0 -bottom-px h-0.5 rounded-full bg-[#6366F1] transition-opacity duration-200"
-                          :class="activeTab === 'finger' ? 'opacity-100' : 'opacity-0'"></span>
                 </button>
                 <button type="button" @click="activeTab = 'etudes'"
-                    class="relative pb-3 text-sm font-medium transition-colors duration-200"
-                    :class="activeTab === 'etudes' ? 'text-[#6366F1] font-semibold' : 'text-gray-400 hover:text-gray-600'">
+                    class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
+                    :class="activeTab === 'etudes' ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-600/20' : 'text-gray-500 hover:text-gray-700'">
                     Etudes &amp; Pieces
-                    <span class="absolute left-0 right-0 -bottom-px h-0.5 rounded-full bg-[#6366F1] transition-opacity duration-200"
-                          :class="activeTab === 'etudes' ? 'opacity-100' : 'opacity-0'"></span>
                 </button>
             </div>
         </div>
