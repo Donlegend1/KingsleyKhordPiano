@@ -5,13 +5,13 @@
         @foreach ($latestCourses as $category => $latestCourse)
             @php
                 $lessonType = match ($category) {
-                    'finger exercise' => 'upload',
+                    'piano exercise' => 'upload',
                     'learn songs' => 'learn_song',
                     'extra courses' => 'extra_course',
                     default => null,
                 };
 
-                $lessonUrl = $category === 'technique drills'
+                $lessonUrl = $category === 'harmonic drills'
                     ? "/member/piano-exercise/player?series=" . urlencode($latestCourse->series) . "&video_id={$latestCourse->id}"
                     : "/member/lesson/{$latestCourse->id}?type={$lessonType}";
             @endphp

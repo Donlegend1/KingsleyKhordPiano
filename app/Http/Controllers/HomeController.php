@@ -73,16 +73,16 @@ class HomeController extends Controller
 
         $latestCourses = [];
 
-            $latestFingerExercise = Upload::where('category', 'piano exercise')
+            $latestPianoExercise = Upload::where('category', 'piano exercise')
                 ->orderBy('created_at', 'desc')
                 ->first();
-            if ($latestFingerExercise) {
-                $latestCourses['finger exercise'] = $latestFingerExercise;
+            if ($latestPianoExercise) {
+                $latestCourses['piano exercise'] = $latestPianoExercise;
             }
 
-            $latestTechniqueDrill = \App\Models\MusicalApplication::orderBy('created_at', 'desc')->first();
-            if ($latestTechniqueDrill) {
-                $latestCourses['technique drills'] = $latestTechniqueDrill;
+            $latestHarmonicDrill = \App\Models\MusicalApplication::orderBy('created_at', 'desc')->first();
+            if ($latestHarmonicDrill) {
+                $latestCourses['harmonic drills'] = $latestHarmonicDrill;
             }
 
             $latestLearnSong = \App\Models\LearnSong::orderBy('created_at', 'desc')->first();
