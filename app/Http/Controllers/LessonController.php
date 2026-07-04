@@ -73,32 +73,30 @@ class LessonController extends Controller
 
         $search = $request->input('search');
         $activeTab = $request->input('tab', 'all');
+        $tonalCenter = $request->input('key', 'all');
         $page = $request->input('page', 1);
 
-        $query = \App\Models\LearnSongCategory::query()
+        $query = \App\Models\LearnSong::query()
+            ->where('status', 'active')
+            ->with('category')
             ->when($activeTab !== 'all', fn($q) => $q->where('level', $activeTab))
-            ->with(['songs' => function($q) use ($search) {
-                $q->where('status', 'active')
-                  ->when($search, function($subQ) use ($search) {
-                      $subQ->where('title', 'like', "%{$search}%")
-                           ->orWhere('description', 'like', "%{$search}%");
-                  })
-                  ->orderBy('position');
-            }])
-            ->whereHas('songs', function($q) use ($search) {
-                $q->where('status', 'active')
-                  ->when($search, function($subQ) use ($search) {
-                      $subQ->where('title', 'like', "%{$search}%")
-                           ->orWhere('description', 'like', "%{$search}%");
-                  });
+            ->when($tonalCenter !== 'all', fn($q) => $q->where('tonal_center', $tonalCenter))
+            ->when($search, function($q) use ($search) {
+                $q->where(function($subQ) use ($search) {
+                    $subQ->where('title', 'like', "%{$search}%")
+                         ->orWhere('description', 'like', "%{$search}%");
+                });
             })
-            ->withMax(['songs as latest_song_at' => function($q) {
-                $q->where('status', 'active');
-            }], 'created_at')
-            ->orderByDesc('latest_song_at');
+            ->latest();
 
-        $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
+        $songs = $query->paginate(9, ['*'], 'page', $page)->appends([
+            'tab' => $activeTab,
+            'key' => $tonalCenter,
+            'search' => $search,
+        ]);
 
-        return view('memberpages.learnsongs', compact('categories', 'search', 'activeTab'));
+        $tonalCenters = \App\Enums\Music\TonalCenterEnum::options();
+
+        return view('memberpages.learnsongs', compact('songs', 'search', 'activeTab', 'tonalCenter', 'tonalCenters'));
     }
 }

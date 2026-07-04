@@ -38,8 +38,24 @@ const LearnSongsAdmin = () => {
         video_type: "iframe",
         video_url: "",
         status: "active",
+        tonal_center: "",
         related_songs: [],
     });
+
+    const tonalCenters = [
+        { value: "C", label: "C" },
+        { value: "C#", label: "C# / Db" },
+        { value: "D", label: "D" },
+        { value: "D#", label: "D# / Eb" },
+        { value: "E", label: "E" },
+        { value: "F", label: "F" },
+        { value: "F#", label: "F# / Gb" },
+        { value: "G", label: "G" },
+        { value: "G#", label: "G# / Ab" },
+        { value: "A", label: "A" },
+        { value: "A#", label: "A# / Bb" },
+        { value: "B", label: "B" },
+    ];
 
     const [isEditSongModalOpen, setIsEditSongModalOpen] = useState(false);
     const [editingSong, setEditingSong] = useState(null);
@@ -205,6 +221,7 @@ const LearnSongsAdmin = () => {
         formData.append("video_type", newSong.video_type);
         formData.append("video_url", newSong.video_url);
         formData.append("status", newSong.status);
+        formData.append("tonal_center", newSong.tonal_center || "");
         if (thumbnailFile) {
             formData.append("thumbnail", thumbnailFile);
         }
@@ -265,6 +282,7 @@ const LearnSongsAdmin = () => {
         formData.append("video_type", editingSong.video_type);
         formData.append("video_url", editingSong.video_url);
         formData.append("status", editingSong.status);
+        formData.append("tonal_center", editingSong.tonal_center || "");
         if (thumbnailFile) {
             formData.append("thumbnail", thumbnailFile);
         }
@@ -550,6 +568,19 @@ const LearnSongsAdmin = () => {
                             </select>
                         </div>
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Tonal Center (Key)</label>
+                            <select
+                                value={newSong.tonal_center}
+                                onChange={(e) => setNewSong({ ...newSong, tonal_center: e.target.value })}
+                                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none"
+                            >
+                                <option value="">None</option>
+                                {tonalCenters.map((key) => (
+                                    <option key={key.value} value={key.value}>{key.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail</label>
                             <input
                                 type="file"
@@ -679,6 +710,19 @@ const LearnSongsAdmin = () => {
                                 >
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Tonal Center (Key)</label>
+                                <select
+                                    value={editingSong.tonal_center || ""}
+                                    onChange={(e) => setEditingSong({ ...editingSong, tonal_center: e.target.value })}
+                                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none"
+                                >
+                                    <option value="">None</option>
+                                    {tonalCenters.map((key) => (
+                                        <option key={key.value} value={key.value}>{key.label}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div>

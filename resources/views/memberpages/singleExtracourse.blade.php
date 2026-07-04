@@ -186,8 +186,12 @@
                         </form>
                     </div>
 
+                    @if ($lessonType === 'learn_songs')
+                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
+                    @endif
+
                     {{-- Lessons in this course (Mobile Only) --}}
-                    @if ($playlist->count() > 1)
+                    @if ($playlist->count() > 1 && $lessonType !== 'learn_songs')
                         <div class="block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
                             {{-- Header --}}
                             <div class="px-5 py-4 border-b border-gray-100">
@@ -332,6 +336,7 @@
                 </div>
 
                 {{-- ── RIGHT COLUMN: Sidebar (Playlist or Related Lessons) ── --}}
+                @unless ($lessonType === 'learn_songs')
                 <aside
                     class="w-full lg:w-[360px] flex-shrink-0 border border-gray-100 rounded-xl overflow-hidden shadow-sm sticky top-6 bg-white {{ $playlist->count() > 1 ? 'hidden lg:block' : '' }}">
 
@@ -436,6 +441,7 @@
                     @endif
 
                 </aside>
+                @endunless
 
             </div>
         @else
