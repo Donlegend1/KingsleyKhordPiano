@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
     useFlashMessage,
@@ -37,6 +37,23 @@ const CourseDetails = ({
     const [editedComment, setEditedComment] = useState("");
     const [replyText, setReplyText] = useState({});
     const [activeReplyId, setActiveReplyId] = useState(null);
+    const iframeWrapperRef = useRef(null);
+
+    // The injected iframe embed (e.g. VdoCipher) ships with fixed inline
+    // width/height — override it so it fills the responsive aspect-ratio box.
+    useEffect(() => {
+        if (course.video_type === "iframe" && iframeWrapperRef.current) {
+            const iframe = iframeWrapperRef.current.querySelector("iframe");
+            if (iframe) {
+                iframe.style.position = "absolute";
+                iframe.style.top = "0";
+                iframe.style.left = "0";
+                iframe.style.width = "100%";
+                iframe.style.height = "100%";
+                iframe.style.border = "0";
+            }
+        }
+    }, [course.video_type, course.video_url]);
 
     const handleMenuToggle = (commentId) => {
         setActiveMenuId(activeMenuId === commentId ? null : commentId);
@@ -239,10 +256,13 @@ const CourseDetails = ({
         switch (course.video_type) {
             case "iframe":
                 return (
-                    <div
-                        className="mb-4 w-full dark:bg-black"
-                        dangerouslySetInnerHTML={{ __html: course.video_url }}
-                    />
+                    <div className="relative w-full aspect-video rounded overflow-hidden shadow-lg bg-gray-100 mb-4">
+                        <div
+                            ref={iframeWrapperRef}
+                            className="absolute inset-0"
+                            dangerouslySetInnerHTML={{ __html: course.video_url }}
+                        />
+                    </div>
                 );
 
             case "google":
@@ -668,6 +688,7 @@ const CoursesPage = () => {
     const [showCourseModal, setShowCourseModal] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const contentScrollRef = useRef(null);
 
     useEffect(() => {
         const isDark = localStorage.getItem("darkMode") === "true";
@@ -700,6 +721,17 @@ const CoursesPage = () => {
 
                 console.log(response.data);
                 setCourses(response.data);
+
+                // On first load, show the mobile course list by default and
+                // auto-expand just the first category so users immediately
+                // see lessons without an extra tap.
+                if (response.data.length > 0) {
+                    setExpandedCategories((prev) => ({
+                        ...prev,
+                        __mobile: true,
+                        [response.data[0].category]: true,
+                    }));
+                }
             } catch (error) {
                 console.error("Error fetching courses:", error);
             }
@@ -770,90 +802,107 @@ const CoursesPage = () => {
 
     const CourseList = () => (
         <div className="p-3 space-y-3">
-            {courses.map((categoryObj) => (
-                <div
-                    key={categoryObj.id || categoryObj.category}
-                >
+            {courses.map((categoryObj) => {
+                const isOpen = !!expandedCategories[categoryObj.category];
+                return (
                     <div
-                        className="px-4 py-3.5 bg-gray-100 dark:bg-gray-800 rounded-2xl font-bold text-base text-gray-800 dark:text-gray-100 cursor-pointer flex justify-between items-center transition hover:bg-gray-200/70 dark:hover:bg-gray-700"
-                        onClick={() => toggleCategory(categoryObj.category)}
+                        key={categoryObj.id || categoryObj.category}
+                        className="rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
                     >
-                        <span className="flex items-center gap-3">
-                            <FolderIcon className="w-5 h-5 text-sky-400 flex-shrink-0" />
-                            {categoryObj.category}
-                            {categoryObj.hasNewLessons && (
-                                <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full tracking-wide flex-shrink-0">
-                                    NEW
-                                </span>
-                            )}
-                        </span>
-                        <ChevronIcon
-                            open={!!expandedCategories[categoryObj.category]}
-                            className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0"
-                        />
-                    </div>
-                    {expandedCategories[categoryObj.category] && (
-                        <div className="mt-3 space-y-2.5">
-                            {categoryObj.courses &&
-                            categoryObj.courses.length > 0 ? (
-                                categoryObj.courses.map((course) => {
-                                    const isSelected =
-                                        selectedCourse &&
-                                        selectedCourse.id === course.id;
-                                    return (
-                                        <div
-                                            key={course.id}
-                                            className={`flex items-center justify-between px-4 py-3.5 rounded-2xl transition cursor-pointer ${
-                                                isSelected
-                                                    ? "bg-sky-50 dark:bg-sky-900/30 border-l-[3px] border-sky-400 pl-[13px]"
-                                                    : "bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-                                            }`}
-                                            onClick={() => {
-                                                setSelectedCourse(course);
-                                                setShowCourseModal(false);
-                                                setExpandedCategories(
-                                                    (prev) => ({
-                                                        ...prev,
-                                                        __mobile: false,
-                                                    }),
-                                                );
-                                            }}
-                                        >
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <FileIcon
-                                                    className={`w-4 h-4 flex-shrink-0 ${
-                                                        isSelected
-                                                            ? "text-sky-400"
-                                                            : "text-gray-400 dark:text-gray-500"
-                                                    }`}
-                                                />
-                                                <span
-                                                    className={`text-[15px] truncate font-medium ${
-                                                        isSelected
-                                                            ? "text-sky-600 dark:text-sky-400"
-                                                            : "text-gray-800 dark:text-gray-100"
-                                                    }`}
-                                                >
-                                                    {course.title}
-                                                </span>
-                                            </div>
-                                            {course.progress?.course_id && (
-                                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 flex-shrink-0">
-                                                    <i className="fa fa-check text-white text-[10px]"></i>
-                                                </span>
-                                            )}
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <div className="text-sm text-gray-500 dark:text-gray-400 italic p-2">
-                                    No courses available in this category
-                                </div>
-                            )}
+                        <div
+                            className="px-4 py-3.5 bg-white dark:bg-gray-900 font-bold text-base text-gray-800 dark:text-gray-100 cursor-pointer flex justify-between items-center transition hover:bg-gray-50 dark:hover:bg-gray-800"
+                            onClick={() => toggleCategory(categoryObj.category)}
+                        >
+                            <span className="flex items-center gap-3">
+                                <FolderIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                {categoryObj.category}
+                                {categoryObj.hasNewLessons && (
+                                    <span className="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full tracking-wide flex-shrink-0">
+                                        NEW
+                                    </span>
+                                )}
+                            </span>
+                            <span className="flex items-center justify-center w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 flex-shrink-0 text-base leading-none">
+                                {isOpen ? "−" : "+"}
+                            </span>
                         </div>
-                    )}
-                </div>
-            ))}
+                        {isOpen && (
+                            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                {categoryObj.courses &&
+                                categoryObj.courses.length > 0 ? (
+                                    categoryObj.courses.map((course, idx) => {
+                                        const isSelected =
+                                            selectedCourse &&
+                                            selectedCourse.id === course.id;
+                                        return (
+                                            <div
+                                                key={course.id}
+                                                className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition ${
+                                                    isSelected
+                                                        ? "bg-blue-500"
+                                                        : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                }`}
+                                                onClick={() => {
+                                                    setSelectedCourse(course);
+                                                    setShowCourseModal(false);
+                                                    setExpandedCategories(
+                                                        (prev) => ({
+                                                            ...prev,
+                                                            __mobile: false,
+                                                        }),
+                                                    );
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <span
+                                                        className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold flex-shrink-0 ${
+                                                            isSelected
+                                                                ? "bg-white/20 text-white"
+                                                                : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                                                        }`}
+                                                    >
+                                                        {idx + 1}
+                                                    </span>
+                                                    <span
+                                                        className={`text-[15px] truncate font-medium ${
+                                                            isSelected
+                                                                ? "text-white"
+                                                                : "text-gray-800 dark:text-gray-100"
+                                                        }`}
+                                                    >
+                                                        {course.title}
+                                                    </span>
+                                                </div>
+                                                {course.progress?.course_id && (
+                                                    <span
+                                                        className={`flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 ${
+                                                            isSelected
+                                                                ? "bg-white/20"
+                                                                : "bg-green-500"
+                                                        }`}
+                                                    >
+                                                        <i
+                                                            className={`fa fa-check text-[10px] ${
+                                                                isSelected
+                                                                    ? "text-white"
+                                                                    : "text-white"
+                                                            }`}
+                                                        ></i>
+                                                    </span>
+                                                )}
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="text-sm text-gray-500 dark:text-gray-400 italic p-4">
+                                        No courses available in this category
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 
@@ -863,6 +912,16 @@ const CoursesPage = () => {
     const currentIndex = selectedCourse
         ? flatCourses.findIndex((c) => c.id === selectedCourse.id)
         : -1;
+
+    // Jump back to the top of the lesson content whenever the selected
+    // lesson changes (e.g. via the Prev/Next buttons), so the video/title
+    // is visible instead of staying scrolled wherever the user left off.
+    useEffect(() => {
+        if (contentScrollRef.current) {
+            contentScrollRef.current.scrollTop = 0;
+        }
+        window.scrollTo(0, 0);
+    }, [selectedCourse?.id]);
 
     // Record a lesson view so "Resume Last Lesson" on the dashboard can pick
     // up roadmap lessons the same way it already does for other lesson types.
@@ -937,64 +996,94 @@ const CoursesPage = () => {
                     } transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800`}
                     style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
                 >
-                    <button
-                        onClick={handleSidebarToggle}
-                        className="w-full flex items-center gap-3 px-4 py-5 font-bold text-lg text-gray-900 dark:text-gray-100 focus:outline-none"
-                    >
-                        <svg
-                            className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
-                                sidebarCollapsed ? "rotate-180" : ""
-                            }`}
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    <div className={`relative ${sidebarCollapsed ? "px-4 py-5" : "px-4 py-5 bg-blue-600"}`}>
+                        <button
+                            onClick={handleSidebarToggle}
+                            className={
+                                sidebarCollapsed
+                                    ? "flex items-center justify-center w-11 h-11 mx-auto rounded-2xl text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
+                                    : "absolute top-4 right-4 flex items-center justify-center w-7 h-7 rounded-full border border-white/80 text-white/80 hover:text-white hover:bg-white/10 transition focus:outline-none"
+                            }
+                            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                         >
-                            <path d="M15 18l-6-6 6-6" />
-                        </svg>
+                            {sidebarCollapsed ? (
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            ) : (
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 6 6 18M6 6l12 12" />
+                                </svg>
+                            )}
+                        </button>
+
                         {!sidebarCollapsed && (
-                            <span className="truncate">
-                                {lastSegment.charAt(0).toUpperCase() +
-                                    lastSegment.slice(1)}{" "}
-                                Piano Roadmap
-                            </span>
+                            <>
+                                <span className="block font-bold text-lg text-white truncate pr-8">
+                                    {lastSegment.charAt(0).toUpperCase() +
+                                        lastSegment.slice(1)}{" "}
+                                    Piano Roadmap
+                                </span>
+                                <a
+                                    href="/member/roadmap"
+                                    className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-white/80 hover:text-white transition"
+                                >
+                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M15 18l-6-6 6-6" />
+                                    </svg>
+                                    Back
+                                </a>
+                            </>
                         )}
-                    </button>
+                    </div>
                     {!sidebarCollapsed && <CourseList />}
                 </div>
 
                 {/* Mobile Course List */}
-                <div className="md:hidden w-full mb-4 bg-gray-50 dark:bg-gray-900">
-                    <button
-                        className="w-full flex items-center justify-between gap-3 px-4 py-5 font-bold text-lg text-gray-900 dark:text-gray-100 focus:outline-none"
-                        onClick={() =>
-                            setExpandedCategories((prev) => ({
-                                ...prev,
-                                __mobile: !prev.__mobile,
-                            }))
-                        }
-                    >
-                        <span className="truncate">
+                <div className="md:hidden w-full mb-4">
+                    <div className="relative px-4 py-5 bg-blue-600">
+                        <button
+                            onClick={() =>
+                                setExpandedCategories((prev) => ({
+                                    ...prev,
+                                    __mobile: !prev.__mobile,
+                                }))
+                            }
+                            className="absolute top-4 right-4 flex items-center justify-center w-7 h-7 rounded-full border border-white/80 text-white/80 hover:text-white hover:bg-white/10 transition focus:outline-none"
+                            aria-label={expandedCategories.__mobile ? "Collapse list" : "Expand list"}
+                        >
+                            {expandedCategories.__mobile ? (
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 6 6 18M6 6l12 12" />
+                                </svg>
+                            ) : (
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M6 9l6 6 6-6" />
+                                </svg>
+                            )}
+                        </button>
+
+                        <span className="block font-bold text-lg text-white truncate pr-8">
                             {lastSegment.charAt(0).toUpperCase() +
                                 lastSegment.slice(1)}{" "}
                             Piano Roadmap
                         </span>
-                        <svg
-                            className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
-                                expandedCategories.__mobile ? "rotate-180" : ""
-                            }`}
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                        <a
+                            href="/member/roadmap"
+                            className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-white/80 hover:text-white transition"
                         >
-                            <path d="M6 9l6 6 6-6" />
-                        </svg>
-                    </button>
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                            Back
+                        </a>
+                    </div>
                     {expandedCategories.__mobile && <CourseList />}
                 </div>
 
                 {/* Course Details */}
                 <div
+                    ref={contentScrollRef}
                     className={`px-4 pb-4 pt-1 transition-all duration-300 ${
                         sidebarCollapsed ? "md:w-full" : "md:w-2/3"
                     }`}
@@ -1011,6 +1100,7 @@ const CoursesPage = () => {
                             ></div>
                         </div>
                     </div>
+
                     {selectedCourse ? (
                         <CourseDetails
                             course={selectedCourse}
