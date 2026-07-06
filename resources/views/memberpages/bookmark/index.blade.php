@@ -1,4 +1,8 @@
-@extends('layouts.member')
+@extends('layouts.community')
+
+@section('breadcrumb-parent', 'Overview')
+@section('breadcrumb-parent-url', '/member/my-library')
+@section('breadcrumb', 'Bookmark')
 
 @section('content')
 <section class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white py-10 px-6 min-h-screen">
@@ -30,10 +34,14 @@
                         '/member/course/' . $item?->level
                         . '?selected_course=' . $item?->id,
 
-                    'App\Models\Upload',
-                    'App\Models\LearnSong',
+                    'App\Models\Upload' =>
+                        '/member/lesson/' . $item?->id . '?type=upload',
+
+                    'App\Models\LearnSong' =>
+                        '/member/lesson/' . $item?->id . '?type=learn_song',
+
                     'App\Models\ExtraCourse' =>
-                        '/member/lesson/' . $item?->id,
+                        '/member/lesson/' . $item?->id . '?type=extra_course',
 
                     'App\Models\Post' =>
                         '/member/post/' . $item?->id,
@@ -41,77 +49,48 @@
                     default => '#',
                 };
 
+                $categoryLabel = match ($bookmark->bookmarkable_type) {
+                    'App\Models\Course' => 'Roadmap',
+                    'App\Models\Upload' => 'Quick Lesson',
+                    'App\Models\LearnSong' => 'Learn Song',
+                    'App\Models\ExtraCourse' => 'Extra Course',
+                    'App\Models\Post' => 'Post',
+                    default => 'Bookmark',
+                };
+
                 if ($isPost) {
                     $author = $item?->user;
                     $authorName = trim(($author?->first_name ?? '') . ' ' . ($author?->last_name ?? '')) ?: 'Member';
-                    $imageBlock = $item?->media?->firstWhere('type', 'image')
-                        ?? $item?->blocks?->firstWhere('type', 'image');
-                    $postImage = $imageBlock
-                        ? asset($imageBlock->file_path ?? $imageBlock->content)
-                        : null;
-                    $textBlock = $item?->blocks?->firstWhere('type', 'text');
-                    $excerpt = $textBlock ? \Illuminate\Support\Str::limit($textBlock->content, 90) : null;
+                    $title = $authorName . "'s Post";
                 } else {
-                    $lessonThumb = $item?->thumbnail_url ?? ($item?->thumbnail ? asset($item->thumbnail) : null);
+                    $title = $item?->title ?? 'Untitled';
                 }
             @endphp
 
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
 
-                        @if($isPost)
-                            <!-- Post Preview -->
-                            <a href="{{ $url }}" class="block">
-                                @if($postImage)
-                                    <img src="{{ $postImage }}" alt="Post by {{ $authorName }}" class="w-full h-36 object-cover">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 dark:text-indigo-400 flex-shrink-0">
+                                @if($isPost)
+                                    <i class="fas fa-comment-dots text-lg"></i>
                                 @else
-                                    <div class="w-full h-36 bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-6 text-center">
-                                        <div class="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-semibold text-sm mb-2">
-                                            {{ strtoupper(substr($authorName, 0, 1)) }}
-                                        </div>
-                                        @if($excerpt)
-                                            <p class="text-xs text-gray-400 dark:text-gray-500 line-clamp-2">{{ $excerpt }}</p>
-                                        @endif
-                                    </div>
+                                    <i class="fas fa-play text-base"></i>
                                 @endif
-                            </a>
-
-                            <div class="p-4 flex items-center justify-between gap-3">
-                                <div class="min-w-0">
-                                    <p class="text-[11px] font-semibold text-indigo-500 uppercase tracking-wide mb-0.5">Post</p>
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ $authorName }}</p>
-                                </div>
-                                <a href="{{ $url }}"
-                                    class="flex-shrink-0 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition">
-                                    View →
-                                </a>
                             </div>
-                        @else
-                            <!-- Lesson Preview -->
-                            <a href="{{ $url }}" class="block">
-                                @if($lessonThumb)
-                                    <img src="{{ $lessonThumb }}"
-                                        alt="{{ $item?->title ?? 'Bookmarked item' }}"
-                                        class="w-full h-36 object-cover">
-                                @else
-                                    <div class="w-full h-36 bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                                        <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 dark:text-blue-400">
-                                            <i class="fas fa-play text-xs"></i>
-                                        </div>
-                                    </div>
-                                @endif
-                            </a>
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wide">
+                                {{ $categoryLabel }}
+                            </span>
+                        </div>
 
-                            <div class="p-4 flex items-center justify-between gap-3">
-                                <div class="min-w-0">
-                                    <p class="text-[11px] font-semibold text-blue-500 uppercase tracking-wide mb-0.5">Lesson</p>
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ $item?->title }}</p>
-                                </div>
-                                <a href="{{ $url }}"
-                                    class="flex-shrink-0 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 transition">
-                                    View →
-                                </a>
-                            </div>
-                        @endif
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 line-clamp-2 flex-1">{{ $title }}</h3>
+
+                        <a href="{{ $url }}"
+                            class="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold uppercase tracking-wide transition-colors shadow-sm">
+                            <span class="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-play text-[9px] ml-0.5"></i>
+                            </span>
+                            View
+                        </a>
                     </div>
                 @endforeach
 

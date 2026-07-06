@@ -23,51 +23,56 @@ class CoursesController extends Controller
         \App\Models\CategoryView::markViewed(auth()->id(), 'extra_courses');
 
         $search = $request->input('name');
-        $activeTab = $request->input('tab', 'beginner');
+        $activeTab = $request->input('tab', 'all');
+        $page = $request->input('page', 1);
 
-        $fetchLevelCategories = function($level) use ($search) {
-            $query = \App\Models\ExtraCourseCategory::where('level', $level)
-                ->orderBy('position');
-
-            $query->with(['courses' => function($q) use ($search, $level) {
-                $q->where('level', $level)
-                  ->where('status', 'active')
+        $query = \App\Models\ExtraCourseCategory::query()
+            ->when($activeTab !== 'all', fn($q) => $q->where('level', $activeTab))
+            ->with(['courses' => function($q) use ($search) {
+                $q->where('status', 'active')
                   ->when($search, function($subQ) use ($search) {
                       $subQ->where('title', 'like', "%{$search}%")
                            ->orWhere('description', 'like', "%{$search}%");
                   })
                   ->orderBy('position');
-            }]);
+            }])
+            ->whereHas('courses', function($q) use ($search) {
+                $q->where('status', 'active')
+                  ->when($search, function($subQ) use ($search) {
+                      $subQ->where('title', 'like', "%{$search}%")
+                           ->orWhere('description', 'like', "%{$search}%");
+                  });
+            })
+            ->withMax(['courses as latest_course_at' => function($q) {
+                $q->where('status', 'active');
+            }], 'created_at')
+            ->orderByDesc('latest_course_at');
 
-            $categories = $query->get();
+        $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
 
-            if ($search) {
-                $categories = $categories->filter(function($category) {
-                    return $category->courses->isNotEmpty();
-                });
-            }
-
-            return $categories;
-        };
-
-        $beginnerCategories = $fetchLevelCategories('beginner');
-        $intermediateCategories = $fetchLevelCategories('intermediate');
-        $advancedCategories = $fetchLevelCategories('advanced');
-
-        return view('memberpages.extracources', compact(
-            'beginnerCategories',
-            'intermediateCategories',
-            'advancedCategories',
-            'search',
-            'activeTab'
-        ));
+        return view('memberpages.extracources', compact('categories', 'search', 'activeTab'));
     }
 
-    public function singleCourse($id, BookmarkService $service) 
+    public function singleCourse($id, BookmarkService $service, Request $request)
     {
-        // Try ExtraCourse
-        $lesson = \App\Models\ExtraCourse::find($id);
-        $type = 'extra_course';
+        // ExtraCourse, LearnSong, and Upload each have their own auto-incrementing
+        // id, so the same numeric id can legitimately belong to all three. Links
+        // built after this fix always pass ?type=... to resolve unambiguously;
+        // older/untyped links fall back to the previous try-each-model guess.
+        $type = $request->query('type');
+
+        $lesson = match ($type) {
+            'extra_course' => \App\Models\ExtraCourse::find($id),
+            'learn_song'   => \App\Models\LearnSong::find($id),
+            'upload'       => Upload::find($id),
+            default        => null,
+        };
+
+        if (!$lesson) {
+            // Try ExtraCourse
+            $lesson = \App\Models\ExtraCourse::find($id);
+            $type = 'extra_course';
+        }
 
         if (!$lesson) {
             // Try LearnSong

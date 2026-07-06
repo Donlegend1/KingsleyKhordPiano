@@ -223,12 +223,12 @@ const PlanSwitchAndCurrencySelect = () => {
     return (
         <section className="container mx-auto px-5 md:px-10 lg:px-20 bg-white mb-24 overflow-x-hidden">
             <div className="text-center pt-4 pb-10 mx-auto max-w-3xl">
-                <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-500 mb-3">
+                <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-[#BC1414] mb-3">
                     Membership
                 </span>
                 <h2 className="font-extrabold text-2xl sm:text-3xl lg:text-4xl text-gray-900 leading-tight">
                     Gain Immediate Entry to{" "}
-                    <span className="text-indigo-600 block sm:inline sm:whitespace-nowrap">
+                    <span className="text-[#BC1414] block sm:inline sm:whitespace-nowrap">
                         Kingsley Khord Piano Academy
                     </span>
                 </h2>
@@ -248,7 +248,7 @@ const PlanSwitchAndCurrencySelect = () => {
                         >
                             <span className="capitalize whitespace-nowrap">{cycle}</span>
                             {saveBadge[cycle] && (
-                                <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                                     {saveBadge[cycle]}
                                 </span>
                             )}

@@ -37,6 +37,7 @@ class UpdateCourseRequest extends FormRequest
             'related_courses' => 'nullable|array',
             'images' => 'nullable|array',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+            'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
         ];
     }
 }

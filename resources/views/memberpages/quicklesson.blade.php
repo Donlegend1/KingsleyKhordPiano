@@ -131,12 +131,12 @@
             </div>
           @else
             <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-              <a href="/member/lesson/{{ $exercise->id }}">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload">
               <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md">
               </a>
               <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
               <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
                 Watch Now
               </a>
             </div>
@@ -175,12 +175,12 @@
             </div>
           @else
             <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-              <a href="/member/lesson/{{ $exercise->id }}">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload">
               <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md">
               </a>
               <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
               <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
                 Watch Now
               </a>
             </div>
@@ -220,12 +220,12 @@
             </div>
           @else
             <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-              <a href="/member/lesson/{{ $exercise->id }}">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload">
                 <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md">
               </a>
               <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
               <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
                 Watch Now
               </a>
             </div>
@@ -265,12 +265,12 @@
             </div>
           @else
             <div class="bg-white p-6 rounded-lg shadow flex flex-col items-center space-y-4">
-              <a href="/member/lesson/{{ $exercise->id }}">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload">
               <img src="{{ $exercise->thumbnail_url }}" alt="{{ $exercise->title }}" class="w-full h-48 object-cover rounded-md">
               </a>
               <h3 class="font-bold text-gray-800">{{ $exercise->title }}</h3>
               <p class="text-xs text-gray-700">{{ $exercise->level }}</p>
-              <a href="/member/lesson/{{ $exercise->id }}" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
+              <a href="/member/lesson/{{ $exercise->id }}?type=upload" class="border border-black px-4 py-2 rounded-lg hover:bg-black hover:text-white transition text-center w-full">
                 Watch Now
               </a>
             </div>

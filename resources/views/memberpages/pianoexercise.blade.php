@@ -73,7 +73,7 @@
                 </div>
 
                 <!-- Content -->
-                <h2 class="text-3xl font-extrabold text-[#1E293B] leading-tight mb-1">Technique<br><span class="text-amber-500">Drills</span></h2>
+                <h2 class="text-3xl font-extrabold text-[#1E293B] leading-tight mb-1">Harmonic<br><span class="text-amber-500">Drills</span></h2>
                 <div class="w-10 h-1 rounded-full bg-amber-400 mb-5"></div>
                 <p class="text-[#64748B] text-[15px] leading-relaxed mb-8 max-w-[260px] relative z-10">
                     Sharpen your technique with focused drills designed to improve speed, accuracy, and control.

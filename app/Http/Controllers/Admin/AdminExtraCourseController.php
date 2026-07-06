@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ExtraCourse;
 use App\Models\ExtraCourseCategory;
+use App\Models\User;
+use App\Notifications\NewExtraCourseCreated;
+use App\Enums\Roles\UserRoles;
 use App\Helpers\VideoHelper;
 use Illuminate\Support\Facades\DB;
 
@@ -168,6 +171,11 @@ class AdminExtraCourseController extends Controller
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
         ]);
+
+        $members = User::where('role', UserRoles::MEMBER->value)->get();
+        foreach ($members as $member) {
+            $member->notify(new NewExtraCourseCreated($course));
+        }
 
         return response()->json($course, 201);
     }

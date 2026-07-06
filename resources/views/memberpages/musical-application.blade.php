@@ -42,13 +42,34 @@
         ];
     @endphp
 
+    <div x-data="{ search: '' }">
+
     <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
-        <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
-            <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
-            <span>/</span>
-            <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
-            <span>/</span>
-            <span class="text-[#6366F1] font-medium">Technique Drills</span>
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm text-gray-500 min-h-8">
+            <div class="flex items-center gap-2">
+                <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
+                <span>/</span>
+                <span class="text-[#6366F1] font-medium">Harmonic Drills</span>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full sm:w-72 group">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+                </svg>
+                <input
+                    type="text"
+                    x-model="search"
+                    placeholder="Search drills..."
+                    class="w-full h-10 pl-10 pr-9 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-indigo-500/40 transition-all"
+                >
+                <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </section>
 
@@ -88,16 +109,23 @@
                     </div>
                 </div>
 
-                <!-- Desktop: Pills -->
-                <div class="hidden sm:flex flex-wrap items-center gap-6">
+                <!-- Desktop: Segmented Control -->
+                <div class="hidden sm:flex items-stretch bg-gray-100 rounded-xl p-1.5">
                     @foreach ($skillLevels as $level)
                         <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
-                            class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
+                            class="flex-1 flex items-center justify-center text-center px-6 py-4 rounded-lg font-semibold transition-all duration-300
                        {{ $skillLevel === $level
                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                           : 'text-gray-500 hover:text-gray-700' }}">
+                           : 'text-gray-700 hover:text-gray-900' }}">
                             {{ $level }}
                         </a>
+                        @php
+                          $nextLevel = $skillLevels[$loop->index + 1] ?? null;
+                          $showDivider = $nextLevel && $skillLevel !== $level && $skillLevel !== $nextLevel;
+                        @endphp
+                        @if ($showDivider)
+                          <div class="w-px my-3 bg-gray-300"></div>
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -110,10 +138,12 @@
                             $firstItem = $items->first();
                             $lessonCount = count($items);
                             $playerUrl = route('piano.exercise.player', ['series' => $seriesName, 'skill_level' => strtolower($firstItem->skill_level)]);
-                            $isNew = !\App\Models\LessonView::hasViewed(auth()->id(), $firstItem)
-                                && $items->contains(fn ($i) => $i->created_at && $i->created_at->gt(now()->subDays(7)));
+                            $isNew = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $items);
+                            $searchableText = Str::lower($seriesName);
                         @endphp
-                        <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+                        <div
+                            x-show="search === '' || {{ \Illuminate\Support\Js::from($searchableText) }}.includes(search.toLowerCase())"
+                            class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
                             <!-- Thumbnail -->
                             <a href="{{ $playerUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
@@ -173,9 +203,17 @@
                         </div>
                     @endforelse
                 </div>
+
+                @if ($seriesPage->hasPages())
+                    <div class="flex justify-center py-8">
+                        {{ $seriesPage->links('components.pagination') }}
+                    </div>
+                @endif
             </div>
 
         </div>
+    </div>
+
     </div>
 
     <style>

@@ -332,6 +332,7 @@ const PDFFiles = () => {
                                 <option value="chords">Chords</option>
                                 <option value="scales">Scales</option>
                                 <option value="exercise">Exercise</option>
+                                <option value="handouts">Handouts</option>
                             </select>
                         </div>
 
@@ -465,6 +466,7 @@ const PDFFiles = () => {
                                 <option value="chords">Chords</option>
                                 <option value="scales">Scales</option>
                                 <option value="exercise">Exercise</option>
+                                <option value="handouts">Handouts</option>
                             </select>
                         </div>
 

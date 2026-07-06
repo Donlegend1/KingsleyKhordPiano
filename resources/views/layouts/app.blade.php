@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="KingsleyKhord is a platform that connects you with the best service providers in your area. Whether you're looking for a plumber, electrician, or any other service, we've got you covered.">
-    <meta name="keywords" content="KingsleyKhord, service providers, local services, find services, connect with service providers">
+    <meta name="description" content="Master Gospel Piano and Play Like the Pros | Achieve Pro-Level Gospel Piano Skills—Even If You&rsquo;re Starting from Scratch!">
+    <meta name="keywords" content="Kingsley Khord Piano, gospel piano lessons, learn gospel piano online, piano chord progressions, piano technique drills, online piano course">
     <meta name="author" content="LengendOSA Consultants">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#FFD736">

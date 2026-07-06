@@ -1,9 +1,5 @@
 @extends("layouts.community")
 
-@section("page-title")
-    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight truncate">Your Growth at a Glance</h1>
-@endsection
-
 @section("content")
 
 @php
@@ -64,18 +60,59 @@
 <div class="px-6 pt-6 pb-12">
     <div class="space-y-8">
 
+            @php
+                // "Complete Your Profile" tracks fields that actually exist on
+                // this platform's User model.
+                $profileChecklist = [
+                    ['label' => 'Profile Photo', 'done' => $user->passport ? 1 : 0, 'total' => 1],
+                    ['label' => 'Country', 'done' => $user->country ? 1 : 0, 'total' => 1],
+                    ['label' => 'Biography', 'done' => $user->biography ? 1 : 0, 'total' => 1],
+                    ['label' => 'Skill Assessment', 'done' => $assessment ? 1 : 0, 'total' => 1],
+                ];
+
+                $profileDoneTotal = collect($profileChecklist)->sum('done');
+                $profileFieldTotal = collect($profileChecklist)->sum('total');
+                $profilePct = $profileFieldTotal > 0 ? round(($profileDoneTotal / $profileFieldTotal) * 100) : 0;
+
+                // 270° speedometer-style arc (open gap at the bottom) instead
+                // of a full circle: sweeps from 135° to 405° clockwise.
+                $arcPath = function ($cx, $cy, $r, $startDeg, $endDeg) {
+                    $toRad = fn($d) => $d * M_PI / 180;
+                    $x1 = $cx + $r * cos($toRad($startDeg));
+                    $y1 = $cy + $r * sin($toRad($startDeg));
+                    $x2 = $cx + $r * cos($toRad($endDeg));
+                    $y2 = $cy + $r * sin($toRad($endDeg));
+                    $largeArc = ($endDeg - $startDeg) > 180 ? 1 : 0;
+                    return "M {$x1} {$y1} A {$r} {$r} 0 {$largeArc} 1 {$x2} {$y2}";
+                };
+                $profileArcStart = 135;
+                $profileArcEnd = 405;
+                $profileTrackPath = $arcPath(60, 60, 52, $profileArcStart, $profileArcEnd);
+                $profileFillPath = $arcPath(60, 60, 52, $profileArcStart, $profileArcStart + (($profileArcEnd - $profileArcStart) * $profilePct / 100));
+            @endphp
+
             {{-- Profile + Stats: side by side --}}
-            <div class="flex flex-col sm:flex-row sm:items-start gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-stretch gap-6">
 
                 {{-- Profile Card --}}
-                <div class="flex-1 bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
-                    @if($user->passport)
-                        <img src="{{ asset($user->passport) }}" alt="Avatar" class="w-20 h-20 rounded-full object-cover ring-4 ring-indigo-100 dark:ring-blue-500/20 flex-shrink-0 mb-4">
-                    @else
-                        <div class="w-20 h-20 rounded-full bg-indigo-50 dark:bg-blue-500/10 ring-4 ring-indigo-100 dark:ring-blue-500/20 flex items-center justify-center text-indigo-300 dark:text-blue-400 text-xs font-semibold flex-shrink-0 mb-4">
-                            Avatar
-                        </div>
-                    @endif
+                <div class="flex-1 bg-white dark:bg-[#161617] border border-gray-100 dark:border-white/10 rounded-2xl p-8 shadow-sm flex flex-col items-center text-center">
+                    <div class="relative mb-5">
+                        @if($user->passport)
+                            <img src="{{ asset($user->passport) }}" alt="Avatar" class="w-20 h-20 rounded-full object-cover ring-1 ring-gray-100 dark:ring-white/10 flex-shrink-0">
+                        @else
+                            <div class="w-20 h-20 rounded-full bg-indigo-50 dark:bg-blue-500/10 ring-1 ring-gray-100 dark:ring-white/10 flex items-center justify-center text-indigo-300 dark:text-blue-400 text-xs font-semibold flex-shrink-0">
+                                Avatar
+                            </div>
+                        @endif
+
+                        <a href="/member/profile" aria-label="Change photo"
+                            class="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 shadow-sm flex items-center justify-center text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+                            </svg>
+                        </a>
+                    </div>
 
                     <div class="min-w-0">
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
@@ -86,10 +123,6 @@
                                 </svg>
                             @endif
                         </h2>
-
-                        <p class="text-sm font-semibold text-indigo-500 dark:text-blue-400 mt-0.5">
-                            {{ !empty($user->biography) ? $user->biography : 'Gospel Piano Enthusiast' }}
-                        </p>
 
                         <div class="mt-3 inline-flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-3 py-1.5 rounded-full">
                             <svg class="w-3.5 h-3.5 text-red-500 fill-current" viewBox="0 0 24 24">
@@ -129,6 +162,46 @@
                                 <span class="text-2xl font-black text-gray-900 dark:text-amber-400">{{ $achievedCount }}</span>
                                 <p class="text-[11px] font-semibold text-gray-500 dark:text-amber-500 -mt-0.5">Milestones</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Complete Your Profile Card --}}
+                <div class="flex-1 bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+                    <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Complete Your Profile</p>
+                    <div class="flex items-center gap-5">
+                        <div class="relative w-24 h-24 flex-shrink-0">
+                            <svg class="w-24 h-24" viewBox="0 0 120 120">
+                                <path d="{{ $profileTrackPath }}" stroke="#E5E7EB" class="dark:stroke-gray-700" stroke-width="9" fill="none" stroke-linecap="round"/>
+                                <path d="{{ $profileFillPath }}" stroke="#10B981" stroke-width="9" fill="none" stroke-linecap="round" class="transition-all duration-500"/>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-xl font-black text-gray-900 dark:text-white">{{ $profilePct }}%</span>
+                                <span class="text-[9px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wider">Complete</span>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            @foreach($profileChecklist as $item)
+                                @php $itemDone = $item['done'] >= $item['total']; @endphp
+                                <div class="flex items-stretch gap-3">
+                                    <div class="flex flex-col items-center">
+                                        <span class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 {{ $itemDone ? 'bg-emerald-500' : 'border-2 border-gray-200 dark:border-gray-600' }}">
+                                            @if($itemDone)
+                                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                            @endif
+                                        </span>
+                                        @if(!$loop->last)
+                                            <span class="flex-1 border-l border-dashed border-gray-200 dark:border-gray-700 my-1"></span>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center gap-2 flex-1 pb-5 text-sm">
+                                        <span class="text-gray-700 dark:text-gray-200 font-medium">{{ $item['label'] }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>

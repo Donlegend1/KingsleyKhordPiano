@@ -24,6 +24,7 @@ class Course extends Model
         'requirements',
         'related_courses',
         'images',
+        'pdf_resource',
     ];
 
     protected $casts = [
@@ -31,11 +32,16 @@ class Course extends Model
         'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url', 'image_urls'];
+    protected $appends = ['thumbnail_url', 'image_urls', 'pdf_resource_url'];
 
     public function getThumbnailUrlAttribute()
     {
         return $this->thumbnail ? asset($this->thumbnail) : null;
+    }
+
+    public function getPdfResourceUrlAttribute()
+    {
+        return $this->pdf_resource ? asset($this->pdf_resource) : null;
     }
 
     public function getImageUrlsAttribute()

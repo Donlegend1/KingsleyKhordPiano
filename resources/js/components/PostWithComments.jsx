@@ -10,7 +10,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "./Alert/FlashMessageContext";
-import { Trash2, Bookmark, Heart, MessageCircle, PinIcon } from "lucide-react";
+import { Trash2, Bookmark, ThumbsUp, MessageCircle, PinIcon } from "lucide-react";
 import AuthorNameWithVerification from "./User/AuthorNameWithVerification";
 import PostBlocks from "./PostBlocks";
 
@@ -63,6 +63,7 @@ const PostWithComments = ({
     const [commentsVisible, setCommentsVisible] = useState(false);
     const [likes, setLikes] = useState(post.likes || []);
     const [liked, setLiked] = useState(post.liked_by_user || false);
+    const [heartPulse, setHeartPulse] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(post.is_bookmarked || false);
     const [replySectionFor, setReplySectionFor] = useState(null);
     const [editingCommentId, setEditingCommentId] = useState(null);
@@ -82,6 +83,9 @@ const PostWithComments = ({
     const initials = getInitials(author.first_name, author.last_name);
 
     const toggleLike = async () => {
+        setHeartPulse(true);
+        setTimeout(() => setHeartPulse(false), 400);
+
         try {
             const response = await axios.post("/api/member/like", {
                 post_id: post.id,
@@ -449,48 +453,41 @@ const PostWithComments = ({
 
             <PostBlocks post={post} />
 
-            {/* Engagement Section */}
-            {/* <div className="flex justify-between items-center mb-3">
-                <div className="flex items-center gap-2">
-                    <svg
-                        className="w-5 h-5 text-red-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
-                    </svg>
-                    <span className="text-sm text-[#6B7280] dark:text-gray-300">
-                        {likes.length} Loves
+            {/* Engagement Summary */}
+            {(likes.length > 0 || totalCommentCount > 0) && (
+                <div className="flex items-center justify-between text-sm text-gray-400 dark:text-gray-500 pb-2">
+                    <span>
+                        {likes.length > 0 &&
+                            `${likes.length} ${likes.length === 1 ? "Like" : "Likes"}`}
+                    </span>
+                    <span>
+                        {totalCommentCount > 0 &&
+                            `${totalCommentCount} ${totalCommentCount === 1 ? "Comment" : "Comments"}`}
                     </span>
                 </div>
-                <span className="text-sm text-[#6B7280] dark:text-gray-300">
-                    {comments.length} Comments
-                </span>
-            </div> */}
+            )}
 
             {/* Action Buttons */}
 
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
-                <div className="flex">
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-1">
+                <div className="flex items-center">
                     {/* Like */}
                     <button
                         onClick={toggleLike}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors active:scale-[0.98]"
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-md transition-colors duration-150 active:scale-95 ${
+                            liked
+                                ? "text-blue-600 dark:text-blue-400"
+                                : "text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                        }`}
                     >
-                        <Heart
-                            className={`w-4 h-4 ${
-                                likes.length > 0
-                                    ? "fill-red-500 text-red-500"
-                                    : ""
-                            }`}
+                        <ThumbsUp
+                            className={`w-4 h-4 transition-transform ease-out ${
+                                heartPulse
+                                    ? "scale-125 duration-200"
+                                    : "scale-100 duration-300"
+                            } ${liked ? "fill-blue-600 text-blue-600 dark:fill-blue-400 dark:text-blue-400" : ""}`}
                         />
-
-                        <span className="font-medium">
-                            Love
-                            <span className="ml-0.5 text-[11px] sm:text-xs text-gray-400">
-                                ({likes.length})
-                            </span>
-                        </span>
+                        <span>{liked ? "Liked" : "Like"}</span>
                     </button>
 
                     {/* Comment */}
@@ -499,13 +496,10 @@ const PostWithComments = ({
                             setCommentsVisible(!commentsVisible);
                             setSelectedPost(post);
                         }}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors active:scale-[0.98]"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 active:scale-95"
                     >
                         <MessageCircle className="w-4 h-4" />
-
-                        <span className="font-medium">
-                            Comment({totalCommentCount})
-                        </span>
+                        <span>Comment</span>
                     </button>
                 </div>
             </div>

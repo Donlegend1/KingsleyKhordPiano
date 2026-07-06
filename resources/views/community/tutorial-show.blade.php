@@ -1,17 +1,12 @@
 @extends('layouts.community')
 
+@section('breadcrumb-parent', 'Overview')
+@section('breadcrumb-parent-url', '/member/my-library')
+@section('breadcrumb', 'Tutorial')
+
 @section('content')
 
-<!-- Header Section -->
-<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
-    <div class="px-6 py-4 flex items-center gap-2 text-sm font-medium">
-        <a href="{{ route('community.index') }}" class="text-gray-400 hover:text-gray-700 dark:hover:text-white transition">Overview</a>
-        <span class="text-gray-300">/</span>
-        <a href="{{ route('community.subcategory', 'lessons') }}" class="text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-200 transition">Tutorial</a>
-    </div>
-</div>
-
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12">
     <div class="flex flex-col lg:flex-row gap-8 items-start">
 
         {{-- Left: Video + details --}}

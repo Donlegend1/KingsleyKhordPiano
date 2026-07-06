@@ -4,9 +4,16 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         @foreach ($latestCourses as $category => $latestCourse)
             @php
-                $lessonUrl = $category === 'technique drills'
+                $lessonType = match ($category) {
+                    'piano exercise' => 'upload',
+                    'learn songs' => 'learn_song',
+                    'extra courses' => 'extra_course',
+                    default => null,
+                };
+
+                $lessonUrl = $category === 'harmonic drills'
                     ? "/member/piano-exercise/player?series=" . urlencode($latestCourse->series) . "&video_id={$latestCourse->id}"
-                    : "/member/lesson/{$latestCourse->id}";
+                    : "/member/lesson/{$latestCourse->id}?type={$lessonType}";
             @endphp
             <div class="flex flex-col group">
                 {{-- Thumbnail --}}
