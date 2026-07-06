@@ -83,7 +83,7 @@
                     <button
                         type="button"
                         @click="open = !open"
-                        class="w-full flex items-center justify-between px-6 py-2.5 rounded-full font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transition-all duration-300"
+                        class="w-full flex items-center justify-between px-6 py-2.5 rounded-full font-semibold bg-blue-600 text-white shadow-md shadow-blue-600/20 transition-all duration-300"
                     >
                         <span>{{ $skillLevel }}</span>
                         <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@
                             <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
                                 class="block px-6 py-3 font-semibold transition-colors duration-150
                            {{ $skillLevel === $level
-                               ? 'bg-indigo-600 text-white'
+                               ? 'bg-blue-600 text-white'
                                : 'text-gray-600 hover:bg-gray-50' }}">
                                 {{ $level }}
                             </a>
@@ -115,7 +115,7 @@
                         <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
                             class="flex-1 flex items-center justify-center text-center px-6 py-4 rounded-lg font-semibold transition-all duration-300
                        {{ $skillLevel === $level
-                           ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                           ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                            : 'text-gray-700 hover:text-gray-900' }}">
                             {{ $level }}
                         </a>
@@ -190,7 +190,7 @@
 
                                 <!-- Watch Now Button -->
                                 <a href="{{ $playerUrl }}"
-                                   class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
+                                   class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
                                     Watch Now
                                 </a>
                             </div>

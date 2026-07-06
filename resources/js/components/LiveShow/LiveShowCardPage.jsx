@@ -13,8 +13,6 @@ import {
 
 const PremiumVideoSection = () => {
     const [videos, setVideos] = useState([]);
-    const [fileId, setFileId] = useState(null);
-    const [selectedVideo, setSelectedVideo] = useState(null);
     const [countdowns, setCountdowns] = useState({});
     const [notifySubscribed, setNotifySubscribed] = useState(false);
     const { showMessage } = useFlashMessage();
@@ -38,22 +36,6 @@ const PremiumVideoSection = () => {
 
         fetchVideos();
     }, []);
-
-    const extractGoogleDriveFileId = (url) => {
-        console.log("Extracting file ID from URL:", url);
-        const regex = /(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/;
-        const match = url.match(regex);
-        return match ? match[1] : null;
-    };
-
-    useEffect(() => {
-        if (selectedVideo && selectedVideo.recording_url) {
-            const id = extractGoogleDriveFileId(selectedVideo?.recording_url);
-            setFileId(id);
-        } else {
-            setFileId(null);
-        }
-    }, [selectedVideo]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -93,9 +75,7 @@ const PremiumVideoSection = () => {
                 "Please upgrade to premium to watch this video",
                 "error"
             );
-            return;
         }
-        setSelectedVideo(video);
     };
 
     const handleCreateLiveShowNotification = async () => {
@@ -112,62 +92,6 @@ const PremiumVideoSection = () => {
     };
     return (
         <section className="max-w-7xl mx-auto px-6 py-16">
-            {/* Video Modal Overlay */}
-            {selectedVideo && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10">
-                    <div 
-                        className="absolute inset-0 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300"
-                        onClick={() => setSelectedVideo(null)}
-                    ></div>
-                    
-                    <div className="relative w-full max-w-5xl bg-gray-900 rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] border border-white/10 animate-in zoom-in-95 duration-300">
-                        {/* Modal Header */}
-                        <div className="absolute top-0 left-0 right-0 z-20 p-6 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
-                            <h3 className="text-xl font-bold text-white drop-shadow-lg truncate pr-10">
-                                {selectedVideo.title}
-                            </h3>
-                            <button 
-                                onClick={() => setSelectedVideo(null)}
-                                className="p-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all hover:rotate-90"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        {/* Video Player Container */}
-                        <div className="aspect-video w-full bg-black">
-                            {fileId ? (
-                                <iframe
-                                    src={`https://drive.google.com/file/d/${fileId}/preview`}
-                                    className="w-full h-full"
-                                    frameBorder="0"
-                                    allow="autoplay; encrypted-media; fullscreen"
-                                    allowFullScreen
-                                    title={selectedVideo.title}
-                                />
-                            ) : (
-                                <div className="h-full flex items-center justify-center text-red-500 font-bold">
-                                    Invalid video URL or restricted access
-                                </div>
-                            )}
-                        </div>
-                        
-                        {/* Modal Footer Info */}
-                        <div className="p-6 bg-gray-900 border-t border-white/5 flex items-center justify-between">
-                            <span className="text-white/50 text-sm font-medium">
-                                Recorded on {dayjs(selectedVideo.start_time).format("MMMM D, YYYY")}
-                            </span>
-                            <div className="flex items-center gap-2 text-[#FFD736] text-xs font-black uppercase tracking-widest">
-                                <img src="/icons/wave.png" alt="Icon" className="w-4 h-4 invert opacity-50" />
-                                Premium Session
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Empty State */}
             {videos.length === 0 && (
                 <div className="flex flex-col items-center justify-center bg-blue-50/60 rounded-2xl py-20 px-8 text-center">
@@ -257,13 +181,14 @@ const PremiumVideoSection = () => {
                             {isPast ? (
                                 <div className="mt-auto">
                                     {video.recording_url ? (
-                                        <button
-                                            onClick={() => handleVideoClick(video)}
+                                        <a
+                                            href={isRestricted ? "#" : `/member/live-show/${video.id}/recording`}
+                                            onClick={isRestricted ? (e) => { e.preventDefault(); handleVideoClick(video); } : undefined}
                                             className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition-colors shadow-sm shadow-red-200"
                                         >
                                             <i className="fa-solid fa-play-circle"></i>
                                             <span className="font-bold text-sm uppercase tracking-widest">Watch Recording</span>
-                                        </button>
+                                        </a>
                                     ) : (
                                         <div className="flex items-center justify-center gap-2 bg-gray-50 border border-gray-100 text-gray-400 py-3 rounded-xl">
                                             <i className="fa-solid fa-circle-info"></i>

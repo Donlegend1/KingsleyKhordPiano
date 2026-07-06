@@ -48,12 +48,12 @@
             <div class="inline-flex items-stretch bg-gray-100 rounded-xl p-1.5">
                 <button type="button" @click="activeTab = 'finger'"
                     class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
-                    :class="activeTab === 'finger' ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    :class="activeTab === 'finger' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
                     Finger Exercise
                 </button>
                 <button type="button" @click="activeTab = 'etudes'"
                     class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
-                    :class="activeTab === 'etudes' ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    :class="activeTab === 'etudes' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
                     Etudes &amp; Pieces
                 </button>
             </div>
@@ -124,7 +124,7 @@
 
                     <!-- Watch Now Button -->
                     <a href="{{ $watchUrl }}"
-                       class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
+                       class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
                         Watch Now
                     </a>
                 </div>
