@@ -67,7 +67,7 @@
                 <a href="/home" class="hover:text-gray-700">Dashboard</a>
                 <span>/</span>
                 @if($series)
-                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-gray-700">Technique Drills</a>
+                    <a href="{{ route('piano.exercise.musical') }}" class="hover:text-gray-700">Harmonic Drills</a>
                 @else
                     <a href="{{ route('piano.exercise.finger') }}" class="hover:text-gray-700">Finger Exercises</a>
                 @endif
@@ -157,7 +157,7 @@
 
                     {{-- Lessons in this course (mobile & tablet only) --}}
                     <div class="lg:hidden mb-10">
-                        @include('memberpages.partials.lesson-playlist')
+                        @include($level ? 'memberpages.partials.lesson-playlist-grouped' : 'memberpages.partials.lesson-playlist')
                     </div>
 
                     {{-- Related Lessons --}}
@@ -240,13 +240,11 @@
                         </div>
                     </div>
 
-                    @include('memberpages.partials.course-resources', ['lesson' => $activeVideo])
-
                 </div>
 
                 {{-- ── RIGHT COLUMN: Sidebar Playlist (desktop only) ── --}}
                 <aside class="hidden lg:block w-[360px] flex-shrink-0 sticky top-6">
-                    @include('memberpages.partials.lesson-playlist')
+                    @include($level ? 'memberpages.partials.lesson-playlist-grouped' : 'memberpages.partials.lesson-playlist')
                 </aside>
 
             </div>

@@ -2,39 +2,38 @@
 
 @section('content')
 
+<div x-data="{ search: '' }">
+
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
-  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center min-h-8 gap-4">
-    <div class="flex items-center gap-2 text-sm text-gray-500">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm text-gray-500 min-h-8">
+    <div class="flex items-center gap-2">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
       <span class="text-[#6366F1] font-medium">Extra Courses</span>
     </div>
-    <div class="w-full sm:w-auto">
-      <form method="GET" action="{{ route('extra.courses') }}" class="flex">
-        <input type="hidden" name="tab" value="{{ request('tab', 'all') }}">
-        <div class="relative w-full sm:w-72">
-          <input
+
+    <!-- Search Bar -->
+    <div class="relative w-full sm:w-72 group">
+        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+        </svg>
+        <input
             type="text"
-            name="search"
-            value="{{ request('search') }}"
-            class="w-full h-8 border border-gray-200 rounded-full pl-4 pr-10 text-sm leading-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
+            x-model="search"
             placeholder="Search courses..."
-          >
-          <button type="submit" class="absolute inset-y-0 right-3 flex items-center justify-center text-gray-400 hover:text-gray-600">
-            <i class="fa fa-search text-sm"></i>
-          </button>
-        </div>
-      </form>
+            class="w-full h-10 pl-10 pr-9 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-indigo-500/40 transition-all"
+        >
+        <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+        </button>
     </div>
   </div>
 </section>
 
 @php
-  $beginnerGroups    = $beginnerCategories->filter(fn($cat) => $cat->courses->isNotEmpty());
-  $intermediateGroups = $intermediateCategories->filter(fn($cat) => $cat->courses->isNotEmpty());
-  $advancedGroups    = $advancedCategories->filter(fn($cat) => $cat->courses->isNotEmpty());
-  $allGroups         = $beginnerGroups->merge($intermediateGroups)->merge($advancedGroups);
-
   $levelLabels = [
     'beginner'     => 'Beginner',
     'intermediate' => 'Intermediate',
@@ -53,7 +52,7 @@
         'advanced'     => 'Advanced',
       ];
       $activeTabKey = request('tab', 'all');
-      $tabQuery = fn($key) => '?tab=' . $key . (request('search') ? '&search=' . urlencode(request('search')) : '');
+      $tabQuery = fn($key) => '?tab=' . $key;
     @endphp
 
     <!-- Choose Tab -->
@@ -89,52 +88,46 @@
           </div>
       </div>
 
-      <!-- Desktop: Pills -->
-      <div class="hidden sm:flex flex-wrap items-center gap-6">
+      <!-- Desktop: Segmented Control -->
+      @php $tabKeys = array_keys($tabs); @endphp
+      <div class="hidden sm:flex items-stretch bg-gray-100 rounded-xl p-1.5">
           @foreach ($tabs as $key => $label)
               <a href="{{ $tabQuery($key) }}"
-                  class="px-6 py-2.5 rounded-full font-semibold transition-all duration-300
+                  class="flex-1 flex items-center justify-center text-center px-6 py-4 rounded-lg font-semibold transition-all duration-300
              {{ $activeTabKey === $key
                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                 : 'text-gray-500 hover:text-gray-700' }}">
+                 : 'text-gray-700 hover:text-gray-900' }}">
                   {{ $label }}
               </a>
+              @php
+                $nextKey = $tabKeys[$loop->index + 1] ?? null;
+                $showDivider = $nextKey && $activeTabKey !== $key && $activeTabKey !== $nextKey;
+              @endphp
+              @if ($showDivider)
+                <div class="w-px my-3 bg-gray-300"></div>
+              @endif
           @endforeach
       </div>
     </div>
 
     <!-- Course Cards -->
-    @php
-      $activeTab = request('tab', 'all');
-
-      $groups = match($activeTab) {
-        'beginner'     => $beginnerGroups,
-        'intermediate' => $intermediateGroups,
-        'advanced'     => $advancedGroups,
-        default        => $allGroups,
-      };
-
-      $levelMap = [];
-      foreach($beginnerCategories as $cat)     $levelMap[$cat->id] = 'beginner';
-      foreach($intermediateCategories as $cat) $levelMap[$cat->id] = 'intermediate';
-      foreach($advancedCategories as $cat)     $levelMap[$cat->id] = 'advanced';
-    @endphp
-
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @forelse($groups as $cat)
+      @forelse($categories as $cat)
         @php
           $firstCourse = $cat->courses->first();
           $lessonCount = $cat->courses->count();
-          $level       = $levelMap[$cat->id] ?? 'beginner';
-          $levelLabel  = $levelLabels[$level];
-          $isNew       = !\App\Models\LessonView::hasViewed(auth()->id(), $firstCourse)
-              && $cat->courses->contains(fn ($c) => $c->created_at && $c->created_at->gt(now()->subDays(7)));
+          $level       = $cat->level;
+          $levelLabel  = $levelLabels[$level] ?? ucfirst($level);
+          $isNew       = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $cat->courses);
+          $searchableText = Str::lower($cat->category . ' ' . $cat->courses->pluck('title')->implode(' '));
         @endphp
 
-        <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+        <div
+          x-show="search === '' || {{ \Illuminate\Support\Js::from($searchableText) }}.includes(search.toLowerCase())"
+          class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
           <!-- Thumbnail -->
-          <a href="/member/lesson/{{ $firstCourse->id }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+          <a href="/member/lesson/{{ $firstCourse->id }}?type=extra_course" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
             @if($firstCourse->thumbnail_url)
               <img src="{{ $firstCourse->thumbnail_url }}" alt="{{ $cat->category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
             @else
@@ -177,7 +170,7 @@
             </div>
 
             <!-- Watch Now Button -->
-            <a href="/member/lesson/{{ $firstCourse->id }}"
+            <a href="/member/lesson/{{ $firstCourse->id }}?type=extra_course"
                class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
               Watch Now
             </a>
@@ -192,8 +185,16 @@
       @endforelse
     </div>
 
+    @if ($categories->hasPages())
+      <div class="flex justify-center py-8">
+        {{ $categories->links('components.pagination') }}
+      </div>
+    @endif
+
   </div>
 </section>
+
+</div>
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');

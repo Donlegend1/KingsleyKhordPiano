@@ -72,46 +72,31 @@ class LessonController extends Controller
         \App\Models\CategoryView::markViewed(auth()->id(), 'learn_songs');
 
         $search = $request->input('search');
-        $activeTab = $request->input('tab', 'beginner');
+        $activeTab = $request->input('tab', 'all');
+        $tonalCenter = $request->input('key', 'all');
+        $page = $request->input('page', 1);
 
-        $fetchLevelCategories = function($level) use ($search) {
-            $query = \App\Models\LearnSongCategory::where('level', $level)
-                ->orderBy('position');
-
-            $query->with(['songs' => function($q) use ($search, $level) {
-                $q->where('level', $level)
-                  ->where('status', 'active')
-                  ->when($search, function($subQ) use ($search) {
-                      $subQ->where(function($query) use ($search) {
-                          $query->where('title', 'like', "%{$search}%")
-                                ->orWhere('description', 'like', "%{$search}%")
-                                ->orWhere('author', 'like', "%{$search}%");
-                      });
-                  })
-                  ->orderBy('position');
-            }]);
-
-            $categories = $query->get();
-
-            if ($search) {
-                $categories = $categories->filter(function($category) {
-                    return $category->songs->isNotEmpty();
+        $query = \App\Models\LearnSong::query()
+            ->where('status', 'active')
+            ->with('category')
+            ->when($activeTab !== 'all', fn($q) => $q->where('level', $activeTab))
+            ->when($tonalCenter !== 'all', fn($q) => $q->where('tonal_center', $tonalCenter))
+            ->when($search, function($q) use ($search) {
+                $q->where(function($subQ) use ($search) {
+                    $subQ->where('title', 'like', "%{$search}%")
+                         ->orWhere('description', 'like', "%{$search}%");
                 });
-            }
+            })
+            ->latest();
 
-            return $categories;
-        };
+        $songs = $query->paginate(9, ['*'], 'page', $page)->appends([
+            'tab' => $activeTab,
+            'key' => $tonalCenter,
+            'search' => $search,
+        ]);
 
-        $beginnerCategories = $fetchLevelCategories('beginner');
-        $intermediateCategories = $fetchLevelCategories('intermediate');
-        $advancedCategories = $fetchLevelCategories('advanced');
+        $tonalCenters = \App\Enums\Music\TonalCenterEnum::options();
 
-        return view('memberpages.learnsongs', compact(
-            'beginnerCategories',
-            'intermediateCategories',
-            'advancedCategories',
-            'search',
-            'activeTab'
-        ));
+        return view('memberpages.learnsongs', compact('songs', 'search', 'activeTab', 'tonalCenter', 'tonalCenters'));
     }
 }

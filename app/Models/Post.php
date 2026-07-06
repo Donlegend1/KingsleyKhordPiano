@@ -48,7 +48,7 @@ class Post extends Model
         return $this->hasMany(PostBlock::class);
     }
 
-    protected $appends = ['is_bookmarked'];
+    protected $appends = ['is_bookmarked', 'liked_by_user'];
 
     public function getIsBookmarkedAttribute(): bool
     {
@@ -59,5 +59,16 @@ class Post extends Model
         }
 
         return $this->bookmarks->contains('user_id', $userId);
+    }
+
+    public function getLikedByUserAttribute(): bool
+    {
+        $userId = auth()->id();
+
+        if (!$userId) {
+            return false;
+        }
+
+        return $this->likes->contains('user_id', $userId);
     }
 }

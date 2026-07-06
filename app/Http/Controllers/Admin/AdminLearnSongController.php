@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\LearnSong;
 use App\Models\LearnSongCategory;
+use App\Models\User;
+use App\Notifications\NewLearnSongCreated;
+use App\Enums\Roles\UserRoles;
 use App\Helpers\VideoHelper;
 use Illuminate\Support\Facades\DB;
 
@@ -63,6 +66,7 @@ class AdminLearnSongController extends Controller
             'video_url' => 'required|string',
             'status' => 'required|string',
             'description' => 'nullable|string',
+            'tonal_center' => 'nullable|string|max:10',
             'thumbnail' => 'nullable|image|max:5000',
             'related_songs' => 'nullable|array',
             'images' => 'nullable|array',
@@ -163,6 +167,7 @@ class AdminLearnSongController extends Controller
             'video_url' => $videoUrl,
             'thumbnail' => $thumbnailPath,
             'level' => $level,
+            'tonal_center' => $request->input('tonal_center'),
             'status' => $request->input('status'),
             'position' => $maxPos + 1,
             'related_songs' => $request->input('related_songs'),
@@ -170,6 +175,11 @@ class AdminLearnSongController extends Controller
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
         ]);
+
+        $members = User::where('role', UserRoles::MEMBER->value)->get();
+        foreach ($members as $member) {
+            $member->notify(new NewLearnSongCreated($song));
+        }
 
         return response()->json($song, 201);
     }
@@ -185,6 +195,7 @@ class AdminLearnSongController extends Controller
             'video_url' => 'nullable|string',
             'status' => 'nullable|string',
             'description' => 'nullable|string',
+            'tonal_center' => 'nullable|string|max:10',
             'thumbnail' => 'nullable|image|max:5000',
             'related_songs' => 'nullable|array',
             'images' => 'nullable|array',
@@ -294,6 +305,7 @@ class AdminLearnSongController extends Controller
             'video_type' => $videoType,
             'video_url' => $videoUrl,
             'thumbnail' => $thumbnailPath,
+            'tonal_center' => $request->input('tonal_center') ?? $song->tonal_center,
             'status' => $request->input('status') ?? $song->status,
             'related_songs' => $request->input('related_songs') ?? $song->related_songs,
             'images' => $descriptionImages,

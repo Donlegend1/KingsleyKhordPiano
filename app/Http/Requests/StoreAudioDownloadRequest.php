@@ -23,6 +23,8 @@ class StoreAudioDownloadRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            'artist' => 'nullable|string|max:255',
+            'collection' => 'nullable|string|max:255',
             'category' => 'required|in:tracks_loops,piano_plays',
             'audio_file' => 'required|file|mimes:mp3,wav,m4a,aac',
             'duration' => 'nullable|string',

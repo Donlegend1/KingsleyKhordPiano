@@ -88,37 +88,56 @@ class ExerciseController extends Controller
 
         public function pianoExercisePlayer(Request $request)
     {
-        
-        try {
-            $level = $request->query('level');
-            $series = $request->query('series');
-            $skillLevel = $request->query('skill_level', 'Basic');
+        $level = $request->query('level');
+        $series = $request->query('series');
+        $skillLevel = $request->query('skill_level');
 
-            if ($series) {
-                $playlistQuery = \App\Models\MusicalApplication::where('series', $series);
-            } elseif ($level) {
-                $playlistQuery = Upload::where('category', 'piano exercise')
-                    ->where('level', $level)
-                    ->where('skill_level', $skillLevel);
-            } else {
-                return redirect()->route('piano.exercise');
-            }
+        $skillLevels = ['Basic', 'Competent', 'Challenging'];
+        $groupedPlaylist = collect();
 
-            $playlist = $playlistQuery->latest()->get();
+        if ($series) {
+            $playlist = \App\Models\MusicalApplication::where('series', $series)
+                ->orderBy('id', 'asc')
+                ->get();
+        } elseif ($level) {
+            // Finger exercises browse all skill levels for this focus area at
+            // once (grouped in the sidebar) instead of being locked to one
+            // skill level chosen on the previous page. skill_level is stored
+            // inconsistently cased in the DB (e.g. "basic" vs "Basic"), so
+            // every comparison here is done case-insensitively.
+            $skillOrder = array_flip(array_map('strtolower', $skillLevels));
 
-            if ($playlist->isEmpty()) {
-                return redirect()->route('piano.exercise')
-                    ->with('error', 'No exercises found.');
-            }
+            $playlist = Upload::where('category', 'piano exercise')
+                ->where('level', $level)
+                ->orderBy('id', 'asc')
+                ->get()
+                ->sortBy(fn($item) => ($skillOrder[strtolower($item->skill_level ?? '')] ?? count($skillLevels)) * 1000000 + $item->id)
+                ->values();
+
+            $groupedPlaylist = collect($skillLevels)
+                ->mapWithKeys(fn($lvl) => [
+                    $lvl => $playlist->filter(fn($item) => strtolower($item->skill_level ?? '') === strtolower($lvl))->values(),
+                ])
+                ->filter(fn($items) => $items->isNotEmpty());
+        } else {
+            return redirect()->route('piano.exercise');
+        }
+
+        if ($playlist->isEmpty()) {
+            return redirect()->route('piano.exercise')->with('error', 'No exercises found.');
+        }
 
             $activeVideoId = $request->query('video_id');
             $activeVideo = $activeVideoId
                 ? $playlist->firstWhere('id', $activeVideoId)
                 : $playlist->first();
 
-            if ($activeVideo) {
-                \App\Models\LessonView::record(auth()->id(), $activeVideo);
-            }
+        if ($activeVideo) {
+            \App\Models\LessonView::record(auth()->id(), $activeVideo);
+            $skillLevel = $level ? $activeVideo->skill_level : $skillLevel;
+        }
+
+        $skillLevel = $skillLevel ?? 'Basic';
 
             $service = app(\App\Services\BookmarkService::class);
             $isBookmarked = $activeVideo
@@ -129,8 +148,7 @@ class ExerciseController extends Controller
                 ->where('category', 'piano exercise')
                 ->get();
 
-            $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
-            $skillLevels = ['Basic', 'Competent', 'Challenging'];
+        $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
 
             $related_courses = [];
 
@@ -138,31 +156,19 @@ class ExerciseController extends Controller
                 $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
             }
 
-            return view('memberpages.series-player', compact(
-                'playlist',
-                'activeVideo',
-                'level',
-                'series',
-                'skillLevel',
-                'isBookmarked',
-                'levels',
-                'skillLevels',
-                'comments',
-                'related_courses'
-            ));
-        } catch (\Throwable $e) {
-            logger()->error('Piano Exercise Player Error', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
-                'request' => $request->all(),
-            ]);
-
-            return redirect()
-                ->route('piano.exercise')
-                ->with('error', 'An error occurred while loading the exercise player.');
-        }
+        return view('memberpages.series-player', compact(
+            'playlist',
+            'groupedPlaylist',
+            'activeVideo',
+            'level',
+            'series',
+            'skillLevel',
+            'isBookmarked',
+            'levels',
+            'skillLevels',
+            'comments',
+            'related_courses'
+        ));
     }
 
     public function storeComment(Request $request)
@@ -183,26 +189,44 @@ class ExerciseController extends Controller
         return back()->with('success', 'Comment posted successfully.');
     }
 
-    public function fingerExercises(Request $request)
+    public function fingerExercises()
     {
-        $skillLevel = $request->query('skill_level', 'Basic');
-        $skillLevels = ['Basic', 'Competent', 'Challenging'];
-        
-        return view('memberpages.finger-exercises', compact('skillLevel', 'skillLevels'));
+        return view('memberpages.finger-exercises');
     }
 
     public function musicalApplication(Request $request)
     {
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
-        
-        $query = \App\Models\MusicalApplication::where('status', 'active');
-        if ($skillLevel !== 'ALL') {
-            $query->where('skill_level', $skillLevel);
-        }
-        
-        $applications = $query->get()->groupBy('series');
+        $page = $request->query('page', 1);
 
-        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications'));
+        $baseQuery = fn() => \App\Models\MusicalApplication::where('status', 'active')
+            ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel));
+
+        $seriesPage = $baseQuery()
+            ->select('series')
+            ->selectRaw('MAX(created_at) as latest_created_at')
+            ->groupBy('series')
+            ->orderByDesc('latest_created_at')
+            ->paginate(9, ['*'], 'page', $page)
+            ->appends(['skill_level' => $skillLevel]);
+
+        $seriesNames = collect($seriesPage->items())->pluck('series');
+
+        $applications = $baseQuery()
+            ->where(function($q) use ($seriesNames) {
+                $named = $seriesNames->filter()->values();
+                if ($named->isNotEmpty()) {
+                    $q->whereIn('series', $named);
+                }
+                if ($seriesNames->contains(null)) {
+                    $q->orWhereNull('series');
+                }
+            })
+            ->get()
+            ->groupBy('series')
+            ->sortBy(fn($items, $series) => $seriesNames->search($series));
+
+        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage'));
     }
 }

@@ -20,6 +20,7 @@ const AudioFiles = () => {
 
     const [form, setForm] = useState({
         title: "",
+        artist: "",
         category: "",
         audio_file: null,
         duration: "",
@@ -58,6 +59,7 @@ const AudioFiles = () => {
     const handleCreate = async () => {
         const fd = new FormData();
         fd.append("title", form.title);
+        fd.append("artist", form.artist);
         fd.append("category", form.category);
 
         if (form.audio_file instanceof File) {
@@ -81,6 +83,7 @@ const AudioFiles = () => {
             setCreateModalOpen(false);
             setForm({
                 title: "",
+                artist: "",
                 category: "",
                 audio_file: null,
                 duration: "",
@@ -105,6 +108,7 @@ const AudioFiles = () => {
     const handleUpdate = async () => {
         const fd = new FormData();
         fd.append("title", selectedFile.title);
+        fd.append("artist", selectedFile.artist || "");
         fd.append("category", selectedFile.category);
 
         if (selectedFile.audio_file instanceof File) {
@@ -270,6 +274,22 @@ const AudioFiles = () => {
                             />
                         </div>
 
+                        {/* Artist Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Artist
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter artist name"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                                value={form.artist}
+                                onChange={(e) =>
+                                    setForm({ ...form, artist: e.target.value })
+                                }
+                            />
+                        </div>
+
                         {/* Category Field */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -380,6 +400,25 @@ const AudioFiles = () => {
                                 }
                             />
                         </div>
+
+                        {/* Artist Field */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Artist
+                            </label>
+                            <input
+                                type="text"
+                                value={selectedFile.artist || ""}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                                onChange={(e) =>
+                                    setSelectedFile({
+                                        ...selectedFile,
+                                        artist: e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
+
 
                         {/* Category Field */}
                         <div>

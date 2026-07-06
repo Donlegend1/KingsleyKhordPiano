@@ -11,6 +11,15 @@
             $lessonType = 'extra_courses';
         }
 
+        // Every lesson link on this page points to the same model as the
+        // current lesson (playlist neighbors, related lessons), so a single
+        // type disambiguates all of them for the /member/lesson/{id} route.
+        $linkType = match ($lessonType) {
+            'learn_songs' => 'learn_song',
+            'extra_courses' => 'extra_course',
+            default => 'upload',
+        };
+
         $isCompleted = $lesson && \App\Models\LessonCompletion::where('user_id', auth()->id())
             ->where('completable_id', $lesson->id)
             ->where('completable_type', get_class($lesson))
@@ -142,8 +151,12 @@
                         </form>
                     </div>
 
+                    @if ($lessonType === 'learn_songs')
+                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
+                    @endif
+
                     {{-- Lessons in this course (Mobile Only) --}}
-                    @if ($playlist->count() > 1)
+                    @if ($playlist->count() > 1 && $lessonType !== 'learn_songs')
                         <div class="block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
                             {{-- Header --}}
                             <div class="px-5 py-4 border-b border-gray-100">
@@ -161,7 +174,7 @@
                                             && $item->created_at->gt(now()->subDays(7))
                                             && !\App\Models\LessonView::hasViewed(auth()->id(), $item);
                                     @endphp
-                                    <a href="/member/lesson/{{ $item->id }}"
+                                    <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                         class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
                                         {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
 
@@ -183,17 +196,19 @@
                                 @endforeach
                             </div>
 
+                            @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
+
                             {{-- Next/Prev Lesson buttons --}}
                             <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
                                 @if ($previousVideo)
-                                    <a href="/member/lesson/{{ $previousVideo->id }}"
+                                    <a href="/member/lesson/{{ $previousVideo->id }}?type={{ $linkType }}"
                                         class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                         <i class="fa-solid fa-arrow-left text-sm"></i> Prev
                                     </a>
                                 @endif
 
                                 @if ($nextVideo)
-                                    <a href="/member/lesson/{{ $nextVideo->id }}"
+                                    <a href="/member/lesson/{{ $nextVideo->id }}?type={{ $linkType }}"
                                         class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                         Next <i class="fa-solid fa-arrow-right text-sm"></i>
                                     </a>
@@ -212,7 +227,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($relatedUploads as $related)
                                     @php
-                                        $relatedLink = "/member/lesson/{$related->id}";
+                                        $relatedLink = "/member/lesson/{$related->id}?type={$linkType}";
                                         $relatedIsNew = $related->created_at
                                             && $related->created_at->gt(now()->subDays(7))
                                             && !\App\Models\LessonView::hasViewed(auth()->id(), $related);
@@ -283,11 +298,10 @@
                         </div>
                     </div>
 
-                    @include('memberpages.partials.course-resources', ['lesson' => $lesson])
-
                 </div>
 
                 {{-- ── RIGHT COLUMN: Sidebar (Playlist or Related Lessons) ── --}}
+                @unless ($lessonType === 'learn_songs')
                 <aside
                     class="w-full lg:w-[360px] flex-shrink-0 border border-gray-100 rounded-xl overflow-hidden shadow-sm sticky top-6 bg-white {{ $playlist->count() > 1 ? 'hidden lg:block' : '' }}">
 
@@ -308,7 +322,7 @@
                                         && $item->created_at->gt(now()->subDays(7))
                                         && !\App\Models\LessonView::hasViewed(auth()->id(), $item);
                                 @endphp
-                                <a href="/member/lesson/{{ $item->id }}"
+                                <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                     class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
                                     {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
 
@@ -330,17 +344,19 @@
                             @endforeach
                         </div>
 
+                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
+
                         {{-- Next Lesson button --}}
                         <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
                             @if ($previousVideo)
-                                <a href="/member/lesson/{{ $previousVideo->id }}"
+                                <a href="/member/lesson/{{ $previousVideo->id }}?type={{ $linkType }}"
                                     class="flex items-center justify-center gap-2 w-1/2 py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                     <i class="fa-solid fa-arrow-left text-sm"></i> Prev
                                 </a>
                             @endif
 
                             @if ($nextVideo)
-                                <a href="/member/lesson/{{ $nextVideo->id }}"
+                                <a href="/member/lesson/{{ $nextVideo->id }}?type={{ $linkType }}"
                                     class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                                     Next <i class="fa-solid fa-arrow-right text-sm"></i>
                                 </a>
@@ -362,7 +378,7 @@
                                         && $item->created_at->gt(now()->subDays(7))
                                         && !\App\Models\LessonView::hasViewed(auth()->id(), $item);
                                 @endphp
-                                <a href="/member/lesson/{{ $item->id }}"
+                                <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                     class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors bg-white hover:bg-gray-50">
 
                                     
@@ -383,10 +399,13 @@
                                     </div>
                                 </a>
                             @endforeach
-                        </div> --}}
+                        </div>
+
+                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
                     @endif
 
                 </aside>
+                @endunless
 
             </div>
         @else

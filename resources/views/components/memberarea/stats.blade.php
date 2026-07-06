@@ -141,10 +141,13 @@
     }
 
     // Find last lesson to resume.
-    // Two competing signals: an explicit Course bookmark (roadmap lessons, the
-    // existing working path) and a LessonView (auto-recorded whenever the user
-    // opens a finger exercise, technique drill, extra course, or learn song
-    // page). Whichever happened more recently wins.
+    // Two competing signals: an explicit Course bookmark (a fallback for older
+    // roadmap bookmarks made before view-tracking existed) and a LessonView
+    // (auto-recorded whenever the user opens a finger exercise, technique
+    // drill, extra course, learn song, or roadmap course lesson). Whichever
+    // happened more recently wins. If neither exists, the user has never
+    // opened a lesson yet, so the card shows a blank state — no fallback to
+    // an arbitrary "first active lesson" in the catalog.
     $resumeLesson = null;
     $resumeUrl = '#';
 
@@ -159,6 +162,7 @@
             'App\Models\MusicalApplication',
             'App\Models\ExtraCourse',
             'App\Models\LearnSong',
+            'App\Models\Course',
         ])
         ->latest('updated_at')
         ->first();
@@ -169,80 +173,70 @@
     if ($useLessonView && $lastLessonView->viewable) {
         $resumeLesson = $lastLessonView->viewable;
         $resumeType = $lastLessonView->viewable_type;
-        $resumeUrl = ($resumeType === 'App\Models\MusicalApplication')
-            ? '/member/piano-exercise/player?series=' . $resumeLesson->series . '&video_id=' . $resumeLesson->id
-            : '/member/lesson/' . $resumeLesson->id;
+        $resumeUrl = match ($resumeType) {
+            'App\Models\MusicalApplication' => '/member/piano-exercise/player?series=' . $resumeLesson->series . '&video_id=' . $resumeLesson->id,
+            'App\Models\Course' => '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id,
+            'App\Models\ExtraCourse' => '/member/lesson/' . $resumeLesson->id . '?type=extra_course',
+            'App\Models\LearnSong' => '/member/lesson/' . $resumeLesson->id . '?type=learn_song',
+            'App\Models\Upload' => '/member/lesson/' . $resumeLesson->id . '?type=upload',
+            default => '/member/lesson/' . $resumeLesson->id,
+        };
     } elseif ($lastCourseBookmark && $lastCourseBookmark->bookmarkable) {
         $resumeLesson = $lastCourseBookmark->bookmarkable;
         $resumeType = $lastCourseBookmark->bookmarkable_type;
         $resumeUrl = '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id;
-    } else {
-        // Fallback to first active lesson
-        $resumeLesson = \App\Models\LearnSong::where('status', 'active')->first() 
-            ?? \App\Models\ExtraCourse::where('status', 'active')->first() 
-            ?? \App\Models\Course::where('status', 'active')->first();
-        if ($resumeLesson) {
-            $resumeType = get_class($resumeLesson);
-            $resumeUrl = ($resumeType === 'App\Models\Course') 
-                ? '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id 
-                : '/member/lesson/' . $resumeLesson->id;
-        }
     }
+
+    $resumeSectionLabel = match ($resumeType ?? null) {
+        'App\Models\ExtraCourse' => 'Extra Courses',
+        'App\Models\LearnSong' => 'Learn Songs',
+        'App\Models\MusicalApplication' => 'Piano Exercise',
+        'App\Models\Course' => 'Roadmap',
+        'App\Models\Upload' => $resumeLesson->category ? \Illuminate\Support\Str::title($resumeLesson->category) : 'Quick Lessons',
+        default => null,
+    };
   @endphp
 
   <div class="flex flex-col gap-6">
     
     {{-- Header Card --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4">
-      @if(Auth::user()->passport)
-        <img src="{{ Auth::user()->passport }}" alt="Avatar" class="w-14 h-14 rounded-full object-cover ring-2 ring-blue-100">
-      @else
-        <div class="w-14 h-14 rounded-full bg-[#0FA9A0]/10 flex items-center justify-center text-[#0FA9A0] font-bold text-xl ring-2 ring-teal-50">
-          {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'U', 0, 1)) }}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="flex items-center gap-4">
+        @if(Auth::user()->passport)
+          <img src="{{ Auth::user()->passport }}" alt="Avatar" class="w-14 h-14 rounded-full object-cover ring-2 ring-blue-100">
+        @else
+          <div class="w-14 h-14 rounded-full bg-[#0FA9A0]/10 flex items-center justify-center text-[#0FA9A0] font-bold text-xl ring-2 ring-teal-50">
+            {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'U', 0, 1)) }}
+          </div>
+        @endif
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Your Piano Journey ✨</h2>
+          <p class="text-xs text-gray-400 mt-0.5">Personalized for your growth and success</p>
+        </div>
+      </div>
+
+      @if($resumeLesson)
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 border-t border-gray-200 pt-6 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
+          <div>
+            <p class="text-xs text-gray-400">Pick up where you left off...</p>
+            @if($resumeSectionLabel)
+              <span class="inline-block mt-1 text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
+                {{ $resumeSectionLabel }}
+              </span>
+            @endif
+          </div>
+          <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-between gap-3 px-5 py-3 bg-gray-900 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors duration-200 min-w-0">
+            <span class="truncate max-w-[220px]">{{ $resumeLesson->title }}</span>
+            <svg class="w-4 h-4 flex-shrink-0 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
         </div>
       @endif
-      <div>
-        <h2 class="text-xl font-bold text-gray-900">Your Piano Journey ✨</h2>
-        <p class="text-xs text-gray-400 mt-0.5">Personalized for your growth and success</p>
-      </div>
     </div>
 
-    {{-- Row 1: Resume Last Lesson & Practice Streak --}}
+    {{-- Row 1: Practice Streak & Recent Activity --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-      {{-- Resume Last Lesson --}}
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
-        <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-            <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-          <span class="text-sm font-bold text-gray-900">Resume Last Lesson</span>
-        </div>
-        
-        @if($resumeLesson)
-          @php
-            $thumbnail = $resumeLesson->thumbnail ? asset($resumeLesson->thumbnail) : ($resumeLesson->thumbnail_url ?? asset('images/featured1.jpeg'));
-          @endphp
-          <div class="flex items-center gap-6">
-            <img src="{{ $thumbnail }}" alt="{{ $resumeLesson->title }}" class="w-40 sm:w-48 h-28 sm:h-32 object-cover rounded-xl shadow-sm border border-gray-100 flex-shrink-0">
-            <div class="flex-grow min-w-0">
-              <h4 class="text-xl font-extrabold text-gray-900 truncate mb-1">{{ $resumeLesson->title }}</h4>
-              <p class="text-sm text-gray-400 mb-4">{{ ucfirst($resumeLesson->level ?? 'Beginner') }} Lesson</p>
-
-              <a href="{{ $resumeUrl }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-full text-sm font-bold transition duration-200 shadow-sm">
-                <span>Continue Learning</span>
-                <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
-              </a>
-            </div>
-          </div>
-        @else
-          <p class="text-xs text-gray-400 py-6 text-center">No lessons found.</p>
-        @endif
-      </div>
 
       {{-- Practice Streak --}}
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
@@ -291,12 +285,7 @@
           @endforeach
         </div>
       </div>
-      
-    </div>
 
-    {{-- Row 2: Recent Activity & Your Stats --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
       {{-- Recent Activity --}}
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
         <div>
@@ -310,7 +299,7 @@
               <span class="text-sm font-bold text-gray-900">Recent Activity</span>
             </div>
           </div>
-          
+
           <div class="space-y-4">
             @forelse($recentActivity as $act)
               @php
@@ -345,6 +334,11 @@
         </div>
       </div>
 
+    </div>
+
+    {{-- Row 2: Your Stats & Next Milestone --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
       {{-- Your Stats --}}
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
         <div>
@@ -373,33 +367,35 @@
           </div>
         </div>
       </div>
-      
-    </div>
 
-    {{-- Row 3: Next Milestone --}}
-    <div class="bg-[#FFFDF4] border border-[#FBEFBF] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-4 w-full md:w-auto">
-        <div class="w-12 h-12 rounded-xl bg-[#FDF6D6] flex items-center justify-center text-2xl shadow-sm flex-shrink-0">
-          🏆
+      {{-- Next Milestone --}}
+      <div class="relative bg-[#FFFDF4] border border-[#FBEFBF] rounded-2xl p-6 overflow-hidden">
+        <div class="pr-16">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-[#FDF6D6] flex items-center justify-center text-2xl shadow-sm flex-shrink-0">
+              🏆
+            </div>
+            <div class="flex-grow min-w-0 pt-1">
+              <h4 class="text-sm font-bold text-gray-900">Next Milestone</h4>
+              <p class="text-xs text-gray-500 mt-0.5">
+                @if($nextMilestone)
+                  Complete {{ $neededLessons }} more {{ Str::plural('lesson', $neededLessons) }} to reach <span class="font-bold text-amber-600">{{ $nextMilestone['name'] }}</span>!
+                @else
+                  You achieved all milestones! You are a <span class="font-bold text-amber-600">Piano Legend</span>!
+                @endif
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <span class="text-2xl font-extrabold text-amber-500">{{ $milestonePct }}%</span>
+            <div class="mt-3 bg-amber-100 rounded-full h-2.5">
+              <div class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: {{ $milestonePct }}%"></div>
+            </div>
+          </div>
         </div>
-        <div class="flex-grow min-w-0">
-          <h4 class="text-sm font-bold text-gray-900">Next Milestone</h4>
-          <p class="text-xs text-gray-500 mt-0.5">
-            @if($nextMilestone)
-              Complete {{ $neededLessons }} more {{ Str::plural('lesson', $neededLessons) }} to reach <span class="font-bold text-amber-600">{{ $nextMilestone['name'] }}</span>!
-            @else
-              You achieved all milestones! You are a <span class="font-bold text-amber-600">Piano Legend</span>!
-            @endif
-          </p>
-        </div>
-      </div>
-      
-      <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-        <span class="text-sm font-bold text-amber-600">{{ $milestonePct }}%</span>
-        <div class="w-32 bg-amber-100 rounded-full h-2">
-          <div class="bg-amber-500 h-2 rounded-full transition-all duration-500" style="width: {{ $milestonePct }}%"></div>
-        </div>
-        <div class="relative flex items-center justify-center flex-shrink-0">
+
+        <div class="absolute right-6 top-1/2 -translate-y-1/2 flex items-center justify-center">
           {{-- Purple and Gold Shield Icon --}}
           <svg class="w-11 h-11 text-indigo-700 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/>
@@ -411,6 +407,7 @@
           </div>
         </div>
       </div>
+
     </div>
 
   </div>
