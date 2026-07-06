@@ -49,7 +49,7 @@
             <div class="flex items-center gap-2">
                 <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
                 <span>/</span>
-                <span class="text-[#6366F1] font-medium">Harmonic Drills</span>
+                <span class="text-blue-600 font-medium">Harmonic Drills</span>
             </div>
 
             <!-- Search Bar -->

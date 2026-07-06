@@ -120,7 +120,7 @@
                 @endif
                 @if ($lesson?->category)
                     <span>/</span>
-                    <span class="text-[#6366F1] font-medium">{{ $lesson->category->category }}</span>
+                    <span class="text-blue-600 font-medium">{{ $lesson->category->category }}</span>
                 @endif
             </div>
         </section>
@@ -194,8 +194,8 @@
                     @if ($playlist->count() > 1 && $lessonType !== 'learn_songs')
                         <div class="block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
                             {{-- Header --}}
-                            <div class="px-5 py-4 border-b border-gray-100">
-                                <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                            <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
+                                <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
                                     Lessons in this course:
                                 </p>
                             </div>
@@ -211,13 +211,13 @@
                                     @endphp
                                     <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                         class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                                        {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+                                        {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
                                         {{-- Title --}}
                                         <div class="flex-1 min-w-0">
                                             <p
                                                 class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
-                                                {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
+                                                {{ $isActive ? 'text-white' : 'text-gray-800' }}">
                                                 <span class="truncate">{{ $item->title }}</span>
                                                 @if ($itemIsNew)
                                                     <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
@@ -342,8 +342,8 @@
 
                     @if ($playlist->count() > 1)
                         {{-- Header --}}
-                        <div class="px-5 py-4 border-b border-gray-100">
-                            <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                        <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
+                            <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
                                 Lessons in this course:
                             </p>
                         </div>
@@ -359,13 +359,13 @@
                                 @endphp
                                 <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                     class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                                    {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+                                    {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
                                     {{-- Title --}}
                                     <div class="flex-1 min-w-0">
                                         <p
                                             class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
-                                            {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
+                                            {{ $isActive ? 'text-white' : 'text-gray-800' }}">
                                             <span class="truncate">{{ $item->title }}</span>
                                             @if ($itemIsNew)
                                                 <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>

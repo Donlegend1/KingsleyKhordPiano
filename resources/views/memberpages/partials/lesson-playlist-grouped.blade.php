@@ -52,13 +52,13 @@
                         @endphp
                         <a href="{{ request()->fullUrlWithQuery(['video_id' => $item->id]) }}"
                             class="flex items-center gap-3 px-5 py-3.5 transition-colors
-                    {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+                    {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
-                            <i class="fa-solid fa-play text-[9px] flex-shrink-0 {{ $isActive ? 'text-blue-600' : 'text-gray-300' }}"></i>
+                            <i class="fa-solid fa-play text-[9px] flex-shrink-0 {{ $isActive ? 'text-white' : 'text-gray-300' }}"></i>
 
                             <div class="flex-1 min-w-0">
                                 <p class="text-[13px] leading-snug flex items-center gap-2
-                         {{ $isActive ? 'font-semibold text-blue-700' : 'font-medium text-gray-700' }}">
+                         {{ $isActive ? 'font-semibold text-white' : 'font-medium text-gray-700' }}">
                                     <span class="line-clamp-1">{{ $item->title }}</span>
                                     @if ($itemIsNew)
                                         <span class="bg-red-600 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded flex-shrink-0">NEW</span>

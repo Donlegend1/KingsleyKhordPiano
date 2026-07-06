@@ -73,7 +73,7 @@
                 @endif
                 @if ($courseLabel)
                     <span>/</span>
-                    <span class="text-[#6366F1] font-medium">{{ $courseLabel }}</span>
+                    <span class="text-blue-600 font-medium">{{ $courseLabel }}</span>
                 @endif
             </div>
         </section>

@@ -9,7 +9,7 @@
     <div class="flex items-center gap-2">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
-      <span class="text-[#6366F1] font-medium">Extra Courses</span>
+      <span class="text-blue-600 font-medium">Extra Courses</span>
     </div>
 
     <!-- Search Bar -->
