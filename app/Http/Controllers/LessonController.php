@@ -82,8 +82,11 @@ class LessonController extends Controller
                 $q->where('level', $level)
                   ->where('status', 'active')
                   ->when($search, function($subQ) use ($search) {
-                      $subQ->where('title', 'like', "%{$search}%")
-                           ->orWhere('description', 'like', "%{$search}%");
+                      $subQ->where(function($query) use ($search) {
+                          $query->where('title', 'like', "%{$search}%")
+                                ->orWhere('description', 'like', "%{$search}%")
+                                ->orWhere('author', 'like', "%{$search}%");
+                      });
                   })
                   ->orderBy('position');
             }]);

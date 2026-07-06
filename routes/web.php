@@ -118,6 +118,7 @@ Route::post('/logout/community', [CommunityAuthController::class, 'logout'])->na
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(['check.payment', 'verified']);
 Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')->middleware(['check.payment', 'verified']);
 
+Route::get('/payment/direct-checkout', [PaymentController::class, 'directCheckout'])->middleware(['auth'])->name('payment.direct-checkout');
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
 Route::get('/member/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->middleware(['auth', 'check.payment', 'verified'])->name('notifications.index');
@@ -254,7 +255,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('email-campaign', [EmailCampaignController::class, 'index']);
     Route::get('email-campaign/create', [EmailCampaignController::class, 'create']);
     Route::get('pdf-download', [PDFDownloadController::class, 'index']);
-    Route::get('audio-download', [PDFDownloadController::class, 'index']);
+    Route::get('audio-download', [AudioDownloadController::class, 'index']);
     Route::get('musical-application-list', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'musicalApplicationList']);
     Route::get('musical-application-all-courses', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'getAllCourses']);
     Route::resource('musical-application', \App\Http\Controllers\Admin\MusicalApplicationController::class, ['as' => 'admin']);

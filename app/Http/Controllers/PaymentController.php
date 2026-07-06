@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\Paystack\PaystackSubscriptionService;
+use App\Services\PaystackService;
+use App\Services\ManualPaymentService;
 use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use Illuminate\Support\Facades\Http;
@@ -19,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 class PaymentController extends Controller
 {
 
-    public function initialize(Request $request)
+    public function initialize(Request $request, PaystackService $paystackService)
     {
         try {
             $user = Auth::user();
@@ -28,41 +30,26 @@ class PaymentController extends Controller
                 return redirect('register');
             }
             
-            $reference = Str::uuid()->toString();
-            $plan =Plan::find($request->plan_id);
-            Subscription::create([
-                'user_id' => Auth::id(),
-                'type' => 'default',
-                'stripe_status' => 'pending',
-                'payment_method' => 'paystack',
-            ]);
+            $plan = Plan::find($request->plan_id);
+            if (!$plan) {
+                return redirect()->back()->with('error', 'Selected plan not found.');
+            }
 
-            $payload = [
-                'email' => $user->email,
-                'plan' => $plan->paystack_product_id,
-                'reference' => $reference,
-                "amount"=> $plan->price_ngn *100, 
-                'callback_url' => route('payment.verify'),
-                'metadata' => [
-                    'user_id' => $user->id,
-                ],
-            ];
-
-            $response = Http::withToken(config('services.paystack.secret_key'))
-                ->acceptJson()
-                ->post('https://api.paystack.co/transaction/initialize', $payload);
+            $res = $paystackService->initialize($user, $plan, $request->currency);
+            $response = $res['response'];
+            $payload = $res['payload'];
 
             if (!$response->successful()) {
+                $errData = $response->json();
                 Log::error('Paystack initialize failed', [
                     'user_id' => $user->id,
                     'payload' => $payload,
                     'status' => $response->status(),
-                    'response' => $response->json(),
+                    'response' => $errData,
                 ]);
 
-                return response()->json([
-                    'error' => 'Unable to initialize subscription',
-                ], 500);
+                $msg = $errData['message'] ?? 'Unable to initialize subscription';
+                return redirect()->back()->with('error', "Paystack initialization failed: {$msg}");
             }
 
             $data = $response->json();
@@ -73,15 +60,12 @@ class PaymentController extends Controller
                     'response' => $data,
                 ]);
 
-                return response()->json([
-                    'error' => 'Invalid payment response',
-                ], 500);
+                return redirect()->back()->with('error', 'Paystack returned an invalid response.');
             }
 
             return redirect()->away($data['data']['authorization_url']);
 
         } catch (\Throwable $e) {
-
             Log::critical('Paystack subscription initialization exception', [
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
@@ -94,16 +78,25 @@ class PaymentController extends Controller
         }
     }
 
-    public function handlePaystackCallback(Request $request, PaystackSubscriptionService $service)
+    public function handlePaystackCallback(Request $request, PaystackService $paystackService, PaystackSubscriptionService $service)
     {
         $reference = $request->query('reference');
+        logger()->info('Paystack callback received', [
+            'user_id' => Auth::id(),
+            'reference' => $reference,
+            'all' => $request->all(),
+        ]);
 
         if (!$reference) {
             return response()->json(['error' => 'No transaction reference supplied'], 400);
         }
 
-        $response = Http::withToken(config('services.paystack.secret_key'))
-            ->get("https://api.paystack.co/transaction/verify/{$reference}");
+        $response = $paystackService->verify($reference);
+        logger()->info('Paystack verification response', [
+            'user_id' => Auth::id(),
+            'reference' => $reference,
+            'response' => $response->json(),
+        ]);
 
         if (!$response->successful()) {
             return response()->json(['error' => 'Verification failed'], 500);
@@ -119,10 +112,54 @@ class PaymentController extends Controller
             return redirect()->route('home')->with('error', 'Payment failed');
         }
 
-        $user =User::where('email', $data['email'])->first();
+        $user = User::where('email', $data['email'])->first();
         $service->store($user, $data);
 
         return redirect()->route('home')->with('success', 'Subscription activated');
+    }
+
+    public function directCheckout(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return redirect('register');
+            }
+
+            $planId = $request->input('plan_id');
+            if (!$planId) {
+                return redirect('/member/plan')->with('error', 'Missing plan choice.');
+            }
+
+            $plan = Plan::find($planId);
+            if (!$plan) {
+                return redirect('/member/plan')->with('error', 'Selected plan not found.');
+            }
+
+            $paymentMethod = $request->input('payment_method');
+            if (!$paymentMethod) {
+                $currency = $request->input('currency', 'EUR');
+                $paymentMethod = ($currency === 'NGN') ? 'paystack' : 'stripe';
+                $request->merge(['payment_method' => $paymentMethod]);
+            }
+
+            if ($paymentMethod === 'stripe') {
+                return app(\App\Http\Controllers\StripeController::class)->checkout($request);
+            } elseif ($paymentMethod === 'paystack') {
+                return $this->initialize($request, app(PaystackService::class));
+            } elseif ($paymentMethod === 'paypal') {
+                return app(\App\Http\Controllers\PayPalController::class)->pay($request);
+            }
+
+            return redirect('/member/plan')->with('error', 'Invalid payment method.');
+        } catch (\Throwable $e) {
+            Log::error('Direct checkout failed', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect('/member/plan')->with('error', 'Direct checkout failed: ' . $e->getMessage());
+        }
     }
 
     public function redirectToStripe(Request $request)
@@ -159,66 +196,15 @@ class PaymentController extends Controller
         return view('payment.cancel');
     }
 
-    public function manualPayment(ManualPaymentRequest $request)
+    public function manualPayment(ManualPaymentRequest $request, ManualPaymentService $service)
     {
-        $user = User::findOrFail($request->user_id);
-        $reference = (string) Str::uuid();
-
-        $startsAt = $request->starts_at ?? now();
-        $endsAt = $request->ends_at ?? now()->addMonth();
-        $reference = Str::uuid()->toString(); 
-
-        DB::beginTransaction();
         try {
-            $subscription = Subscription::where('user_id', $user->id)->first();
-
-            if ($subscription) {
-                $subscription->update([
-                    'ends_at' => $endsAt,
-                    'stripe_status' => 'active',
-                    'stripe_price' => $request->plan_price_id ?? $subscription->stripe_price,
-                    'quantity' => 1,
-                ]);
-            } else {
-            DB::table('payments')->insert([
-                'user_id' => $request->user_id,
-                'reference' => $reference,
-                'amount' => $request->amount,
-                'metadata' => json_encode($request->all()),
-                'payment_method' =>'Manual',
-                'starts_at' => $startsAt,
-                'notified_at' => null,
-                'ends_at' =>  $endsAt,
-                'status' => 'successful',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            }
-
-            $user->update([
-                'metadata' => $request->all(),
-                'premium' => $request->premium === 'premium',
-                'payment_method' => 'Manual',
-                'last_payment_reference' => $reference,
-                'last_payment_amount' => $request->amount,
-                'payment_status' => 'successful',
-                'last_payment_at' => now(),
-            ]);
-
-            DB::commit();
-
+            $service->process($request);
             return response()->json([
                 'success' => true,
-                    'Subscription Updated successfully.',
+                'message' => 'Subscription updated successfully.',
             ], 200);
-
         } catch (\Throwable $e) {
-            DB::rollBack();
-            logger()->error('Manual Payment Failed', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Manual payment failed. ' . $e->getMessage(),

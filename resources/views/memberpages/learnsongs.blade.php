@@ -167,6 +167,9 @@
             <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug">
               {{ $cat->category }}
             </h3>
+            @if($firstSong && !empty($firstSong->author))
+              <p class="text-xs text-indigo-500 font-medium -mt-2">by {{ $firstSong->author }}</p>
+            @endif
 
             <!-- Level Badge -->
             <div>

@@ -14,6 +14,7 @@ const PlanSwitchAndCurrencySelect = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [plans, setPlans] = useState([]);
     const [selectedPlanDetails, setSelectedPlanDetails] = useState(null);
+    const [isCheckoutOnly, setIsCheckoutOnly] = useState(false);
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
@@ -35,15 +36,41 @@ const PlanSwitchAndCurrencySelect = () => {
         fetchPlans();
     }, []);
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const planId = params.get("plan_id");
+        const curr = params.get("currency");
+        const dur = params.get("duration");
+
+        if (curr) {
+            setCurrency(curr);
+        }
+        if (dur) {
+            setSelectedPlan(dur);
+        }
+
+        if (planId && plans.length > 0) {
+            const foundPlan = plans.find((p) => String(p.id) === String(planId));
+            if (foundPlan) {
+                setSelectedPlanDetails(foundPlan);
+                setModalOpen(true);
+                setIsCheckoutOnly(true);
+                // Clear URL params so reload doesn't trigger modal again
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        }
+    }, [plans]);
+
     const authUser = window.authUser || null;
 
     const handleModalOpen = (plan) => {
-        if (!authUser) {
-            window.location.href = "/register";
-            return;
-        }
         setSelectedPlanDetails(plan);
         setModalOpen(true);
+    };
+
+    const handleGuestCheckoutChoice = (method) => {
+        window.location.href = `/register?plan_id=${selectedPlanDetails.id}&currency=${currency}&tier=${selectedPlanDetails.tier}&duration=${selectedPlanDetails.type}&payment_method=${method}`;
     };
 
     const filteredPlans = plans.filter((plan) => plan.type === selectedPlan);
@@ -86,6 +113,112 @@ const PlanSwitchAndCurrencySelect = () => {
         quarterly: "Save 10%",
         yearly: "Save 30%",
     };
+    if (isCheckoutOnly && selectedPlanDetails) {
+        return (
+            <div className="flex items-center justify-center py-6 px-4">
+                <div className="bg-[#2D2D2D] rounded-2xl shadow-2xl p-8 sm:p-12 w-full max-w-xl border border-gray-800">
+                    <h2 className="text-3xl font-extrabold text-center text-white mb-2 tracking-tight">
+                        Complete Your Subscription
+                    </h2>
+                    <div className="bg-[#3D3D3D] rounded-xl p-6 text-center my-6 border border-gray-700">
+                        <p className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-1">
+                            Selected Plan
+                        </p>
+                        <h3 className="text-2xl font-bold text-white mb-2">
+                            {selectedPlanDetails.tier?.toLowerCase().includes("premium") ? "Premium" : "Standard"} Plan
+                        </h3>
+                        <div className="text-3xl font-black text-white">
+                            {currencySigns[currency]}
+                            {matchAmountToCurrency(selectedPlanDetails)}
+                            <span className="text-sm text-gray-400 font-medium font-normal">
+                                /{selectedPlanDetails.type === "monthly" ? "month" : selectedPlanDetails.type === "quarterly" ? "quarter" : "year"}
+                            </span>
+                        </div>
+                    </div>
+
+                    <p className="text-center text-gray-300 mb-6 font-medium">
+                        Choose your preferred payment method below to complete payment:
+                    </p>
+
+                    <div className="flex flex-col gap-4">
+                        <form action="/stripe/create" method="POST">
+                            <input type="hidden" name="_token" value={csrfToken} />
+                            <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
+                            <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
+                            <input type="hidden" name="duration" value={selectedPlanDetails.type} />
+                            <input type="hidden" name="currency" value={currency} />
+                            <button
+                                type="submit"
+                                className="bg-[#FFD736] hover:bg-[#E5C130] text-gray-900 py-3.5 rounded-xl text-center font-bold w-full transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                            >
+                                Pay with Stripe
+                            </button>
+                        </form>
+
+                        <form action="/paystack" method="POST">
+                            <input type="hidden" name="_token" value={csrfToken} />
+                            <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
+                            <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
+                            <input type="hidden" name="duration" value={selectedPlanDetails.type} />
+                            <input type="hidden" name="currency" value={currency} />
+                            <button
+                                type="submit"
+                                className="bg-white hover:bg-gray-100 text-gray-900 py-3.5 rounded-xl text-center font-bold w-full transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                            >
+                                Pay with Paystack
+                            </button>
+                        </form>
+
+                        {currency !== "NGN" && (
+                            <form action="/paypal/create-order" method="POST">
+                                <input type="hidden" name="_token" value={csrfToken} />
+                                <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
+                                <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
+                                <input type="hidden" name="duration" value={selectedPlanDetails.type} />
+                                <input type="hidden" name="currency" value={currency} />
+                                <button
+                                    type="submit"
+                                    className="bg-[#003087] hover:bg-[#001C54] text-white py-3.5 rounded-xl text-center font-bold w-full transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                                >
+                                    Pay with PayPal
+                                </button>
+                            </form>
+                        )}
+                    </div>
+
+                    <div className="mt-8 flex items-center justify-center text-xs text-gray-500">
+                        <p className="flex items-center gap-2">
+                            Secure payment powered by
+                            <span className="inline-block bg-gray-800 rounded px-1.5 py-0.5">
+                                <img src="/icons/stripe2.png" alt="Stripe" className="h-3" />
+                            </span>
+                            <span className="inline-block bg-gray-800 rounded px-1.5 py-0.5">
+                                <img src="/icons/paystack2.png" alt="Paystack" className="h-3" />
+                            </span>
+                            {currency !== "NGN" && (
+                                <span className="inline-block bg-gray-800 rounded px-1.5 py-0.5">
+                                    <img src="/icons/paypal.png" alt="PayPal" className="h-3" />
+                                </span>
+                            )}
+                        </p>
+                    </div>
+
+                    <div className="mt-8 text-center">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsCheckoutOnly(false);
+                                setModalOpen(false);
+                            }}
+                            className="text-gray-400 hover:text-white text-sm font-semibold transition"
+                        >
+                            &larr; Choose a different plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <section className="container mx-auto px-5 md:px-10 lg:px-20 bg-white mb-24 overflow-x-hidden">
@@ -241,87 +374,117 @@ const PlanSwitchAndCurrencySelect = () => {
                         </p>
 
                         <div className="flex flex-col gap-6">
-                            <form action="/stripe/create" method="POST">
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value={csrfToken}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="plan_id"
-                                    value={selectedPlanDetails.id}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="tier"
-                                    value={selectedPlanDetails.tier}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="duration"
-                                    value={selectedPlanDetails.type}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="currency"
-                                    value={currency}
-                                />
-                                <button
-                                    type="submit"
-                                    className="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold w-full"
-                                >
-                                    Pay with Stripe
-                                </button>
-                            </form>
-                            <form action="/paystack" method="POST">
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value={csrfToken}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="plan_id"
-                                    value={selectedPlanDetails.id}
-                                />
-                                
-                                <input
-                                    type="hidden"
-                                    name="tier"
-                                    value={selectedPlanDetails.tier}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="duration"
-                                    value={selectedPlanDetails.type}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="currency"
-                                    value={currency}
-                                />
-                                <button
-                                    type="submit"
-                                    className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full"
-                                >
-                                    Pay with Paystack
-                                </button>
-                            </form>
-
-                            {/* <form action="/paypal/create-order" method="POST">
-                                <input type="hidden" name="_token" value={csrfToken} />
-                                <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
-                                <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
-                                <input type="hidden" name="duration" value={selectedPlanDetails.type} />
-                                <input type="hidden" name="currency" value={currency} />
-                                <button
-                                    type="submit"
-                                    className="bg-cyan-500 hover:bg-cyan-800 py-3 rounded text-center font-semibold w-full"
-                                >
-                                    Pay with PayPal
-                                </button>
-                            </form> */}
+                            {authUser ? (
+                                <>
+                                    <form action="/stripe/create" method="POST">
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value={csrfToken}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="plan_id"
+                                            value={selectedPlanDetails.id}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="tier"
+                                            value={selectedPlanDetails.tier}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="duration"
+                                            value={selectedPlanDetails.type}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="currency"
+                                            value={currency}
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold w-full"
+                                        >
+                                            Pay with Stripe
+                                        </button>
+                                    </form>
+                                    <form action="/paystack" method="POST">
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value={csrfToken}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="plan_id"
+                                            value={selectedPlanDetails.id}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="tier"
+                                            value={selectedPlanDetails.tier}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="duration"
+                                            value={selectedPlanDetails.type}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="currency"
+                                            value={currency}
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full"
+                                        >
+                                            Pay with Paystack
+                                        </button>
+                                    </form>
+                                    {currency !== "NGN" && (
+                                        <form action="/paypal/create-order" method="POST">
+                                            <input type="hidden" name="_token" value={csrfToken} />
+                                            <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
+                                            <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
+                                            <input type="hidden" name="duration" value={selectedPlanDetails.type} />
+                                            <input type="hidden" name="currency" value={currency} />
+                                            <button
+                                                type="submit"
+                                                className="bg-[#003087] hover:bg-[#001C54] text-white py-3 rounded text-center font-semibold w-full transition duration-200"
+                                            >
+                                                Pay with PayPal
+                                            </button>
+                                        </form>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleGuestCheckoutChoice("stripe")}
+                                        className="bg-[#FFD736] hover:bg-[#a7923e] py-3 rounded text-center font-semibold w-full text-gray-900"
+                                    >
+                                        Pay with Stripe
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleGuestCheckoutChoice("paystack")}
+                                        className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full text-gray-900"
+                                    >
+                                        Pay with Paystack
+                                    </button>
+                                    {currency !== "NGN" && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleGuestCheckoutChoice("paypal")}
+                                            className="bg-[#003087] hover:bg-[#001C54] text-white py-3 rounded text-center font-semibold w-full transition duration-200"
+                                        >
+                                            Pay with PayPal
+                                        </button>
+                                    )}
+                                </>
+                            )}
                         </div>
 
                         <div className="mt-4 flex items-center justify-center text-sm text-gray-400">
@@ -341,13 +504,15 @@ const PlanSwitchAndCurrencySelect = () => {
                                         className="h-4"
                                     />
                                 </span>
-                                {/* <span className="inline-block mx-2 bg-gray-300 rounded-md p-1">
-                                    <img
-                                        src="/icons/paypal.png"
-                                        alt="Paystack"
-                                        className="h-4"
-                                    />
-                                </span> */}
+                                {currency !== "NGN" && (
+                                    <span className="inline-block mx-2 bg-gray-300 rounded-md p-1">
+                                        <img
+                                            src="/icons/paypal.png"
+                                            alt="PayPal"
+                                            className="h-4"
+                                        />
+                                    </span>
+                                )}
                             </p>
                         </div>
                     </div>

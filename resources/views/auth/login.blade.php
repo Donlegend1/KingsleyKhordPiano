@@ -17,7 +17,7 @@
     </div>
 
     <!-- Form -->
-    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+    <form method="POST" action="{{ route('login') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="space-y-4">
       @csrf
 
       <!-- Email -->
@@ -102,7 +102,7 @@
     <!-- Footer -->
     <p class="mt-6 text-center text-sm text-gray-500">
       Don't have an account?
-      <a href="/plans" class="font-semibold text-gray-900 hover:underline">
+      <a href="{{ route('register') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="font-semibold text-gray-900 hover:underline">
         Sign up
       </a>
     </p>

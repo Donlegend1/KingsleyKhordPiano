@@ -88,9 +88,14 @@
                     <div id="uploads-single" class="w-full h-full"></div>
 
                     {{-- Title --}}
-                    <h1 class="text-[22px] font-bold text-gray-900 mt-5 mb-5">
+                    <h1 class="text-[22px] font-bold text-gray-900 mt-5 mb-1">
                         {{ Str::title($lesson->title) }}
                     </h1>
+                    @if(!empty($lesson->author))
+                        <p class="text-indigo-600 font-semibold text-sm mb-5">by {{ $lesson->author }}</p>
+                    @else
+                        <div class="mb-5"></div>
+                    @endif
 
                     @if (!empty($lesson->images) && is_array($lesson->images))
                         <div class="mt-6 mb-8">

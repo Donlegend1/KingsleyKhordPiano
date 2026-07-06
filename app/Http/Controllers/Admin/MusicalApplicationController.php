@@ -91,7 +91,7 @@ class MusicalApplicationController extends Controller
 
     public function update(Request $request, MusicalApplication $musicalApplication)
     {
-        $validated = $request->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'video_url' => 'required|string',
@@ -99,11 +99,20 @@ class MusicalApplicationController extends Controller
             'skill_level' => 'required|in:Beginner,Intermediate,Advanced',
             'series' => 'nullable|string',
             'status' => 'required|in:active,inactive,draft',
-            'thumbnail' => 'nullable|image|max:2048',
             'tags' => 'nullable|array',
-            'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
-            'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
-        ]);
+        ];
+
+        if ($request->hasFile('thumbnail')) {
+            $rules['thumbnail'] = 'image|max:2048';
+        }
+        if ($request->hasFile('audio_resource')) {
+            $rules['audio_resource'] = 'file|mimes:mp3,wav,ogg,m4a|max:20480';
+        }
+        if ($request->hasFile('pdf_resource')) {
+            $rules['pdf_resource'] = 'file|mimes:pdf|max:20480';
+        }
+
+        $validated = $request->validate($rules);
 
         if (isset($validated['video_type'])) {
             $videoPath = $validated['video_url'];

@@ -29,6 +29,43 @@ const ExtraCoursesAdmin = () => {
     const [newCategoryLevel, setNewCategoryLevel] = useState(null);
     const [newCategoryName, setNewCategoryName] = useState("");
 
+    // Edit Category States
+    const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
+    const [editingCategoryName, setEditingCategoryName] = useState("");
+    const [originalCategoryName, setOriginalCategoryName] = useState("");
+
+    const openEditCategoryModal = (categoryName) => {
+        setOriginalCategoryName(categoryName);
+        setEditingCategoryName(categoryName);
+        setEditCategoryModalOpen(true);
+    };
+
+    const handleUpdateCategory = async () => {
+        if (!editingCategoryName.trim()) return;
+        setLoading(true);
+        try {
+            await axios.put(
+                `/api/admin/extra-courses/category/${originalCategoryName}/update`,
+                {
+                    category: editingCategoryName,
+                },
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                    withCredentials: true,
+                }
+            );
+            fetchCourses();
+            setEditCategoryModalOpen(false);
+            showMessage("Category Updated successfully", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message || "Error updating category", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
     const [selectedLevel, setSelectedLevel] = useState("");
     const [selectedCategoryName, setSelectedCategoryName] = useState("");
@@ -410,6 +447,13 @@ const ExtraCoursesAdmin = () => {
                                                                                         Add Course
                                                                                     </button>
                                                                                     <i
+                                                                                        className="fa fa-pencil text-blue-500 hover:text-blue-700 text-sm cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            openEditCategoryModal(categoryName);
+                                                                                        }}
+                                                                                    ></i>
+                                                                                    <i
                                                                                         className="fa fa-trash text-red-500 hover:text-red-700 text-sm"
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
@@ -494,7 +538,20 @@ const ExtraCoursesAdmin = () => {
                     </div>
                     <div className="flex justify-end gap-3 pt-2">
                         <button onClick={() => setNewCategoryModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button onClick={handleCreateCategory} className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Create</button>
+                        <button
+                            onClick={handleCreateCategory}
+                            disabled={loading}
+                            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Creating...</span>
+                                </>
+                            ) : (
+                                "Create"
+                            )}
+                        </button>
                     </div>
                 </div>
             </Modal>
@@ -625,7 +682,20 @@ const ExtraCoursesAdmin = () => {
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                         <button type="button" onClick={() => setIsCreateCourseModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Save Course</button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                "Save Course"
+                            )}
+                        </button>
                     </div>
                 </form>
             </Modal>
@@ -772,7 +842,20 @@ const ExtraCoursesAdmin = () => {
 
                         <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" onClick={() => setIsEditCourseModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                            <button type="submit" className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Update Course</button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <i className="fa fa-spinner fa-spin"></i>
+                                        <span>Updating...</span>
+                                    </>
+                                ) : (
+                                    "Update Course"
+                                )}
+                            </button>
                         </div>
                     </form>
                 )}
@@ -785,7 +868,53 @@ const ExtraCoursesAdmin = () => {
                     <p className="text-gray-500 text-sm mb-6">Are you sure you want to delete course <span className="font-semibold text-red-600">"{courseToDelete?.title}"</span>? This action is permanent.</p>
                     <div className="flex justify-center gap-3">
                         <button onClick={() => setIsDeleteCourseModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button onClick={handleDeleteCourse} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold">Yes, Delete</button>
+                        <button
+                            onClick={handleDeleteCourse}
+                            disabled={loading}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Deleting...</span>
+                                </>
+                            ) : (
+                                "Yes, Delete"
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Edit Category Modal */}
+            <Modal isOpen={editCategoryModalOpen} onClose={() => setEditCategoryModalOpen(false)}>
+                <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Edit Category Name</h3>
+                    <div className="mb-4">
+                        <label className="block mb-2 font-medium text-gray-700">Category Name:</label>
+                        <input
+                            type="text"
+                            value={editingCategoryName}
+                            onChange={(e) => setEditingCategoryName(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <button onClick={() => setEditCategoryModalOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">Cancel</button>
+                        <button
+                            onClick={handleUpdateCategory}
+                            disabled={loading}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                "Save Changes"
+                            )}
+                        </button>
                     </div>
                 </div>
             </Modal>

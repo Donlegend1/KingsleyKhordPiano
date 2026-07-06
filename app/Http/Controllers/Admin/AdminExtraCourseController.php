@@ -370,4 +370,21 @@ class AdminExtraCourseController extends Controller
             'message' => 'Category positions updated successfully',
         ]);
     }
+
+    public function updateCategory(Request $request, $name)
+    {
+        $request->validate([
+            'category' => 'required|string|max:255',
+        ]);
+
+        $category = ExtraCourseCategory::where('category', $name)->firstOrFail();
+        $category->update([
+            'category' => $request->input('category'),
+        ]);
+
+        return response()->json([
+            'message' => 'Category updated successfully',
+            'category' => $category
+        ], 200);
+    }
 }

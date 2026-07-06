@@ -25,6 +25,43 @@ const DraggableCategoryList = ({
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
+
+    // Edit Category States
+    const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
+    const [editingCategoryName, setEditingCategoryName] = useState("");
+    const [originalCategoryName, setOriginalCategoryName] = useState("");
+
+    const openEditCategoryModal = (categoryName) => {
+        setOriginalCategoryName(categoryName);
+        setEditingCategoryName(categoryName);
+        setEditCategoryModalOpen(true);
+    };
+
+    const handleUpdateCategory = async () => {
+        if (!editingCategoryName.trim()) return;
+        setLoading(true);
+        try {
+            await axios.put(
+                `/api/admin/course/category/${originalCategoryName}/update`,
+                {
+                    category: editingCategoryName,
+                },
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                    withCredentials: true,
+                }
+            );
+            fetchCourses();
+            setEditCategoryModalOpen(false);
+            showMessage("Course Category Updated", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message || "Error updating category", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
     const [selectedCourse, setSelectedCourse] = useState({
         title: "",
         category: "",
@@ -282,6 +319,8 @@ const DraggableCategoryList = ({
     };
 
     const handleDeleteCategory = async (category) => {
+        if (!confirm(`Are you sure you want to delete category "${category}"?`)) return;
+        setLoading(true);
         try {
             const response = await axios.delete(
                 `/api/admin/course/category/${category}/delete`,
@@ -346,6 +385,19 @@ const DraggableCategoryList = ({
                                                         <span>{category}</span>
 
                                                         <div className="flex items-center gap-4">
+                                                            {/* Edit Icon */}
+                                                            <i
+                                                                className="fa fa-pencil text-blue-600 hover:text-blue-800 text-sm cursor-pointer"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation(); // prevent toggle
+                                                                    openEditCategoryModal(
+                                                                        category
+                                                                    );
+                                                                }}
+                                                            ></i>
+
                                                             {/* Delete Icon */}
                                                             <i
                                                                 className="fa fa-trash text-red-600 hover:text-red-800 text-sm cursor-pointer"
@@ -710,6 +762,49 @@ const DraggableCategoryList = ({
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
                         >
                             Yes, Delete
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Edit Category Modal */}
+            <Modal
+                isOpen={editCategoryModalOpen}
+                onClose={() => setEditCategoryModalOpen(false)}
+            >
+                <div className="p-6">
+                    <h2 className="text-xl font-bold mb-4 text-gray-800">
+                        Edit Category Name
+                    </h2>
+                    <div className="mb-4">
+                        <label className="block mb-2 font-medium text-gray-700">Category Name:</label>
+                        <input
+                            type="text"
+                            value={editingCategoryName}
+                            onChange={(e) => setEditingCategoryName(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                        />
+                    </div>
+                    <div className="flex justify-end space-x-4">
+                        <button
+                            onClick={() => setEditCategoryModalOpen(false)}
+                            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleUpdateCategory}
+                            disabled={loading}
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                "Save Changes"
+                            )}
                         </button>
                     </div>
                 </div>

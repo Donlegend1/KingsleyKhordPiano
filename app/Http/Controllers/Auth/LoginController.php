@@ -19,9 +19,6 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 
-    /**
-     * Called automatically after a successful login.
-     */
     protected function authenticated(Request $request, $user)
     {
         $user->update([
@@ -29,6 +26,10 @@ class LoginController extends Controller
         ]);
 
         UserDailyLogin::recordToday($user->id, $user->timezone);
+
+        if ($request->has('plan_id')) {
+            return app(\App\Http\Controllers\PaymentController::class)->directCheckout($request);
+        }
     }
 
     /**

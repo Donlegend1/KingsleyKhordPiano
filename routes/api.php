@@ -71,6 +71,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
         Route::post('/courses/category/create', [CourseCategoryController::class, 'create']);
         Route::delete('/course/category/{name}/delete', [CourseCategoryController::class, 'delete']);
+        Route::put('/course/category/{name}/update', [CourseCategoryController::class, 'update']);
 
         // Learn Songs Admin API
         Route::get('learn-songs', [AdminLearnSongController::class, 'list']);
@@ -80,6 +81,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('learn-songs/{id}', [AdminLearnSongController::class, 'deleteSong']);
         Route::post('learn-songs/category/create', [AdminLearnSongController::class, 'createCategory']);
         Route::delete('learn-songs/category/{name}/delete', [AdminLearnSongController::class, 'deleteCategory']);
+        Route::put('learn-songs/category/{name}/update', [AdminLearnSongController::class, 'updateCategory']);
         Route::post('reorder/learn-songs', [AdminLearnSongController::class, 'updatePositions']);
 
         // Extra Courses Admin API
@@ -90,6 +92,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('extra-courses/{id}', [AdminExtraCourseController::class, 'deleteCourse']);
         Route::post('extra-courses/category/create', [AdminExtraCourseController::class, 'createCategory']);
         Route::delete('extra-courses/category/{name}/delete', [AdminExtraCourseController::class, 'deleteCategory']);
+        Route::put('extra-courses/category/{name}/update', [AdminExtraCourseController::class, 'updateCategory']);
         Route::post('reorder/extra-courses', [AdminExtraCourseController::class, 'updatePositions']);
 
         Route::post('/midi-file/create', [MidiFileController::class, 'store']);

@@ -56,6 +56,7 @@ class AdminLearnSongController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'author' => 'nullable|string|max:255',
             'category' => 'required|string', // Category name
             'level' => 'required|string',
             'video_type' => 'required|string',
@@ -156,6 +157,7 @@ class AdminLearnSongController extends Controller
         $song = LearnSong::create([
             'learn_song_category_id' => $category->id,
             'title' => $request->input('title'),
+            'author' => $request->input('author'),
             'description' => $request->input('description'),
             'video_type' => $videoType,
             'video_url' => $videoUrl,
@@ -178,6 +180,7 @@ class AdminLearnSongController extends Controller
 
         $request->validate([
             'title' => 'nullable|string|max:255',
+            'author' => 'nullable|string|max:255',
             'video_type' => 'nullable|string',
             'video_url' => 'nullable|string',
             'status' => 'nullable|string',
@@ -286,6 +289,7 @@ class AdminLearnSongController extends Controller
 
         $song->update([
             'title' => $request->input('title') ?? $song->title,
+            'author' => $request->has('author') ? $request->input('author') : $song->author,
             'description' => $request->input('description') ?? $song->description,
             'video_type' => $videoType,
             'video_url' => $videoUrl,
@@ -369,5 +373,22 @@ class AdminLearnSongController extends Controller
         return response()->json([
             'message' => 'Category positions updated successfully',
         ]);
+    }
+
+    public function updateCategory(Request $request, $name)
+    {
+        $request->validate([
+            'category' => 'required|string|max:255',
+        ]);
+
+        $category = LearnSongCategory::where('category', $name)->firstOrFail();
+        $category->update([
+            'category' => $request->input('category'),
+        ]);
+
+        return response()->json([
+            'message' => 'Category updated successfully',
+            'category' => $category
+        ], 200);
     }
 }

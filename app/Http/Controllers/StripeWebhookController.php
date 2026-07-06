@@ -115,6 +115,18 @@ class StripeWebhookController extends Controller
         $user->subscription_status     = 'active';
         $user->save();
 
+        // Create or update subscription record
+        Subscription::updateOrCreate(
+            ['user_id' => $user->id, 'type' => 'default'],
+            [
+                'stripe_id' => $session->subscription ?? 'stripe_' . $session->id,
+                'stripe_status' => 'active',
+                'status' => 'active',
+                'ends_at' => $user->subscription_expires_at,
+                'payment_method' => 'stripe',
+            ]
+        );
+
         logger()->info("Checkout session completed for user {$user->id}, tier={$tier}");
     }
 

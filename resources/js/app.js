@@ -54,5 +54,6 @@ import './components/AudioDownload/PDFFiles.jsx';
 // import './components/WhatsApp/WhatsAppGroupModalWrapper.jsx';
 import './components/musical-application/MusicalApplications.jsx';
 import './components/Home/CoachReels.jsx';
+import './components/Guidance/PersonalizedGuidance.jsx';
 
 

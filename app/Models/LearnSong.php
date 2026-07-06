@@ -12,6 +12,7 @@ class LearnSong extends Model
     protected $fillable = [
         'learn_song_category_id',
         'title',
+        'author',
         'description',
         'video_type',
         'video_url',

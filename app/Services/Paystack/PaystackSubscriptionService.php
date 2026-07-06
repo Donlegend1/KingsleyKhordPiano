@@ -27,12 +27,13 @@ class PaystackSubscriptionService
                     ],
                     [
                         'plan_code'          => Arr::get($data, 'plan'),
-                        'subscription_code'  => Arr::get($data, 'subscription.subscription_code'),
-                        'email_token'        => Arr::get($data, 'subscription.email_token'),
+                        'subscription_code'  => Arr::get($data, 'subscription.subscription_code') ?? Arr::get($data, 'subscription_code'),
+                        'email_token'        => Arr::get($data, 'subscription.email_token') ?? Arr::get($data, 'email_token'),
                         'authorization_code' => Arr::get($data, 'authorization.authorization_code'),
-                        'end_date'           => Arr::get($data, 'period_end'),
+                        'ends_at'            => Arr::get($data, 'period_end') ? \Carbon\Carbon::parse(Arr::get($data, 'period_end')) : (\Carbon\Carbon::parse(Arr::get($data, 'next_payment_date') ?? '+1 month')),
                         'type'               => 'default',
                         'status'             => 'active',
+                        'stripe_status'      => 'active',
                     ]
                 );
       

@@ -29,11 +29,49 @@ const LearnSongsAdmin = () => {
     const [newCategoryLevel, setNewCategoryLevel] = useState(null);
     const [newCategoryName, setNewCategoryName] = useState("");
 
+    // Edit Category States
+    const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
+    const [editingCategoryName, setEditingCategoryName] = useState("");
+    const [originalCategoryName, setOriginalCategoryName] = useState("");
+
+    const openEditCategoryModal = (categoryName) => {
+        setOriginalCategoryName(categoryName);
+        setEditingCategoryName(categoryName);
+        setEditCategoryModalOpen(true);
+    };
+
+    const handleUpdateCategory = async () => {
+        if (!editingCategoryName.trim()) return;
+        setLoading(true);
+        try {
+            await axios.put(
+                `/api/admin/learn-songs/category/${originalCategoryName}/update`,
+                {
+                    category: editingCategoryName,
+                },
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                    withCredentials: true,
+                }
+            );
+            fetchSongs();
+            setEditCategoryModalOpen(false);
+            showMessage("Category Updated successfully", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message || "Error updating category", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const [isCreateSongModalOpen, setIsCreateSongModalOpen] = useState(false);
     const [selectedLevel, setSelectedLevel] = useState("");
     const [selectedCategoryName, setSelectedCategoryName] = useState("");
     const [newSong, setNewSong] = useState({
         title: "",
+        author: "",
         description: "",
         video_type: "iframe",
         video_url: "",
@@ -181,6 +219,7 @@ const LearnSongsAdmin = () => {
         setSelectedCategoryName(category);
         setNewSong({
             title: "",
+            author: "",
             description: "",
             video_type: "iframe",
             video_url: "",
@@ -199,6 +238,7 @@ const LearnSongsAdmin = () => {
 
         const formData = new FormData();
         formData.append("title", newSong.title);
+        formData.append("author", newSong.author || "");
         formData.append("description", newSong.description || "");
         formData.append("category", selectedCategoryName);
         formData.append("level", selectedLevel);
@@ -261,6 +301,7 @@ const LearnSongsAdmin = () => {
 
         const formData = new FormData();
         formData.append("title", editingSong.title);
+        formData.append("author", editingSong.author || "");
         formData.append("description", editingSong.description || "");
         formData.append("video_type", editingSong.video_type);
         formData.append("video_url", editingSong.video_url);
@@ -410,6 +451,13 @@ const LearnSongsAdmin = () => {
                                                                                         Add Song
                                                                                     </button>
                                                                                     <i
+                                                                                        className="fa fa-pencil text-blue-500 hover:text-blue-700 text-sm cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            openEditCategoryModal(categoryName);
+                                                                                        }}
+                                                                                    ></i>
+                                                                                    <i
                                                                                         className="fa fa-trash text-red-500 hover:text-red-700 text-sm"
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
@@ -443,6 +491,11 @@ const LearnSongsAdmin = () => {
                                                                                                     </div>
                                                                                                     <div className="p-4">
                                                                                                         <h4 className="font-bold text-gray-800 truncate mb-1">{song.title}</h4>
+                                                                                                        {song.author && (
+                                                                                                            <p className="text-xs text-blue-600 font-semibold mb-2 truncate">
+                                                                                                                by {song.author}
+                                                                                                            </p>
+                                                                                                        )}
                                                                                                         <p className="text-gray-500 text-xs line-clamp-2 h-8 leading-relaxed mb-3">{song.description || "No description provided."}</p>
                                                                                                         <span className="px-2 py-0.5 bg-gray-100 text-[10px] text-gray-600 rounded-md capitalize font-semibold">{song.video_type}</span>
                                                                                                     </div>
@@ -494,7 +547,20 @@ const LearnSongsAdmin = () => {
                     </div>
                     <div className="flex justify-end gap-3 pt-2">
                         <button onClick={() => setNewCategoryModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button onClick={handleCreateCategory} className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Create</button>
+                        <button
+                            onClick={handleCreateCategory}
+                            disabled={loading}
+                            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Creating...</span>
+                                </>
+                            ) : (
+                                "Create"
+                            )}
+                        </button>
                     </div>
                 </div>
             </Modal>
@@ -511,6 +577,15 @@ const LearnSongsAdmin = () => {
                                 required
                                 value={newSong.title}
                                 onChange={(e) => setNewSong({ ...newSong, title: e.target.value })}
+                                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Artist / Author (Optional)</label>
+                            <input
+                                type="text"
+                                value={newSong.author || ""}
+                                onChange={(e) => setNewSong({ ...newSong, author: e.target.value })}
                                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
@@ -625,7 +700,20 @@ const LearnSongsAdmin = () => {
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                         <button type="button" onClick={() => setIsCreateSongModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Save Song</button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                "Save Song"
+                            )}
+                        </button>
                     </div>
                 </form>
             </Modal>
@@ -643,6 +731,15 @@ const LearnSongsAdmin = () => {
                                     required
                                     value={editingSong.title}
                                     onChange={(e) => setEditingSong({ ...editingSong, title: e.target.value })}
+                                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                            </div>
+                            <div className="col-span-1 sm:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Artist / Author (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={editingSong.author || ""}
+                                    onChange={(e) => setEditingSong({ ...editingSong, author: e.target.value })}
                                     className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none"
                                 />
                             </div>
@@ -772,7 +869,20 @@ const LearnSongsAdmin = () => {
 
                         <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" onClick={() => setIsEditSongModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                            <button type="submit" className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Update Song</button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <i className="fa fa-spinner fa-spin"></i>
+                                        <span>Updating...</span>
+                                    </>
+                                ) : (
+                                    "Update Song"
+                                )}
+                            </button>
                         </div>
                     </form>
                 )}
@@ -785,7 +895,53 @@ const LearnSongsAdmin = () => {
                     <p className="text-gray-500 text-sm mb-6">Are you sure you want to delete song <span className="font-semibold text-red-600">"{songToDelete?.title}"</span>? This action is permanent.</p>
                     <div className="flex justify-center gap-3">
                         <button onClick={() => setIsDeleteSongModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button onClick={handleDeleteSong} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold">Yes, Delete</button>
+                        <button
+                            onClick={handleDeleteSong}
+                            disabled={loading}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Deleting...</span>
+                                </>
+                            ) : (
+                                "Yes, Delete"
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Edit Category Modal */}
+            <Modal isOpen={editCategoryModalOpen} onClose={() => setEditCategoryModalOpen(false)}>
+                <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Edit Category Name</h3>
+                    <div className="mb-4">
+                        <label className="block mb-2 font-medium text-gray-700">Category Name:</label>
+                        <input
+                            type="text"
+                            value={editingCategoryName}
+                            onChange={(e) => setEditingCategoryName(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <button onClick={() => setEditCategoryModalOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">Cancel</button>
+                        <button
+                            onClick={handleUpdateCategory}
+                            disabled={loading}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                "Save Changes"
+                            )}
+                        </button>
                     </div>
                 </div>
             </Modal>
