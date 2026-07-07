@@ -11,7 +11,7 @@
                     default => null,
                 };
 
-                $lessonUrl = $category === 'harmonic drills'
+                $lessonUrl = $category === 'guided practice'
                     ? "/member/piano-exercise/player?series=" . urlencode($latestCourse->series) . "&video_id={$latestCourse->id}"
                     : "/member/lesson/{$latestCourse->id}?type={$lessonType}";
             @endphp
