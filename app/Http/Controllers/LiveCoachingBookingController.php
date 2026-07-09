@@ -27,15 +27,15 @@ class LiveCoachingBookingController extends Controller
     {
         $user = Auth::user();
 
-        $monthStart = now()->startOfMonth()->toDateString();
-        $monthEnd = now()->endOfMonth()->toDateString();
+        [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
 
         $sessionsIncluded = 1;
         $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
-            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('date', '>=', $cycleStart->toDateString())
+            ->where('date', '<', $cycleEnd->toDateString())
             ->count();
 
-        $nextResetLabel = now()->startOfMonth()->addMonthNoOverflow()->format('F j, Y');
+        $nextResetLabel = $cycleEnd->format('F j, Y');
 
         $windowStart = now()->toDateString();
         $windowEnd = now()->addDays(self::WINDOW_DAYS - 1)->toDateString();
@@ -49,7 +49,8 @@ class LiveCoachingBookingController extends Controller
             ->toArray();
 
         $activeBooking = LiveCoachingBooking::where('user_id', $user->id)
-            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('date', '>=', $cycleStart->toDateString())
+            ->where('date', '<', $cycleEnd->toDateString())
             ->first();
 
         return view('memberpages.my-library', [
@@ -94,14 +95,14 @@ class LiveCoachingBookingController extends Controller
             return response()->json(['error' => 'Bookings must be made at least 24 hours in advance.'], 422);
         }
 
-        // 4) User must still have their free session available this month.
-        $monthStart = now()->startOfMonth()->toDateString();
-        $monthEnd = now()->endOfMonth()->toDateString();
+        // 4) User must still have their free session available this cycle.
+        [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
         $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
-            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('date', '>=', $cycleStart->toDateString())
+            ->where('date', '<', $cycleEnd->toDateString())
             ->count();
         if ($sessionsUsed >= 1) {
-            return response()->json(['error' => 'You have already used your free session this month.'], 422);
+            return response()->json(['error' => 'You have already used your free session this cycle.'], 422);
         }
 
         // 5) Slot must not already be booked by anyone else.
