@@ -223,17 +223,17 @@
                         </div>
                     @endif
 
-                    <div class="mt-8" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
-                        <h2 class="text-[18px] font-bold text-gray-900 mb-6">Discussion</h2>
+                    <div class="mt-10 pt-8 border-t border-gray-100" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
+                        <h2 class="text-[17px] font-semibold text-gray-900 tracking-tight mb-5">Discussion</h2>
                         <form id="comment-form" class="mb-8">
                             <textarea name="comment" placeholder="What did you learn from this lesson?"
-                                class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all outline-none" rows="3"></textarea>
+                                class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">
-                                <button type="submit" class="bg-[#2563EB] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#1D4ED8] transition-all">Comment</button>
+                                <button type="submit" class="bg-gray-900 text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-black transition-colors">Comment</button>
                             </div>
                         </form>
 
-                        <div class="space-y-6" id="comment-list">
+                        <div class="divide-y divide-gray-100" id="comment-list">
                             @foreach($comments as $comment)
                                 @include('memberpages.partials.course-video-comment', ['comment' => $comment])
                             @endforeach

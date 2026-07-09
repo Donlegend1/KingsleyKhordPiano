@@ -30,8 +30,8 @@
         </p>
     </div>
 
-    {{-- Scrollable grouped list --}}
-    <div class="overflow-y-auto" style="max-height: 520px;">
+    {{-- Grouped list --}}
+    <div>
         @foreach ($groupedPlaylist as $groupLevel => $items)
             <div>
                 <button type="button"

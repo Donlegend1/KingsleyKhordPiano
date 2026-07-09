@@ -121,6 +121,7 @@ class ExerciseController extends Controller
 
         $comments = CourseVideoComment::where('course_id', $activeVideo->id)
                             ->where('category', 'piano exercise')
+                            ->with(['user', 'replies.user'])
                             ->get();
 
         $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
