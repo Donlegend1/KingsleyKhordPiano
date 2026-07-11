@@ -5,6 +5,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
+import { watInputToUtcIso } from "../../utils/formatRelativeTime";
 
 
 const LiveShowForm = () => {
@@ -30,7 +31,7 @@ const LiveShowForm = () => {
         try {
             const response = await axios.post(
                 "/admin/live-shows",
-                liveShow
+                { ...liveShow, start_time: watInputToUtcIso(liveShow.start_time) }
             );
             showMessage("Live show created successfully!", "success");
             setLiveShow({
@@ -75,7 +76,7 @@ const LiveShowForm = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Start Date & Time
+                                Start Date & Time (WAT)
                             </label>
                             <input
                                 name="start_time"
@@ -85,6 +86,9 @@ const LiveShowForm = () => {
                                 className="w-full p-3 border rounded-md"
                                 required
                             />
+                            <p className="text-xs text-gray-400 mt-1">
+                                Enter the time in West Africa Time (WAT). It will be shown to each member in their own local time.
+                            </p>
                         </div>
 
                         <div>

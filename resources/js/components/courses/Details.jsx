@@ -810,7 +810,7 @@ const CoursesPage = () => {
                         className="rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
                     >
                         <div
-                            className="px-4 py-3.5 bg-white dark:bg-gray-900 font-bold text-base text-gray-800 dark:text-gray-100 cursor-pointer flex justify-between items-center transition hover:bg-gray-50 dark:hover:bg-gray-800"
+                            className="px-4 py-3.5 bg-gray-100 dark:bg-gray-900 font-bold text-base text-gray-800 dark:text-gray-100 cursor-pointer flex justify-between items-center transition hover:bg-gray-200 dark:hover:bg-gray-800"
                             onClick={() => toggleCategory(categoryObj.category)}
                         >
                             <span className="flex items-center gap-3">

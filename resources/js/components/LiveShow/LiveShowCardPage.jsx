@@ -10,6 +10,7 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
+import { formatLocalTime } from "../../utils/formatRelativeTime";
 
 const PremiumVideoSection = () => {
     const [videos, setVideos] = useState([]);
@@ -135,6 +136,7 @@ const PremiumVideoSection = () => {
                     const isToday = date.isSame(dayjs(), 'day');
                     const countdown = countdowns[video.id] || { days: 0, hours: 0, minutes: 0, seconds: 0 };
                     const isSession = video.category === "session";
+                    const { localDate, localTime, tzLabel } = formatLocalTime(video.start_time);
 
                     return (
                         <div
@@ -169,11 +171,11 @@ const PremiumVideoSection = () => {
                             <div className="flex items-center gap-4 text-gray-500 text-sm font-medium mb-6">
                                 <div className="flex items-center gap-1.5">
                                     <i className="fa-regular fa-calendar text-gray-400"></i>
-                                    {date.format("MMM DD, YYYY")}
+                                    {localDate}
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <i className="fa-regular fa-clock text-gray-400"></i>
-                                    {date.format("HH:mm")} (WAT)
+                                    {localTime} ({tzLabel})
                                 </div>
                             </div>
 

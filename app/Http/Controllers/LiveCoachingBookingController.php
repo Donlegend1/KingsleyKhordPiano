@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LiveCoachingBooking;
+use App\Services\GoogleCalendarService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -130,6 +131,22 @@ class LiveCoachingBookingController extends Controller
                 ->notify(new \App\Notifications\AdminCoachingBookingNotification($booking));
         } catch (\Exception $e) {
             logger()->warning('Failed to send live coaching session booking emails: ' . $e->getMessage());
+        }
+
+        try {
+            // Slot times are validated above against SCHEDULE, which is defined in WAT.
+            $startWat = Carbon::parse($request->date . ' ' . $time, 'Africa/Lagos');
+            $endWat = $startWat->copy()->addMinutes(45);
+
+            (new GoogleCalendarService())->createEvent([
+                'title' => 'Live Coaching Session with ' . $user->first_name . ' ' . $user->last_name,
+                'description' => "Booked by {$user->first_name} {$user->last_name} ({$user->email}) via the membership site.",
+                'start_time' => $startWat->toRfc3339String(),
+                'end_time' => $endWat->toRfc3339String(),
+                'timezone' => 'Africa/Lagos',
+            ]);
+        } catch (\Exception $e) {
+            logger()->warning('Failed to create Google Calendar event for coaching booking: ' . $e->getMessage());
         }
 
         return response()->json(['success' => true, 'booking' => $booking]);

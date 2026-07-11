@@ -60,17 +60,6 @@
             <p x-show="open" x-transition class="text-sm text-gray-600 mt-2">Go to your <a href="/member/profile" class="text-blue-500">account page </a> and follow the prompts.</p>
         </div>
 
-         <div x-data="{ open: false }" class="border-b pb-2">
-            <button @click="open = !open" class="w-full text-left flex justify-between items-center text-gray-700 font-medium">
-                <span>Will you transcrive this song for me? I am unable to catch every chord being played</span>
-                <svg :class="open ? 'rotate-180' : ''" class="h-5 w-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            <p x-show="open" x-transition class="text-sm text-gray-600 mt-2">While I don’t transcribe personal midi files anymore (my membership site is my top focus at the moment), I am willing to assist you in identifying the chords for a song. Post a link to a song in the Activity Feed and me or other members can jump in and help.</p>
-        </div>
-
-
         {{-- FAQ Item 2 --}}
         <div x-data="{ open: false }" class="border-b pb-2">
             <button @click="open = !open" class="w-full text-left flex justify-between items-center text-gray-700 font-medium">
@@ -101,38 +90,50 @@
 
 
     {{-- Contact Support Form --}}
-    <div class="bg-white p-6 rounded-2xl shadow-md">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Send Us a Message</h3>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                <i class="fa-regular fa-paper-plane text-indigo-600 text-sm"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 leading-tight">Send Us a Message</h3>
+                <p class="text-sm text-gray-500">We usually reply within a day.</p>
+            </div>
+        </div>
 
         @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 text-sm rounded-md p-4 mb-4">
-                {{ session('success') }}
+            <div class="flex items-start gap-2 bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl p-4 mb-6">
+                <i class="fa-solid fa-circle-check mt-0.5"></i>
+                <span>{{ session('success') }}</span>
             </div>
         @endif
 
-        <form action="/support/send" method="POST" class="space-y-6">
+        <form action="/support/send" method="POST" class="space-y-5">
             @csrf
             <div>
-                <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+                <label for="subject" class="block text-sm font-semibold text-gray-700 mb-1.5">Subject</label>
                 <input type="text" name="subject" id="subject" value="{{ old('subject') }}" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                       placeholder="What's this about?"
+                       class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none">
                 @error('subject')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                <label for="message" class="block text-sm font-semibold text-gray-700 mb-1.5">Message</label>
                 <textarea name="message" id="message" rows="5" required
-                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('message') }}</textarea>
+                          placeholder="Tell us how we can help..."
+                          class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none resize-none">{{ old('message') }}</textarea>
                 @error('message')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="flex justify-end">
+            <div class="flex justify-end pt-2">
                 <button type="submit"
-                        class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 font-medium text-sm">
+                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold text-sm shadow-sm shadow-indigo-200 transition-all duration-150 hover:scale-[1.02] active:scale-95">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
                     Send Message
                 </button>
             </div>
