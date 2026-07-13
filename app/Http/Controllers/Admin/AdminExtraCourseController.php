@@ -395,4 +395,20 @@ class AdminExtraCourseController extends Controller
             'category' => $category
         ], 200);
     }
+
+    public function updateCoursePositions(Request $request)
+    {
+        $validated = $request->validate([
+            'courses' => 'required|array',
+            'courses.*' => 'integer',
+        ]);
+
+        foreach ($validated['courses'] as $index => $id) {
+            ExtraCourse::where('id', $id)->update(['position' => $index + 1]);
+        }
+
+        return response()->json([
+            'message' => 'Extra course positions updated successfully',
+        ]);
+    }
 }

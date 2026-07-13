@@ -44,8 +44,8 @@ class LiveShowController extends Controller
 
             if ($subscribers->isNotEmpty()) {
                 foreach ($subscribers as $subscriber) {
-                    if ($subscriber->user) {
-                         new NewLiveShowNotification($liveshow, $subscriber->user);
+                    if ($subscriber->user && $subscriber->user->hasActiveSubscription()) {
+                        $subscriber->user->notify(new NewLiveShowNotification($liveshow, $subscriber->user));
                     }
                 }
             }

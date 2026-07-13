@@ -22,6 +22,7 @@ class MusicalApplication extends Model
         'tags',
         'audio_resource',
         'pdf_resource',
+        'position',
     ];
 
     protected $casts = [

@@ -184,31 +184,70 @@ const ExtraCoursesAdmin = () => {
 
     const handleOnDragEnd = async (result, level) => {
         if (!result.destination) return;
-        const currentData = coursesData[level]?.data || {};
-        const items = Object.entries(currentData);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
 
-        const updatedData = {};
-        items.forEach(([cat, list]) => {
-            updatedData[cat] = list;
-        });
+        if (result.source.droppableId === `droppable-${level}`) {
+            const currentData = coursesData[level]?.data || {};
+            const items = Object.entries(currentData);
+            const [reorderedItem] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, reorderedItem);
 
-        setCoursesData((prev) => ({
-            ...prev,
-            [level]: { ...prev[level], data: updatedData }
-        }));
-
-        try {
-            await axios.post("/api/admin/reorder/extra-courses", {
-                level,
-                categories: items.map(([category]) => category),
-            }, {
-                headers: { "X-CSRF-TOKEN": csrfToken }
+            const updatedData = {};
+            items.forEach(([cat, list]) => {
+                updatedData[cat] = list;
             });
-        } catch (error) {
-            console.error("Failed to persist category order:", error);
-            showMessage("Failed to save category order", "error");
+
+            setCoursesData((prev) => ({
+                ...prev,
+                [level]: { ...prev[level], data: updatedData }
+            }));
+
+            try {
+                await axios.post("/api/admin/reorder/extra-courses", {
+                    level,
+                    categories: items.map(([category]) => category),
+                }, {
+                    headers: { "X-CSRF-TOKEN": csrfToken }
+                });
+            } catch (error) {
+                console.error("Failed to persist category order:", error);
+                showMessage("Failed to save category order", "error");
+            }
+        } else if (result.source.droppableId.startsWith("courses-")) {
+            const categoryName = result.source.droppableId.replace("courses-", "");
+            const currentData = coursesData[level]?.data || {};
+            const items = Object.entries(currentData);
+
+            const updatedData = {};
+            items.forEach(([cat, list]) => {
+                if (cat === categoryName) {
+                    const coursesList = Array.from(list);
+                    const [reorderedItem] = coursesList.splice(result.source.index, 1);
+                    coursesList.splice(result.destination.index, 0, reorderedItem);
+                    updatedData[cat] = coursesList;
+                } else {
+                    updatedData[cat] = list;
+                }
+            });
+
+            setCoursesData((prev) => ({
+                ...prev,
+                [level]: { ...prev[level], data: updatedData }
+            }));
+
+            const targetCourses = updatedData[categoryName];
+            if (targetCourses) {
+                const coursesIds = targetCourses.map(c => c.id);
+                try {
+                    await axios.post("/api/admin/reorder/extra-courses/items", {
+                        courses: coursesIds,
+                    }, {
+                        headers: { "X-CSRF-TOKEN": csrfToken }
+                    });
+                } catch (error) {
+                    console.error("Failed to persist course order:", error);
+                    showMessage("Failed to save course order", "error");
+                }
+            }
         }
     };
 
@@ -469,39 +508,61 @@ const ExtraCoursesAdmin = () => {
                                                                                 {courses.length === 0 ? (
                                                                                     <p className="text-gray-500 text-xs text-center py-4">No courses in this category yet.</p>
                                                                                 ) : (
-                                                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                                                        {courses.map((course) => (
-                                                                                            <div key={course.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
-                                                                                                <div>
-                                                                                                    <div className="h-40 bg-gray-100 relative">
-                                                                                                        {course.thumbnail_url ? (
-                                                                                                            <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
-                                                                                                        ) : (
-                                                                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                                                                <i className="fa fa-image text-3xl"></i>
+                                                                                    <Droppable droppableId={`courses-${categoryName}`} type="course">
+                                                                                        {(provided) => (
+                                                                                            <div
+                                                                                                ref={provided.innerRef}
+                                                                                                {...provided.droppableProps}
+                                                                                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                                                                                            >
+                                                                                                {courses.map((course, courseIndex) => (
+                                                                                                    <Draggable key={course.id} draggableId={`course-${course.id}`} index={courseIndex}>
+                                                                                                        {(provided, snapshot) => (
+                                                                                                            <div
+                                                                                                                ref={provided.innerRef}
+                                                                                                                {...provided.draggableProps}
+                                                                                                                {...provided.dragHandleProps}
+                                                                                                                className={`bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col justify-between hover:shadow-md transition ${
+                                                                                                                    snapshot.isDragging
+                                                                                                                        ? "ring-2 ring-blue-400 scale-[1.01]"
+                                                                                                                        : "border-gray-100"
+                                                                                                                }`}
+                                                                                                            >
+                                                                                                                <div>
+                                                                                                                    <div className="h-40 bg-gray-100 relative">
+                                                                                                                        {course.thumbnail_url ? (
+                                                                                                                            <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
+                                                                                                                        ) : (
+                                                                                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                                                                                                <i className="fa fa-image text-3xl"></i>
+                                                                                                                            </div>
+                                                                                                                        )}
+                                                                                                                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${course.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                                                                                                            {course.status}
+                                                                                                                        </span>
+                                                                                                                    </div>
+                                                                                                                    <div className="p-4">
+                                                                                                                        <h4 className="font-bold text-gray-800 truncate mb-1">{course.title}</h4>
+                                                                                                                        <p className="text-gray-500 text-xs line-clamp-2 h-8 leading-relaxed mb-3">{course.description || "No description provided."}</p>
+                                                                                                                        <span className="px-2 py-0.5 bg-gray-100 text-[10px] text-gray-600 rounded-md capitalize font-semibold">{course.video_type}</span>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
+                                                                                                                    <button onClick={() => openEditCourseModal(course)} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs">
+                                                                                                                        <i className="fa fa-edit"></i>
+                                                                                                                    </button>
+                                                                                                                    <button onClick={() => openDeleteCourseModal(course)} className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs">
+                                                                                                                        <i className="fa fa-trash"></i>
+                                                                                                                    </button>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         )}
-                                                                                                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${course.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                                                                                            {course.status}
-                                                                                                        </span>
-                                                                                                    </div>
-                                                                                                    <div className="p-4">
-                                                                                                        <h4 className="font-bold text-gray-800 truncate mb-1">{course.title}</h4>
-                                                                                                        <p className="text-gray-500 text-xs line-clamp-2 h-8 leading-relaxed mb-3">{course.description || "No description provided."}</p>
-                                                                                                        <span className="px-2 py-0.5 bg-gray-100 text-[10px] text-gray-600 rounded-md capitalize font-semibold">{course.video_type}</span>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
-                                                                                                    <button onClick={() => openEditCourseModal(course)} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs">
-                                                                                                        <i className="fa fa-edit"></i>
-                                                                                                    </button>
-                                                                                                    <button onClick={() => openDeleteCourseModal(course)} className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs">
-                                                                                                        <i className="fa fa-trash"></i>
-                                                                                                    </button>
-                                                                                                </div>
+                                                                                                    </Draggable>
+                                                                                                ))}
+                                                                                                {provided.placeholder}
                                                                                             </div>
-                                                                                        ))}
-                                                                                    </div>
+                                                                                        )}
+                                                                                    </Droppable>
                                                                                 )}
                                                                             </div>
                                                                         </div>

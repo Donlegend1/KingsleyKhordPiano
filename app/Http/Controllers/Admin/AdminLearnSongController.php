@@ -403,4 +403,20 @@ class AdminLearnSongController extends Controller
             'category' => $category
         ], 200);
     }
+
+    public function updateSongPositions(Request $request)
+    {
+        $validated = $request->validate([
+            'songs' => 'required|array',
+            'songs.*' => 'integer',
+        ]);
+
+        foreach ($validated['songs'] as $index => $id) {
+            LearnSong::where('id', $id)->update(['position' => $index + 1]);
+        }
+
+        return response()->json([
+            'message' => 'Song positions updated successfully',
+        ]);
+    }
 }

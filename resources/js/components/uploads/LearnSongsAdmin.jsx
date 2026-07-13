@@ -201,31 +201,70 @@ const LearnSongsAdmin = () => {
 
     const handleOnDragEnd = async (result, level) => {
         if (!result.destination) return;
-        const currentData = songsData[level]?.data || {};
-        const items = Object.entries(currentData);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
 
-        const updatedData = {};
-        items.forEach(([cat, list]) => {
-            updatedData[cat] = list;
-        });
+        if (result.source.droppableId === `droppable-${level}`) {
+            const currentData = songsData[level]?.data || {};
+            const items = Object.entries(currentData);
+            const [reorderedItem] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, reorderedItem);
 
-        setSongsData((prev) => ({
-            ...prev,
-            [level]: { ...prev[level], data: updatedData }
-        }));
-
-        try {
-            await axios.post("/api/admin/reorder/learn-songs", {
-                level,
-                categories: items.map(([category]) => category),
-            }, {
-                headers: { "X-CSRF-TOKEN": csrfToken }
+            const updatedData = {};
+            items.forEach(([cat, list]) => {
+                updatedData[cat] = list;
             });
-        } catch (error) {
-            console.error("Failed to persist category order:", error);
-            showMessage("Failed to save category order", "error");
+
+            setSongsData((prev) => ({
+                ...prev,
+                [level]: { ...prev[level], data: updatedData }
+            }));
+
+            try {
+                await axios.post("/api/admin/reorder/learn-songs", {
+                    level,
+                    categories: items.map(([category]) => category),
+                }, {
+                    headers: { "X-CSRF-TOKEN": csrfToken }
+                });
+            } catch (error) {
+                console.error("Failed to persist category order:", error);
+                showMessage("Failed to save category order", "error");
+            }
+        } else if (result.source.droppableId.startsWith("songs-")) {
+            const categoryName = result.source.droppableId.replace("songs-", "");
+            const currentData = songsData[level]?.data || {};
+            const items = Object.entries(currentData);
+
+            const updatedData = {};
+            items.forEach(([cat, list]) => {
+                if (cat === categoryName) {
+                    const songsList = Array.from(list);
+                    const [reorderedItem] = songsList.splice(result.source.index, 1);
+                    songsList.splice(result.destination.index, 0, reorderedItem);
+                    updatedData[cat] = songsList;
+                } else {
+                    updatedData[cat] = list;
+                }
+            });
+
+            setSongsData((prev) => ({
+                ...prev,
+                [level]: { ...prev[level], data: updatedData }
+            }));
+
+            const targetSongs = updatedData[categoryName];
+            if (targetSongs) {
+                const songsIds = targetSongs.map(s => s.id);
+                try {
+                    await axios.post("/api/admin/reorder/learn-songs/items", {
+                        songs: songsIds,
+                    }, {
+                        headers: { "X-CSRF-TOKEN": csrfToken }
+                    });
+                } catch (error) {
+                    console.error("Failed to persist song order:", error);
+                    showMessage("Failed to save song order", "error");
+                }
+            }
         }
     };
 
@@ -491,44 +530,66 @@ const LearnSongsAdmin = () => {
                                                                                 {songs.length === 0 ? (
                                                                                     <p className="text-gray-500 text-xs text-center py-4">No songs in this category yet.</p>
                                                                                 ) : (
-                                                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                                                        {songs.map((song) => (
-                                                                                            <div key={song.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
-                                                                                                <div>
-                                                                                                    <div className="h-40 bg-gray-100 relative">
-                                                                                                        {song.thumbnail_url ? (
-                                                                                                            <img src={song.thumbnail_url} alt={song.title} className="w-full h-full object-cover" />
-                                                                                                        ) : (
-                                                                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                                                                <i className="fa fa-image text-3xl"></i>
+                                                                                    <Droppable droppableId={`songs-${categoryName}`} type="song">
+                                                                                        {(provided) => (
+                                                                                            <div
+                                                                                                ref={provided.innerRef}
+                                                                                                {...provided.droppableProps}
+                                                                                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                                                                                            >
+                                                                                                {songs.map((song, songIndex) => (
+                                                                                                    <Draggable key={song.id} draggableId={`song-${song.id}`} index={songIndex}>
+                                                                                                        {(provided, snapshot) => (
+                                                                                                            <div
+                                                                                                                ref={provided.innerRef}
+                                                                                                                {...provided.draggableProps}
+                                                                                                                {...provided.dragHandleProps}
+                                                                                                                className={`bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col justify-between hover:shadow-md transition ${
+                                                                                                                    snapshot.isDragging
+                                                                                                                        ? "ring-2 ring-blue-400 scale-[1.01]"
+                                                                                                                        : "border-gray-100"
+                                                                                                                }`}
+                                                                                                            >
+                                                                                                                <div>
+                                                                                                                    <div className="h-40 bg-gray-100 relative">
+                                                                                                                        {song.thumbnail_url ? (
+                                                                                                                            <img src={song.thumbnail_url} alt={song.title} className="w-full h-full object-cover" />
+                                                                                                                        ) : (
+                                                                                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                                                                                                <i className="fa fa-image text-3xl"></i>
+                                                                                                                            </div>
+                                                                                                                        )}
+                                                                                                                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${song.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                                                                                                            {song.status}
+                                                                                                                        </span>
+                                                                                                                    </div>
+                                                                                                                    <div className="p-4">
+                                                                                                                        <h4 className="font-bold text-gray-800 truncate mb-1">{song.title}</h4>
+                                                                                                                        {song.author && (
+                                                                                                                            <p className="text-xs text-blue-600 font-semibold mb-2 truncate">
+                                                                                                                                by {song.author}
+                                                                                                                            </p>
+                                                                                                                        )}
+                                                                                                                        <p className="text-gray-500 text-xs line-clamp-2 h-8 leading-relaxed mb-3">{song.description || "No description provided."}</p>
+                                                                                                                        <span className="px-2 py-0.5 bg-gray-100 text-[10px] text-gray-600 rounded-md capitalize font-semibold">{song.video_type}</span>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
+                                                                                                                    <button onClick={() => openEditSongModal(song)} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs">
+                                                                                                                        <i className="fa fa-edit"></i>
+                                                                                                                    </button>
+                                                                                                                    <button onClick={() => openDeleteSongModal(song)} className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs">
+                                                                                                                        <i className="fa fa-trash"></i>
+                                                                                                                    </button>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         )}
-                                                                                                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${song.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                                                                                            {song.status}
-                                                                                                        </span>
-                                                                                                    </div>
-                                                                                                    <div className="p-4">
-                                                                                                        <h4 className="font-bold text-gray-800 truncate mb-1">{song.title}</h4>
-                                                                                                        {song.author && (
-                                                                                                            <p className="text-xs text-blue-600 font-semibold mb-2 truncate">
-                                                                                                                by {song.author}
-                                                                                                            </p>
-                                                                                                        )}
-                                                                                                        <p className="text-gray-500 text-xs line-clamp-2 h-8 leading-relaxed mb-3">{song.description || "No description provided."}</p>
-                                                                                                        <span className="px-2 py-0.5 bg-gray-100 text-[10px] text-gray-600 rounded-md capitalize font-semibold">{song.video_type}</span>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
-                                                                                                    <button onClick={() => openEditSongModal(song)} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs">
-                                                                                                        <i className="fa fa-edit"></i>
-                                                                                                    </button>
-                                                                                                    <button onClick={() => openDeleteSongModal(song)} className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs">
-                                                                                                        <i className="fa fa-trash"></i>
-                                                                                                    </button>
-                                                                                                </div>
+                                                                                                    </Draggable>
+                                                                                                ))}
+                                                                                                {provided.placeholder}
                                                                                             </div>
-                                                                                        ))}
-                                                                                    </div>
+                                                                                        )}
+                                                                                    </Droppable>
                                                                                 )}
                                                                             </div>
                                                                         </div>

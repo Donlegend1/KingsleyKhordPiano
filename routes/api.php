@@ -69,6 +69,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
         Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
+        Route::post('/reorder/courses/items', [CourseController::class, 'updateCoursePositions']);
         Route::post('/courses/category/create', [CourseCategoryController::class, 'create']);
         Route::delete('/course/category/{name}/delete', [CourseCategoryController::class, 'delete']);
         Route::put('/course/category/{name}/update', [CourseCategoryController::class, 'update']);
@@ -83,6 +84,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('learn-songs/category/{name}/delete', [AdminLearnSongController::class, 'deleteCategory']);
         Route::put('learn-songs/category/{name}/update', [AdminLearnSongController::class, 'updateCategory']);
         Route::post('reorder/learn-songs', [AdminLearnSongController::class, 'updatePositions']);
+        Route::post('reorder/learn-songs/items', [AdminLearnSongController::class, 'updateSongPositions']);
 
         // Extra Courses Admin API
         Route::get('extra-courses-list', [AdminExtraCourseController::class, 'list']);
@@ -94,6 +96,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('extra-courses/category/{name}/delete', [AdminExtraCourseController::class, 'deleteCategory']);
         Route::put('extra-courses/category/{name}/update', [AdminExtraCourseController::class, 'updateCategory']);
         Route::post('reorder/extra-courses', [AdminExtraCourseController::class, 'updatePositions']);
+        Route::post('reorder/extra-courses/items', [AdminExtraCourseController::class, 'updateCoursePositions']);
 
         Route::post('/midi-file/create', [MidiFileController::class, 'store']);
         Route::delete('/midi-files/{midiFile}', [MidiFileController::class, 'destroy']);
