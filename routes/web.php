@@ -246,6 +246,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('uploads/extra-courses', [UploadController::class, 'extraCourses']);
     Route::get('uploads/quick-lessons', [UploadController::class, 'quickLessons']);
     Route::get('uploads/learn-songs', [UploadController::class, 'learnSongs']);
+    Route::get('uploads/etudes', [UploadController::class, 'etudes']);
     Route::get('uploads/create', [UploadController::class, 'create']);
     Route::post('upload/store', [UploadController::class, 'store']);
     Route::delete('upload/{upload}', [UploadController::class, 'destroy']);

@@ -58,12 +58,12 @@ class CoursesController extends Controller
         // ExtraCourse, LearnSong, and Upload each have their own auto-incrementing
         // id, so the same numeric id can legitimately belong to all three. Links
         // built after this fix always pass ?type=... to resolve unambiguously;
-        // older/untyped links fall back to the previous try-each-model guess.
         $type = $request->query('type');
 
         $lesson = match ($type) {
             'extra_course' => \App\Models\ExtraCourse::find($id),
             'learn_song'   => \App\Models\LearnSong::find($id),
+            'etudes'       => \App\Models\Etude::find($id),
             'upload'       => Upload::find($id),
             default        => null,
         };
@@ -78,6 +78,14 @@ class CoursesController extends Controller
             // Try LearnSong
             $lesson = \App\Models\LearnSong::find($id);
             $type = 'learn_song';
+        }
+
+        if (!$lesson) {
+            // Try Etudes
+            $lesson = \App\Models\Etude::find($id);
+            if ($lesson) {
+                $type = 'etudes';
+            }
         }
 
         if (!$lesson) {
@@ -103,6 +111,10 @@ class CoursesController extends Controller
         } elseif ($type === 'extra_course') {
             if (is_array($lesson->related_courses) && count($lesson->related_courses)) {
                 $relatedUploads = \App\Models\ExtraCourse::whereIn('id', $lesson->related_courses)->get();
+            }
+        } elseif ($type === 'etudes') {
+            if (is_array($lesson->related_etudes) && count($lesson->related_etudes)) {
+                $relatedUploads = \App\Models\Etude::whereIn('id', $lesson->related_etudes)->get();
             }
         } else {
             if (is_array($lesson->tags) && count($lesson->tags)) {
@@ -133,6 +145,16 @@ class CoursesController extends Controller
                 ->first();
 
             $nextVideo = \App\Models\ExtraCourse::where('extra_course_category_id', $lesson->extra_course_category_id)
+                ->where('position', '>', $lesson->position)
+                ->orderBy('position', 'asc')
+                ->first();
+        } elseif ($type === 'etudes') {
+            $previousVideo = \App\Models\Etude::where('etude_category_id', $lesson->etude_category_id)
+                ->where('position', '<', $lesson->position)
+                ->orderBy('position', 'desc')
+                ->first();
+
+            $nextVideo = \App\Models\Etude::where('etude_category_id', $lesson->etude_category_id)
                 ->where('position', '>', $lesson->position)
                 ->orderBy('position', 'asc')
                 ->first();
