@@ -61,7 +61,7 @@
         // Get comments specifically for this lesson
         $lessonComments = \App\Models\CourseVideoComment::where('course_id', $lesson->id)
             ->where('category', 'others')
-            ->with(['user'])
+            ->with(['user', 'replies.user'])
             ->latest()
             ->get();
     @endphp
@@ -80,7 +80,7 @@
                 @endif
                 @if ($lesson?->category)
                     <span>/</span>
-                    <span class="text-[#6366F1] font-medium">{{ $lesson->category->category }}</span>
+                    <span class="text-blue-600 font-medium">{{ $lesson->category->category }}</span>
                 @endif
             </div>
         </section>
@@ -159,8 +159,8 @@
                     @if ($playlist->count() > 1 && $lessonType !== 'learn_songs')
                         <div class="block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
                             {{-- Header --}}
-                            <div class="px-5 py-4 border-b border-gray-100">
-                                <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                            <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
+                                <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
                                     Lessons in this course:
                                 </p>
                             </div>
@@ -176,13 +176,13 @@
                                     @endphp
                                     <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                         class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                                        {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+                                        {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
                                         {{-- Title --}}
                                         <div class="flex-1 min-w-0">
                                             <p
                                                 class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
-                                                {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
+                                                {{ $isActive ? 'text-white' : 'text-gray-800' }}">
                                                 <span class="truncate">{{ $item->title }}</span>
                                                 @if ($itemIsNew)
                                                     <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
@@ -217,62 +217,75 @@
                         </div>
                     @endif
 
-                    {{-- Related Lessons (Only visible at the bottom if playlist is in sidebar) --}}
-                    @if ($playlist->count() > 1 && $relatedUploads->count() > 0)
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
+                    {{-- Related Lessons --}}
+                    @if ($relatedUploads->count() > 0)
+                        <div class="mt-12 pt-8 border-t border-gray-100">
+                            <div class="flex items-center gap-2.5 mb-6">
+                                <span class="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+                                <h3 class="text-[18px] font-extrabold text-gray-900 tracking-tight">Related Lessons</h3>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach ($relatedUploads as $related)
                                     @php
                                         $relatedLink = "/member/lesson/{$related->id}?type={$linkType}";
                                         $relatedIsNew = $related->created_at
                                             && $related->created_at->gt(now()->subDays(7))
                                             && !\App\Models\LessonView::hasViewed(auth()->id(), $related);
+                                        $relatedLevel = strtolower($related->level ?? $lesson->level ?? 'beginner');
+                                        
+                                        // Pick badge colors based on level
+                                        if (str_contains($relatedLevel, 'begin') || str_contains($relatedLevel, 'basic')) {
+                                            $badgeClass = 'bg-emerald-500/10 text-emerald-600 border-emerald-500/10';
+                                        } elseif (str_contains($relatedLevel, 'inter') || str_contains($relatedLevel, 'competent')) {
+                                            $badgeClass = 'bg-amber-500/10 text-amber-600 border-amber-500/10';
+                                        } else {
+                                            $badgeClass = 'bg-rose-500/10 text-rose-600 border-rose-500/10';
+                                        }
                                     @endphp
                                     <a href="{{ $relatedLink }}"
-                                        class="group bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                                        class="group bg-white/60 backdrop-blur-md border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col">
 
-                                        {{-- Thumbnail --}}
-                                        <div class="relative aspect-video bg-black overflow-hidden">
-                                            <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
-                                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                        {{-- Thumbnail Container --}}
+                                        <div class="relative aspect-video bg-gray-950 overflow-hidden">
+                                            @if($related->thumbnail_url)
+                                                <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
+                                                    class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+                                            @else
+                                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-950 to-purple-950">
+                                                    <i class="fa fa-music text-3xl text-white/20"></i>
+                                                </div>
+                                            @endif
 
                                             @if ($relatedIsNew)
-                                                <div class="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded tracking-wide">
+                                                <div class="absolute top-3 right-3 bg-gradient-to-r from-rose-500 to-red-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-md tracking-wider shadow-sm shadow-red-500/20 uppercase">
                                                     NEW
                                                 </div>
                                             @endif
 
-                                            {{-- Duration badge top-left --}}
-                                            <div
-                                                class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded">
+                                            {{-- Duration badge --}}
+                                            <div class="absolute bottom-3 right-3 bg-black/50 backdrop-blur-md text-white text-[10px] font-semibold px-2 py-0.5 rounded">
                                                 {{ $related->duration ?? '05:00' }}
                                             </div>
 
-                                            {{-- Play button center --}}
-                                            <div class="absolute inset-0 flex items-center justify-center">
-                                                <div
-                                                    class="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-[#2563EB] transition-colors">
+                                            {{-- Play overlay --}}
+                                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                <div class="w-11 h-11 bg-white/10 backdrop-blur-md border border-white/25 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-[#6366F1] group-hover:border-[#6366F1] transition-all duration-300 shadow-md">
                                                     <i class="fa-solid fa-play text-white text-xs ml-0.5"></i>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {{-- Card text --}}
-                                        <div class="p-4">
-                                            <p
-                                                class="text-[13px] font-semibold text-gray-900 leading-snug line-clamp-2 mb-3 text-center">
-                                                {{ Str::title($related->title) }}
-                                            </p>
-                                            <div class="flex justify-center">
-                                                <span
-                                                    class="bg-[#2563EB]/10 text-[#2563EB] text-[11px] font-bold px-3 py-1 rounded-full">
-                                                    {{ ucfirst($related->level ?? $lesson->level ?? 'Basic') }}
+                                        {{-- Card Body --}}
+                                        <div class="p-4 flex flex-col flex-grow">
+                                            <div class="mb-3">
+                                                <span class="inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border {{ $badgeClass }} uppercase tracking-wider">
+                                                    {{ $related->level ?? $lesson->level ?? 'Beginner' }}
                                                 </span>
                                             </div>
+                                            <h4 class="text-sm font-bold text-gray-800 leading-snug line-clamp-2 group-hover:text-[#6366F1] transition-colors">
+                                                {{ Str::title($related->title) }}
+                                            </h4>
                                         </div>
                                     </a>
                                 @endforeach
@@ -281,17 +294,17 @@
                     @endif
 
                     {{-- Discussion / Comments --}}
-                    <div class="mt-8" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
-                        <h2 class="text-[18px] font-bold text-gray-900 mb-6">Discussion</h2>
+                    <div class="mt-10 pt-8 border-t border-gray-100" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
+                        <h2 class="text-[17px] font-semibold text-gray-900 tracking-tight mb-5">Discussion</h2>
                         <form id="comment-form" class="mb-8">
                             <textarea name="comment" placeholder="What did you learn from this lesson?"
-                                class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all outline-none" rows="3"></textarea>
+                                class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">
-                                <button type="submit" class="bg-[#2563EB] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#1D4ED8] transition-all">Comment</button>
+                                <button type="submit" class="bg-gray-900 text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-black transition-colors">Comment</button>
                             </div>
                         </form>
 
-                        <div class="space-y-6" id="comment-list">
+                        <div class="divide-y divide-gray-100" id="comment-list">
                             @foreach($lessonComments as $comment)
                                 @include('memberpages.partials.course-video-comment', ['comment' => $comment])
                             @endforeach
@@ -307,8 +320,8 @@
 
                     @if ($playlist->count() > 1)
                         {{-- Header --}}
-                        <div class="px-5 py-4 border-b border-gray-100">
-                            <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                        <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
+                            <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
                                 Lessons in this course:
                             </p>
                         </div>
@@ -324,13 +337,13 @@
                                 @endphp
                                 <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                     class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                                    {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+                                    {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
                                     {{-- Title --}}
                                     <div class="flex-1 min-w-0">
                                         <p
                                             class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
-                                            {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
+                                            {{ $isActive ? 'text-white' : 'text-gray-800' }}">
                                             <span class="truncate">{{ $item->title }}</span>
                                             @if ($itemIsNew)
                                                 <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
@@ -399,7 +412,7 @@
                                     </div>
                                 </a>
                             @endforeach
-                        </div>
+                        </div> --}}
 
                         @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
                     @endif

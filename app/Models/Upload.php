@@ -23,6 +23,7 @@ class Upload extends Model
         'images',
         'audio_resource',
         'pdf_resource',
+        'position',
     ];
 
     protected $casts = [

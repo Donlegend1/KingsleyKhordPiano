@@ -419,6 +419,50 @@ const CourseDetails = ({
                 </button>
             </div>
 
+            {/* Downloads for this lesson */}
+            {course.pdf_resource_url && (
+                <div className="mt-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="bg-red-600 px-5 py-3">
+                        <h3 className="text-white text-sm font-bold tracking-wide uppercase">
+                            Downloads for this lesson
+                        </h3>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-800 px-5 py-4 flex items-center gap-4">
+                        <div className="w-16 h-10 rounded bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            PDF
+                        </div>
+                        <a
+                            href={course.pdf_resource_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-red-500 hover:text-red-600 font-bold"
+                        >
+                            View the Chart
+                        </a>
+                    </div>
+                </div>
+            )}
+
+            {/* Lesson Navigation */}
+            <div className="flex items-center justify-between mt-8 border-t pt-6 dark:border-gray-700">
+                <button
+                    onClick={onPrevLesson}
+                    disabled={!hasPrevLesson}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 bg-yellow-400 text-black hover:bg-yellow-500 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    <i className="fa fa-chevron-left"></i>
+                    Prev
+                </button>
+                <button
+                    onClick={onNextLesson}
+                    disabled={!hasNextLesson}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 bg-gray-900 text-white hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    Next
+                    <i className="fa fa-chevron-right"></i>
+                </button>
+            </div>
+
             {/* Comment Section */}
             <div className="mt-10">
                 <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
@@ -624,50 +668,6 @@ const CourseDetails = ({
                 </div>
             </div>
 
-            {/* Lesson Navigation */}
-            <div className="flex items-center justify-between mt-8 border-t pt-6 dark:border-gray-700">
-                <button
-                    onClick={onPrevLesson}
-                    disabled={!hasPrevLesson}
-                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                    <i className="fa fa-chevron-left"></i>
-                    Previous
-                </button>
-                <button
-                    onClick={onNextLesson}
-                    disabled={!hasNextLesson}
-                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 bg-gray-900 text-white hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                    Next
-                    <i className="fa fa-chevron-right"></i>
-                </button>
-            </div>
-
-            {/* Downloads for this lesson */}
-            {course.pdf_resource_url && (
-                <div className="mt-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                    <div className="bg-gray-900 dark:bg-black px-5 py-3">
-                        <h3 className="text-white text-sm font-bold tracking-wide uppercase">
-                            Downloads for this lesson
-                        </h3>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-800 px-5 py-4 flex items-center gap-4">
-                        <div className="w-16 h-10 rounded bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                            PDF
-                        </div>
-                        <a
-                            href={course.pdf_resource_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-red-500 hover:text-red-600 font-bold"
-                        >
-                            View the Chart
-                        </a>
-                    </div>
-                </div>
-            )}
-
             {/* Related Courses Section */}
             {course.related && course.related.length > 0 && (
                 <div className="mt-12 border-t pt-8">
@@ -845,7 +845,7 @@ const CoursesPage = () => {
                         className="rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
                     >
                         <div
-                            className="px-4 py-3.5 bg-white dark:bg-gray-900 font-bold text-base text-gray-800 dark:text-gray-100 cursor-pointer flex justify-between items-center transition hover:bg-gray-50 dark:hover:bg-gray-800"
+                            className="px-4 py-3.5 bg-gray-100 dark:bg-gray-900 font-bold text-base text-gray-800 dark:text-gray-100 cursor-pointer flex justify-between items-center transition hover:bg-gray-200 dark:hover:bg-gray-800"
                             onClick={() => toggleCategory(categoryObj.category)}
                         >
                             <span className="flex items-center gap-3">
@@ -874,7 +874,7 @@ const CoursesPage = () => {
                                                 key={course.id}
                                                 className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition ${
                                                     isSelected
-                                                        ? "bg-blue-500"
+                                                        ? "bg-gray-800"
                                                         : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 }`}
                                                 onClick={() => {
@@ -1130,7 +1130,7 @@ const CoursesPage = () => {
                         </span>
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
                             <div
-                                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${generalProgress}%` }}
                             ></div>
                         </div>

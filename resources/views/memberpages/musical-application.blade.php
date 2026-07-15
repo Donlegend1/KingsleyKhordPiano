@@ -49,7 +49,7 @@
             <div class="flex items-center gap-2">
                 <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
                 <span>/</span>
-                <span class="text-[#6366F1] font-medium">Harmonic Drills</span>
+                <span class="text-blue-600 font-medium">Guided Practice</span>
             </div>
 
             <!-- Search Bar -->
@@ -83,7 +83,7 @@
                     <button
                         type="button"
                         @click="open = !open"
-                        class="w-full flex items-center justify-between px-6 py-2.5 rounded-full font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transition-all duration-300"
+                        class="w-full flex items-center justify-between px-6 py-2.5 rounded-full font-semibold bg-blue-600 text-white shadow-md shadow-blue-600/20 transition-all duration-300"
                     >
                         <span>{{ $skillLevel }}</span>
                         <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@
                             <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
                                 class="block px-6 py-3 font-semibold transition-colors duration-150
                            {{ $skillLevel === $level
-                               ? 'bg-indigo-600 text-white'
+                               ? 'bg-blue-600 text-white'
                                : 'text-gray-600 hover:bg-gray-50' }}">
                                 {{ $level }}
                             </a>
@@ -115,7 +115,7 @@
                         <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
                             class="flex-1 flex items-center justify-center text-center px-6 py-4 rounded-lg font-semibold transition-all duration-300
                        {{ $skillLevel === $level
-                           ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                           ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                            : 'text-gray-700 hover:text-gray-900' }}">
                             {{ $level }}
                         </a>
@@ -169,7 +169,7 @@
                                 <!-- Play overlay -->
                                 <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
                                     <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
-                                        <i class="fa fa-play text-indigo-600 text-sm ml-0.5"></i>
+                                        <i class="fa fa-play text-black text-sm ml-0.5"></i>
                                     </div>
                                 </div>
                             </a>
@@ -182,7 +182,7 @@
 
                                 <!-- Level Badge -->
                                 <div>
-                                    <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
+                                    <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-black text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                                         {{ $firstItem->skill_level }}
                                     </span>
@@ -190,7 +190,7 @@
 
                                 <!-- Watch Now Button -->
                                 <a href="{{ $playerUrl }}"
-                                   class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
+                                   class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
                                     Watch Now
                                 </a>
                             </div>

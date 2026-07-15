@@ -89,3 +89,26 @@ export const formatLocalTime = (startTime) => {
 
     return { localDate, localTime, tzLabel };
 };
+
+// Africa/Lagos (WAT) has no DST, so it's always a fixed UTC+1 offset.
+// Admin forms collect times in WAT since that's the studio's business timezone.
+export const watInputToUtcIso = (datetimeLocalValue) => {
+    if (!datetimeLocalValue) return "";
+    return new Date(`${datetimeLocalValue}:00+01:00`).toISOString();
+};
+
+export const utcIsoToWatInput = (utcValue) => {
+    if (!utcValue) return "";
+    const date = new Date(utcValue);
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Africa/Lagos',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    }).formatToParts(date).reduce((acc, p) => ({ ...acc, [p.type]: p.value }), {});
+
+    return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
+};

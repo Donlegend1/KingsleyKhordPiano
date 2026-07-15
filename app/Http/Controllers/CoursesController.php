@@ -96,19 +96,19 @@ class CoursesController extends Controller
             ->get();
 
         $relatedUploads = collect();
-        // if ($type === 'learn_song') {
-        //     if (is_array($lesson->related_songs) && count($lesson->related_songs)) {
-        //         $relatedUploads = \App\Models\LearnSong::whereIn('id', $lesson->related_songs)->get();
-        //     }
-        // } elseif ($type === 'extra_course') {
-        //     if (is_array($lesson->related_courses) && count($lesson->related_courses)) {
-        //         $relatedUploads = \App\Models\ExtraCourse::whereIn('id', $lesson->related_courses)->get();
-        //     }
-        // } else {
-        //     if (is_array($lesson->tags) && count($lesson->tags)) {
-        //         $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
-        //     }
-        // }
+        if ($type === 'learn_song') {
+            if (is_array($lesson->related_songs) && count($lesson->related_songs)) {
+                $relatedUploads = \App\Models\LearnSong::whereIn('id', $lesson->related_songs)->get();
+            }
+        } elseif ($type === 'extra_course') {
+            if (is_array($lesson->related_courses) && count($lesson->related_courses)) {
+                $relatedUploads = \App\Models\ExtraCourse::whereIn('id', $lesson->related_courses)->get();
+            }
+        } else {
+            if (is_array($lesson->tags) && count($lesson->tags)) {
+                $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
+            }
+        }
 
         $isBookmarked = $service->isBookmarked($lesson);
 

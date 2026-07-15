@@ -44,8 +44,8 @@ class LiveShowController extends Controller
 
             if ($subscribers->isNotEmpty()) {
                 foreach ($subscribers as $subscriber) {
-                    if ($subscriber->user) {
-                         new NewLiveShowNotification($liveshow, $subscriber->user);
+                    if ($subscriber->user && $subscriber->user->hasActiveSubscription()) {
+                        $subscriber->user->notify(new NewLiveShowNotification($liveshow, $subscriber->user));
                     }
                 }
             }
@@ -109,6 +109,28 @@ class LiveShowController extends Controller
         return response()->json([
             'message' => 'Live show deleted successfully.'
         ]);
+    }
+
+    /**
+     * Show the recording of a past live show, with its discussion thread.
+     */
+    public function showRecording(Liveshow $liveshow)
+    {
+        abort_unless($liveshow->recording_url, 404);
+
+        $user = auth()->user();
+        if ($liveshow->access_type === 'premium' && !$user->premium) {
+            return redirect('/member/live-session')
+                ->with('error', 'Please upgrade to premium to watch this recording.');
+        }
+
+        $comments = \App\Models\CourseVideoComment::where('course_id', $liveshow->id)
+            ->where('category', 'liveshow')
+            ->with(['user', 'replies.user'])
+            ->latest()
+            ->get();
+
+        return view('memberpages.livesession-recording', compact('liveshow', 'comments'));
     }
 
     public function list(Request $request)

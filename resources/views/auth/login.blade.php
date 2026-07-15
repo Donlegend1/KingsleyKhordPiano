@@ -74,7 +74,7 @@
           <input
             type="checkbox"
             name="remember"
-            class="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+            class="w-4 h-4 rounded border border-gray-400 text-gray-900 focus:ring-gray-900"
             {{ old('remember') ? 'checked' : '' }}
           />
           Remember me

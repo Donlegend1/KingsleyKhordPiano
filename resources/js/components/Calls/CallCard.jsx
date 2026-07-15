@@ -28,14 +28,14 @@ const CallCard = () => {
                 onClick={handleClick}
                 className="block transition-shadow hover:shadow-md"
             >
-                <div className="min-h-[120px] h-full flex justify-between items-center gap-3 p-6 bg-[#F3F5F6] rounded-lg shadow-sm border">
+                <div className="min-h-[120px] h-full flex justify-between items-center gap-3 p-6 bg-[#2A2E35] rounded-lg shadow-sm border border-gray-700">
                     <div className="flex items-center space-x-4 min-w-0">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-md bg-[#F3F5F6] border shadow-sm flex-shrink-0">
-                            <KeyboardMusic className="w-6 h-6 text-[#435065]" />
+                        <div className="flex items-center justify-center w-12 h-12 rounded-md bg-[#353A42] border border-gray-600 shadow-sm flex-shrink-0">
+                            <KeyboardMusic className="w-6 h-6 text-gray-200" />
                         </div>
                         <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                                <h4 className="font-semibold text-[#435065] text-[20px] font-sf truncate">
+                                <h4 className="font-semibold text-white text-[20px] font-sf truncate">
                                     Piano Coaching
                                 </h4>
 
@@ -46,7 +46,7 @@ const CallCard = () => {
                                 />
                             </div>
 
-                            <p className="text-sm text-[#5E6779] my-5 font-sf">
+                            <p className="text-sm text-gray-400 my-5 font-sf">
                                 One on One Live Session
                             </p>
                         </div>

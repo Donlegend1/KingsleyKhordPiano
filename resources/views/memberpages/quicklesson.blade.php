@@ -10,7 +10,7 @@
       <div class="flex items-center gap-2 text-sm text-gray-500">
         <a href="/home" class="hover:text-gray-700">Dashboard</a>
         <span>/</span>
-        <span class="text-[#6366F1] font-medium">Quick Lesson</span>
+        <span class="text-blue-600 font-medium">Quick Lesson</span>
       </div>
       <div class="flex items-center space-x-2">
           <form method="GET" action="{{ route('quick.lession') }}" class="mb-2 flex justify-end">

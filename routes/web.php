@@ -162,7 +162,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
     Route::redirect('dashboard', '/home');
     Route::get('piano-exercise/finger', [ExerciseController::class, 'fingerExercises'])->name('piano.exercise.finger');
-    Route::get('piano-exercise/harmonic-drills', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
+    Route::get('piano-exercise/guided-practice', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
     Route::get('piano-exercise/player', [ExerciseController::class, 'pianoExercisePlayer'])->name('piano.exercise.player');
     Route::post('piano-exercise/comment', [ExerciseController::class, 'storeComment'])->name('piano.exercise.comment');
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
@@ -175,17 +175,16 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('live-session/{liveshow}/confirm', [LiveSessionController::class, 'confirmBooking'])->name('member.live-session.confirm');
     Route::post('live-session/{liveshow}/book', [LiveSessionController::class, 'bookSlot'])->name('member.live-session.book');
+    Route::get('live-show/{liveshow}/recording', [LiveShowController::class, 'showRecording'])->name('member.live-show.recording');
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
     Route::post('/course/{course}/view', [CourseController::class, 'recordView']);
 });
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
-    Route::get('profile', [HomeController::class, 'profile']);
     Route::post('whatsapp-preference', [HomeController::class, 'updateWhatsappPreference']);
     Route::post('timezone', [HomeController::class, 'updateTimezone'])->name('member.timezone');
     Route::get('/shop', [ShopController::class, 'index']);
-    Route::get('support', [HomeController::class, 'support']);
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/my-library', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
@@ -220,6 +219,12 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('bookmark', [BookMarkController::class, 'bookmark']);
     Route::post('/bookmark/toggle', [BookmarkController::class, 'toggle'])->name('bookmark.toggle');
     Route::post('/lesson-completion', [LessonCompletionController::class, 'store'])->name('lesson.complete');
+});
+
+// routes for member profile and support pages
+Route::prefix('member')->middleware(['auth',  'verified'])->group(function () {
+Route::get('profile', [HomeController::class, 'profile']);
+Route::get('support', [HomeController::class, 'support']);
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
@@ -260,6 +265,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('musical-application-list', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'musicalApplicationList']);
     Route::get('musical-application-all-courses', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'getAllCourses']);
     Route::resource('musical-application', \App\Http\Controllers\Admin\MusicalApplicationController::class, ['as' => 'admin']);
+    Route::post('reorder-musical-applications', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'updatePositions']);
+    Route::post('reorder-uploads', [UploadController::class, 'updatePositions']);
     
     // Community Tutorials Admin
     Route::resource('tutorials', \App\Http\Controllers\Admin\AdminTutorialController::class, ['as' => 'admin'])->except(['show']);

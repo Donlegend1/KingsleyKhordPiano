@@ -8,80 +8,107 @@
         const list = document.getElementById('comment-list');
         const form = document.getElementById('comment-form');
 
+        function userName(user) {
+            if (!user) return 'User';
+            return `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.name || 'User';
+        }
+
+        function buildReplyNode(reply) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex gap-3 py-3 first:pt-0';
+            wrapper.dataset.replyId = reply.id;
+
+            const name = userName(reply.user);
+
+            wrapper.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <span class="text-gray-500 font-semibold text-[11px]">${name.charAt(0).toUpperCase()}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-baseline gap-2">
+                        <p class="text-[13px] font-semibold text-gray-900"></p>
+                        <span class="text-[11px] text-gray-400">Just now</span>
+                    </div>
+                    <p class="text-[13px] text-gray-600 leading-relaxed mt-0.5"></p>
+                </div>
+            `;
+            wrapper.querySelector('p.font-semibold').textContent = name;
+            wrapper.querySelector('p.leading-relaxed').textContent = reply.reply;
+
+            return wrapper;
+        }
+
         function buildCommentNode(comment) {
             const wrapper = document.createElement('div');
-            wrapper.className = 'flex gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors';
+            wrapper.className = 'flex gap-3.5 py-5 first:pt-0';
             wrapper.dataset.commentId = comment.id;
 
-            const avatar = document.createElement('div');
-            avatar.className = 'w-10 h-10 bg-[#2563EB]/10 rounded-full flex items-center justify-center flex-shrink-0';
-            const initial = document.createElement('span');
-            initial.className = 'text-[#2563EB] font-bold text-sm';
-            const name = comment.user ? (comment.user.first_name || comment.user.name || 'U') : 'U';
-            initial.textContent = name.charAt(0).toUpperCase();
-            avatar.appendChild(initial);
-
-            const body = document.createElement('div');
-            body.className = 'flex-1 min-w-0';
-
-            const headerRow = document.createElement('div');
-            headerRow.className = 'flex items-center justify-between gap-2 mb-1';
-
-            const nameRow = document.createElement('div');
-            nameRow.className = 'flex items-center gap-2';
-            const nameEl = document.createElement('p');
-            nameEl.className = 'text-[14px] font-bold text-gray-900';
-            nameEl.textContent = comment.user
-                ? `${comment.user.first_name ?? ''} ${comment.user.last_name ?? ''}`.trim() || comment.user.name || 'User'
-                : 'User';
-            const timeEl = document.createElement('span');
-            timeEl.className = 'text-[11px] text-gray-400';
-            timeEl.textContent = '• Just now';
-            nameRow.appendChild(nameEl);
-            nameRow.appendChild(timeEl);
-            headerRow.appendChild(nameRow);
-
+            const name = userName(comment.user);
             const isOwner = window.authUser && comment.user_id === window.authUser.id;
 
-            if (isOwner) {
-                const menuWrap = document.createElement('div');
-                menuWrap.className = 'relative comment-menu';
-                menuWrap.innerHTML = `
-                    <button type="button" class="comment-menu-toggle text-gray-400 hover:text-gray-600 px-1">
-                        <i class="fa-solid fa-ellipsis-vertical"></i>
+            wrapper.innerHTML = `
+                <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <span class="text-gray-500 font-semibold text-xs">${name.charAt(0).toUpperCase()}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-[13.5px] font-semibold text-gray-900 comment-author"></p>
+                            <span class="text-[11.5px] text-gray-400">Just now</span>
+                        </div>
+                        ${isOwner ? `
+                        <div class="relative comment-menu">
+                            <button type="button" class="comment-menu-toggle text-gray-300 hover:text-gray-500 px-1 transition-colors">
+                                <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+                            </button>
+                            <div class="comment-menu-dropdown hidden absolute right-0 mt-1 w-32 bg-white border border-gray-100 rounded-xl shadow-lg z-10 overflow-hidden">
+                                <button type="button" class="comment-edit-btn block w-full px-4 py-2 text-left text-[13px] text-gray-600 hover:bg-gray-50">Edit</button>
+                                <button type="button" class="comment-delete-btn block w-full px-4 py-2 text-left text-[13px] text-red-500 hover:bg-gray-50">Delete</button>
+                            </div>
+                        </div>` : ''}
+                    </div>
+
+                    <p class="text-[13.5px] text-gray-600 leading-relaxed mt-1 comment-text"></p>
+
+                    ${isOwner ? `
+                    <div class="comment-edit-form hidden mt-3 space-y-2">
+                        <textarea class="comment-edit-input w-full bg-white border border-gray-200 rounded-2xl p-3 text-[13.5px] focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="2"></textarea>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" class="comment-edit-cancel text-[12px] font-semibold text-gray-500 px-3.5 py-1.5 rounded-full hover:bg-gray-100 transition-colors">Cancel</button>
+                            <button type="button" class="comment-edit-save text-[12px] font-semibold text-white bg-gray-900 px-3.5 py-1.5 rounded-full hover:bg-black transition-colors">Save</button>
+                        </div>
+                    </div>` : ''}
+
+                    <button type="button" class="comment-reply-toggle mt-2 text-[12px] font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+                        Reply
                     </button>
-                    <div class="comment-menu-dropdown hidden absolute right-0 mt-1 w-32 bg-white border border-gray-100 rounded-lg shadow-md z-10">
-                        <button type="button" class="comment-edit-btn block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50">Edit</button>
-                        <button type="button" class="comment-delete-btn block w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-50">Delete</button>
+
+                    <div class="comment-reply-form hidden mt-3 space-y-2">
+                        <textarea class="comment-reply-input w-full bg-white border border-gray-200 rounded-2xl p-3 text-[13px] focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="2" placeholder="Write a reply..."></textarea>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" class="comment-reply-cancel text-[12px] font-semibold text-gray-500 px-3.5 py-1.5 rounded-full hover:bg-gray-100 transition-colors">Cancel</button>
+                            <button type="button" class="comment-reply-submit text-[12px] font-semibold text-white bg-gray-900 px-3.5 py-1.5 rounded-full hover:bg-black transition-colors">Reply</button>
+                        </div>
                     </div>
-                `;
-                headerRow.appendChild(menuWrap);
-            }
 
-            body.appendChild(headerRow);
+                    <div class="comment-replies-list mt-4 space-y-4"></div>
+                </div>
+            `;
 
-            const textEl = document.createElement('p');
-            textEl.className = 'text-[13px] text-gray-600 leading-relaxed comment-text';
-            textEl.textContent = comment.comment;
-            body.appendChild(textEl);
+            wrapper.querySelector('.comment-author').textContent = name;
+            wrapper.querySelector('.comment-text').textContent = comment.comment;
 
             if (isOwner) {
-                const editForm = document.createElement('div');
-                editForm.className = 'comment-edit-form hidden mt-2 space-y-2';
-                editForm.innerHTML = `
-                    <textarea class="comment-edit-input w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-[13px] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all outline-none" rows="2"></textarea>
-                    <div class="flex justify-end gap-2">
-                        <button type="button" class="comment-edit-cancel text-[12px] font-semibold text-gray-500 px-3 py-1.5 rounded-lg hover:bg-gray-100">Cancel</button>
-                        <button type="button" class="comment-edit-save text-[12px] font-semibold text-white bg-[#2563EB] px-3 py-1.5 rounded-lg hover:bg-[#1D4ED8]">Save</button>
-                    </div>
-                `;
-                editForm.querySelector('.comment-edit-input').value = comment.comment;
-                body.appendChild(editForm);
+                wrapper.querySelector('.comment-edit-input').value = comment.comment;
             }
 
-            wrapper.appendChild(avatar);
-            wrapper.appendChild(body);
             return wrapper;
+        }
+
+        function addReplyToComment(wrapper, reply) {
+            const repliesList = wrapper.querySelector('.comment-replies-list');
+            repliesList.classList.add('border-l-2', 'pl-4');
+            repliesList.appendChild(buildReplyNode(reply));
         }
 
         form.addEventListener('submit', async function (e) {
@@ -186,6 +213,51 @@
                         console.error('Failed to delete comment:', err);
                         alert('Failed to delete comment. Please try again.');
                     });
+                return;
+            }
+
+            if (e.target.closest('.comment-reply-toggle')) {
+                wrapper.querySelector('.comment-reply-form').classList.toggle('hidden');
+                wrapper.querySelector('.comment-reply-input').focus();
+                return;
+            }
+
+            if (e.target.closest('.comment-reply-cancel')) {
+                const replyForm = wrapper.querySelector('.comment-reply-form');
+                replyForm.querySelector('.comment-reply-input').value = '';
+                replyForm.classList.add('hidden');
+                return;
+            }
+
+            if (e.target.closest('.comment-reply-submit')) {
+                const replyForm = wrapper.querySelector('.comment-reply-form');
+                const input = replyForm.querySelector('.comment-reply-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                fetch(`/api/member/comment/${commentId}/reply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({ comment: text }),
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Failed to post reply');
+                        return res.json();
+                    })
+                    .then(({ data }) => {
+                        addReplyToComment(wrapper, data);
+                        input.value = '';
+                        replyForm.classList.add('hidden');
+                    })
+                    .catch(err => {
+                        console.error('Failed to post reply:', err);
+                        alert('Failed to post reply. Please try again.');
+                    });
+                return;
             }
         });
 

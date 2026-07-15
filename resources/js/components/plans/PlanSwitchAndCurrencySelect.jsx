@@ -155,7 +155,7 @@ const PlanSwitchAndCurrencySelect = () => {
                             </button>
                         </form>
 
-                        <form action="/paystack" method="POST">
+                        {/* <form action="/paystack" method="POST">
                             <input type="hidden" name="_token" value={csrfToken} />
                             <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
                             <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
@@ -167,7 +167,7 @@ const PlanSwitchAndCurrencySelect = () => {
                             >
                                 Pay with Paystack
                             </button>
-                        </form>
+                        </form> */}
 
                         {currency !== "NGN" && (
                             <form action="/paypal/create-order" method="POST">
@@ -192,9 +192,9 @@ const PlanSwitchAndCurrencySelect = () => {
                             <span className="inline-block bg-gray-800 rounded px-1.5 py-0.5">
                                 <img src="/icons/stripe2.png" alt="Stripe" className="h-3" />
                             </span>
-                            <span className="inline-block bg-gray-800 rounded px-1.5 py-0.5">
+                            {/* <span className="inline-block bg-gray-800 rounded px-1.5 py-0.5">
                                 <img src="/icons/paystack2.png" alt="Paystack" className="h-3" />
-                            </span>
+                            </span> */}
                             {currency !== "NGN" && (
                                 <span className="inline-block bg-gray-800 rounded px-1.5 py-0.5">
                                     <img src="/icons/paypal.png" alt="PayPal" className="h-3" />
@@ -409,7 +409,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                             Pay with Stripe
                                         </button>
                                     </form>
-                                    <form action="/paystack" method="POST">
+                                    {/* <form action="/paystack" method="POST">
                                         <input
                                             type="hidden"
                                             name="_token"
@@ -441,7 +441,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                         >
                                             Pay with Paystack
                                         </button>
-                                    </form>
+                                    </form> */}
                                     {currency !== "NGN" && (
                                         <form action="/paypal/create-order" method="POST">
                                             <input type="hidden" name="_token" value={csrfToken} />
@@ -467,13 +467,13 @@ const PlanSwitchAndCurrencySelect = () => {
                                     >
                                         Pay with Stripe
                                     </button>
-                                    <button
+                                    {/* <button
                                         type="button"
                                         onClick={() => handleGuestCheckoutChoice("paystack")}
                                         className="bg-[#FAFAFA] hover:bg-[#e7dfdf] py-3 rounded text-center font-semibold w-full text-gray-900"
                                     >
                                         Pay with Paystack
-                                    </button>
+                                    </button> */}
                                     {currency !== "NGN" && (
                                         <button
                                             type="button"
@@ -497,13 +497,13 @@ const PlanSwitchAndCurrencySelect = () => {
                                         className="h-4"
                                     />
                                 </span>
-                                <span className="inline-block mx-2 bg-gray-300 rounded-md p-1">
+                                {/* <span className="inline-block mx-2 bg-gray-300 rounded-md p-1">
                                     <img
                                         src="/icons/paystack2.png"
                                         alt="Paystack"
                                         className="h-4"
                                     />
-                                </span>
+                                </span> */}
                                 {currency !== "NGN" && (
                                     <span className="inline-block mx-2 bg-gray-300 rounded-md p-1">
                                         <img

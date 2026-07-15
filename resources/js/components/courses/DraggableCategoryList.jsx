@@ -245,19 +245,47 @@ const DraggableCategoryList = ({
     const handleOnDragEnd = async (result) => {
         if (!result.destination) return;
 
-        const items = Array.from(orderedCategories);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
+        if (result.source.droppableId === `droppable-${level}`) {
+            const items = Array.from(orderedCategories);
+            const [reorderedItem] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, reorderedItem);
 
-        setOrderedCategories(items);
+            setOrderedCategories(items);
 
-        try {
-            const response = await axios.post("/api/admin/reorder/courses", {
-                level,
-                categories: items.map(([category]) => category),
+            try {
+                await axios.post("/api/admin/reorder/courses", {
+                    level,
+                    categories: items.map(([category]) => category),
+                });
+            } catch (error) {
+                console.error("Failed to persist category order:", error);
+            }
+        } else if (result.source.droppableId.startsWith("courses-")) {
+            const categoryName = result.source.droppableId.replace("courses-", "");
+            
+            const updatedCategories = orderedCategories.map(([categoryNameKey, categoryCourses]) => {
+                if (categoryNameKey === categoryName) {
+                    const coursesList = Array.from(categoryCourses);
+                    const [reorderedItem] = coursesList.splice(result.source.index, 1);
+                    coursesList.splice(result.destination.index, 0, reorderedItem);
+                    return [categoryNameKey, coursesList];
+                }
+                return [categoryNameKey, categoryCourses];
             });
-        } catch (error) {
-            console.error("Failed to persist category order:", error);
+
+            setOrderedCategories(updatedCategories);
+
+            const targetCategory = updatedCategories.find(([cat]) => cat === categoryName);
+            if (targetCategory) {
+                const coursesIds = targetCategory[1].map(c => c.id);
+                try {
+                    await axios.post("/api/admin/reorder/courses/items", {
+                        courses: coursesIds,
+                    });
+                } catch (error) {
+                    console.error("Failed to persist course order:", error);
+                }
+            }
         }
     };
 
@@ -444,93 +472,114 @@ const DraggableCategoryList = ({
                                                                 Add Course
                                                             </button>
                                                         </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                            {categoryCourses.map(
-                                                                (course) => (
-                                                                    <div
-                                                                        key={
-                                                                            course.id
-                                                                        }
-                                                                        className="bg-white dark:bg-gray-900 p-4 rounded-lg shadow hover:shadow-md transition-all"
-                                                                    >
-                                                                        <div className="relative h-48 rounded-t-lg overflow-hidden">
-                                                                            {course.thumbnail ? (
-                                                                                <img
-                                                                                    src={
-                                                                                        course.thumbnail
-                                                                                    }
-                                                                                    alt={
-                                                                                        course.title
-                                                                                    }
-                                                                                    className="w-full h-full object-cover"
-                                                                                />
-                                                                            ) : (
-                                                                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                                                                    <i className="fa fa-image text-4xl text-gray-400"></i>
-                                                                                </div>
-                                                                            )}
-                                                                            <div className="absolute top-2 right-2">
-                                                                                <span
-                                                                                    className={`px-2 py-1 text-xs rounded-full ${
-                                                                                        course.status ===
-                                                                                        "active"
-                                                                                            ? "bg-green-100 text-green-800"
-                                                                                            : "bg-yellow-100 text-yellow-800"
-                                                                                    }`}
-                                                                                >
-                                                                                    {
-                                                                                        course.status
-                                                                                    }
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="p-4">
-                                                                            <h3 className="font-semibold text-lg mb-2 truncate">
-                                                                                {
-                                                                                    course.title
-                                                                                }
-                                                                            </h3>
-                                                                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                                                                                <span className="px-2 py-1 bg-blue-50 rounded-md">
-                                                                                    {
-                                                                                        course.category
-                                                                                    }
-                                                                                </span>
-                                                                                <span className="px-2 py-1 bg-purple-50 rounded-md">
-                                                                                    {
-                                                                                        course.level
-                                                                                    }
-                                                                                </span>
-                                                                            </div>
-                                                                            <div className="flex items-center justify-end gap-2 mt-4">
-                                                                                <div className="flex gap-2">
-                                                                                    <button
-                                                                                        onClick={() =>
-                                                                                            openEditModal(
-                                                                                                course
-                                                                                            )
-                                                                                        }
-                                                                                        className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                                                        <Droppable droppableId={`courses-${category}`} type="course">
+                                                            {(provided) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.droppableProps}
+                                                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                                                                >
+                                                                    {categoryCourses.map(
+                                                                        (course, courseIndex) => (
+                                                                            <Draggable
+                                                                                key={course.id}
+                                                                                draggableId={`course-${course.id}`}
+                                                                                index={courseIndex}
+                                                                            >
+                                                                                {(provided, snapshot) => (
+                                                                                    <div
+                                                                                        ref={provided.innerRef}
+                                                                                        {...provided.draggableProps}
+                                                                                        {...provided.dragHandleProps}
+                                                                                        className={`bg-white dark:bg-gray-900 p-4 rounded-lg shadow hover:shadow-md transition-all ${
+                                                                                            snapshot.isDragging
+                                                                                                ? "ring-2 ring-blue-400 scale-[1.01]"
+                                                                                                : ""
+                                                                                        }`}
                                                                                     >
-                                                                                        <i className="fa fa-edit"></i>
-                                                                                    </button>
-                                                                                    <button
-                                                                                        onClick={() =>
-                                                                                            openDeleteModal(
-                                                                                                course
-                                                                                            )
-                                                                                        }
-                                                                                        className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
-                                                                                    >
-                                                                                        <i className="fa fa-trash"></i>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                )
+                                                                                        <div className="relative h-48 rounded-t-lg overflow-hidden">
+                                                                                            {course.thumbnail ? (
+                                                                                                <img
+                                                                                                    src={
+                                                                                                        course.thumbnail
+                                                                                                    }
+                                                                                                    alt={
+                                                                                                        course.title
+                                                                                                    }
+                                                                                                    className="w-full h-full object-cover"
+                                                                                                />
+                                                                                            ) : (
+                                                                                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                                                                    <i className="fa fa-image text-4xl text-gray-400"></i>
+                                                                                                </div>
+                                                                                            )}
+                                                                                            <div className="absolute top-2 right-2">
+                                                                                                <span
+                                                                                                    className={`px-2 py-1 text-xs rounded-full ${
+                                                                                                        course.status ===
+                                                                                                        "active"
+                                                                                                            ? "bg-green-100 text-green-800"
+                                                                                                            : "bg-yellow-100 text-yellow-800"
+                                                                                                    }`}
+                                                                                                >
+                                                                                                    {
+                                                                                                        course.status
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div className="p-4">
+                                                                                            <h3 className="font-semibold text-lg mb-2 truncate">
+                                                                                                {
+                                                                                                    course.title
+                                                                                                }
+                                                                                            </h3>
+                                                                                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                                                                                                <span className="px-2 py-1 bg-blue-50 rounded-md">
+                                                                                                    {
+                                                                                                        course.category
+                                                                                                    }
+                                                                                                </span>
+                                                                                                <span className="px-2 py-1 bg-purple-50 rounded-md">
+                                                                                                    {
+                                                                                                        course.level
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            <div className="flex items-center justify-end gap-2 mt-4">
+                                                                                                <div className="flex gap-2">
+                                                                                                    <button
+                                                                                                        onClick={() =>
+                                                                                                            openEditModal(
+                                                                                                                course
+                                                                                                            )
+                                                                                                        }
+                                                                                                        className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                                                                                                    >
+                                                                                                        <i className="fa fa-edit"></i>
+                                                                                                    </button>
+                                                                                                    <button
+                                                                                                        onClick={() =>
+                                                                                                            openDeleteModal(
+                                                                                                                course
+                                                                                                            )
+                                                                                                        }
+                                                                                                        className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+                                                                                                    >
+                                                                                                        <i className="fa fa-trash"></i>
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                )}
+                                                                            </Draggable>
+                                                                        )
+                                                                    )}
+                                                                    {provided.placeholder}
+                                                                </div>
                                                             )}
-                                                        </div>
+                                                        </Droppable>
 
                                                         {/* Pagination */}
                                                         {perPage !== "all" && (

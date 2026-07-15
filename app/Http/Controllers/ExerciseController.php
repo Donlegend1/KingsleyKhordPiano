@@ -39,7 +39,7 @@ class ExerciseController extends Controller
             }
 
             if ($series) {
-                $query->where('series', $series)->orderBy('id', 'asc');
+                $query->where('series', $series)->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'asc');
             } else {
                 $subquery = Upload::where('category', 'piano exercise')
                     ->when($level, fn ($q) => $q->where('level', $level))
@@ -55,6 +55,7 @@ class ExerciseController extends Controller
                             ->whereRaw('COALESCE(u2.series, CAST(u2.id AS CHAR)) = COALESCE(uploads.series, CAST(uploads.id AS CHAR))')
                             ->selectRaw('count(*)');
                     }, 'item_count')
+                    ->orderByRaw('position IS NULL, position ASC')
                     ->latest();
             }
 
@@ -109,6 +110,7 @@ class ExerciseController extends Controller
 
             $playlist = Upload::where('category', 'piano exercise')
                 ->where('level', $level)
+                ->orderByRaw('position IS NULL, position ASC')
                 ->orderBy('id', 'asc')
                 ->get()
                 ->sortBy(fn($item) => ($skillOrder[strtolower($item->skill_level ?? '')] ?? count($skillLevels)) * 1000000 + $item->id)
@@ -144,16 +146,21 @@ class ExerciseController extends Controller
                 ? $service->isBookmarked($activeVideo)
                 : false;
 
-            $comments = CourseVideoComment::where('course_id', $activeVideo->id)
-                ->where('category', 'piano exercise')
-                ->get();
+        $comments = CourseVideoComment::where('course_id', $activeVideo->id)
+                            ->where('category', 'piano exercise')
+                            ->with(['user', 'replies.user'])
+                            ->get();
 
         $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
 
             $related_courses = [];
 
             if ($activeVideo && !empty($activeVideo->tags)) {
-                $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
+                if ($activeVideo instanceof \App\Models\MusicalApplication) {
+                    $related_courses = \App\Models\MusicalApplication::whereIn('id', $activeVideo->tags)->get();
+                } else {
+                    $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
+                }
             }
 
         return view('memberpages.series-player', compact(
@@ -201,7 +208,8 @@ class ExerciseController extends Controller
         $page = $request->query('page', 1);
 
         $baseQuery = fn() => \App\Models\MusicalApplication::where('status', 'active')
-            ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel));
+            ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel))
+            ->orderByRaw('position IS NULL, position ASC');
 
         $seriesPage = $baseQuery()
             ->select('series')

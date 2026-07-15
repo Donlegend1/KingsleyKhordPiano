@@ -80,9 +80,9 @@ class HomeController extends Controller
                 $latestCourses['piano exercise'] = $latestPianoExercise;
             }
 
-            $latestHarmonicDrill = \App\Models\MusicalApplication::orderBy('created_at', 'desc')->first();
-            if ($latestHarmonicDrill) {
-                $latestCourses['harmonic drills'] = $latestHarmonicDrill;
+            $latestGuidedPractice = \App\Models\MusicalApplication::orderBy('created_at', 'desc')->first();
+            if ($latestGuidedPractice) {
+                $latestCourses['guided practice'] = $latestGuidedPractice;
             }
 
             $latestLearnSong = \App\Models\LearnSong::orderBy('created_at', 'desc')->first();

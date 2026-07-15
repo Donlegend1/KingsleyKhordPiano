@@ -14,7 +14,7 @@ class MusicalApplicationController extends Controller
 {
     public function index()
     {
-        $uploads = MusicalApplication::latest()->get();
+        $uploads = MusicalApplication::orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get();
         return view('admin.musical-application.index', compact('uploads'));
     }
 
@@ -194,14 +194,30 @@ class MusicalApplicationController extends Controller
     public function musicalApplicationList(Request $request)
     {
         $perPage = $request->input('perPage', 10);
-        $uploads = MusicalApplication::latest()->paginate($perPage);
+        $uploads = MusicalApplication::orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->paginate($perPage);
 
         return response()->json($uploads, 200);
     }
 
     public function getAllCourses()
     {
-        $uploads = \App\Models\Upload::select('id', 'title')->get();
+        $uploads = MusicalApplication::select('id', 'title')->get();
         return response()->json($uploads);
+    }
+
+    public function updatePositions(Request $request)
+    {
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*' => 'integer',
+        ]);
+
+        foreach ($validated['items'] as $index => $id) {
+            MusicalApplication::where('id', $id)->update(['position' => $index + 1]);
+        }
+
+        return response()->json([
+            'message' => 'Musical Application positions updated successfully',
+        ]);
     }
 }

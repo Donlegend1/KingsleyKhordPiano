@@ -326,6 +326,7 @@ class CourseController extends Controller
                             $q->where('user_id', $userId);
                         }
                     ])
+                    ->orderByRaw('position IS NULL, position ASC')
                     ->orderBy('id');
             }
         ])
@@ -387,4 +388,19 @@ class CourseController extends Controller
         ]);
     }
 
+    public function updateCoursePositions(Request $request)
+    {
+        $validated = $request->validate([
+            'courses' => 'required|array',
+            'courses.*' => 'integer',
+        ]);
+
+        foreach ($validated['courses'] as $index => $id) {
+            Course::where('id', $id)->update(['position' => $index + 1]);
+        }
+
+        return response()->json([
+            'message' => 'Course positions updated successfully',
+        ]);
+    }
 }

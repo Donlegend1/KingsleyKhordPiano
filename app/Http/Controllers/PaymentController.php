@@ -214,6 +214,9 @@ class PaymentController extends Controller
 
     public function handlePaystackWebhook(Request $request)
     {
+        logger()->info('Paystack Webhook received',
+            ['payload' => $request->all()]
+        );
         $payload = $request->getContent();
         $signature = $request->header('x-paystack-signature');
 
@@ -263,7 +266,7 @@ class PaymentController extends Controller
 
     protected function onSubscriptionCreated(array $data)
     {
-        logger()->info(['web hook data' => $data]);
+        logger()->info('Subscription created webhook data', ['data' => $data]);
         $email = $data['customer']['email'] ?? $data['email'] ?? null;
         $user = User::where('email', $email)->first();
         

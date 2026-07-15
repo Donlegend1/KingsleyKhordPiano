@@ -6,7 +6,7 @@
     <div class="flex items-center gap-2 text-sm text-gray-500">
         <a href="/" class="hover:text-gray-700">Home</a>
         <span>/</span>
-        <span class="text-[#6366F1] font-medium">{{ $pageTitle ?? 'Current Page' }}</span>
+        <span class="text-blue-600 font-medium">{{ $pageTitle ?? 'Current Page' }}</span>
     </div>
 </div>
 

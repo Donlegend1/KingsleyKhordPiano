@@ -313,7 +313,7 @@
             <p class="text-sm text-gray-500 mb-7">You get 1 free live coaching session every month as part of your membership.</p>
 
             <div x-show="sessionsUsed >= sessionsIncluded" x-cloak
-                class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-5 py-4 mb-6 text-sm">
+                class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-5 py-4 mb-6 text-sm">
                 You've used your free session for this month. Your next session becomes available on
                 <span class="font-bold" x-text="nextResetLabel"></span>.
             </div>
@@ -322,14 +322,14 @@
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">
                 <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100">
                     <div class="flex items-center gap-4 px-6 py-5">
-                        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </div>
                         <div>
                             <p class="text-xs text-gray-400 font-medium">Monthly Session</p>
-                            <p class="text-xl font-bold text-amber-500 leading-tight"><span x-text="sessionsUsed"></span> <span class="text-gray-300 font-light">/</span> <span x-text="sessionsIncluded"></span></p>
+                            <p class="text-xl font-bold text-blue-500 leading-tight"><span x-text="sessionsUsed"></span> <span class="text-gray-300 font-light">/</span> <span x-text="sessionsIncluded"></span></p>
                             <p class="text-[11px] text-gray-400">Sessions used</p>
                         </div>
                     </div>
@@ -356,8 +356,8 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-4 px-6 py-5">
-                        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </div>
@@ -410,8 +410,8 @@
                                     :disabled="isDisabled(day)"
                                     class="aspect-square flex items-center justify-center text-sm rounded-lg transition font-medium mx-auto w-9 h-9"
                                     :class="{
-                                        'bg-amber-600 text-white font-bold shadow': selectedDay === day,
-                                        'bg-amber-50 text-amber-700 font-semibold ring-1 ring-amber-300': isToday(day) && selectedDay !== day && !isDisabled(day),
+                                        'bg-blue-600 text-white font-bold shadow': selectedDay === day,
+                                        'bg-blue-50 text-blue-700 font-semibold ring-1 ring-blue-300': isToday(day) && selectedDay !== day && !isDisabled(day),
                                         'text-gray-300 cursor-not-allowed': isDisabled(day),
                                         'text-gray-700 hover:bg-gray-100': !isDisabled(day) && !isToday(day) && selectedDay !== day
                                     }"
@@ -441,13 +441,13 @@
                                     :class="slot.booked
                                         ? 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60'
                                         : (selectedTime === slot.label
-                                            ? 'border-amber-500 bg-amber-50 ring-1 ring-amber-400 cursor-pointer'
+                                            ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-400 cursor-pointer'
                                             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 cursor-pointer')">
                                     <input type="radio" name="time" :value="slot.label" :disabled="slot.booked"
                                         @change="selectedTime = slot.label" :checked="selectedTime === slot.label" class="hidden">
                                     <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition"
-                                        :class="slot.booked ? 'border-gray-300' : (selectedTime === slot.label ? 'border-amber-500' : 'border-gray-300')">
-                                        <div class="w-2.5 h-2.5 rounded-full bg-amber-500 transition" x-show="!slot.booked && selectedTime === slot.label"></div>
+                                        :class="slot.booked ? 'border-gray-300' : (selectedTime === slot.label ? 'border-blue-500' : 'border-gray-300')">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-blue-500 transition" x-show="!slot.booked && selectedTime === slot.label"></div>
                                     </div>
                                     <span class="text-sm font-semibold flex-1" :class="slot.booked ? 'text-gray-400' : 'text-gray-700'" x-text="slot.label"></span>
                                     <span x-show="slot.booked" class="text-[10px] font-bold text-gray-400 uppercase tracking-wide bg-gray-100 px-2 py-1 rounded-full">Booked</span>
@@ -495,15 +495,15 @@
             <p class="text-sm text-gray-500 mb-6">You get 1 free live coaching session every month as part of your membership.</p>
 
             <!-- Success Banner -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6 px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="bg-white rounded-2xl border border-gray-100 mb-6 px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-11 h-11 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                         </svg>
                     </div>
                     <div>
-                        <p class="text-base font-bold text-green-600">Your session is booked!</p>
+                        <p class="text-base font-bold text-gray-900">Your session is booked</p>
                         <p class="text-sm text-gray-400">The Zoom link will be sent to your registered email.</p>
                     </div>
                 </div>
@@ -541,133 +541,123 @@
                 </div>
             </div>
 
-            <!-- Detail Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Detail Grid: 2 cols x 2 rows so paired cards align to equal height -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-6">
 
-                <!-- Left column -->
-                <div class="flex flex-col gap-6">
+                <!-- Booked Session Card -->
+                <div class="bg-white rounded-2xl border border-gray-100 p-5">
+                    <p class="text-sm font-bold text-gray-900 mb-3">Your Booked Session</p>
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xl font-bold text-gray-900 leading-tight" x-text="activeBooking ? getFormattedBookingDate() : selectedDateLabel"></p>
+                            <p class="text-sm text-gray-500 mt-0.5" x-text="(activeBooking ? getFormattedBookingTime() : selectedTime) + ' (45 Minutes)'"></p>
+                        </div>
+                    </div>
 
-                    <!-- Booked Session Card -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-                        <p class="text-sm font-bold text-gray-900 mb-5">Your Booked Session</p>
-                        <div class="flex items-start gap-4 mb-6">
-                            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                            </div>
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                            </svg>
                             <div>
-                                <p class="text-xl font-bold text-gray-900 leading-tight" x-text="activeBooking ? getFormattedBookingDate() : selectedDateLabel"></p>
-                                <p class="text-sm text-gray-500 mt-0.5" x-text="(activeBooking ? getFormattedBookingTime() : selectedTime) + ' (45 Minutes)'"></p>
+                                <p class="text-[11px] text-gray-400">Platform</p>
+                                <p class="text-sm font-bold text-gray-800">Zoom</p>
                             </div>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-4 pt-5 border-t border-gray-100">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
-                                </svg>
-                                <div>
-                                    <p class="text-[11px] text-gray-400">Platform</p>
-                                    <p class="text-sm font-bold text-gray-800">Zoom</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
-                                </svg>
-                                <div>
-                                    <p class="text-[11px] text-gray-400">Time zone</p>
-                                    <p class="text-sm font-bold text-gray-800" x-text="userTzLabel"></p>
-                                </div>
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                            </svg>
+                            <div>
+                                <p class="text-[11px] text-gray-400">Time zone</p>
+                                <p class="text-sm font-bold text-gray-800" x-text="userTzLabel"></p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Important Notes Card -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-                        <p class="text-sm font-bold text-gray-900 mb-5">Important Notes</p>
-                        <ul class="flex flex-col gap-3 mb-6">
-                            <li class="flex items-start gap-3">
-                                <div class="w-5 h-5 rounded bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                </div>
-                                <span class="text-sm text-gray-600">You will receive an email with the Zoom link and session details.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <div class="w-5 h-5 rounded bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                </div>
-                                <span class="text-sm text-gray-600">Please arrive a few minutes early to make the most of our time together.</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <div class="w-5 h-5 rounded bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                </div>
-                                <span class="text-sm text-gray-600">Come prepared with any questions or topics you'd like help with.</span>
-                            </li>
-                        </ul>
-                    </div>
-
                 </div>
 
-                <!-- Right column -->
-                <div class="flex flex-col gap-6">
-
-                    <!-- Monthly Session Status -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-                        <div class="flex items-center justify-between mb-6">
-                            <p class="text-sm font-bold text-gray-900">Monthly Session Status</p>
-                            <span class="text-xs font-bold text-green-700 bg-green-100 px-3 py-1.5 rounded-full" x-text="sessionsUsed + ' / ' + sessionsIncluded + ' Used'"></span>
+                <!-- Monthly Session Status -->
+                <div class="bg-white rounded-2xl border border-gray-100 p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-sm font-bold text-gray-900">Monthly Session Status</p>
+                        <span class="text-xs font-bold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full" x-text="sessionsUsed + ' / ' + sessionsIncluded + ' Used'"></span>
+                    </div>
+                    <div class="flex flex-col gap-0 divide-y divide-gray-100">
+                        <div class="flex items-center justify-between py-2.5">
+                            <span class="text-sm text-gray-500">Sessions Included</span>
+                            <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded"></span>
                         </div>
-                        <div class="flex flex-col gap-0 divide-y divide-gray-100">
-                            <div class="flex items-center justify-between py-3.5">
-                                <span class="text-sm text-gray-500">Sessions Included</span>
-                                <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded"></span>
-                            </div>
-                            <div class="flex items-center justify-between py-3.5">
-                                <span class="text-sm text-gray-500">Sessions Used</span>
-                                <span class="text-sm font-bold text-gray-900" x-text="sessionsUsed"></span>
-                            </div>
-                            <div class="flex items-center justify-between py-3.5">
-                                <span class="text-sm text-gray-500">Remaining Sessions</span>
-                                <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded - sessionsUsed"></span>
-                            </div>
-                            <div class="flex items-center justify-between py-3.5">
-                                <span class="text-sm text-gray-500">Next Available</span>
-                                <span class="text-sm font-bold text-gray-900" x-text="nextResetLabel"></span>
-                            </div>
+                        <div class="flex items-center justify-between py-2.5">
+                            <span class="text-sm text-gray-500">Sessions Used</span>
+                            <span class="text-sm font-bold text-gray-900" x-text="sessionsUsed"></span>
+                        </div>
+                        <div class="flex items-center justify-between py-2.5">
+                            <span class="text-sm text-gray-500">Remaining Sessions</span>
+                            <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded - sessionsUsed"></span>
+                        </div>
+                        <div class="flex items-center justify-between py-2.5">
+                            <span class="text-sm text-gray-500">Next Available</span>
+                            <span class="text-sm font-bold text-gray-900" x-text="nextResetLabel"></span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Watch Tutorial Card -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Before Your Session</p>
-                        <div class="flex items-start gap-4 mb-5">
-                            <div class="w-11 h-11 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z"/>
+                <!-- Important Notes Card -->
+                <div class="bg-white rounded-2xl border border-gray-100 p-5">
+                    <p class="text-sm font-bold text-gray-900 mb-3">Important Notes</p>
+                    <ul class="flex flex-col gap-2.5">
+                        <li class="flex items-start gap-3">
+                            <div class="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
-                            <div>
-                                <p class="text-base font-bold text-gray-900 leading-tight">Watch the Set-Up Tutorial</p>
-                                <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">Make sure you have the best experience. This short tutorial walks you through how to prepare for your live coaching session.</p>
+                            <span class="text-sm text-gray-600">You will receive an email with the Zoom link and session details.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
                             </div>
-                        </div>
-                        <button class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-5 py-3.5 rounded-xl transition shadow-sm shadow-indigo-200">
-                            Watch Tutorial
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                            </svg>
-                        </button>
-                    </div>
+                            <span class="text-sm text-gray-600">Please arrive a few minutes early to make the most of our time together.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-gray-600">Come prepared with any questions or topics you'd like help with.</span>
+                        </li>
+                    </ul>
+                </div>
 
+                <!-- Watch Tutorial Card -->
+                <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Before Your Session</p>
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-11 h-11 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-base font-bold text-gray-900 leading-tight">Watch the Set-Up Tutorial</p>
+                            <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">Make sure you have the best experience. This short tutorial walks you through how to prepare for your live coaching session.</p>
+                        </div>
+                    </div>
+                    <button class="mt-auto w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold px-5 py-3 rounded-xl transition">
+                        Watch Tutorial
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </button>
                 </div>
 
             </div>
