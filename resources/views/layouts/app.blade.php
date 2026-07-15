@@ -32,7 +32,7 @@
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
 <body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
-    <div id="app">
+    <div id="app" class="min-h-screen flex flex-col">
     <header
       x-data="{ scrolled: false }"
       x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 10 })"
@@ -200,12 +200,12 @@
     @endif
 
         <!-- Main Content -->
-        <main >
+        <main class="flex-1">
             @yield('content')
         </main>
 
         <!-- Footer -->
-        <footer class="bg-gray-100 shadow bottom-0 z-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-5">
+        <footer class="bg-white shadow bottom-0 z-50 border-t border-gray-200 py-5">
             <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center text-sm text-gray-500 dark:text-gray-400 space-y-2 md:space-y-0 md:space-x-4">
                 <div class="flex items-center space-x-2">
                     <div>&copy; {{ date('Y') }} {{ config('app.name') }}</div>

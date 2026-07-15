@@ -263,7 +263,7 @@
                         ['url' => 'home',                   'label' => 'Dashboard',     'icon' => 'dashboard.svg'],
                         ['url' => 'member/roadmap',         'label' => 'Roadmap',       'icon' => 'roadmap2.png', 'new' => $hasNewRoadmap],
                         ['url' => 'member/piano-exercise/finger', 'label' => 'Piano Exercise','icon' => 'piano2.png', 'new' => $hasNewPianoExercise],
-                        ['url' => 'member/piano-exercise/harmonic-drills', 'label' => 'Harmonic Drills', 'icon' => 'piano.svg', 'new' => $hasNewHarmonicDrills],
+                        ['url' => 'member/piano-exercise/guided-practice', 'label' => 'Guided Practice', 'icon' => 'guided-practice.svg', 'new' => $hasNewHarmonicDrills],
                         ['url' => 'member/ear-training',    'label' => 'Ear Training',  'icon' => 'eartraning.svg'],
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
                         // ['url' => 'member/quick-lessons',   'label' => 'Quick Lesson',  'icon' => 'quick lession.svg'],

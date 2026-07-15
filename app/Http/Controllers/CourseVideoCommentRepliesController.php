@@ -36,6 +36,8 @@ class CourseVideoCommentRepliesController extends Controller
             'user_id' => auth()->id(),
         ]);
 
+        $reply->load('user');
+
         return response()->json([
             'message' => 'Reply created successfully',
             'data' => $reply,

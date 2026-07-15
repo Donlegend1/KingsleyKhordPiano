@@ -111,6 +111,28 @@ class LiveShowController extends Controller
         ]);
     }
 
+    /**
+     * Show the recording of a past live show, with its discussion thread.
+     */
+    public function showRecording(Liveshow $liveshow)
+    {
+        abort_unless($liveshow->recording_url, 404);
+
+        $user = auth()->user();
+        if ($liveshow->access_type === 'premium' && !$user->premium) {
+            return redirect('/member/live-session')
+                ->with('error', 'Please upgrade to premium to watch this recording.');
+        }
+
+        $comments = \App\Models\CourseVideoComment::where('course_id', $liveshow->id)
+            ->where('category', 'liveshow')
+            ->with(['user', 'replies.user'])
+            ->latest()
+            ->get();
+
+        return view('memberpages.livesession-recording', compact('liveshow', 'comments'));
+    }
+
     public function list(Request $request)
     {
         $filter = $request->query('filter');

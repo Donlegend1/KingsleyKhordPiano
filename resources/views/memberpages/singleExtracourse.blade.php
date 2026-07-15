@@ -61,7 +61,7 @@
         // Get comments specifically for this lesson
         $lessonComments = \App\Models\CourseVideoComment::where('course_id', $lesson->id)
             ->where('category', 'others')
-            ->with(['user'])
+            ->with(['user', 'replies.user'])
             ->latest()
             ->get();
     @endphp
@@ -80,7 +80,7 @@
                 @endif
                 @if ($lesson?->category)
                     <span>/</span>
-                    <span class="text-[#6366F1] font-medium">{{ $lesson->category->category }}</span>
+                    <span class="text-blue-600 font-medium">{{ $lesson->category->category }}</span>
                 @endif
             </div>
         </section>
@@ -159,8 +159,8 @@
                     @if ($playlist->count() > 1 && $lessonType !== 'learn_songs')
                         <div class="block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
                             {{-- Header --}}
-                            <div class="px-5 py-4 border-b border-gray-100">
-                                <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                            <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
+                                <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
                                     Lessons in this course:
                                 </p>
                             </div>
@@ -176,13 +176,13 @@
                                     @endphp
                                     <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                         class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                                        {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+                                        {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
                                         {{-- Title --}}
                                         <div class="flex-1 min-w-0">
                                             <p
                                                 class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
-                                                {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
+                                                {{ $isActive ? 'text-white' : 'text-gray-800' }}">
                                                 <span class="truncate">{{ $item->title }}</span>
                                                 @if ($itemIsNew)
                                                     <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
@@ -294,17 +294,17 @@
                     @endif
 
                     {{-- Discussion / Comments --}}
-                    <div class="mt-8" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
-                        <h2 class="text-[18px] font-bold text-gray-900 mb-6">Discussion</h2>
+                    <div class="mt-10 pt-8 border-t border-gray-100" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
+                        <h2 class="text-[17px] font-semibold text-gray-900 tracking-tight mb-5">Discussion</h2>
                         <form id="comment-form" class="mb-8">
                             <textarea name="comment" placeholder="What did you learn from this lesson?"
-                                class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-[14px] focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all outline-none" rows="3"></textarea>
+                                class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">
-                                <button type="submit" class="bg-[#2563EB] text-white font-bold px-6 py-2.5 rounded-xl hover:bg-[#1D4ED8] transition-all">Comment</button>
+                                <button type="submit" class="bg-gray-900 text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-black transition-colors">Comment</button>
                             </div>
                         </form>
 
-                        <div class="space-y-6" id="comment-list">
+                        <div class="divide-y divide-gray-100" id="comment-list">
                             @foreach($lessonComments as $comment)
                                 @include('memberpages.partials.course-video-comment', ['comment' => $comment])
                             @endforeach
@@ -320,8 +320,8 @@
 
                     @if ($playlist->count() > 1)
                         {{-- Header --}}
-                        <div class="px-5 py-4 border-b border-gray-100">
-                            <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                        <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
+                            <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
                                 Lessons in this course:
                             </p>
                         </div>
@@ -337,13 +337,13 @@
                                 @endphp
                                 <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                     class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-                                    {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+                                    {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
                                     {{-- Title --}}
                                     <div class="flex-1 min-w-0">
                                         <p
                                             class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
-                                            {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
+                                            {{ $isActive ? 'text-white' : 'text-gray-800' }}">
                                             <span class="truncate">{{ $item->title }}</span>
                                             @if ($itemIsNew)
                                                 <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>

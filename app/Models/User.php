@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Cashier\Billable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -129,5 +130,36 @@ class User extends Authenticatable implements MustVerifyEmail
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
+    }
+
+    /**
+     * The [start, end) bounds of the user's current subscription-anniversary
+     * cycle (used e.g. to reset the monthly free live coaching session).
+     *
+     * Each boundary is computed directly from the anchor day-of-month via
+     * addMonthsNoOverflow(), not chained from the previous boundary, so a
+     * short month doesn't permanently shift the anchor: Jan 31 -> Feb 28/29
+     * -> Mar 31, not Feb 28 -> Mar 28.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    public function currentCoachingCycleBounds(?Carbon $now = null): array
+    {
+        $now = $now ?? now();
+        $anchor = ($this->subscription_started_at ?? $this->created_at)->copy()->startOfDay();
+
+        $monthsElapsed = $anchor->diffInMonths($now);
+
+        while ($anchor->copy()->addMonthsNoOverflow($monthsElapsed)->gt($now)) {
+            $monthsElapsed--;
+        }
+        while ($anchor->copy()->addMonthsNoOverflow($monthsElapsed + 1)->lte($now)) {
+            $monthsElapsed++;
+        }
+
+        $cycleStart = $anchor->copy()->addMonthsNoOverflow($monthsElapsed);
+        $cycleEnd = $anchor->copy()->addMonthsNoOverflow($monthsElapsed + 1);
+
+        return [$cycleStart, $cycleEnd];
     }
 }

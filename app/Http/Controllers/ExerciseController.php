@@ -146,9 +146,10 @@ class ExerciseController extends Controller
                 ? $service->isBookmarked($activeVideo)
                 : false;
 
-            $comments = CourseVideoComment::where('course_id', $activeVideo->id)
-                ->where('category', 'piano exercise')
-                ->get();
+        $comments = CourseVideoComment::where('course_id', $activeVideo->id)
+                            ->where('category', 'piano exercise')
+                            ->with(['user', 'replies.user'])
+                            ->get();
 
         $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
 

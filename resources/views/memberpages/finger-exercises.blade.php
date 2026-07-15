@@ -36,7 +36,7 @@
     <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
         <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
         <span>/</span>
-        <span class="text-[#6366F1] font-medium">Piano Exercise</span>
+        <span class="text-blue-600 font-medium">Piano Exercise</span>
     </div>
 </section>
 
@@ -48,12 +48,12 @@
             <div class="inline-flex items-stretch bg-gray-100 rounded-xl p-1.5">
                 <button type="button" @click="activeTab = 'finger'"
                     class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
-                    :class="activeTab === 'finger' ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    :class="activeTab === 'finger' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
                     Finger Exercise
                 </button>
                 <button type="button" @click="activeTab = 'etudes'"
                     class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
-                    :class="activeTab === 'etudes' ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    :class="activeTab === 'etudes' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
                     Etudes &amp; Pieces
                 </button>
             </div>
@@ -101,7 +101,7 @@
                     <!-- Play overlay -->
                     <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
                         <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
-                            <i class="fa fa-play text-indigo-600 text-sm ml-0.5"></i>
+                            <i class="fa fa-play text-black text-sm ml-0.5"></i>
                         </div>
                     </div>
                 </a>
@@ -116,7 +116,7 @@
 
                     <!-- Level Badge -->
                     <div>
-                        <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
+                        <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-black text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                             All Levels
                         </span>
@@ -124,7 +124,7 @@
 
                     <!-- Watch Now Button -->
                     <a href="{{ $watchUrl }}"
-                       class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
+                       class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
                         Watch Now
                     </a>
                 </div>

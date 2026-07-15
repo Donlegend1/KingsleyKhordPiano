@@ -9,7 +9,7 @@
     <div class="flex items-center gap-2">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
-      <span class="text-[#6366F1] font-medium">Learn Songs</span>
+      <span class="text-blue-600 font-medium">Learn Songs</span>
     </div>
 
     <!-- Search Bar -->
@@ -62,7 +62,7 @@
         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Skill Level</label>
         <div class="relative">
           <button type="button" @click="open = !open"
-            class="w-full flex items-center justify-between gap-2 px-4 py-2.5 border-2 border-indigo-200 dark:border-indigo-900 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition">
+            class="w-full flex items-center justify-between gap-2 px-4 py-2.5 border-2 border-blue-200 dark:border-blue-900 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
             <span>{{ $skillOptions[$activeTab] ?? 'All' }}</span>
             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -75,11 +75,11 @@
               <a href="{{ $buildQuery(['tab' => $key]) }}"
                 class="flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors duration-150
                   {{ $activeTab === $key
-                      ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 font-semibold'
+                      ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-semibold'
                       : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
                 {{ $label }}
                 @if($activeTab === $key)
-                  <i class="fa fa-check text-indigo-600 dark:text-indigo-300 text-xs"></i>
+                  <i class="fa fa-check text-blue-600 dark:text-blue-300 text-xs"></i>
                 @endif
               </a>
             @endforeach
@@ -92,7 +92,7 @@
         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Tonal Center (Key)</label>
         <div class="relative">
           <button type="button" @click="open = !open"
-            class="w-full flex items-center justify-between gap-2 px-4 py-2.5 border-2 border-indigo-200 dark:border-indigo-900 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition">
+            class="w-full flex items-center justify-between gap-2 px-4 py-2.5 border-2 border-blue-200 dark:border-blue-900 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
             <span>{{ $keyOptions[$tonalCenter] ?? 'All Keys' }}</span>
             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -104,11 +104,11 @@
             <a href="{{ $buildQuery(['key' => 'all']) }}"
               class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 mb-2
                 {{ $tonalCenter === 'all'
-                    ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 font-semibold'
+                    ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-semibold'
                     : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
               All Keys
               @if($tonalCenter === 'all')
-                <i class="fa fa-check text-indigo-600 dark:text-indigo-300 text-xs"></i>
+                <i class="fa fa-check text-blue-600 dark:text-blue-300 text-xs"></i>
               @endif
             </a>
             <div class="grid grid-cols-3 gap-1.5 border-t border-gray-100 dark:border-gray-700 pt-2">
@@ -116,11 +116,11 @@
                 <a href="{{ $buildQuery(['key' => $value]) }}"
                   class="flex items-center justify-center gap-1 px-2 py-2 rounded-lg text-xs font-medium text-center whitespace-nowrap transition-colors duration-150
                     {{ $tonalCenter === $value
-                        ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 font-semibold'
+                        ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-semibold'
                         : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
                   {{ $label }}
                   @if($tonalCenter === $value)
-                    <i class="fa fa-check text-indigo-600 dark:text-indigo-300 text-[10px]"></i>
+                    <i class="fa fa-check text-blue-600 dark:text-blue-300 text-[10px]"></i>
                   @endif
                 </a>
               @endforeach
@@ -162,7 +162,7 @@
             <!-- Play overlay -->
             <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
               <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
-                <i class="fa fa-play text-indigo-600 text-sm ml-0.5"></i>
+                <i class="fa fa-play text-black text-sm ml-0.5"></i>
               </div>
             </div>
           </a>
@@ -182,7 +182,7 @@
 
             <!-- Level Badge -->
             <div>
-              <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
+              <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-black text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 {{ $levelLabel }}
               </span>
@@ -190,7 +190,7 @@
 
             <!-- Watch Now Button -->
             <a href="/member/lesson/{{ $song->id }}?type=learn_song"
-               class="mt-auto flex items-center justify-center w-full py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-xl transition-all duration-200">
+               class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
               Watch Now
             </a>
           </div>

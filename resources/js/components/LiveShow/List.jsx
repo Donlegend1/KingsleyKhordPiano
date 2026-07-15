@@ -7,6 +7,7 @@ import {
 } from "../Alert/FlashMessageContext";
 import CustomPagination from "../Pagination/CustomPagination";
 import Modal from "../Modal/Modal";
+import { watInputToUtcIso, utcIsoToWatInput } from "../../utils/formatRelativeTime";
 
 const LiveShow = () => {
     const [courses, setCourses] = useState([]);
@@ -85,7 +86,7 @@ const LiveShow = () => {
     };
 
     const openEditModal = (course) => {
-        setLiveShow(course);
+        setLiveShow({ ...course, start_time: utcIsoToWatInput(course.start_time) });
         setIsEditModalOpen(true);
     };
 
@@ -110,7 +111,7 @@ const LiveShow = () => {
         try {
             const response = await axios.patch(
                 `/api/admin/live-shows/${liveShow.id}`,
-                liveShow,
+                { ...liveShow, start_time: watInputToUtcIso(liveShow.start_time) },
                 {
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
@@ -260,6 +261,7 @@ const LiveShow = () => {
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg"
                         />
+                        <label className="text-xs text-gray-500 -mb-2">Start Date & Time (WAT)</label>
                         <input
                             type="datetime-local"
                             name="start_time"
