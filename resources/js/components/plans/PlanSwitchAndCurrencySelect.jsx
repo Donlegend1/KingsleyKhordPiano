@@ -63,6 +63,7 @@ const PlanSwitchAndCurrencySelect = () => {
     }, [plans]);
 
     const authUser = window.authUser || null;
+    const isSubscribed = window.isSubscribed || false;
 
     const handleModalOpen = (plan) => {
         setSelectedPlanDetails(plan);
@@ -345,10 +346,15 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </ul>
 
                                 <button
-                                    className="w-full py-3 rounded-xl text-sm font-bold transition bg-gray-900 text-white hover:bg-gray-800"
-                                    onClick={() => handleModalOpen(plan)}
+                                    className={`w-full py-3 rounded-xl text-sm font-bold transition ${
+                                        isSubscribed
+                                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                            : "bg-gray-900 text-white hover:bg-gray-800"
+                                    }`}
+                                    onClick={() => !isSubscribed && handleModalOpen(plan)}
+                                    disabled={isSubscribed}
                                 >
-                                    Join Now
+                                    {isSubscribed ? "Already Subscribed" : "Join Now"}
                                 </button>
                             </div>
                         );

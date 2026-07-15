@@ -15,6 +15,10 @@ class StripeController extends Controller
             'plan_id' => 'required|integer'
         ]);
 
+        if ($request->user()->hasActiveSubscription()) {
+            return redirect()->back()->with('error', 'You already have an active subscription.');
+        }
+
         $plan = Plan::find($request->plan_id);
 
         return $request->user()

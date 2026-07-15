@@ -66,6 +66,9 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-disc-icon lucide-disc">
                 <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/></svg> <span>Learn Songs</span>
             </a>
+            <a href="/admin/uploads/etudes" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa-solid fa-feather-pointed"></i> <span>Etudes & Pieces</span>
+            </a>
             <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>
             </a>
@@ -157,6 +160,9 @@
         </a>
         <a href="/admin/uploads/list" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-upload"></i> <span>Others</span>
+        </a>
+        <a href="/admin/uploads/etudes" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa-solid fa-feather-pointed"></i> <span>Etudes & Pieces</span>
         </a>
         <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>

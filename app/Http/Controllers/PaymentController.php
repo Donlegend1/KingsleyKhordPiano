@@ -29,6 +29,10 @@ class PaymentController extends Controller
             if (!$user) {
                 return redirect('register');
             }
+
+            if ($user->hasActiveSubscription()) {
+                return redirect()->back()->with('error', 'You already have an active subscription.');
+            }
             
             $plan = Plan::find($request->plan_id);
             if (!$plan) {
@@ -124,6 +128,10 @@ class PaymentController extends Controller
             $user = Auth::user();
             if (!$user) {
                 return redirect('register');
+            }
+
+            if ($user->hasActiveSubscription()) {
+                return redirect()->back()->with('error', 'You already have an active subscription.');
             }
 
             $planId = $request->input('plan_id');

@@ -26,6 +26,10 @@ class PayPalController extends Controller
             return redirect('register');
         }
 
+        if ($user->hasActiveSubscription()) {
+            return redirect()->back()->with('error', 'You already have an active subscription.');
+        }
+
         try {
             $plan = Plan::where('type', $request->duration)->where('tier', $request->tier)->first();
             if (!$plan) {

@@ -40,6 +40,10 @@ class UploadController extends Controller
             'uploads' => Upload::where('category', 'learn songs')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
     }
+    public function etudes()
+    {
+        return view('admin.uploads.etudes');
+    }
 
     /**
      * Show the form for creating a new resource.

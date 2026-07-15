@@ -98,6 +98,18 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('reorder/extra-courses', [AdminExtraCourseController::class, 'updatePositions']);
         Route::post('reorder/extra-courses/items', [AdminExtraCourseController::class, 'updateCoursePositions']);
 
+        // Etudes Admin API
+        Route::get('etudes-list', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'list']);
+        Route::get('all-etudes', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'allEtudes']);
+        Route::post('etudes/store', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'storeEtude']);
+        Route::post('etudes/update/{id}', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateEtude']);
+        Route::delete('etudes/{id}', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'deleteEtude']);
+        Route::post('etudes/category/create', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'createCategory']);
+        Route::delete('etudes/category/{name}/delete', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'deleteCategory']);
+        Route::put('etudes/category/{name}/update', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateCategory']);
+        Route::post('reorder/etudes', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updatePositions']);
+        Route::post('reorder/etudes/items', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateEtudePositions']);
+
         Route::post('/midi-file/create', [MidiFileController::class, 'store']);
         Route::delete('/midi-files/{midiFile}', [MidiFileController::class, 'destroy']);
         Route::get('/midi-files', [MidiFileController::class, 'fetchAll']);
