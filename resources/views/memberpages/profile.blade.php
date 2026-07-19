@@ -139,9 +139,15 @@
                     <!-- Password -->
                     <div>
                         <label for="new_password_input" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                        <input id="new_password_input" name="new_password_input" type="password"
-                        autocomplete="new-password"
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                        <div class="relative">
+                            <input id="new_password_input" name="new_password_input" type="password"
+                            autocomplete="new-password"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 pr-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            <button type="button" onclick="togglePasswordVisibility('new_password_input', this)"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                         @error('new_password_input')
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -150,9 +156,15 @@
                     <!-- Confirm Password -->
                     <div>
                         <label for="new_password_input_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                        <input id="new_password_input_confirmation" name="new_password_input_confirmation" type="password"
-                        autocomplete="new-password"
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                        <div class="relative">
+                            <input id="new_password_input_confirmation" name="new_password_input_confirmation" type="password"
+                            autocomplete="new-password"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 pr-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            <button type="button" onclick="togglePasswordVisibility('new_password_input_confirmation', this)"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -205,6 +217,16 @@
                     // Update on input
                     textarea.addEventListener('input', updateCharCount);
                 });
+
+                function togglePasswordVisibility(inputId, button) {
+                    const input = document.getElementById(inputId);
+                    const icon = button.querySelector('i');
+                    const isHidden = input.type === 'password';
+
+                    input.type = isHidden ? 'text' : 'password';
+                    icon.classList.toggle('fa-eye', !isHidden);
+                    icon.classList.toggle('fa-eye-slash', isHidden);
+                }
             </script>
         </div>
     </div>

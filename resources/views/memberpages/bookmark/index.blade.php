@@ -51,7 +51,7 @@
 
                 $categoryLabel = match ($bookmark->bookmarkable_type) {
                     'App\Models\Course' => 'Roadmap',
-                    'App\Models\Upload' => 'Quick Lesson',
+                    'App\Models\Upload' => $bookmark->bookmarkable?->category ? \Illuminate\Support\Str::title($bookmark->bookmarkable->category) : 'Lesson',
                     'App\Models\LearnSong' => 'Learn Song',
                     'App\Models\ExtraCourse' => 'Extra Course',
                     'App\Models\Post' => 'Post',

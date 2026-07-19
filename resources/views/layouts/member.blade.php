@@ -266,7 +266,6 @@
                         ['url' => 'member/piano-exercise/guided-practice', 'label' => 'Guided Practice', 'icon' => 'guided-practice.svg', 'new' => $hasNewHarmonicDrills],
                         ['url' => 'member/ear-training',    'label' => 'Ear Training',  'icon' => 'eartraning.svg'],
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
-                        // ['url' => 'member/quick-lessons',   'label' => 'Quick Lesson',  'icon' => 'quick lession.svg'],
                         ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'music-note.svg', 'new' => $hasNewLearnSongs],
                         ['url' => 'member/live-session',    'label' => 'Live Shows',  'icon' => 'livesession.svg'],
                     ];

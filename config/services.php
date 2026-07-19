@@ -65,6 +65,12 @@ return [
         'calendar_id' => env('GOOGLE_CALENDAR_ID', 'primary'),
     ],
 
+    'zoom' => [
+        'account_id' => env('ZOOM_ACCOUNT_ID'),
+        'client_id' => env('ZOOM_CLIENT_ID'),
+        'client_secret' => env('ZOOM_CLIENT_SECRET'),
+    ],
+
     'admin_notification_email' => env('ADMIN_NOTIFICATION_EMAIL', 'kingsleykhord@gmail.com'),
 
     // When enabled, guest bookings skip the real Stripe/Paystack checkout and are

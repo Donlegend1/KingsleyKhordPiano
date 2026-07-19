@@ -23,7 +23,7 @@ class StoreUploadRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'category' => 'required|in:piano exercise,extra courses,quick lessons,learn songs',
+            'category' => 'required|in:piano exercise,extra courses,learn songs',
             'description' => 'nullable|string|max:1000',
             'video_url' => 'required|string',
             'level' => 'nullable|string|max:50',

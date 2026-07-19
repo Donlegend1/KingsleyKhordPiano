@@ -63,6 +63,7 @@ class CoachingBookingNotification extends Notification implements ShouldQueue
                 'timeFormatted' => $timeFormatted,
                 'timezone' => $gmtLabel,
                 'setupLink' => $setupLink,
+                'zoomLink' => $this->booking->zoom_join_url,
             ]);
     }
 }
