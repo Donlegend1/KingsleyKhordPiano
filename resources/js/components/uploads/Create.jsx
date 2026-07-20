@@ -39,7 +39,6 @@ const UploadForm = () => {
     const categories = [
         "piano exercise",
         "extra courses",
-        "quick lessons",
         "learn songs",
     ];
 

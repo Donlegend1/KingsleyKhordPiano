@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LiveCoachingBooking;
 use App\Services\GoogleCalendarService;
-use App\Services\SubscriptionService;
+use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,6 +125,26 @@ class LiveCoachingBookingController extends Controller
 
         $booking->load('user');
 
+        // Slot times are validated above against SCHEDULE, which is defined in WAT.
+        $startWat = Carbon::parse($request->date . ' ' . $time, 'Africa/Lagos');
+        $endWat = $startWat->copy()->addMinutes(45);
+
+        try {
+            $meeting = (new ZoomService())->createMeeting([
+                'topic' => 'Live session with ' . $user->first_name,
+                'start_time' => $startWat->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s\Z'),
+                'duration' => 45,
+                'timezone' => 'Africa/Lagos',
+            ]);
+
+            $booking->update([
+                'zoom_join_url' => $meeting['join_url'] ?? null,
+                'zoom_meeting_id' => $meeting['id'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            logger()->warning('Failed to create Zoom meeting for coaching booking: ' . $e->getMessage());
+        }
+
         try {
             // Send notification to the member who booked
             $user->notify(new \App\Notifications\CoachingBookingNotification($booking));
@@ -137,13 +157,10 @@ class LiveCoachingBookingController extends Controller
         }
 
         try {
-            // Slot times are validated above against SCHEDULE, which is defined in WAT.
-            $startWat = Carbon::parse($request->date . ' ' . $time, 'Africa/Lagos');
-            $endWat = $startWat->copy()->addMinutes(45);
-
             (new GoogleCalendarService())->createEvent([
-                'title' => 'Live Coaching Session with ' . $user->first_name . ' ' . $user->last_name,
-                'description' => "Booked by {$user->first_name} {$user->last_name} ({$user->email}) via the membership site.",
+                'title' => 'Live session with ' . $user->first_name,
+                'description' => "Booked by {$user->first_name} {$user->last_name} ({$user->email}) via the membership site."
+                    . ($booking->zoom_join_url ? "\n\nZoom link: {$booking->zoom_join_url}" : ''),
                 'start_time' => $startWat->toRfc3339String(),
                 'end_time' => $endWat->toRfc3339String(),
                 'timezone' => 'Africa/Lagos',

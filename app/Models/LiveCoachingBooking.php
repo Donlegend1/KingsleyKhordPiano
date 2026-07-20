@@ -10,6 +10,8 @@ class LiveCoachingBooking extends Model
         'user_id',
         'date',
         'time',
+        'zoom_join_url',
+        'zoom_meeting_id',
     ];
 
     public function user()

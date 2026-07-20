@@ -28,12 +28,6 @@ class UploadController extends Controller
             'uploads' => Upload::where('category', 'extra courses')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
     }
-    public function quickLessons()
-    {
-        return view('admin.uploads.quick-lessons', [
-            'uploads' => Upload::where('category', 'quick lessons')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
-        ]);
-    }
     public function learnSongs()
     {
         return view('admin.uploads.learn-songs', [

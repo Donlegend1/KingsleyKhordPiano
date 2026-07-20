@@ -15,7 +15,15 @@
                     📅 <strong>Date:</strong> {{ $dateFormatted }}<br>
                     🕗 <strong>Time:</strong> {{ $timeFormatted }} ({{ $timezone }})
                 </p>
-                
+
+                @if($zoomLink)
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{{ $zoomLink }}" style="background-color: #2D8CFF; color: #fff; text-decoration: none; padding: 12px 25px; border-radius: 6px; display: inline-block;">Join Zoom Session</a>
+                    </div>
+                @else
+                    <p style="color: #b91c1c;">⚠️ No Zoom link was generated for this booking. Please create one manually.</p>
+                @endif
+
                 <p>Thanks,<br><strong>{{ config('app.name') }}</strong></p>
             </td>
         </tr>

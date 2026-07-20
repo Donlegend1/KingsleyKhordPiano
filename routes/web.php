@@ -170,7 +170,6 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
     Route::get('ear-training', [EarTrainingController::class, 'earTraining'])->name('ear.training');
     Route::get('ear-training/{id}', [EarTrainingController::class, 'showmember']);
-    Route::get('quick-lessons', [LessonController::class, 'quicklession'])->name('quick.lession');
     Route::get('learn-songs', [LessonController::class, 'learnSongs'])->name('learn.songs');
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('live-session/{liveshow}/confirm', [LiveSessionController::class, 'confirmBooking'])->name('member.live-session.confirm');
@@ -244,7 +243,6 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::post('course', [CourseController::class, 'store']);
     Route::get('uploads/piano-exercise', [UploadController::class, 'pianoExercise']);
     Route::get('uploads/extra-courses', [UploadController::class, 'extraCourses']);
-    Route::get('uploads/quick-lessons', [UploadController::class, 'quickLessons']);
     Route::get('uploads/learn-songs', [UploadController::class, 'learnSongs']);
     Route::get('uploads/etudes', [UploadController::class, 'etudes']);
     Route::get('uploads/create', [UploadController::class, 'create']);
