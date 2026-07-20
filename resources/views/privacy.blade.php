@@ -34,7 +34,7 @@
         <div>
             <h2 class="text-xl font-semibold">3. Why We Collect It</h2>
             <ul class="list-disc pl-5">
-                <li>Provide you with courses, downloadable resources, quick lessons, and community features.</li>
+                <li>Provide you with courses, downloadable resources, and community features.</li>
                 <li>Process payments and manage subscriptions.</li>
                 <li>Send updates, tips, support, and relevant promotions (with your permission).</li>
                 <li>Understand user engagement and improve our platform.</li>

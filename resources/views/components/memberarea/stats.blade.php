@@ -192,7 +192,7 @@
         'App\Models\LearnSong' => 'Learn Songs',
         'App\Models\MusicalApplication' => 'Piano Exercise',
         'App\Models\Course' => 'Roadmap',
-        'App\Models\Upload' => $resumeLesson->category ? \Illuminate\Support\Str::title($resumeLesson->category) : 'Quick Lessons',
+        'App\Models\Upload' => $resumeLesson->category ? \Illuminate\Support\Str::title($resumeLesson->category) : 'Lesson',
         default => null,
     };
   @endphp

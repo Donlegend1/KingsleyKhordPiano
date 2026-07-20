@@ -65,6 +65,7 @@ class AdminCoachingBookingNotification extends Notification implements ShouldQue
                 'dateFormatted' => $startUser->format('l, F j, Y'),
                 'timeFormatted' => $timeFormatted,
                 'timezone' => $gmtLabel,
+                'zoomLink' => $this->booking->zoom_join_url,
             ]);
     }
 }
