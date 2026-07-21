@@ -741,17 +741,7 @@ const LearnSongsAdmin = () => {
                                 </div>
                             )}
                         </div>
-                        <div className="col-span-1 sm:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Related Songs</label>
-                            <Select
-                                isMulti
-                                options={allSongs}
-                                onChange={(opts) => setNewSong({ ...newSong, related_songs: opts ? opts.map(o => o.value) : [] })}
-                                className="basic-multi-select"
-                                classNamePrefix="select"
-                                placeholder="Select related songs..."
-                            />
-                        </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
                             <input
@@ -916,18 +906,7 @@ const LearnSongsAdmin = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="col-span-1 sm:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Related Songs</label>
-                                <Select
-                                    isMulti
-                                    options={allSongs}
-                                    onChange={(opts) => setEditingSong({ ...editingSong, related_songs: opts ? opts.map(o => o.value) : [] })}
-                                    value={allSongs.filter(opt => editingSong.related_songs.includes(opt.value))}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    placeholder="Select related songs..."
-                                />
-                            </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
                                 <input

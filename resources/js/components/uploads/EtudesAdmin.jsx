@@ -659,17 +659,7 @@ const EtudesAdmin = () => {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                                 />
                             </div>
-                            <div className="col-span-1 sm:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons</label>
-                                <Select
-                                    isMulti
-                                    options={allEtudes}
-                                    onChange={(opts) => setNewEtude({ ...newEtude, related_etudes: opts ? opts.map(o => o.value) : [] })}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    placeholder="Select related lessons..."
-                                />
-                            </div>
+
                             <div className="col-span-1 sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                 <textarea
@@ -791,18 +781,7 @@ const EtudesAdmin = () => {
                                         </div>
                                     )}
                                 </div>
-                                <div className="col-span-1 sm:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons</label>
-                                    <Select
-                                        isMulti
-                                        options={allEtudes}
-                                        onChange={(opts) => setEditingEtude({ ...editingEtude, related_etudes: opts ? opts.map(o => o.value) : [] })}
-                                        value={allEtudes.filter(opt => editingEtude.related_etudes.includes(opt.value))}
-                                        className="basic-multi-select"
-                                        classNamePrefix="select"
-                                        placeholder="Select related lessons..."
-                                    />
-                                </div>
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
                                     <input
