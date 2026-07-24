@@ -12,6 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        DB::table('uploads')->where('category', 'quick lessons')->delete();
         DB::statement("ALTER TABLE uploads MODIFY category ENUM('piano exercise', 'extra courses', 'learn songs')");
     }
 

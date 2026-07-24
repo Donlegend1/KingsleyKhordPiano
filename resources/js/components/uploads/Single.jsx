@@ -29,6 +29,43 @@ const SingleUpload = () => {
         }
     }, [upload]);
 
+    useEffect(() => {
+        if (!upload || !upload.video_url) return;
+
+        // Parse any script tags in the video_url and inject them into the document
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(upload.video_url, "text/html");
+        const scripts = doc.querySelectorAll("script");
+
+        scripts.forEach((script) => {
+            const src = script.getAttribute("src");
+            if (src) {
+                // Check if script is already in document to avoid duplicates
+                const existingScript = document.querySelector(`script[src="${src}"]`);
+                if (!existingScript) {
+                    const newScript = document.createElement("script");
+                    newScript.src = src;
+                    newScript.async = true;
+                    
+                    const type = script.getAttribute("type");
+                    if (type) {
+                        newScript.type = type;
+                    }
+
+                    newScript.onload = () => {
+                        console.log(`Successfully loaded script: ${src}`);
+                    };
+
+                    newScript.onerror = (e) => {
+                        console.error(`Failed to load script: ${src}`, e);
+                    };
+                    
+                    document.head.appendChild(newScript);
+                }
+            }
+        });
+    }, [upload?.video_url]);
+
     const renderVideoPlayer = () => {
         if (!upload?.video_type || !upload?.video_url) {
             return upload?.thumbnail_url || upload?.thumbnail ? (

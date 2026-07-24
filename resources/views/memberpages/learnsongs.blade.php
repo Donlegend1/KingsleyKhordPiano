@@ -172,6 +172,9 @@
             <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug">
               {{ $song->title }}
             </h3>
+            @if($song && !empty($song->author))
+              <p class="text-xs text-indigo-500 font-medium -mt-2">by {{ $song->author }}</p>
+            @endif
 
             @if($song->category?->category)
               <p class="text-xs text-gray-400 dark:text-gray-500 -mt-1">{{ $song->category->category }}</p>

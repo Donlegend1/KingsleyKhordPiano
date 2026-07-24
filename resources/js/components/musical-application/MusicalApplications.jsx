@@ -8,6 +8,7 @@ import {
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
 import Modal from "../Modal/Modal";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const MusicalApplicationList = () => {
     const [uploads, setUploads] = useState([]);
@@ -84,6 +85,27 @@ const MusicalApplicationList = () => {
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
+
+    const handleOnDragEnd = async (result) => {
+        if (!result.destination) return;
+        const items = Array.from(uploads);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        setUploads(items);
+
+        try {
+            await axios.post("/admin/reorder-musical-applications", {
+                items: items.map(item => item.id),
+            }, {
+                headers: { "X-CSRF-TOKEN": csrfToken }
+            });
+            showMessage("Order updated successfully.", "success");
+        } catch (error) {
+            console.error("Error updating order:", error);
+            showMessage("Error saving order.", "error");
+        }
+    };
 
     const fetchTagOptions = async () => {
         try {
@@ -299,55 +321,73 @@ const MusicalApplicationList = () => {
                 <p>Loading...</p>
             ) : (
                 <>
-                    <table className="min-w-full bg-white mb-4">
-                        <thead className="bg-gray-800 text-white">
-                            <tr>
-                                <th className="py-2 px-4 text-left">S/N</th>
-                                <th className="py-2 px-4 text-left">Title</th>
-                                <th className="py-2 px-4 text-left">Thumbnail</th>
-                                <th className="py-2 px-4 text-left">Series</th>
-                                <th className="py-2 px-4 text-left">Level</th>
-                                <th className="py-2 px-4 text-left">Status</th>
-                                <th className="py-2 px-4 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {uploads && uploads.length > 0 ? (
-                                uploads.map((item, index) => (
-                                    <tr key={item.id} className="border-b">
-                                        <td className="py-2 px-4">{index + 1}</td>
-                                        <td className="py-2 px-4">{item.title}</td>
-                                        <td className="py-2 px-4">
-                                            <div className="w-16 h-10 bg-gray-100 rounded overflow-hidden">
-                                                <img src={item.thumbnail_url} alt="" className="w-full h-full object-cover" />
-                                            </div>
-                                        </td>
-                                        <td className="py-2 px-4">{item.series}</td>
-                                        <td className="py-2 px-4">{item.skill_level}</td>
-                                        <td className="py-2 px-4">
-                                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${item.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-                                                {item.status}
-                                            </span>
-                                        </td>
-                                        <td className="py-2 px-4 flex justify-center gap-2">
-                                            <button onClick={() => openEditModal(item)} className="bg-blue-500 text-white p-1.5 rounded hover:bg-blue-600">
-                                                <span className="fa fa-edit"></span>
-                                            </button>
-                                            <button onClick={() => openDeleteModal(item)} className="bg-red-500 text-white p-1.5 rounded hover:bg-red-600">
-                                                <span className="fa fa-trash"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="7" className="py-10 text-center text-gray-400">
-                                        No entries found.
-                                    </td>
-                                </tr>
+                    <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="musical-applications-list">
+                            {(provided) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.droppableProps}
+                                    className="space-y-3 mb-4"
+                                >
+                                    {uploads && uploads.length > 0 ? (
+                                        uploads.map((item, index) => (
+                                            <Draggable key={item.id} draggableId={`item-${item.id}`} index={index}>
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        className={`flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all ${
+                                                            snapshot.isDragging ? "ring-2 ring-[#0FA9A0] scale-[1.01] bg-[#0FA9A0]/5" : ""
+                                                        }`}
+                                                    >
+                                                        {/* Left side: Drag handle, S/N, Thumbnail, Title info */}
+                                                        <div className="flex items-center gap-4">
+                                                            <div {...provided.dragHandleProps} className="p-2 cursor-move hover:bg-gray-100 rounded">
+                                                                <i className="fa fa-bars text-gray-400"></i>
+                                                            </div>
+                                                            <span className="text-sm font-semibold text-gray-400">#{index + 1}</span>
+                                                            <div className="w-16 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                                <img src={item.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="font-semibold text-gray-800 text-base">{item.title}</h4>
+                                                                <div className="flex items-center gap-2 mt-1">
+                                                                    {item.series && (
+                                                                        <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">{item.series}</span>
+                                                                    )}
+                                                                    <span className="text-xs px-2 py-0.5 bg-purple-50 text-purple-600 rounded font-medium">{item.skill_level}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Right side: Status and Actions */}
+                                                        <div className="flex items-center gap-4">
+                                                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${item.status === 'active' ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}>
+                                                                {item.status}
+                                                            </span>
+                                                            <div className="flex gap-2">
+                                                                <button type="button" onClick={() => openEditModal(item)} className="bg-blue-50 hover:bg-blue-100 text-blue-600 p-2 rounded-lg transition-colors">
+                                                                    <span className="fa fa-edit"></span>
+                                                                </button>
+                                                                <button type="button" onClick={() => openDeleteModal(item)} className="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-lg transition-colors">
+                                                                    <span className="fa fa-trash"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))
+                                    ) : (
+                                        <div className="py-12 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+                                            No entries found.
+                                        </div>
+                                    )}
+                                    {provided.placeholder}
+                                </div>
                             )}
-                        </tbody>
-                    </table>
+                        </Droppable>
+                    </DragDropContext>
 
                     <div className="flex items-center justify-center mt-6">
                         <CustomPagination

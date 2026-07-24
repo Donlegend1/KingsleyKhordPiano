@@ -332,6 +332,7 @@
         </div>
     </div>
 </div>
+<script src="https://fast.wistia.com/player.js" async></script>
 
 <script>
     function themeToggle() {

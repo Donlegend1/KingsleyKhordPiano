@@ -50,7 +50,6 @@ use App\Http\Controllers\LiveShowNotificationController;
     });
 
     Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
-    Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
     Route::post('/notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
     
 
@@ -70,8 +69,10 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('/live-show/{liveshow}/delete', [LiveShowController::class, 'destroy']);
         Route::post('/payment/update', [PaymentController::class, 'manualPayment']);
         Route::post('/reorder/courses', [CourseController::class, 'updatePositions']);
+        Route::post('/reorder/courses/items', [CourseController::class, 'updateCoursePositions']);
         Route::post('/courses/category/create', [CourseCategoryController::class, 'create']);
         Route::delete('/course/category/{name}/delete', [CourseCategoryController::class, 'delete']);
+        Route::put('/course/category/{name}/update', [CourseCategoryController::class, 'update']);
 
         // Learn Songs Admin API
         Route::get('learn-songs', [AdminLearnSongController::class, 'list']);
@@ -81,7 +82,9 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('learn-songs/{id}', [AdminLearnSongController::class, 'deleteSong']);
         Route::post('learn-songs/category/create', [AdminLearnSongController::class, 'createCategory']);
         Route::delete('learn-songs/category/{name}/delete', [AdminLearnSongController::class, 'deleteCategory']);
+        Route::put('learn-songs/category/{name}/update', [AdminLearnSongController::class, 'updateCategory']);
         Route::post('reorder/learn-songs', [AdminLearnSongController::class, 'updatePositions']);
+        Route::post('reorder/learn-songs/items', [AdminLearnSongController::class, 'updateSongPositions']);
 
         // Extra Courses Admin API
         Route::get('extra-courses-list', [AdminExtraCourseController::class, 'list']);
@@ -91,7 +94,21 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::delete('extra-courses/{id}', [AdminExtraCourseController::class, 'deleteCourse']);
         Route::post('extra-courses/category/create', [AdminExtraCourseController::class, 'createCategory']);
         Route::delete('extra-courses/category/{name}/delete', [AdminExtraCourseController::class, 'deleteCategory']);
+        Route::put('extra-courses/category/{name}/update', [AdminExtraCourseController::class, 'updateCategory']);
         Route::post('reorder/extra-courses', [AdminExtraCourseController::class, 'updatePositions']);
+        Route::post('reorder/extra-courses/items', [AdminExtraCourseController::class, 'updateCoursePositions']);
+
+        // Etudes Admin API
+        Route::get('etudes-list', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'list']);
+        Route::get('all-etudes', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'allEtudes']);
+        Route::post('etudes/store', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'storeEtude']);
+        Route::post('etudes/update/{id}', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateEtude']);
+        Route::delete('etudes/{id}', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'deleteEtude']);
+        Route::post('etudes/category/create', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'createCategory']);
+        Route::delete('etudes/category/{name}/delete', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'deleteCategory']);
+        Route::put('etudes/category/{name}/update', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateCategory']);
+        Route::post('reorder/etudes', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updatePositions']);
+        Route::post('reorder/etudes/items', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateEtudePositions']);
 
         Route::post('/midi-file/create', [MidiFileController::class, 'store']);
         Route::delete('/midi-files/{midiFile}', [MidiFileController::class, 'destroy']);

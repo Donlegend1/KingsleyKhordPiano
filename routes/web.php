@@ -187,6 +187,7 @@ Route::post('/logout/community', [CommunityAuthController::class, 'logout'])->na
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(['check.payment', 'verified']);
 Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')->middleware(['check.payment', 'verified']);
 
+Route::get('/payment/direct-checkout', [PaymentController::class, 'directCheckout'])->middleware(['auth'])->name('payment.direct-checkout');
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
 Route::get('/member/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->middleware(['auth', 'check.payment', 'verified'])->name('notifications.index');
@@ -249,11 +250,9 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
 });
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
-    Route::get('profile', [HomeController::class, 'profile']);
     Route::post('whatsapp-preference', [HomeController::class, 'updateWhatsappPreference']);
     Route::post('timezone', [HomeController::class, 'updateTimezone'])->name('member.timezone');
     Route::get('/shop', [ShopController::class, 'index']);
-    Route::get('support', [HomeController::class, 'support']);
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/my-library', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
@@ -290,6 +289,12 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('/lesson-completion', [LessonCompletionController::class, 'store'])->name('lesson.complete');
 });
 
+// routes for member profile and support pages
+Route::prefix('member')->middleware(['auth',  'verified'])->group(function () {
+Route::get('profile', [HomeController::class, 'profile']);
+Route::get('support', [HomeController::class, 'support']);
+});
+
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('users', [AdminController::class, 'users']);
     Route::get('courses', [CourseController::class, 'index']);
@@ -308,6 +313,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('uploads/piano-exercise', [UploadController::class, 'pianoExercise']);
     Route::get('uploads/extra-courses', [UploadController::class, 'extraCourses']);
     Route::get('uploads/learn-songs', [UploadController::class, 'learnSongs']);
+    Route::get('uploads/etudes', [UploadController::class, 'etudes']);
     Route::get('uploads/create', [UploadController::class, 'create']);
     Route::post('upload/store', [UploadController::class, 'store']);
     Route::delete('upload/{upload}', [UploadController::class, 'destroy']);
@@ -323,10 +329,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('email-campaign', [EmailCampaignController::class, 'index']);
     Route::get('email-campaign/create', [EmailCampaignController::class, 'create']);
     Route::get('pdf-download', [PDFDownloadController::class, 'index']);
-    Route::get('audio-download', [PDFDownloadController::class, 'index']);
+    Route::get('audio-download', [AudioDownloadController::class, 'index']);
     Route::get('musical-application-list', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'musicalApplicationList']);
     Route::get('musical-application-all-courses', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'getAllCourses']);
     Route::resource('musical-application', \App\Http\Controllers\Admin\MusicalApplicationController::class, ['as' => 'admin']);
+    Route::post('reorder-musical-applications', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'updatePositions']);
+    Route::post('reorder-uploads', [UploadController::class, 'updatePositions']);
     
     // Community Tutorials Admin
     Route::resource('tutorials', \App\Http\Controllers\Admin\AdminTutorialController::class, ['as' => 'admin'])->except(['show']);

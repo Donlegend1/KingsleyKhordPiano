@@ -43,7 +43,7 @@ const LiveShowForm = () => {
                 category: "event",
                 max_slots: 5,
             })
-            window.location ="/admin/live-shows"
+            // window.location ="/admin/live-shows"
            
         } catch (error) {
             console.error("Error creating live show:", error);

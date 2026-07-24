@@ -18,23 +18,25 @@ class UploadController extends Controller
      */
     public function pianoExercise()
     {
-        // dd(Upload::where('category', 'piano exercise')->get());
-
         return view('admin.uploads.piano-exercise', [
-            'uploads' => Upload::where('category', 'piano exercise')->get(),
+            'uploads' => Upload::where('category', 'piano exercise')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
     }
     public function extraCourses()
     {
         return view('admin.uploads.extra-courses', [
-            'uploads' => Upload::where('category', 'extra courses')->get(),
+            'uploads' => Upload::where('category', 'extra courses')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
     }
     public function learnSongs()
     {
         return view('admin.uploads.learn-songs', [
-            'uploads' => Upload::where('category', 'learn songs')->get(),
+            'uploads' => Upload::where('category', 'learn songs')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
+    }
+    public function etudes()
+    {
+        return view('admin.uploads.etudes');
     }
 
     /**
@@ -339,12 +341,32 @@ class UploadController extends Controller
 
     public function uploadList(Request $request)
     {
+        $query = Upload::where('category', $request->input('category'))
+            ->orderByRaw('position IS NULL, position ASC')
+            ->orderBy('id', 'desc');
+
         if ($request->has('page')) {
-            $uploads = Upload::where('category', $request->input('category'))->latest()->paginate(10);
+            $uploads = $query->paginate(10);
         } else {
-            $uploads = Upload::where('category', $request->input('category'))->latest()->get();
+            $uploads = $query->get();
         }
 
         return response()->json($uploads, 200);
+    }
+
+    public function updatePositions(Request $request)
+    {
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*' => 'integer',
+        ]);
+
+        foreach ($validated['items'] as $index => $id) {
+            Upload::where('id', $id)->update(['position' => $index + 1]);
+        }
+
+        return response()->json([
+            'message' => 'Upload positions updated successfully',
+        ]);
     }
 }

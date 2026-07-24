@@ -22,6 +22,7 @@ import './components/ZoomMeetingBooking';
 import './components/uploads/Uploads';
 import './components/uploads/LearnSongsAdmin';
 import './components/uploads/ExtraCoursesAdmin';
+import './components/uploads/EtudesAdmin';
 import './components/uploads/Create';
 import './components/uploads/Single.jsx';
 import './components/EarTraining/Index';
@@ -51,8 +52,9 @@ import "./components/EmailCampaign/Index.jsx"
 import "./components/EmailCampaign/Create.jsx"
 import './components/PDFDownload/AudioFiles.jsx';
 import './components/AudioDownload/PDFFiles.jsx';
-import './components/WhatsApp/WhatsAppGroupModalWrapper.jsx';
+// import './components/WhatsApp/WhatsAppGroupModalWrapper.jsx';
 import './components/musical-application/MusicalApplications.jsx';
 import './components/Home/CoachReels.jsx';
+import './components/Guidance/PersonalizedGuidance.jsx';
 
 

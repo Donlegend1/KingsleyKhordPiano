@@ -11,9 +11,13 @@ class StripeController extends Controller
     {
         $request->validate([
             'tier' => 'required|string',
-            'duration' => 'required|in:monthly,yearly',
+            'duration' => 'required|in:monthly,quarterly,yearly',
             'plan_id' => 'required|integer'
         ]);
+
+        if ($request->user()->hasActiveSubscription()) {
+            return redirect()->back()->with('error', 'You already have an active subscription.');
+        }
 
         $plan = Plan::find($request->plan_id);
 
@@ -23,6 +27,11 @@ class StripeController extends Controller
             ->checkout([
                 'success_url' => route('checkout.success'),
                 'cancel_url' => route('checkout.cancel'),
+                'metadata' => [
+                    'user_id' => $request->user()->id,
+                    'tier' => $request->tier,
+                    'duration' => $request->duration,
+                ]
             ]);
     }
 

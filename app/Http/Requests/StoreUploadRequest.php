@@ -27,6 +27,7 @@ class StoreUploadRequest extends FormRequest
             'description' => 'nullable|string|max:1000',
             'video_url' => 'required|string',
             'level' => 'nullable|string|max:50',
+            'skill_level' => 'nullable|string|max:50',
             'status' => 'required|in:active,inactive,draft',
             'video_type' => 'nullable|string',
             'series' => 'nullable|string|max:255',

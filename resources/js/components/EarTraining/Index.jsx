@@ -541,12 +541,13 @@ const EarTraining = () => {
                                     <label className="block mb-1 font-medium">
                                         Video URL
                                     </label>
-                                    <input
+                                    <textarea
                                         name="video_url"
                                         placeholder="Embedded Video URL"
                                         value={selectedQuiz?.video_url || ""}
                                         onChange={handleChange}
                                         className="w-full p-3 border rounded-lg"
+                                        rows="2"
                                     />
                                 </div>
                             </div>

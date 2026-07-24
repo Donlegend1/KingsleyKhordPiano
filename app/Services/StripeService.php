@@ -89,6 +89,9 @@ class StripeService
         try {
             $session = $this->stripe->checkout->sessions->retrieve($sessionId);
             if ($session->status === 'complete' || $session->payment_status === 'paid') {
+                $payment = DB::table('payments')->where('reference', $reference)->first();
+                $endsAt = $payment ? \Carbon\Carbon::parse($payment->ends_at) : now()->addMonth();
+
                 DB::table('payments')
                     ->where('reference', $reference)
                     ->update([
@@ -96,8 +99,24 @@ class StripeService
                         'updated_at' => now(),
                     ]);
                 $user = \Illuminate\Support\Facades\Auth::user();
-                $user->payment_status = 'successful';
-                $user->save();
+                if ($user) {
+                    $user->payment_status = 'successful';
+                    $user->save();
+
+                    // Create or update subscription record
+                    \App\Models\Subscription::updateOrCreate(
+                        ['user_id' => $user->id],
+                        [
+                            'name' => 'default',
+                            'stripe_id' => $session->subscription ?? 'stripe_' . $sessionId,
+                            'stripe_status' => 'active',
+                            'status' => 'active',
+                            'ends_at' => $endsAt,
+                            'type' => 'default',
+                            'payment_method' => 'stripe',
+                        ]
+                    );
+                }
                 return ['success' => true];
             } else {
                 DB::table('payments')

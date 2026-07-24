@@ -133,8 +133,88 @@
         </div>
 
         <!-- Etudes & Pieces Tab -->
-        <div x-show="activeTab === 'etudes'" x-cloak>
-            {{-- Content coming soon --}}
+        <div x-show="activeTab === 'etudes'" x-cloak class="space-y-12">
+            @forelse($etudeCategories as $category)
+                @if($category->etudes->count() > 0)
+                    <div>
+                        <!-- Category Header -->
+                        <div class="flex items-center gap-2.5 mb-6">
+                            <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
+                                {{ $category->category }}
+                            </h3>
+                            <span class="text-xs bg-gray-200 text-gray-600 px-2.5 py-0.5 rounded-full font-medium">
+                                {{ $category->etudes->count() }} {{ Str::plural('Item', $category->etudes->count()) }}
+                            </span>
+                        </div>
+
+                        <!-- Etudes Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            @foreach($category->etudes as $etude)
+                                @php
+                                    $watchUrl = "/member/lesson/{$etude->id}?type=etudes";
+                                    $isNew = $etude->created_at
+                                        && $etude->created_at->gt(now()->subDays(7))
+                                        && !\App\Models\LessonView::hasViewed(auth()->id(), $etude);
+                                @endphp
+                                <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+                                    
+                                    <!-- Thumbnail -->
+                                    <a href="{{ $watchUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+                                        @if($etude->thumbnail_url)
+                                            <img src="{{ $etude->thumbnail_url }}" alt="{{ $etude->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-950">
+                                                <i class="fa fa-music text-4xl text-white/20"></i>
+                                            </div>
+                                        @endif
+
+                                        @if($isNew)
+                                            <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wide shadow-sm shadow-red-500/20 uppercase">
+                                                NEW
+                                            </div>
+                                        @endif
+
+                                        <!-- Play overlay -->
+                                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
+                                                <i class="fa fa-play text-black text-sm ml-0.5"></i>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <!-- Card Body -->
+                                    <div class="p-5 flex flex-col gap-3 flex-grow">
+                                        <div>
+                                            <h4 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug group-hover:text-blue-600 transition-colors">
+                                                {{ Str::title($etude->title) }}
+                                            </h4>
+                                            @if($etude->author)
+                                                <p class="text-gray-400 text-xs mt-1 font-medium">Composer: {{ $etude->author }}</p>
+                                            @endif
+                                        </div>
+
+                                        @if($etude->description)
+                                            <p class="text-gray-500 text-xs leading-relaxed line-clamp-2">{{ $etude->description }}</p>
+                                        @endif
+
+                                        <!-- Watch Now Button -->
+                                        <a href="{{ $watchUrl }}"
+                                           class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
+                                            Watch Now
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @empty
+                <div class="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-400">
+                    <i class="fa fa-music text-4xl mb-3 block text-gray-300"></i>
+                    No etudes or pieces available yet.
+                </div>
+            @endforelse
         </div>
 
     </div>

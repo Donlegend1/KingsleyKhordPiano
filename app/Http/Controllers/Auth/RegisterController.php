@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
+use App\Enums\Roles\UserRoles;
 use App\Notifications\WelcomeEmailNotification;
 
 
@@ -47,7 +48,7 @@ class RegisterController extends Controller
                 'last_name' => $request->last_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => UserRole::MEMBER->value,
+                'role' => UserRoles::MEMBER->value,
                 'payment_status' => 'pending',
             ]);
 
@@ -56,9 +57,15 @@ class RegisterController extends Controller
 
             auth()->login($user);
 
+            $redirectUrl = $this->redirectPath();
+            if ($request->has('plan_id')) {
+                $redirectUrl = route('payment.direct-checkout', $request->only(['plan_id', 'currency', 'tier', 'duration', 'payment_method']));
+            }
+
             return response()->json([
                 'success' => true,
-                'user' => $user
+                'user' => $user,
+                'redirect_url' => $redirectUrl,
             ]);
         }
 
@@ -71,6 +78,10 @@ class RegisterController extends Controller
         
 
         $this->guard()->login($user);
+
+        if ($response = $this->registered($request, $user)) {
+            return $response;
+        }
 
         return redirect($this->redirectPath());
     }
@@ -106,5 +117,17 @@ class RegisterController extends Controller
         event(new Registered($user)); 
 
         return $user;
+    }
+
+    /**
+     * The user has been registered.
+     */
+    protected function registered(Request $request, $user)
+    {
+        if ($request->has('plan_id')) {
+            return app(\App\Http\Controllers\PaymentController::class)->directCheckout($request);
+        }
+
+        return redirect($this->redirectTo);
     }
 }

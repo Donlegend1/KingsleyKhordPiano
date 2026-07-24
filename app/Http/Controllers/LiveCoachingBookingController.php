@@ -8,6 +8,8 @@ use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\AdminCoachingBookingNotification;
 
 class LiveCoachingBookingController extends Controller
 {
@@ -148,8 +150,8 @@ class LiveCoachingBookingController extends Controller
             $user->notify(new \App\Notifications\CoachingBookingNotification($booking));
 
             // Send notification to the admin
-            \Illuminate\Support\Facades\Notification::route('mail', 'Kingsleykhord@gmail.com')
-                ->notify(new \App\Notifications\AdminCoachingBookingNotification($booking));
+            Notification::route('mail', 'Kingsleykhord@gmail.com')
+                ->notify(new AdminCoachingBookingNotification($booking));
         } catch (\Exception $e) {
             logger()->warning('Failed to send live coaching session booking emails: ' . $e->getMessage());
         }
@@ -169,4 +171,6 @@ class LiveCoachingBookingController extends Controller
 
         return response()->json(['success' => true, 'booking' => $booking]);
     }
+
+
 }

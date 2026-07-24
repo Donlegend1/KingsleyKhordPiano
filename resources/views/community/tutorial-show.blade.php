@@ -121,4 +121,37 @@
 
 </div>
 
+@if($tutorial->video_type === 'iframe')
+<script>
+    function initVideoScripts() {
+        const container = document.querySelector('.aspect-video');
+        if (container) {
+            const scripts = container.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const src = oldScript.getAttribute("src");
+                if (src) {
+                    const existingScript = document.querySelector(`script[src="${src}"]`);
+                    if (!existingScript) {
+                        const newScript = document.createElement("script");
+                        newScript.src = src;
+                        newScript.async = true;
+                        const type = oldScript.getAttribute("type");
+                        if (type) {
+                            newScript.type = type;
+                        }
+                        document.head.appendChild(newScript);
+                    }
+                }
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", initVideoScripts);
+    } else {
+        initVideoScripts();
+    }
+</script>
+@endif
+
 @endsection

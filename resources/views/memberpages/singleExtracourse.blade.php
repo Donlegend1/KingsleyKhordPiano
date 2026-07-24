@@ -57,46 +57,6 @@
         $nextVideo = $playlist->values()->get($currentIndex + 1);
         $previousVideo = $currentIndex > 0 ? $playlist->values()->get($currentIndex - 1) : null;
 
-        // Priority: Use explicitly linked related courses if provided, otherwise fallback to playlist neighbors
-        if (isset($relatedUploads) && $relatedUploads->count() > 0) {
-            $relatedLessons = $relatedUploads;
-        } else {
-            // Get related lessons (excluding the active video) from the playlist
-            $otherLessons = $playlist
-                ->filter(function ($item) use ($lesson) {
-                    return $lesson ? $item->id != $lesson->id : true;
-                })
-                ->values();
-
-            // Try to get next 3 lessons in sequence, wrap around if needed
-            $relatedLessons = $otherLessons->slice($currentIndex, 3);
-            if ($relatedLessons->count() < 3 && $otherLessons->count() > 0) {
-                $relatedLessons = $relatedLessons->merge($otherLessons->take(3 - $relatedLessons->count()))->unique('id');
-            }
-        }
-
-        // Fallback: If still empty (no playlist and no tags), get other uploads in the same category
-        if ($relatedLessons->isEmpty()) {
-            if ($lessonType === 'learn_songs') {
-                $relatedLessons = \App\Models\LearnSong::where('level', $lesson->level)
-                    ->where('id', '!=', $lesson->id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            } elseif ($lessonType === 'extra_courses') {
-                $relatedLessons = \App\Models\ExtraCourse::where('level', $lesson->level)
-                    ->where('id', '!=', $lesson->id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            } else {
-                $relatedLessons = \App\Models\Upload::where('category', $lesson->category)
-                    ->where('id', '!=', $lesson->id)
-                    ->inRandomOrder()
-                    ->take(3)
-                    ->get();
-            }
-        }
 
         // Get comments specifically for this lesson
         $lessonComments = \App\Models\CourseVideoComment::where('course_id', $lesson->id)
@@ -137,9 +97,14 @@
                     <div id="uploads-single" class="w-full h-full"></div>
 
                     {{-- Title --}}
-                    <h1 class="text-[22px] font-bold text-gray-900 mt-5 mb-5">
+                    <h1 class="text-[22px] font-bold text-gray-900 mt-5 mb-1">
                         {{ Str::title($lesson->title) }}
                     </h1>
+                    @if(!empty($lesson->author))
+                        <p class="text-indigo-600 font-semibold text-sm mb-5">by {{ $lesson->author }}</p>
+                    @else
+                        <div class="mb-5"></div>
+                    @endif
 
                     @if (!empty($lesson->images) && is_array($lesson->images))
                         <div class="mt-6 mb-8">
@@ -252,68 +217,7 @@
                         </div>
                     @endif
 
-                    {{-- Related Lessons (Only visible at the bottom if playlist is in sidebar) --}}
-                    @if ($playlist->count() > 1 && $relatedLessons->count() > 0)
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
-                            </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach ($relatedLessons as $related)
-                                    @php
-                                        $relatedLink = "/member/lesson/{$related->id}?type={$linkType}";
-                                        $relatedIsNew = $related->created_at
-                                            && $related->created_at->gt(now()->subDays(7))
-                                            && !\App\Models\LessonView::hasViewed(auth()->id(), $related);
-                                    @endphp
-                                    <a href="{{ $relatedLink }}"
-                                        class="group bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-
-                                        {{-- Thumbnail --}}
-                                        <div class="relative aspect-video bg-black overflow-hidden">
-                                            <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
-                                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-
-                                            @if ($relatedIsNew)
-                                                <div class="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded tracking-wide">
-                                                    NEW
-                                                </div>
-                                            @endif
-
-                                            {{-- Duration badge top-left --}}
-                                            <div
-                                                class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded">
-                                                {{ $related->duration ?? '05:00' }}
-                                            </div>
-
-                                            {{-- Play button center --}}
-                                            <div class="absolute inset-0 flex items-center justify-center">
-                                                <div
-                                                    class="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-[#2563EB] transition-colors">
-                                                    <i class="fa-solid fa-play text-white text-xs ml-0.5"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Card text --}}
-                                        <div class="p-4">
-                                            <p
-                                                class="text-[13px] font-semibold text-gray-900 leading-snug line-clamp-2 mb-3 text-center">
-                                                {{ Str::title($related->title) }}
-                                            </p>
-                                            <div class="flex justify-center">
-                                                <span
-                                                    class="bg-[#2563EB]/10 text-[#2563EB] text-[11px] font-bold px-3 py-1 rounded-full">
-                                                    {{ ucfirst($related->level ?? $lesson->level ?? 'Basic') }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
 
                     {{-- Discussion / Comments --}}
                     <div class="mt-10 pt-8 border-t border-gray-100" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
@@ -406,7 +310,7 @@
                         </div>
 
                         {{-- Scrollable list --}}
-                        <div class="overflow-y-auto" style="max-height: 520px;">
+                        {{-- <div class="overflow-y-auto" style="max-height: 520px;">
                             @foreach ($relatedLessons as $item)
                                 @php
                                     $itemIsNew = $item->created_at
@@ -416,12 +320,11 @@
                                 <a href="/member/lesson/{{ $item->id }}?type={{ $linkType }}"
                                     class="flex items-start gap-3 px-5 py-4 border-b border-gray-50 transition-colors bg-white hover:bg-gray-50">
 
-                                    {{-- Play icon --}}
+                                    
                                     <div class="shrink-0 mt-0.5">
                                         <i class="fa-regular fa-circle-play text-gray-300 text-[18px]"></i>
                                     </div>
 
-                                    {{-- Title + duration --}}
                                     <div class="flex-1 min-w-0">
                                         <p class="text-[12px] font-bold uppercase tracking-wide leading-snug text-gray-800 flex items-center gap-2">
                                             <span class="truncate">{{ $item->title }}</span>
@@ -435,7 +338,7 @@
                                     </div>
                                 </a>
                             @endforeach
-                        </div>
+                        </div> --}}
 
                         @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
                     @endif

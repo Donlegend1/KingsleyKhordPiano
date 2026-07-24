@@ -104,9 +104,28 @@ class StripeWebhookController extends Controller
         ]);
 
         $user->subscription_tier       = $tier;
-        $user->subscription_expires_at = $duration === 'monthly' ? now()->addMonth() : now()->addYear();
+        $user->premium                 = stripos($tier, 'premium') !== false;
+        if ($duration === 'monthly') {
+            $user->subscription_expires_at = now()->addMonth();
+        } elseif ($duration === 'quarterly') {
+            $user->subscription_expires_at = now()->addMonths(3);
+        } else {
+            $user->subscription_expires_at = now()->addYear();
+        }
         $user->subscription_status     = 'active';
         $user->save();
+
+        // Create or update subscription record
+        Subscription::updateOrCreate(
+            ['user_id' => $user->id, 'type' => 'default'],
+            [
+                'stripe_id' => $session->subscription ?? 'stripe_' . $session->id,
+                'stripe_status' => 'active',
+                'status' => 'active',
+                'ends_at' => $user->subscription_expires_at,
+                'payment_method' => 'stripe',
+            ]
+        );
 
         logger()->info("Checkout session completed for user {$user->id}, tier={$tier}");
     }
@@ -138,9 +157,11 @@ class StripeWebhookController extends Controller
                 ]
             );
 
-            $user->last_payment_reference = $sessionId;
-            $user->payment_status = 'successful';
-            $user->last_payment_amount = $amount;
+            $user->last_payment_reference = $subscription->id;
+            $user->payment_status         = $status === 'active' ? 'successful' : $status;
+            $user->last_payment_amount    = isset($subscription->items->data[0]->price->unit_amount)
+                ? $subscription->items->data[0]->price->unit_amount / 100
+                : 0;
 
             $user->save();
 
@@ -196,7 +217,11 @@ class StripeWebhookController extends Controller
                 'payment_method' => 'stripe',
                 'notified_at'    => null,
                 'starts_at'      => now(),
-                'ends_at'        => $extra['duration'] === 'monthly' ?? false ? now()->addMonth() : now()->addYear(),
+                'ends_at'        => isset($extra['duration']) && $extra['duration'] === 'monthly'
+                    ? now()->addMonth()
+                    : (isset($extra['duration']) && $extra['duration'] === 'quarterly'
+                        ? now()->addMonths(3)
+                        : now()->addYear()),
                 'status'         => $status,
                 'updated_at'     => now(),
             ]

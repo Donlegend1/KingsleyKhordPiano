@@ -212,6 +212,43 @@ const ShowEartraining = () => {
         fetchQuiz();
     }, [lastSegment]);
 
+    useEffect(() => {
+        if (!quiz || !quiz.video_url) return;
+
+        // Parse any script tags in the video_url and inject them into the document
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(quiz.video_url, "text/html");
+        const scripts = doc.querySelectorAll("script");
+
+        scripts.forEach((script) => {
+            const src = script.getAttribute("src");
+            if (src) {
+                // Check if script is already in document to avoid duplicates
+                const existingScript = document.querySelector(`script[src="${src}"]`);
+                if (!existingScript) {
+                    const newScript = document.createElement("script");
+                    newScript.src = src;
+                    newScript.async = true;
+                    
+                    const type = script.getAttribute("type");
+                    if (type) {
+                        newScript.type = type;
+                    }
+
+                    newScript.onload = () => {
+                        console.log(`Successfully loaded script: ${src}`);
+                    };
+
+                    newScript.onerror = (e) => {
+                        console.error(`Failed to load script: ${src}`, e);
+                    };
+                    
+                    document.head.appendChild(newScript);
+                }
+            }
+        });
+    }, [quiz?.video_url]);
+
     if (!quiz || !quiz.questions?.length) {
         return (
             <div className="text-center p-6">
@@ -304,7 +341,62 @@ const ShowEartraining = () => {
         return match ? match[1] : null;
     };
 
-    const fileId = extractGoogleDriveFileId(quiz.video_url);
+
+
+    const renderVideo = () => {
+        if (!quiz.video_url) {
+            return <p className="text-gray-500">No video available</p>;
+        }
+
+        // Check if it is an HTML embed snippet (contains HTML tags)
+        if (/<[a-z][\s\S]*>/i.test(quiz.video_url)) {
+            return (
+                <div 
+                    className="w-full rounded shadow overflow-hidden"
+                    dangerouslySetInnerHTML={{ __html: quiz.video_url }}
+                />
+            );
+        }
+
+        // Check if it is a Google Drive URL
+        const googleDriveId = extractGoogleDriveFileId(quiz.video_url);
+        if (googleDriveId) {
+            return (
+                <iframe
+                    src={`https://drive.google.com/file/d/${googleDriveId}/preview`}
+                    width="100%"
+                    height="400"
+                    allow="autoplay"
+                    className="rounded shadow border-0"
+                />
+            );
+        }
+
+        // Check if it is a YouTube URL
+        const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const youtubeMatch = quiz.video_url.match(youtubeRegex);
+        if (youtubeMatch) {
+            return (
+                <iframe
+                    src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
+                    width="100%"
+                    height="400"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="rounded shadow border-0"
+                />
+            );
+        }
+
+        // If it's a direct video link or fallback
+        return (
+            <video 
+                src={quiz.video_url} 
+                controls 
+                className="w-full rounded shadow"
+            />
+        );
+    };
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg mt-6">
@@ -338,17 +430,7 @@ const ShowEartraining = () => {
             </div>
 
             {/* Main Video */}
-            {fileId ? (
-                <iframe
-                    src={`https://drive.google.com/file/d/${fileId}/preview`}
-                    width="100%"
-                    height="400"
-                    allow="autoplay"
-                    className="rounded shadow"
-                />
-            ) : (
-                <p className="text-red-600">Invalid video URL</p>
-            )}
+            {renderVideo()}
 
             {/* Main Audio */}
             {quiz.main_audio_path && (

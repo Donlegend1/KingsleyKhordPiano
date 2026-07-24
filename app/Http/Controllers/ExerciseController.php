@@ -16,56 +16,78 @@ class ExerciseController extends Controller
     
     public function pianoExercise(Request $request)
     {
-        \App\Models\CategoryView::markViewed(auth()->id(), 'piano_exercise');
+        try {
+            \App\Models\CategoryView::markViewed(auth()->id(), 'piano_exercise');
 
-        $level = $request->query('level');
-        $skillLevel = $request->query('skill_level');
-        $search = $request->query('search');
-        $series = $request->query('series');
+            $level = $request->query('level');
+            $skillLevel = $request->query('skill_level');
+            $search = $request->query('search');
+            $series = $request->query('series');
 
-        $query = Upload::query()->where('category', 'piano exercise');
+            $query = Upload::query()->where('category', 'piano exercise');
 
-        if ($level) {
-            $query->where('level', $level);
+            if ($level) {
+                $query->where('level', $level);
+            }
+
+            if ($skillLevel) {
+                $query->where('skill_level', $skillLevel);
+            }
+
+            if ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            }
+
+            if ($series) {
+                $query->where('series', $series)->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'asc');
+            } else {
+                $subquery = Upload::where('category', 'piano exercise')
+                    ->when($level, fn ($q) => $q->where('level', $level))
+                    ->when($skillLevel, fn ($q) => $q->where('skill_level', $skillLevel))
+                    ->when($search, fn ($q) => $q->where('title', 'like', "%{$search}%"))
+                    ->selectRaw('MIN(id) as id')
+                    ->groupBy(\DB::raw('COALESCE(series, CAST(id AS CHAR))'));
+
+                $query->whereIn('id', $subquery)
+                    ->select('uploads.*')
+                    ->selectSub(function ($q) {
+                        $q->from('uploads as u2')
+                            ->whereRaw('COALESCE(u2.series, CAST(u2.id AS CHAR)) = COALESCE(uploads.series, CAST(uploads.id AS CHAR))')
+                            ->selectRaw('count(*)');
+                    }, 'item_count')
+                    ->orderByRaw('position IS NULL, position ASC')
+                    ->latest();
+            }
+
+            $exercises = $query->paginate(12);
+
+            $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
+            $skillLevels = ['Basic', 'Competent', 'Challenging'];
+
+            return view('memberpages.pianoexercise', compact(
+                'exercises',
+                'level',
+                'skillLevel',
+                'search',
+                'levels',
+                'skillLevels',
+                'series'
+            ));
+        } catch (\Throwable $e) {
+            logger()->error('Piano Exercise Error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()
+                ->route('dashboard')
+                ->with('error', 'An error occurred while loading piano exercises.');
         }
-
-        if ($skillLevel) {
-            $query->where('skill_level', $skillLevel);
-        }
-
-        if ($search) {
-            $query->where('title', 'like', "%{$search}%");
-        }
-
-        if ($series) {
-            $query->where('series', $series)->orderBy('id', 'asc');
-        } else {
-            $subquery = Upload::where('category', 'piano exercise')
-                ->when($level, fn($q) => $q->where('level', $level))
-                ->when($skillLevel, fn($q) => $q->where('skill_level', $skillLevel))
-                ->when($search, fn($q) => $q->where('title', 'like', "%{$search}%"))
-                ->selectRaw('MIN(id) as id')
-                ->groupBy(\DB::raw('COALESCE(series, CAST(id AS CHAR))'));
-            
-            $query->whereIn('id', $subquery)
-                ->select('uploads.*')
-                ->selectSub(function($q) {
-                    $q->from('uploads as u2')
-                      ->whereRaw('COALESCE(u2.series, CAST(u2.id AS CHAR)) = COALESCE(uploads.series, CAST(uploads.id AS CHAR))')
-                      ->selectRaw('count(*)');
-                }, 'item_count')
-                ->latest();
-        }
-
-        $exercises = $query->paginate(12);
-
-        $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
-        $skillLevels = ['Basic', 'Competent', 'Challenging'];
-
-        return view('memberpages.pianoexercise', compact('exercises', 'level', 'skillLevel', 'search', 'levels', 'skillLevels', 'series'));
     }
 
-    public function pianoExercisePlayer(Request $request)
+        public function pianoExercisePlayer(Request $request)
     {
         $level = $request->query('level');
         $series = $request->query('series');
@@ -88,6 +110,7 @@ class ExerciseController extends Controller
 
             $playlist = Upload::where('category', 'piano exercise')
                 ->where('level', $level)
+                ->orderByRaw('position IS NULL, position ASC')
                 ->orderBy('id', 'asc')
                 ->get()
                 ->sortBy(fn($item) => ($skillOrder[strtolower($item->skill_level ?? '')] ?? count($skillLevels)) * 1000000 + $item->id)
@@ -106,8 +129,10 @@ class ExerciseController extends Controller
             return redirect()->route('piano.exercise')->with('error', 'No exercises found.');
         }
 
-        $activeVideoId = $request->query('video_id');
-        $activeVideo = $activeVideoId ? $playlist->firstWhere('id', $activeVideoId) : $playlist->first();
+            $activeVideoId = $request->query('video_id');
+            $activeVideo = $activeVideoId
+                ? $playlist->firstWhere('id', $activeVideoId)
+                : $playlist->first();
 
         if ($activeVideo) {
             \App\Models\LessonView::record(auth()->id(), $activeVideo);
@@ -116,8 +141,10 @@ class ExerciseController extends Controller
 
         $skillLevel = $skillLevel ?? 'Basic';
 
-        $service = app(\App\Services\BookmarkService::class);
-        $isBookmarked = $activeVideo ? $service->isBookmarked($activeVideo) : false;
+            $service = app(\App\Services\BookmarkService::class);
+            $isBookmarked = $activeVideo
+                ? $service->isBookmarked($activeVideo)
+                : false;
 
         $comments = CourseVideoComment::where('course_id', $activeVideo->id)
                             ->where('category', 'piano exercise')
@@ -126,10 +153,15 @@ class ExerciseController extends Controller
 
         $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
 
-        $related_courses = [];
-        if ($activeVideo && !empty($activeVideo->tags)) {
-            $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
-        }
+            $related_courses = [];
+
+            if ($activeVideo && !empty($activeVideo->tags)) {
+                if ($activeVideo instanceof \App\Models\MusicalApplication) {
+                    $related_courses = \App\Models\MusicalApplication::whereIn('id', $activeVideo->tags)->get();
+                } else {
+                    $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
+                }
+            }
 
         return view('memberpages.series-player', compact(
             'playlist',
@@ -166,7 +198,13 @@ class ExerciseController extends Controller
 
     public function fingerExercises()
     {
-        return view('memberpages.finger-exercises');
+        $etudeCategories = \App\Models\EtudeCategory::with(['etudes' => function ($q) {
+            $q->where('status', 'active')->orderByRaw('position IS NULL, position ASC');
+        }])
+        ->orderByRaw('position IS NULL, position ASC')
+        ->get();
+
+        return view('memberpages.finger-exercises', compact('etudeCategories'));
     }
 
     public function musicalApplication(Request $request)
@@ -176,7 +214,8 @@ class ExerciseController extends Controller
         $page = $request->query('page', 1);
 
         $baseQuery = fn() => \App\Models\MusicalApplication::where('status', 'active')
-            ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel));
+            ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel))
+            ->orderByRaw('position IS NULL, position ASC');
 
         $seriesPage = $baseQuery()
             ->select('series')
