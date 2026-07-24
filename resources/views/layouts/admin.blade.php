@@ -68,6 +68,9 @@
             <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>
             </a>
+            <a href="{{ route('admin.shop.index', ['type' => 'midi']) }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa-solid fa-store w-6 text-center"></i> <span>Shop</span>
+            </a>
             <a href="/admin/website-video" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-video-icon lucide-list-video"><path d="M21 5H3"/><path d="M10 12H3"/><path d="M10 19H3"/><path d="M15 12.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997a1 1 0 0 1-1.517-.86z"/>
               </svg> <span>Website Videos</span>

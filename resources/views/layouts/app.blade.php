@@ -38,9 +38,19 @@
       x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 10 })"
       :class="'bg-black'"
       class="fixed w-full top-0 z-50 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-3 items-center lg:flex lg:justify-between">
+            <!-- Mobile: Cart Icon (left) -->
+            <div class="lg:hidden justify-self-start">
+                <a href="/cart" class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-neutral-800 hover:bg-neutral-700 transition duration-200" aria-label="View cart">
+                    <i class="fa-solid fa-cart-shopping text-white text-base"></i>
+                    <span id="cart-badge-mobile" class="cart-badge absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[#FFD736] text-black text-[10px] font-bold">
+                        {{ $cartCount ?? 0 }}
+                    </span>
+                </a>
+            </div>
+
             <!-- Left: Logo -->
-            <div class="flex items-center flex-shrink-0">
+            <div class="flex items-center flex-shrink-0 justify-self-center lg:justify-self-auto">
                  <div class="flex items-center space-x-3 flex-shrink-0 relative">
             <a href="/" class="text-2xl font-bold">
                 <img src="/logo/logo.png" alt="KingsleyKhord logo" class="h-8 w-auto">
@@ -106,9 +116,8 @@
                     class="text-base font-semibold transition duration-200 {{ Request::is('about') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     About
                 </a>
-                <a href="https://khordsounds.com/product-category/piano-best-sellers/"
-                    target="blank"
-                    class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
+                <a href="/shop"
+                    class="text-base font-semibold transition duration-200 {{ Request::is('shop') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Shop
                 </a>
                 <a href="https://discord.gg/TKKtTSYVvx"
@@ -131,13 +140,75 @@
                 class="text-lg font-semibold px-4 py-2 rounded-lg bg-[#FFD736] text-black hover:bg-[#e6c22e] shadow transition duration-200">
                 Login
             </a>
-        
+            <div class="relative ml-14" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                <a href="/cart" class="relative flex items-center justify-center w-11 h-11 rounded-xl bg-neutral-800 hover:bg-neutral-700 transition duration-200" aria-label="View cart">
+                    <i class="fa-solid fa-cart-shopping text-white text-lg"></i>
+                    <span id="cart-badge-desktop" class="cart-badge absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[19px] h-[19px] px-1 rounded-full bg-[#FFD736] text-black text-[10px] font-bold">
+                        {{ $cartCount ?? 0 }}
+                    </span>
+                </a>
+
+                <!-- Hover Preview -->
+                <div x-show="open" x-transition x-cloak
+                    class="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-xl overflow-hidden z-50">
+                    @if(count($cartPreviewItems ?? []) === 0)
+                        <div class="text-center py-10 px-6">
+                            <div class="relative inline-block mb-4">
+                                <span class="absolute -top-3 left-1/2 -translate-x-1/2 w-0.5 h-2.5 bg-gray-300 rotate-[-15deg] -translate-x-3"></span>
+                                <span class="absolute -top-4 left-1/2 -translate-x-1/2 w-0.5 h-3 bg-gray-300"></span>
+                                <span class="absolute -top-3 left-1/2 -translate-x-1/2 w-0.5 h-2.5 bg-gray-300 rotate-[15deg] translate-x-3"></span>
+                                <i class="fa-solid fa-cart-shopping text-4xl text-gray-900"></i>
+                            </div>
+                            <p class="font-bold text-gray-900">No products in the cart.</p>
+                            <p class="text-sm text-gray-400 mt-1.5">Browse our MIDI files and plugins to find something for your next project.</p>
+                        </div>
+                    @else
+                        <div class="max-h-80 overflow-y-auto divide-y divide-gray-100">
+                            @foreach($cartPreviewItems as $item)
+                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                    @if(!empty($item['thumbnail']))
+                                        <img src="/{{ $item['thumbnail'] }}" alt="{{ $item['name'] }}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">
+                                    @else
+                                        <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0"
+                                            style="background: linear-gradient(135deg, {{ $item['from'] }}, {{ $item['to'] }});">
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-sm font-medium text-gray-900 truncate">{{ $item['name'] }}</p>
+                                        <div class="flex items-center gap-2 mt-1 text-sm">
+                                            <span class="text-gray-500">{{ $item['qty'] }} &times; ${{ number_format($item['price'], 2) }}</span>
+                                            <button type="button" data-remove-slug="{{ $item['slug'] }}" class="cart-remove-btn flex items-center gap-1 text-red-500 hover:text-red-600 transition text-xs font-medium">
+                                                <i class="fa-regular fa-trash-can"></i>
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="border-t border-gray-100 px-5 py-4 flex items-center justify-between">
+                            <span class="font-bold text-gray-900">Subtotal:</span>
+                            <span class="font-bold text-gray-900">${{ number_format(collect($cartPreviewItems)->sum(fn($i) => $i['price'] * $i['qty']), 2) }}</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 px-5 pb-5">
+                            <a href="/cart" class="flex items-center justify-center bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold py-2.5 rounded-lg transition">
+                                View cart
+                            </a>
+                            <a href="/checkout" class="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-semibold py-2.5 rounded-lg transition">
+                                Checkout
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
 
 
 
             <!-- Mobile Toggle -->
-            <div class="lg:hidden">
+            <div class="lg:hidden justify-self-end">
                 <button class="navbar-burger" aria-label="Open Menu">
                     <svg class="h-6 w-6 text-white dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -162,9 +233,8 @@
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Contact
                     </a>
-                    <a href="https://khordsounds.com/product-category/piano-best-sellers/"
-                    target="blank"
-                        class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
+                    <a href="/shop"
+                        class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Shop
                     </a>
                     <a href="https://discord.gg/TKKtTSYVvx"
@@ -336,6 +406,122 @@ function registerForm() {
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+
+<script>
+    (function () {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        function updateCartBadges(count) {
+            document.querySelectorAll('.cart-badge').forEach(function (badge) {
+                badge.textContent = count;
+            });
+        }
+
+        function postJson(url, body) {
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(body),
+            }).then(function (res) { return res.json(); });
+        }
+
+        document.addEventListener('click', function (e) {
+            const addBtn = e.target.closest('.add-to-cart-btn');
+            if (addBtn) {
+                e.preventDefault();
+                if (addBtn.disabled) return;
+
+                const label = addBtn.querySelector('span');
+                const icon = addBtn.querySelector('i');
+                const originalLabel = label ? label.textContent : '';
+                const originalIconClass = icon ? icon.className : '';
+
+                addBtn.disabled = true;
+
+                postJson('/cart/add', { slug: addBtn.dataset.addSlug })
+                    .then(function (data) {
+                        if (!data.success) {
+                            throw new Error(data.error || 'Failed to add to cart');
+                        }
+
+                        updateCartBadges(data.cartCount);
+
+                        if (addBtn.dataset.redirect) {
+                            window.location.href = addBtn.dataset.redirect;
+                            return;
+                        }
+
+                        if (addBtn.dataset.reload) {
+                            window.location.reload();
+                            return;
+                        }
+
+                        if (label) label.textContent = 'Added!';
+                        if (icon) icon.className = 'fa-solid fa-check text-xs';
+
+                        setTimeout(function () {
+                            if (label) label.textContent = originalLabel;
+                            if (icon) icon.className = originalIconClass;
+                            addBtn.disabled = false;
+                        }, 1500);
+                    })
+                    .catch(function () {
+                        if (label) label.textContent = 'Error';
+                        setTimeout(function () {
+                            if (label) label.textContent = originalLabel;
+                            addBtn.disabled = false;
+                        }, 1500);
+                    });
+
+                return;
+            }
+
+            const removeBtn = e.target.closest('.cart-remove-btn');
+            if (removeBtn) {
+                e.preventDefault();
+                if (removeBtn.disabled) return;
+                removeBtn.disabled = true;
+
+                postJson('/cart/remove', { slug: removeBtn.dataset.removeSlug })
+                    .then(function () {
+                        window.location.reload();
+                    });
+
+                return;
+            }
+
+            const qtyBtn = e.target.closest('.cart-qty-btn');
+            if (qtyBtn) {
+                e.preventDefault();
+                if (qtyBtn.disabled) return;
+                qtyBtn.disabled = true;
+
+                postJson('/cart/update', { slug: qtyBtn.dataset.slug, qty: parseInt(qtyBtn.dataset.qty, 10) })
+                    .then(function () {
+                        window.location.reload();
+                    });
+
+                return;
+            }
+
+            const clearBtn = e.target.closest('#clear-cart-btn');
+            if (clearBtn) {
+                e.preventDefault();
+                if (clearBtn.disabled) return;
+                clearBtn.disabled = true;
+
+                postJson('/cart/clear', {})
+                    .then(function () {
+                        window.location.reload();
+                    });
+            }
+        });
+    })();
+</script>
 
 </body>
 </html>
