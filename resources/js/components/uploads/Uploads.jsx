@@ -574,24 +574,7 @@ const UploadList = () => {
                                 className="w-full p-3 border rounded-lg"
                             />
 
-                            <div>
-                                <label
-                                    htmlFor="edit-tags"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Related Courses
-                                </label>
-                                <Select
-                                    id="edit-tags"
-                                    isMulti
-                                    name="tags"
-                                    options={tagOptions}
-                                    value={selectedTags}
-                                    onChange={handleTagsChange}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                />
-                            </div>
+
                         </div>
 
                         {/* Description Field */}
@@ -871,24 +854,7 @@ const UploadList = () => {
                                     </select>
                                 </div>
                             )}
-                            <div>
-                                <label
-                                    htmlFor="tags"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Related Courses
-                                </label>
-                                <Select
-                                    id="tags"
-                                    isMulti
-                                    name="tags"
-                                    options={tagOptions}
-                                    value={selectedTags}
-                                    onChange={handleTagsChange}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                />
-                            </div>
+
 
                             {/* Status */}
                             <div>
