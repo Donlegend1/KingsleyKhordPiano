@@ -13,7 +13,10 @@ return new class extends Migration
     public function up(): void
     {
         DB::table('uploads')->where('category', 'quick lessons')->delete();
-        DB::statement("ALTER TABLE uploads MODIFY category ENUM('piano exercise', 'extra courses', 'learn songs')");
+
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE uploads MODIFY category ENUM('piano exercise', 'extra courses', 'learn songs')");
+        }
     }
 
     /**
@@ -21,6 +24,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE uploads MODIFY category ENUM('piano exercise', 'extra courses', 'quick lessons', 'learn songs')");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE uploads MODIFY category ENUM('piano exercise', 'extra courses', 'quick lessons', 'learn songs')");
+        }
     }
 };
