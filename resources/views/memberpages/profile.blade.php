@@ -12,16 +12,43 @@
 
     <div x-data="{ open: false }" class="space-y-6">
 
-    <!-- Toggle Button -->
-        <div class="flex justify-end">
-            <button 
-                @click="open = !open"
-                class="px-4 py-2 bg-black text-white hover:text-black rounded-md text-sm font-medium hover:bg-[#FFD736] transition"
-            >
-                <span class="fa fa-edit"></span> Profile
-            </button>
+    @php
+        $latestAssessment = \App\Models\UserAssessment::where('user_id', Auth::id())->latest()->first();
+    @endphp
+
+    <!-- Account Details Preview -->
+        <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800">My Account Details</h3>
+                <button
+                    @click="open = !open"
+                    class="flex items-center gap-1.5 text-sm font-medium text-[#6366F1] hover:text-[#4F46E5] transition"
+                >
+                    <span class="fa" :class="open ? 'fa-times' : 'fa-pencil'"></span>
+                    <span x-text="open ? 'Cancel' : 'Update'"></span>
+                </button>
+            </div>
+
+            <dl x-show="!open" class="divide-y divide-gray-100">
+                <div class="grid grid-cols-1 sm:grid-cols-2 px-6 py-4 gap-1 sm:gap-4">
+                    <dt class="text-sm font-semibold text-gray-700">Account Email</dt>
+                    <dd class="text-sm text-gray-600">{{ Auth::user()->email }}</dd>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 px-6 py-4 gap-1 sm:gap-4">
+                    <dt class="text-sm font-semibold text-gray-700">First Name</dt>
+                    <dd class="text-sm text-gray-600">{{ Auth::user()->first_name ?: '—' }}</dd>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 px-6 py-4 gap-1 sm:gap-4">
+                    <dt class="text-sm font-semibold text-gray-700">Last Name</dt>
+                    <dd class="text-sm text-gray-600">{{ Auth::user()->last_name ?: '—' }}</dd>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 px-6 py-4 gap-1 sm:gap-4">
+                    <dt class="text-sm font-semibold text-gray-700">Skill Level</dt>
+                    <dd class="text-sm text-gray-600">{{ $latestAssessment->skill_level ?? 'Nil' }}</dd>
+                </div>
+            </dl>
         </div>
-    
+
     <!-- Form Section -->
         <div x-show="open" x-transition class="bg-white p-6 rounded-2xl shadow-md space-y-6">
 
@@ -40,6 +67,29 @@
                 @endif
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Passport / Profile Photo -->
+                    <div class="col-span-1 md:col-span-2 flex justify-center mb-2"
+                        x-data="{ preview: {{ \Illuminate\Support\Js::from(Auth::user()->passport ?: '/avatar1.jpg') }} }">
+                        <div class="relative w-28 h-28">
+                            <img :src="preview" alt="Profile photo"
+                                class="w-28 h-28 rounded-full object-cover border-4 border-gray-100 shadow-sm">
+
+                            <label for="passport"
+                                class="absolute bottom-0 right-0 flex items-center justify-center w-9 h-9 rounded-full bg-black text-white shadow-md cursor-pointer hover:bg-gray-800 transition">
+                                <span class="fa fa-camera text-sm"></span>
+                            </label>
+
+                            <input id="passport" name="passport" type="file" accept="image/*" class="hidden"
+                                @change="
+                                    const file = $event.target.files[0];
+                                    if (file) { preview = URL.createObjectURL(file); }
+                                " />
+                        </div>
+                        @error('passport')
+                            <p class="text-red-600 text-sm mt-1 text-center">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- First Name -->
                     <div>
                         <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
@@ -89,9 +139,15 @@
                     <!-- Password -->
                     <div>
                         <label for="new_password_input" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                        <input id="new_password_input" name="new_password_input" type="password"
-                        autocomplete="new-password"
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                        <div class="relative">
+                            <input id="new_password_input" name="new_password_input" type="password"
+                            autocomplete="new-password"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 pr-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            <button type="button" onclick="togglePasswordVisibility('new_password_input', this)"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                         @error('new_password_input')
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -100,91 +156,17 @@
                     <!-- Confirm Password -->
                     <div>
                         <label for="new_password_input_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                        <input id="new_password_input_confirmation" name="new_password_input_confirmation" type="password"
-                        autocomplete="new-password"
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                    </div>
-
-                    <!-- Passport -->
-                    <div>
-                        <label for="passport" class="block text-sm font-medium text-gray-700 mb-1">Passport</label>
-                        <input id="passport" name="passport" type="file"
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                        @error('passport')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Phone Number -->
-                    <div>
-                        <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                        <input id="phone_number" name="phone_number" type="tel" value="{{ old('phone_number', Auth::user()->phone_number) }}"
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                        @error('phone_number')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Skill Level -->
-                    <div>
-                        <label for="skill_level" class="block text-sm font-medium text-gray-700 mb-1">Skill Level</label>
-                        <select id="skill_level" name="skill_level"
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="">Select Skill Level</option>
-                            <option value="beginner" {{ old('skill_level', Auth::user()->skill_level) == 'beginner' ? 'selected' : '' }}>Beginner</option>
-                            <option value="intermediate" {{ old('skill_level', Auth::user()->skill_level) == 'intermediate' ? 'selected' : '' }}>Intermediate</option>
-                            <option value="advanced" {{ old('skill_level', Auth::user()->skill_level) == 'advanced' ? 'selected' : '' }}>Advanced</option>
-                        </select>
-                        @error('skill_level')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Social Media Links Section -->
-                <div class="mt-6">
-                    <h4 class="text-lg font-medium text-gray-900 mb-4">Social Media Links</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Instagram -->
-                        <div>
-                            <label for="instagram" class="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
-                            <input id="instagram" name="instagram" type="url" placeholder="https://instagram.com/username" value="{{ old('instagram', Auth::user()->instagram) }}"
-                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                            @error('instagram')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- YouTube -->
-                        <div>
-                            <label for="youtube" class="block text-sm font-medium text-gray-700 mb-1">YouTube</label>
-                            <input id="youtube" name="youtube" type="url" placeholder="https://youtube.com/channel/..." value="{{ old('youtube', Auth::user()->youtube) }}"
-                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                            @error('youtube')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Facebook -->
-                        <div>
-                            <label for="facebook" class="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
-                            <input id="facebook" name="facebook" type="url" placeholder="https://facebook.com/username" value="{{ old('facebook', Auth::user()->facebook) }}"
-                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                            @error('facebook')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- TikTok -->
-                        <div>
-                            <label for="tiktok" class="block text-sm font-medium text-gray-700 mb-1">TikTok</label>
-                            <input id="tiktok" name="tiktok" type="url" placeholder="https://tiktok.com/@username" value="{{ old('tiktok', Auth::user()->tiktok) }}"
-                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                            @error('tiktok')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                        <div class="relative">
+                            <input id="new_password_input_confirmation" name="new_password_input_confirmation" type="password"
+                            autocomplete="new-password"
+                                class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 pr-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            <button type="button" onclick="togglePasswordVisibility('new_password_input_confirmation', this)"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Biography Section -->
@@ -235,6 +217,16 @@
                     // Update on input
                     textarea.addEventListener('input', updateCharCount);
                 });
+
+                function togglePasswordVisibility(inputId, button) {
+                    const input = document.getElementById(inputId);
+                    const icon = button.querySelector('i');
+                    const isHidden = input.type === 'password';
+
+                    input.type = isHidden ? 'text' : 'password';
+                    icon.classList.toggle('fa-eye', !isHidden);
+                    icon.classList.toggle('fa-eye-slash', isHidden);
+                }
             </script>
         </div>
     </div>

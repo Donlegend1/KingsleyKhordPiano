@@ -78,15 +78,14 @@
         {{-- Video URL / ID --}}
         <div>
           <label for="video_url" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Video URL or Video ID *</label>
-          <input 
-            type="text" 
+          <textarea 
             name="video_url" 
             id="video_url" 
-            value="{{ old('video_url', $tutorial->video_url) }}" 
             required
-            placeholder="e.g. 1195123553 or full URL"
+            placeholder="e.g. 1195123553, full URL or embed code"
+            rows="3"
             class="w-full text-sm px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          >
+          >{{ old('video_url', $tutorial->video_url) }}</textarea>
         </div>
 
         {{-- Duration --}}

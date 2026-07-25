@@ -15,7 +15,7 @@
           <i class="fas fa-play-circle text-[#BC1414] text-2xl"></i>
         </div>
         <div class="text-left">
-          <h3 class="text-2xl font-bold">53,000+</h3>
+          <h3 class="text-2xl font-bold">57,000+</h3>
           <p class="text-gray-600 text-sm">YouTube Followers</p>
         </div>
       </div>
@@ -26,7 +26,7 @@
           <i class="fab fa-instagram text-[#BC1414] text-2xl"></i>
         </div>
         <div class="text-left">
-          <h3 class="text-2xl font-bold">28,000+</h3>
+          <h3 class="text-2xl font-bold">31,000+</h3>
           <p class="text-gray-600 text-sm">Instagram Followers</p>
         </div>
       </div>

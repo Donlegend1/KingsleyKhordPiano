@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\PostComment;
+use App\Enums\Notification\NotificationSectionEnum;
 
 class NewCommentNotification extends Notification implements ShouldQueue
 {
@@ -28,13 +29,13 @@ class NewCommentNotification extends Notification implements ShouldQueue
     public function toDatabase($notifiable)
     {
         return [
-            'type' => 'comment',
-            'post_id' => $this->comment->post_id,
-            'comment_id' => $this->comment->id,
-            'comment_body' => $this->comment->body,
-            'by_user_id' => $this->comment->user->id,
-            'first_name' => $this->comment->user->first_name,
-            'last_name' => $this->comment->user->last_name,
+            'data' => [
+                'user' => $this->comment->user->full_name,
+                'type' => 'comment',
+                'section' => NotificationSectionEnum::COMMUNITY->value,
+                'url' => route('singlePost', $this->comment->post_id) . '#comment-' . $this->comment->id,
+                'by_user_avatar' => $this->comment->user->passport ? asset($this->comment->user->passport) : null,
+            ],
         ];
     }
 

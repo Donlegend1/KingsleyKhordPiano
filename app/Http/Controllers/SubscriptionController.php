@@ -16,7 +16,6 @@ class SubscriptionController extends Controller
         $monthlyPlan = Subscription::find(1);
         $yearlyPlan = Subscription::find(2);
         return view('plans', compact('monthlyPlan', 'yearlyPlan'));
-
     }
 
     /**
@@ -68,10 +67,9 @@ class SubscriptionController extends Controller
     }
 
      public function memberplans()
-    {
-        $monthlyPlan = Subscription::find(1);
-        $yearlyPlan = Subscription::find(2);
-        return view('memberpages.payment.plan', compact('monthlyPlan', 'yearlyPlan'));
-
-    }
+     {
+         $monthlyPlan = Subscription::find(1);
+         $yearlyPlan = Subscription::find(2);
+         return view('memberpages.payment.plan', compact('monthlyPlan', 'yearlyPlan'));
+     }
 }

@@ -42,4 +42,21 @@ class CourseCategoryController extends Controller
             'message' => 'Category deleted successfully'
         ], 200);
     }
+
+    public function update(Request $request, $name)
+    {
+        $request->validate([
+            'category' => 'required|string|max:255',
+        ]);
+
+        $category = CourseCategory::where('category', $name)->firstOrFail();
+        $category->update([
+            'category' => $request->input('category'),
+        ]);
+
+        return response()->json([
+            'message' => 'Category updated successfully',
+            'category' => $category
+        ], 200);
+    }
 }

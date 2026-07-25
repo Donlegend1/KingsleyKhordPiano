@@ -23,6 +23,8 @@ use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CartController;
+use App\Support\ShopCatalog;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\CommunityIndexController;
 // use App\Http\Controllers\StripeWebhookController;
@@ -67,7 +69,74 @@ Route::get('/about', function () {
 });
 
 Route::get('/shop', function () {
-    return view('shop', ['pageTitle' => 'About Us']);
+    return view('shop', ['pageTitle' => 'Shop', 'products' => ShopCatalog::all()]);
+});
+
+Route::get('/shop/midi-files/{slug}', function ($slug) {
+    $product = ShopCatalog::find($slug);
+    if (!$product || $product['type'] !== 'midi') {
+        $product = ShopCatalog::find('gospel-chord-progressions');
+    }
+
+    return view('shop-product', ['product' => $product]);
+});
+
+Route::get('/shop/plugins/{slug}', function ($slug) {
+    $plugin = ShopCatalog::find($slug);
+    if (!$plugin || $plugin['type'] !== 'plugin') {
+        $plugin = ShopCatalog::find('chord-suite-plugin');
+    }
+
+    return view('shop-plugin', ['plugin' => $plugin]);
+});
+
+Route::get('/cart', [CartController::class, 'index']);
+Route::post('/cart/add', [CartController::class, 'add']);
+Route::post('/cart/remove', [CartController::class, 'remove']);
+Route::post('/cart/update', [CartController::class, 'updateQty']);
+Route::post('/cart/clear', [CartController::class, 'clear']);
+
+Route::get('/checkout', function () {
+    $items = CartController::hydrate();
+    $subtotal = collect($items)->sum(fn ($i) => $i['price'] * $i['qty']);
+
+    return view('checkout', [
+        'items' => $items,
+        'subtotal' => $subtotal,
+        'discount' => 0,
+        'total' => $subtotal,
+        'cartCount' => CartController::count(),
+    ]);
+});
+
+Route::get('/order-confirmation', function () {
+    $items = collect(CartController::hydrate())->map(fn ($item) => [
+        'name' => $item['name'],
+        'meta' => $item['type'],
+        'price' => $item['price'] * $item['qty'],
+        'qty' => $item['qty'],
+        'downloadLabel' => $item['type'] === 'Plugin' ? 'Download Plugin' : 'Download File',
+        'downloadUrl' => ShopCatalog::find($item['slug'])['download_url'] ?? null,
+        'thumbnail' => $item['thumbnail'],
+        'from' => $item['from'],
+        'to' => $item['to'],
+    ])->all();
+
+    $subtotal = collect($items)->sum('price');
+
+    // Simulate a completed purchase: this "pays" for whatever was in the cart, then empties it.
+    session(['cart' => []]);
+
+    return view('order-confirmation', [
+        'items' => $items,
+        'subtotal' => $subtotal,
+        'discount' => 0,
+        'total' => $subtotal,
+        'orderNumber' => '#KK-' . now()->format('Y') . '-' . random_int(1000, 9999),
+        'orderDate' => now()->format('F j, Y'),
+        'email' => 'john.doe@example.com',
+        'cartCount' => 0,
+    ]);
 });
 
 Route::get('/book-session', function () {
@@ -118,6 +187,7 @@ Route::post('/logout/community', [CommunityAuthController::class, 'logout'])->na
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(['check.payment', 'verified']);
 Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')->middleware(['check.payment', 'verified']);
 
+Route::get('/payment/direct-checkout', [PaymentController::class, 'directCheckout'])->middleware(['auth'])->name('payment.direct-checkout');
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
 Route::get('/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('payment.verify');
 Route::get('/member/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->middleware(['auth', 'check.payment', 'verified'])->name('notifications.index');
@@ -161,7 +231,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
     Route::redirect('dashboard', '/home');
     Route::get('piano-exercise/finger', [ExerciseController::class, 'fingerExercises'])->name('piano.exercise.finger');
-    Route::get('piano-exercise/technique-drills', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
+    Route::get('piano-exercise/guided-practice', [ExerciseController::class, 'musicalApplication'])->name('piano.exercise.musical');
     Route::get('piano-exercise/player', [ExerciseController::class, 'pianoExercisePlayer'])->name('piano.exercise.player');
     Route::post('piano-exercise/comment', [ExerciseController::class, 'storeComment'])->name('piano.exercise.comment');
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
@@ -169,21 +239,20 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
     Route::get('ear-training', [EarTrainingController::class, 'earTraining'])->name('ear.training');
     Route::get('ear-training/{id}', [EarTrainingController::class, 'showmember']);
-    Route::get('quick-lessons', [LessonController::class, 'quicklession'])->name('quick.lession');
     Route::get('learn-songs', [LessonController::class, 'learnSongs'])->name('learn.songs');
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('live-session/{liveshow}/confirm', [LiveSessionController::class, 'confirmBooking'])->name('member.live-session.confirm');
     Route::post('live-session/{liveshow}/book', [LiveSessionController::class, 'bookSlot'])->name('member.live-session.book');
+    Route::get('live-show/{liveshow}/recording', [LiveShowController::class, 'showRecording'])->name('member.live-show.recording');
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
+    Route::post('/course/{course}/view', [CourseController::class, 'recordView']);
 });
 
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
-    Route::get('profile', [HomeController::class, 'profile']);
     Route::post('whatsapp-preference', [HomeController::class, 'updateWhatsappPreference']);
     Route::post('timezone', [HomeController::class, 'updateTimezone'])->name('member.timezone');
     Route::get('/shop', [ShopController::class, 'index']);
-    Route::get('support', [HomeController::class, 'support']);
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/my-library', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
@@ -220,6 +289,12 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('/lesson-completion', [LessonCompletionController::class, 'store'])->name('lesson.complete');
 });
 
+// routes for member profile and support pages
+Route::prefix('member')->middleware(['auth',  'verified'])->group(function () {
+Route::get('profile', [HomeController::class, 'profile']);
+Route::get('support', [HomeController::class, 'support']);
+});
+
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('users', [AdminController::class, 'users']);
     Route::get('courses', [CourseController::class, 'index']);
@@ -237,8 +312,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::post('course', [CourseController::class, 'store']);
     Route::get('uploads/piano-exercise', [UploadController::class, 'pianoExercise']);
     Route::get('uploads/extra-courses', [UploadController::class, 'extraCourses']);
-    Route::get('uploads/quick-lessons', [UploadController::class, 'quickLessons']);
     Route::get('uploads/learn-songs', [UploadController::class, 'learnSongs']);
+    Route::get('uploads/etudes', [UploadController::class, 'etudes']);
     Route::get('uploads/create', [UploadController::class, 'create']);
     Route::post('upload/store', [UploadController::class, 'store']);
     Route::delete('upload/{upload}', [UploadController::class, 'destroy']);
@@ -254,13 +329,18 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('email-campaign', [EmailCampaignController::class, 'index']);
     Route::get('email-campaign/create', [EmailCampaignController::class, 'create']);
     Route::get('pdf-download', [PDFDownloadController::class, 'index']);
-    Route::get('audio-download', [PDFDownloadController::class, 'index']);
+    Route::get('audio-download', [AudioDownloadController::class, 'index']);
     Route::get('musical-application-list', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'musicalApplicationList']);
     Route::get('musical-application-all-courses', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'getAllCourses']);
     Route::resource('musical-application', \App\Http\Controllers\Admin\MusicalApplicationController::class, ['as' => 'admin']);
+    Route::post('reorder-musical-applications', [\App\Http\Controllers\Admin\MusicalApplicationController::class, 'updatePositions']);
+    Route::post('reorder-uploads', [UploadController::class, 'updatePositions']);
     
     // Community Tutorials Admin
     Route::resource('tutorials', \App\Http\Controllers\Admin\AdminTutorialController::class, ['as' => 'admin'])->except(['show']);
+
+    // Shop Products Admin (MIDI files & Plugins)
+    Route::resource('shop', \App\Http\Controllers\Admin\ShopProductController::class, ['as' => 'admin', 'parameters' => ['shop' => 'shopProduct']])->except(['show']);
 
     // Guest Bookings
     Route::prefix('guest-bookings')->name('admin.guest-bookings.')->group(function () {

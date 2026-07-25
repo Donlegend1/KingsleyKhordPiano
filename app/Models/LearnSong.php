@@ -12,16 +12,19 @@ class LearnSong extends Model
     protected $fillable = [
         'learn_song_category_id',
         'title',
+        'author',
         'description',
         'video_type',
         'video_url',
         'thumbnail',
         'level',
-        'song_key',
+        'tonal_center',
         'status',
         'position',
         'related_songs',
         'images',
+        'audio_resource',
+        'pdf_resource',
     ];
 
     protected $casts = [
@@ -29,11 +32,21 @@ class LearnSong extends Model
         'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url', 'image_urls'];
+    protected $appends = ['thumbnail_url', 'image_urls', 'audio_resource_url', 'pdf_resource_url'];
 
     public function getThumbnailUrlAttribute()
     {
         return $this->thumbnail ? asset($this->thumbnail) : null;
+    }
+
+    public function getAudioResourceUrlAttribute()
+    {
+        return $this->audio_resource ? asset($this->audio_resource) : null;
+    }
+
+    public function getPdfResourceUrlAttribute()
+    {
+        return $this->pdf_resource ? asset($this->pdf_resource) : null;
     }
 
     public function getImageUrlsAttribute()

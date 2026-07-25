@@ -2,8 +2,8 @@
 <div class="w-full border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
 
     {{-- Header --}}
-    <div class="px-5 py-4 border-b border-gray-100">
-        <p class="text-[11px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+    <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
+        <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
             Lessons in this course:
         </p>
     </div>
@@ -11,17 +11,25 @@
     {{-- Scrollable list --}}
     <div class="overflow-y-auto" style="max-height: 520px;">
         @foreach ($playlist as $item)
-            @php $isActive = $activeVideo && $item->id == $activeVideo->id; @endphp
+            @php
+                $isActive = $activeVideo && $item->id == $activeVideo->id;
+                $itemIsNew = $item->created_at
+                    && $item->created_at->gt(now()->subDays(7))
+                    && !\App\Models\LessonView::hasViewed(auth()->id(), $item);
+            @endphp
             <a href="{{ request()->fullUrlWithQuery(['video_id' => $item->id]) }}"
                 class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 transition-colors
-        {{ $isActive ? 'bg-blue-50' : 'bg-white hover:bg-gray-50' }}">
+        {{ $isActive ? 'bg-blue-600' : 'bg-white hover:bg-gray-50' }}">
 
                 {{-- Title --}}
                 <div class="flex-1 min-w-0">
                     <p
-                        class="text-[12px] font-bold uppercase tracking-wide leading-snug
-             {{ $isActive ? 'text-blue-700' : 'text-gray-800' }}">
-                        {{ $item->title }}
+                        class="text-[12px] font-bold uppercase tracking-wide leading-snug flex items-center gap-2
+             {{ $isActive ? 'text-white' : 'text-gray-800' }}">
+                        <span class="truncate">{{ $item->title }}</span>
+                        @if ($itemIsNew)
+                            <span class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md tracking-wide flex-shrink-0">NEW</span>
+                        @endif
                     </p>
                 </div>
                 @if (in_array($item->id, $completedIds ?? []))
@@ -30,6 +38,8 @@
             </a>
         @endforeach
     </div>
+
+    @include('memberpages.partials.sidebar-downloads', ['lesson' => $activeVideo])
 
     {{-- Next Lesson button --}}
     <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
@@ -45,11 +55,6 @@
                 class="flex items-center justify-center gap-2 {{ $previousVideo ? 'w-1/2' : 'w-full' }} py-3 border border-gray-200 rounded-lg text-gray-800 font-bold text-[14px] hover:bg-blue-50 hover:border-blue-200 transition-all">
                 Next <i class="fa-solid fa-arrow-right text-sm"></i>
             </a>
-        @else
-            <button disabled
-                class="w-full py-3 border border-gray-100 rounded-lg text-gray-400 font-bold text-[14px] bg-gray-50 cursor-not-allowed">
-                Course Completed
-            </button>
         @endif
     </div>
 

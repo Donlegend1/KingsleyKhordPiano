@@ -29,6 +29,43 @@ const ExtraCoursesAdmin = () => {
     const [newCategoryLevel, setNewCategoryLevel] = useState(null);
     const [newCategoryName, setNewCategoryName] = useState("");
 
+    // Edit Category States
+    const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
+    const [editingCategoryName, setEditingCategoryName] = useState("");
+    const [originalCategoryName, setOriginalCategoryName] = useState("");
+
+    const openEditCategoryModal = (categoryName) => {
+        setOriginalCategoryName(categoryName);
+        setEditingCategoryName(categoryName);
+        setEditCategoryModalOpen(true);
+    };
+
+    const handleUpdateCategory = async () => {
+        if (!editingCategoryName.trim()) return;
+        setLoading(true);
+        try {
+            await axios.put(
+                `/api/admin/extra-courses/category/${originalCategoryName}/update`,
+                {
+                    category: editingCategoryName,
+                },
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                    withCredentials: true,
+                }
+            );
+            fetchCourses();
+            setEditCategoryModalOpen(false);
+            showMessage("Category Updated successfully", "success");
+        } catch (error) {
+            showMessage(error.response?.data?.message || "Error updating category", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
     const [selectedLevel, setSelectedLevel] = useState("");
     const [selectedCategoryName, setSelectedCategoryName] = useState("");
@@ -50,6 +87,10 @@ const ExtraCoursesAdmin = () => {
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
+    const [audioResourceFile, setAudioResourceFile] = useState(null);
+    const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
+    const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const fileInputRef = useRef(null);
 
     const { showMessage } = useFlashMessage();
@@ -143,31 +184,70 @@ const ExtraCoursesAdmin = () => {
 
     const handleOnDragEnd = async (result, level) => {
         if (!result.destination) return;
-        const currentData = coursesData[level]?.data || {};
-        const items = Object.entries(currentData);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
 
-        const updatedData = {};
-        items.forEach(([cat, list]) => {
-            updatedData[cat] = list;
-        });
+        if (result.source.droppableId === `droppable-${level}`) {
+            const currentData = coursesData[level]?.data || {};
+            const items = Object.entries(currentData);
+            const [reorderedItem] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, reorderedItem);
 
-        setCoursesData((prev) => ({
-            ...prev,
-            [level]: { ...prev[level], data: updatedData }
-        }));
-
-        try {
-            await axios.post("/api/admin/reorder/extra-courses", {
-                level,
-                categories: items.map(([category]) => category),
-            }, {
-                headers: { "X-CSRF-TOKEN": csrfToken }
+            const updatedData = {};
+            items.forEach(([cat, list]) => {
+                updatedData[cat] = list;
             });
-        } catch (error) {
-            console.error("Failed to persist category order:", error);
-            showMessage("Failed to save category order", "error");
+
+            setCoursesData((prev) => ({
+                ...prev,
+                [level]: { ...prev[level], data: updatedData }
+            }));
+
+            try {
+                await axios.post("/api/admin/reorder/extra-courses", {
+                    level,
+                    categories: items.map(([category]) => category),
+                }, {
+                    headers: { "X-CSRF-TOKEN": csrfToken }
+                });
+            } catch (error) {
+                console.error("Failed to persist category order:", error);
+                showMessage("Failed to save category order", "error");
+            }
+        } else if (result.source.droppableId.startsWith("courses-")) {
+            const categoryName = result.source.droppableId.replace("courses-", "");
+            const currentData = coursesData[level]?.data || {};
+            const items = Object.entries(currentData);
+
+            const updatedData = {};
+            items.forEach(([cat, list]) => {
+                if (cat === categoryName) {
+                    const coursesList = Array.from(list);
+                    const [reorderedItem] = coursesList.splice(result.source.index, 1);
+                    coursesList.splice(result.destination.index, 0, reorderedItem);
+                    updatedData[cat] = coursesList;
+                } else {
+                    updatedData[cat] = list;
+                }
+            });
+
+            setCoursesData((prev) => ({
+                ...prev,
+                [level]: { ...prev[level], data: updatedData }
+            }));
+
+            const targetCourses = updatedData[categoryName];
+            if (targetCourses) {
+                const coursesIds = targetCourses.map(c => c.id);
+                try {
+                    await axios.post("/api/admin/reorder/extra-courses/items", {
+                        courses: coursesIds,
+                    }, {
+                        headers: { "X-CSRF-TOKEN": csrfToken }
+                    });
+                } catch (error) {
+                    console.error("Failed to persist course order:", error);
+                    showMessage("Failed to save course order", "error");
+                }
+            }
         }
     };
 
@@ -210,6 +290,12 @@ const ExtraCoursesAdmin = () => {
         newCourse.related_courses.forEach((id, idx) => {
             formData.append(`related_courses[${idx}]`, id);
         });
+        if (audioResourceFile) {
+            formData.append("audio_resource", audioResourceFile);
+        }
+        if (pdfResourceFile) {
+            formData.append("pdf_resource", pdfResourceFile);
+        }
 
         try {
             await axios.post("/api/admin/extra-courses/store", formData, {
@@ -220,6 +306,8 @@ const ExtraCoursesAdmin = () => {
             });
             showMessage("Course added successfully", "success");
             setIsCreateCourseModalOpen(false);
+            setAudioResourceFile(null);
+            setPdfResourceFile(null);
             fetchCourses();
             fetchAllCoursesDropdown();
         } catch (error) {
@@ -238,6 +326,8 @@ const ExtraCoursesAdmin = () => {
         setPreviewUrl(course.thumbnail_url);
         setThumbnailFile(null);
         setDescriptionImageFiles([]);
+        setEditAudioResourceFile(null);
+        setEditPdfResourceFile(null);
         setIsEditCourseModalOpen(true);
     };
 
@@ -260,6 +350,12 @@ const ExtraCoursesAdmin = () => {
         editingCourse.related_courses.forEach((id, idx) => {
             formData.append(`related_courses[${idx}]`, id);
         });
+        if (editAudioResourceFile) {
+            formData.append("audio_resource", editAudioResourceFile);
+        }
+        if (editPdfResourceFile) {
+            formData.append("pdf_resource", editPdfResourceFile);
+        }
 
         try {
             await axios.post(`/api/admin/extra-courses/update/${editingCourse.id}`, formData, {
@@ -390,6 +486,13 @@ const ExtraCoursesAdmin = () => {
                                                                                         Add Course
                                                                                     </button>
                                                                                     <i
+                                                                                        className="fa fa-pencil text-blue-500 hover:text-blue-700 text-sm cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            openEditCategoryModal(categoryName);
+                                                                                        }}
+                                                                                    ></i>
+                                                                                    <i
                                                                                         className="fa fa-trash text-red-500 hover:text-red-700 text-sm"
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
@@ -405,39 +508,61 @@ const ExtraCoursesAdmin = () => {
                                                                                 {courses.length === 0 ? (
                                                                                     <p className="text-gray-500 text-xs text-center py-4">No courses in this category yet.</p>
                                                                                 ) : (
-                                                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                                                        {courses.map((course) => (
-                                                                                            <div key={course.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
-                                                                                                <div>
-                                                                                                    <div className="h-40 bg-gray-100 relative">
-                                                                                                        {course.thumbnail_url ? (
-                                                                                                            <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
-                                                                                                        ) : (
-                                                                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                                                                <i className="fa fa-image text-3xl"></i>
+                                                                                    <Droppable droppableId={`courses-${categoryName}`} type="course">
+                                                                                        {(provided) => (
+                                                                                            <div
+                                                                                                ref={provided.innerRef}
+                                                                                                {...provided.droppableProps}
+                                                                                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                                                                                            >
+                                                                                                {courses.map((course, courseIndex) => (
+                                                                                                    <Draggable key={course.id} draggableId={`course-${course.id}`} index={courseIndex}>
+                                                                                                        {(provided, snapshot) => (
+                                                                                                            <div
+                                                                                                                ref={provided.innerRef}
+                                                                                                                {...provided.draggableProps}
+                                                                                                                {...provided.dragHandleProps}
+                                                                                                                className={`bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col justify-between hover:shadow-md transition ${
+                                                                                                                    snapshot.isDragging
+                                                                                                                        ? "ring-2 ring-blue-400 scale-[1.01]"
+                                                                                                                        : "border-gray-100"
+                                                                                                                }`}
+                                                                                                            >
+                                                                                                                <div>
+                                                                                                                    <div className="h-40 bg-gray-100 relative">
+                                                                                                                        {course.thumbnail_url ? (
+                                                                                                                            <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
+                                                                                                                        ) : (
+                                                                                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                                                                                                <i className="fa fa-image text-3xl"></i>
+                                                                                                                            </div>
+                                                                                                                        )}
+                                                                                                                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${course.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                                                                                                            {course.status}
+                                                                                                                        </span>
+                                                                                                                    </div>
+                                                                                                                    <div className="p-4">
+                                                                                                                        <h4 className="font-bold text-gray-800 truncate mb-1">{course.title}</h4>
+                                                                                                                        <p className="text-gray-500 text-xs line-clamp-2 h-8 leading-relaxed mb-3">{course.description || "No description provided."}</p>
+                                                                                                                        <span className="px-2 py-0.5 bg-gray-100 text-[10px] text-gray-600 rounded-md capitalize font-semibold">{course.video_type}</span>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
+                                                                                                                    <button onClick={() => openEditCourseModal(course)} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs">
+                                                                                                                        <i className="fa fa-edit"></i>
+                                                                                                                    </button>
+                                                                                                                    <button onClick={() => openDeleteCourseModal(course)} className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs">
+                                                                                                                        <i className="fa fa-trash"></i>
+                                                                                                                    </button>
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         )}
-                                                                                                        <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${course.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                                                                                            {course.status}
-                                                                                                        </span>
-                                                                                                    </div>
-                                                                                                    <div className="p-4">
-                                                                                                        <h4 className="font-bold text-gray-800 truncate mb-1">{course.title}</h4>
-                                                                                                        <p className="text-gray-500 text-xs line-clamp-2 h-8 leading-relaxed mb-3">{course.description || "No description provided."}</p>
-                                                                                                        <span className="px-2 py-0.5 bg-gray-100 text-[10px] text-gray-600 rounded-md capitalize font-semibold">{course.video_type}</span>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
-                                                                                                    <button onClick={() => openEditCourseModal(course)} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs">
-                                                                                                        <i className="fa fa-edit"></i>
-                                                                                                    </button>
-                                                                                                    <button onClick={() => openDeleteCourseModal(course)} className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-md text-xs">
-                                                                                                        <i className="fa fa-trash"></i>
-                                                                                                    </button>
-                                                                                                </div>
+                                                                                                    </Draggable>
+                                                                                                ))}
+                                                                                                {provided.placeholder}
                                                                                             </div>
-                                                                                        ))}
-                                                                                    </div>
+                                                                                        )}
+                                                                                    </Droppable>
                                                                                 )}
                                                                             </div>
                                                                         </div>
@@ -474,7 +599,20 @@ const ExtraCoursesAdmin = () => {
                     </div>
                     <div className="flex justify-end gap-3 pt-2">
                         <button onClick={() => setNewCategoryModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button onClick={handleCreateCategory} className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Create</button>
+                        <button
+                            onClick={handleCreateCategory}
+                            disabled={loading}
+                            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Creating...</span>
+                                </>
+                            ) : (
+                                "Create"
+                            )}
+                        </button>
                     </div>
                 </div>
             </Modal>
@@ -554,15 +692,23 @@ const ExtraCoursesAdmin = () => {
                                 </div>
                             )}
                         </div>
-                        <div className="col-span-1 sm:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Related Courses</label>
-                            <Select
-                                isMulti
-                                options={allCourses}
-                                onChange={(opts) => setNewCourse({ ...newCourse, related_courses: opts ? opts.map(o => o.value) : [] })}
-                                className="basic-multi-select"
-                                classNamePrefix="select"
-                                placeholder="Select related courses..."
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                            <input
+                                type="file"
+                                accept="audio/*"
+                                onChange={(e) => setAudioResourceFile(e.target.files[0] || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                            <input
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(e) => setPdfResourceFile(e.target.files[0] || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                             />
                         </div>
                         <div className="col-span-1 sm:col-span-2">
@@ -587,7 +733,20 @@ const ExtraCoursesAdmin = () => {
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                         <button type="button" onClick={() => setIsCreateCourseModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Save Course</button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                "Save Course"
+                            )}
+                        </button>
                     </div>
                 </form>
             </Modal>
@@ -676,17 +835,30 @@ const ExtraCoursesAdmin = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="col-span-1 sm:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Related Courses</label>
-                                <Select
-                                    isMulti
-                                    options={allCourses}
-                                    onChange={(opts) => setEditingCourse({ ...editingCourse, related_courses: opts ? opts.map(o => o.value) : [] })}
-                                    value={allCourses.filter(opt => editingCourse.related_courses.includes(opt.value))}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    placeholder="Select related courses..."
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => setEditAudioResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                                 />
+                                {editingCourse.audio_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">Audio track already uploaded.</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => setEditPdfResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                {editingCourse.pdf_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">PDF already uploaded.</div>
+                                )}
                             </div>
                             <div className="col-span-1 sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -710,7 +882,20 @@ const ExtraCoursesAdmin = () => {
 
                         <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" onClick={() => setIsEditCourseModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                            <button type="submit" className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm">Update Course</button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <i className="fa fa-spinner fa-spin"></i>
+                                        <span>Updating...</span>
+                                    </>
+                                ) : (
+                                    "Update Course"
+                                )}
+                            </button>
                         </div>
                     </form>
                 )}
@@ -723,7 +908,53 @@ const ExtraCoursesAdmin = () => {
                     <p className="text-gray-500 text-sm mb-6">Are you sure you want to delete course <span className="font-semibold text-red-600">"{courseToDelete?.title}"</span>? This action is permanent.</p>
                     <div className="flex justify-center gap-3">
                         <button onClick={() => setIsDeleteCourseModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Cancel</button>
-                        <button onClick={handleDeleteCourse} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold">Yes, Delete</button>
+                        <button
+                            onClick={handleDeleteCourse}
+                            disabled={loading}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Deleting...</span>
+                                </>
+                            ) : (
+                                "Yes, Delete"
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Edit Category Modal */}
+            <Modal isOpen={editCategoryModalOpen} onClose={() => setEditCategoryModalOpen(false)}>
+                <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Edit Category Name</h3>
+                    <div className="mb-4">
+                        <label className="block mb-2 font-medium text-gray-700">Category Name:</label>
+                        <input
+                            type="text"
+                            value={editingCategoryName}
+                            onChange={(e) => setEditingCategoryName(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <button onClick={() => setEditCategoryModalOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">Cancel</button>
+                        <button
+                            onClick={handleUpdateCategory}
+                            disabled={loading}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fa fa-spinner fa-spin"></i>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                "Save Changes"
+                            )}
+                        </button>
                     </div>
                 </div>
             </Modal>

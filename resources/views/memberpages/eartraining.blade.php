@@ -6,7 +6,7 @@
   <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
     <a href="/home" class="hover:text-gray-700">Dashboard</a>
     <span>/</span>
-    <span class="text-[#6366F1] font-medium">Ear Training</span>
+    <span class="text-blue-600 font-medium">Ear Training</span>
   </div>
 </section>
 

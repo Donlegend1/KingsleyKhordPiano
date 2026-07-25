@@ -56,6 +56,8 @@ class CourseVideoCommentsController extends Controller
             'url' => $request->url,
         ]);
 
+        $courseVideoComment->load('user');
+
         return response()->json([
             'message' => 'Comment created successfully',
             'data' => $courseVideoComment
@@ -83,6 +85,12 @@ class CourseVideoCommentsController extends Controller
      */
     public function update(UpdateCourseVideoCommentRequest $request, CourseVideoComment $CourseVideoComment)
     {
+        if ($CourseVideoComment->user_id !== Auth::id()) {
+            return response()->json([
+                'message' => 'You can only edit your own comments.',
+            ], 403);
+        }
+
         $CourseVideoComment->update([
             'comment' => $request->comment,
         ]);
@@ -98,6 +106,12 @@ class CourseVideoCommentsController extends Controller
      */
    public function destroy(CourseVideoComment $CourseVideoComment)
     {
+        if ($CourseVideoComment->user_id !== Auth::id()) {
+            return response()->json([
+                'message' => 'You can only delete your own comments.',
+            ], 403);
+        }
+
         $CourseVideoComment->replies()->delete();
 
         $CourseVideoComment->delete();

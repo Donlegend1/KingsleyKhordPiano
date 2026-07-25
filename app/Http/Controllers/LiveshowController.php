@@ -36,20 +36,29 @@ class LiveShowController extends Controller
      */
     public function store(StoreLiveshowRequest $request)
     {
-        DB::transaction(function () use ($request) {
-            $liveshow = LiveShow::create($request->all());
+        try {
+            // return $request->all();
+            $liveshow = LiveShow::create($request->validated());
 
-            LiveShowNotification::chunkById(100, function ($notifications) use ($liveshow) {
-                foreach ($notifications as $notification) {
-                    $user = $notification->user;
-                    if ($user) {
-                        $user->notify(new NewLiveShowNotification($liveshow));
+            $subscribers = LiveShowNotification::with('user')->get();
+
+            if ($subscribers->isNotEmpty()) {
+                foreach ($subscribers as $subscriber) {
+                    if ($subscriber->user && $subscriber->user->hasActiveSubscription()) {
+                        $subscriber->user->notify(new NewLiveShowNotification($liveshow, $subscriber->user));
                     }
                 }
-            }, 'id', 'id');
-        });
+            }
 
-        return redirect()->back()->with('success', 'Live show created.');
+            return redirect()->back()->with('success', 'Live show created.');
+        } catch (\Exception $e) {
+            logger()->error('LiveShowNotification failed: ' . $e->getMessage());
+
+            return redirect()->back()->with(
+                'error',
+                'Failed to create live show.'
+            );
+        }
     }
 
     /**
@@ -100,6 +109,28 @@ class LiveShowController extends Controller
         return response()->json([
             'message' => 'Live show deleted successfully.'
         ]);
+    }
+
+    /**
+     * Show the recording of a past live show, with its discussion thread.
+     */
+    public function showRecording(Liveshow $liveshow)
+    {
+        abort_unless($liveshow->recording_url, 404);
+
+        $user = auth()->user();
+        if ($liveshow->access_type === 'premium' && !$user->premium) {
+            return redirect('/member/live-session')
+                ->with('error', 'Please upgrade to premium to watch this recording.');
+        }
+
+        $comments = \App\Models\CourseVideoComment::where('course_id', $liveshow->id)
+            ->where('category', 'liveshow')
+            ->with(['user', 'replies.user'])
+            ->latest()
+            ->get();
+
+        return view('memberpages.livesession-recording', compact('liveshow', 'comments'));
     }
 
     public function list(Request $request)

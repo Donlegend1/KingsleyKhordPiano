@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\LiveCoachingBooking;
+use App\Services\GoogleCalendarService;
+use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\AdminCoachingBookingNotification;
 
 class LiveCoachingBookingController extends Controller
 {
@@ -27,15 +31,15 @@ class LiveCoachingBookingController extends Controller
     {
         $user = Auth::user();
 
-        $monthStart = now()->startOfMonth()->toDateString();
-        $monthEnd = now()->endOfMonth()->toDateString();
+        [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
 
         $sessionsIncluded = 1;
         $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
-            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('date', '>=', $cycleStart->toDateString())
+            ->where('date', '<', $cycleEnd->toDateString())
             ->count();
 
-        $nextResetLabel = now()->startOfMonth()->addMonthNoOverflow()->format('F j, Y');
+        $nextResetLabel = $cycleEnd->format('F j, Y');
 
         $windowStart = now()->toDateString();
         $windowEnd = now()->addDays(self::WINDOW_DAYS - 1)->toDateString();
@@ -49,7 +53,8 @@ class LiveCoachingBookingController extends Controller
             ->toArray();
 
         $activeBooking = LiveCoachingBooking::where('user_id', $user->id)
-            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('date', '>=', $cycleStart->toDateString())
+            ->where('date', '<', $cycleEnd->toDateString())
             ->first();
 
         return view('memberpages.my-library', [
@@ -94,14 +99,14 @@ class LiveCoachingBookingController extends Controller
             return response()->json(['error' => 'Bookings must be made at least 24 hours in advance.'], 422);
         }
 
-        // 4) User must still have their free session available this month.
-        $monthStart = now()->startOfMonth()->toDateString();
-        $monthEnd = now()->endOfMonth()->toDateString();
+        // 4) User must still have their free session available this cycle.
+        [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
         $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
-            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('date', '>=', $cycleStart->toDateString())
+            ->where('date', '<', $cycleEnd->toDateString())
             ->count();
         if ($sessionsUsed >= 1) {
-            return response()->json(['error' => 'You have already used your free session this month.'], 422);
+            return response()->json(['error' => 'You have already used your free session this cycle.'], 422);
         }
 
         // 5) Slot must not already be booked by anyone else.
@@ -120,17 +125,52 @@ class LiveCoachingBookingController extends Controller
 
         $booking->load('user');
 
+        // Slot times are validated above against SCHEDULE, which is defined in WAT.
+        $startWat = Carbon::parse($request->date . ' ' . $time, 'Africa/Lagos');
+        $endWat = $startWat->copy()->addMinutes(45);
+
+        try {
+            $meeting = (new ZoomService())->createMeeting([
+                'topic' => 'Live session with ' . $user->first_name,
+                'start_time' => $startWat->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s\Z'),
+                'duration' => 45,
+                'timezone' => 'Africa/Lagos',
+            ]);
+
+            $booking->update([
+                'zoom_join_url' => $meeting['join_url'] ?? null,
+                'zoom_meeting_id' => $meeting['id'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            logger()->warning('Failed to create Zoom meeting for coaching booking: ' . $e->getMessage());
+        }
+
         try {
             // Send notification to the member who booked
             $user->notify(new \App\Notifications\CoachingBookingNotification($booking));
 
             // Send notification to the admin
-            \Illuminate\Support\Facades\Notification::route('mail', 'Kingsleykhord@gmail.com')
-                ->notify(new \App\Notifications\AdminCoachingBookingNotification($booking));
+            Notification::route('mail', 'Kingsleykhord@gmail.com')
+                ->notify(new AdminCoachingBookingNotification($booking));
         } catch (\Exception $e) {
             logger()->warning('Failed to send live coaching session booking emails: ' . $e->getMessage());
         }
 
+        try {
+            (new GoogleCalendarService())->createEvent([
+                'title' => 'Live session with ' . $user->first_name,
+                'description' => "Booked by {$user->first_name} {$user->last_name} ({$user->email}) via the membership site."
+                    . ($booking->zoom_join_url ? "\n\nZoom link: {$booking->zoom_join_url}" : ''),
+                'start_time' => $startWat->toRfc3339String(),
+                'end_time' => $endWat->toRfc3339String(),
+                'timezone' => 'Africa/Lagos',
+            ]);
+        } catch (\Exception $e) {
+            logger()->warning('Failed to create Google Calendar event for coaching booking: ' . $e->getMessage());
+        }
+
         return response()->json(['success' => true, 'booking' => $booking]);
     }
+
+
 }

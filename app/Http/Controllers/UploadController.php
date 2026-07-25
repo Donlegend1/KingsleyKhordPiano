@@ -18,29 +18,25 @@ class UploadController extends Controller
      */
     public function pianoExercise()
     {
-        // dd(Upload::where('category', 'piano exercise')->get());
-
         return view('admin.uploads.piano-exercise', [
-            'uploads' => Upload::where('category', 'piano exercise')->get(),
+            'uploads' => Upload::where('category', 'piano exercise')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
     }
     public function extraCourses()
     {
         return view('admin.uploads.extra-courses', [
-            'uploads' => Upload::where('category', 'extra courses')->get(),
-        ]);
-    }
-    public function quickLessons()
-    {
-        return view('admin.uploads.quick-lessons', [
-            'uploads' => Upload::where('category', 'quick lessons')->get(),
+            'uploads' => Upload::where('category', 'extra courses')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
     }
     public function learnSongs()
     {
         return view('admin.uploads.learn-songs', [
-            'uploads' => Upload::where('category', 'learn songs')->get(),
+            'uploads' => Upload::where('category', 'learn songs')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
         ]);
+    }
+    public function etudes()
+    {
+        return view('admin.uploads.etudes');
     }
 
     /**
@@ -114,6 +110,34 @@ class UploadController extends Controller
             }
         }
 
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/audio');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $audio->move($destination, $filename);
+            $validated['audio_resource'] = 'uploads/resources/audio/' . $filename;
+        }
+
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
+        }
+
         $upload = Upload::create([
             'title'        => $validated['title'],
             'category'     => $validated['category'],
@@ -127,6 +151,8 @@ class UploadController extends Controller
             'thumbnail'    => $validated['thumbnail'] ?? null,
             'series'       => $validated['series'] ?? null,
             'images'       => $descriptionImages,
+            'audio_resource' => $validated['audio_resource'] ?? null,
+            'pdf_resource' => $validated['pdf_resource'] ?? null,
         ]);
 
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -239,6 +265,42 @@ class UploadController extends Controller
             }
         }
 
+        /* ---------------- AUDIO / PDF RESOURCE UPLOAD ---------------- */
+
+        if ($request->hasFile('audio_resource')) {
+            $audio = $request->file('audio_resource');
+            $filename = time() . '_' . $audio->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/audio');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($upload->audio_resource && file_exists(public_path($upload->audio_resource))) {
+                @unlink(public_path($upload->audio_resource));
+            }
+            $audio->move($destination, $filename);
+            $validated['audio_resource'] = 'uploads/resources/audio/' . $filename;
+        }
+
+        if ($request->hasFile('pdf_resource')) {
+            $pdf = $request->file('pdf_resource');
+            $filename = time() . '_' . $pdf->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/pdf');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/pdf');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($upload->pdf_resource && file_exists(public_path($upload->pdf_resource))) {
+                @unlink(public_path($upload->pdf_resource));
+            }
+            $pdf->move($destination, $filename);
+            $validated['pdf_resource'] = 'uploads/resources/pdf/' . $filename;
+        }
+
         /* ---------------- UPDATE MODEL ---------------- */
 
         $upload->update([
@@ -254,6 +316,8 @@ class UploadController extends Controller
             'thumbnail'    => $validated['thumbnail'] ?? $upload->thumbnail,
             'series'       => $validated['series'] ?? $upload->series,
             'images'       => $descriptionImages,
+            'audio_resource' => $validated['audio_resource'] ?? $upload->audio_resource,
+            'pdf_resource' => $validated['pdf_resource'] ?? $upload->pdf_resource,
         ]);
         logger()->info(['video' => $validated['video_type']]);
         
@@ -277,12 +341,32 @@ class UploadController extends Controller
 
     public function uploadList(Request $request)
     {
+        $query = Upload::where('category', $request->input('category'))
+            ->orderByRaw('position IS NULL, position ASC')
+            ->orderBy('id', 'desc');
+
         if ($request->has('page')) {
-            $uploads = Upload::where('category', $request->input('category'))->latest()->paginate(10);
+            $uploads = $query->paginate(10);
         } else {
-            $uploads = Upload::where('category', $request->input('category'))->latest()->get();
+            $uploads = $query->get();
         }
 
         return response()->json($uploads, 200);
+    }
+
+    public function updatePositions(Request $request)
+    {
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*' => 'integer',
+        ]);
+
+        foreach ($validated['items'] as $index => $id) {
+            Upload::where('id', $id)->update(['position' => $index + 1]);
+        }
+
+        return response()->json([
+            'message' => 'Upload positions updated successfully',
+        ]);
     }
 }

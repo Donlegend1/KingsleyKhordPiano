@@ -73,14 +73,16 @@ class HomeController extends Controller
 
         $latestCourses = [];
 
-            foreach (['piano exercise', 'quick lessons'] as $category) {
-                $course = Upload::where('category', $category)
-                    ->orderBy('created_at', 'desc')
-                    ->first();
+            $latestPianoExercise = Upload::where('category', 'piano exercise')
+                ->orderBy('created_at', 'desc')
+                ->first();
+            if ($latestPianoExercise) {
+                $latestCourses['piano exercise'] = $latestPianoExercise;
+            }
 
-                if ($course) {
-                    $latestCourses[$category] = $course;
-                }
+            $latestGuidedPractice = \App\Models\MusicalApplication::orderBy('created_at', 'desc')->first();
+            if ($latestGuidedPractice) {
+                $latestCourses['guided practice'] = $latestGuidedPractice;
             }
 
             $latestLearnSong = \App\Models\LearnSong::orderBy('created_at', 'desc')->first();
@@ -92,9 +94,8 @@ class HomeController extends Controller
             if ($latestExtraCourse) {
                 $latestCourses['extra courses'] = $latestExtraCourse;
             }
-            $latestComments = \App\Models\CourseVideoComment::with(['user', 'course'])->latest()->take(4)->get();
 
-            return view('home', compact('progress', 'levels', 'latestCourses', 'latestComments', 'assessment'));
+            return view('home', compact('progress', 'levels', 'latestCourses', 'assessment'));
         }
     }
 
@@ -276,9 +277,12 @@ class HomeController extends Controller
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-        'password' => 'nullable|string|min:8|confirmed',
+        'new_password_input' => 'nullable|string|min:8|confirmed',
         'passport' => 'nullable|image|mimes:jpeg,png,jpg',
         'country' => 'nullable|string|max:500',
+    ], [
+        'new_password_input.confirmed' => 'The new password and confirm password fields do not match.',
+        'new_password_input.min' => 'The new password must be at least 8 characters.',
     ]);
 
     $user->first_name = $request->first_name;
@@ -286,8 +290,8 @@ class HomeController extends Controller
     $user->email = $request->email;
     $user->country = $request->country;
 
-    if ($request->filled('password')) {
-        $user->password = Hash::make($request->password);
+    if ($request->filled('new_password_input')) {
+        $user->password = Hash::make($request->new_password_input);
     }
 
     /** ------------------------------------

@@ -25,6 +25,42 @@ class GoogleCalendarService
         $this->service = new Calendar($this->client);
     }
 
+    /**
+     * Create a plain calendar event (no auto-generated Meet link), used for
+     * live coaching bookings which run over the studio's existing Zoom room.
+     */
+    public function createEvent($details)
+    {
+        try {
+            $timeZone = $details['timezone'] ?? config('app.timezone', 'UTC');
+
+            $event = new Event([
+                'summary' => $details['title'],
+                'description' => $details['description'] ?? '',
+                'start' => [
+                    'dateTime' => $details['start_time'],
+                    'timeZone' => $timeZone,
+                ],
+                'end' => [
+                    'dateTime' => $details['end_time'],
+                    'timeZone' => $timeZone,
+                ],
+            ]);
+
+            $calendarId = config('services.google.calendar_id', 'primary');
+
+            $createdEvent = $this->service->events->insert($calendarId, $event);
+
+            return [
+                'event_id' => $createdEvent->id,
+                'html_link' => $createdEvent->htmlLink,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Google Calendar event creation failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
     public function createMeeting($details)
     {
         try {

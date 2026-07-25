@@ -21,6 +21,9 @@ class Upload extends Model
         'video_type',
         'series',
         'images',
+        'audio_resource',
+        'pdf_resource',
+        'position',
     ];
 
     protected $casts = [
@@ -30,12 +33,22 @@ class Upload extends Model
         'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url', 'image_urls'];
-    
+    protected $appends = ['thumbnail_url', 'image_urls', 'audio_resource_url', 'pdf_resource_url'];
+
 
     public function getThumbnailUrlAttribute()
     {
         return $this->thumbnail ? asset($this->thumbnail) : null;
+    }
+
+    public function getAudioResourceUrlAttribute()
+    {
+        return $this->audio_resource ? asset($this->audio_resource) : null;
+    }
+
+    public function getPdfResourceUrlAttribute()
+    {
+        return $this->pdf_resource ? asset($this->pdf_resource) : null;
     }
 
     public function getImageUrlsAttribute()

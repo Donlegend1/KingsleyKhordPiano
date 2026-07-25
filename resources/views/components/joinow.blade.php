@@ -16,9 +16,9 @@
 
     <div class="mt-8">
       <a href="/plans#pricing"
-         class="inline-flex items-center bg-[#FFD736] uppercase px-6 py-3 hover:bg-[#c2ab39] text-black rounded-md font-semibold text-base sm:text-lg transition">
+         class="group inline-flex items-center gap-2 bg-[#FFD736] uppercase px-8 py-3.5 hover:bg-[#FFC700] text-black rounded-full font-bold text-base sm:text-lg tracking-wide shadow-lg shadow-[#FFD736]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#FFD736]/40 hover:-translate-y-0.5 active:translate-y-0">
         Join Now
-        <i class="fa fa-angle-right ml-2" aria-hidden="true"></i>
+        <i class="fa fa-angle-right transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true"></i>
       </a>
     </div>
   </div>

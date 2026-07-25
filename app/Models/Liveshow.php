@@ -11,6 +11,10 @@ class Liveshow extends Model
     
     protected $fillable = ['title', 'start_time', 'access_type', 'zoom_link', 'recording_url', 'category', 'max_slots'];
 
+    protected $casts = [
+        'start_time' => 'datetime',
+    ];
+
     public function bookedUsers()
     {
         return $this->belongsToMany(User::class, 'liveshow_bookings', 'liveshow_id', 'user_id')

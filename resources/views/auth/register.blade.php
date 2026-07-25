@@ -12,7 +12,7 @@
       </p>
     </div>
 
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+    <form method="POST" action="{{ route('register') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="space-y-4">
       @csrf
 
       <!-- First Name -->
@@ -136,7 +136,7 @@
     <!-- Login Link -->
     <p class="mt-6 text-center text-sm text-gray-500">
       Already have an account?
-      <a href="{{ route('login') }}" class="text-gray-900 font-semibold hover:underline">
+      <a href="{{ route('login') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="text-gray-900 font-semibold hover:underline">
         {{ __('Login here') }}
       </a>
     </p>

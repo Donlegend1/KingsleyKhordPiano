@@ -14,19 +14,9 @@ use App\Services\ZoomService;
 
 class ZoomMeetingController extends Controller
 {
-    public function redirectToZoom()
+    public function redirectToZoom(ZoomService $service)
     {
-        $authorizeUrl = "https://zoom.us/oauth/authorize";
-        $clientId = 'zzgTBR6hT2qxXI5OfLAxHQ';
-        $clientSecret = 'PLXKN43fN4uVjqwIYlPxSFzbNnbSCSrH';
-        $redirectUri ='http://localhost:8000/zoom/callback';
-
-       $data = Http::asForm(
-           
-        )->post('https://zoom.us/oauth/token?grant_type=account_credentials&account_id=zzgTBR6hT2qxXI5OfLAxHQ:PLXKN43fN4uVjqwIYlPxSFzbNnbSCSrH');
-
-        return $data->json();
-        // return redirect("https://zoom.us/oauth/token?grant_type=account_credentials&account_id=zzgTBR6hT2qxXI5OfLAxHQ");
+        return response()->json($service->getAccessToken());
     }
 
     public function handleZoomCallback(Request $request)

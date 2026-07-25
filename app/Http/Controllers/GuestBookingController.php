@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\GuestBooking;
 use App\Models\BookingAvailability;
+use App\Services\GoogleCalendarService;
+use App\Services\ZoomService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -223,10 +226,53 @@ class GuestBookingController extends Controller
             ->where('time', $booking->time)
             ->update(['is_booked' => true]);
 
-        // Send email notification (Link will be added manually by admin later)
-        Mail::to($booking->email)->send(new GuestBookingConfirmed($booking));
+        // Slots are entered/stored in West Africa Time (the studio's business timezone).
+        $startWat = Carbon::parse($booking->date . ' ' . $booking->time, 'Africa/Lagos');
+        $endWat = $startWat->copy()->addHour();
 
-        // Notify the admin so they can prepare and send the meeting link
-        Mail::to(config('services.admin_notification_email'))->send(new NewGuestBookingNotification($booking));
+        try {
+            $meeting = (new ZoomService())->createMeeting([
+                'topic' => 'One-on-One Session with ' . $booking->name,
+                'start_time' => $startWat->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s\Z'),
+                'duration' => 60,
+                'timezone' => 'Africa/Lagos',
+            ]);
+
+            $booking->update([
+                'zoom_join_url' => $meeting['join_url'] ?? null,
+                'zoom_meeting_id' => $meeting['id'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to create Zoom meeting for guest booking: ' . $e->getMessage());
+        }
+
+        try {
+            $event = (new GoogleCalendarService())->createEvent([
+                'title' => 'One-on-One Session with ' . $booking->name,
+                'description' => "Booked by {$booking->name} ({$booking->email}) via the membership site."
+                    . ($booking->skill_level ? "\nSkill level: {$booking->skill_level}" : '')
+                    . ($booking->focus ? "\nFocus: {$booking->focus}" : '')
+                    . ($booking->zoom_join_url ? "\n\nZoom link: {$booking->zoom_join_url}" : ''),
+                'start_time' => $startWat->toRfc3339String(),
+                'end_time' => $endWat->toRfc3339String(),
+                'timezone' => 'Africa/Lagos',
+            ]);
+
+            if ($event) {
+                $booking->update(['google_calendar_event_id' => $event['event_id'] ?? null]);
+            }
+        } catch (\Exception $e) {
+            Log::warning('Failed to create Google Calendar event for guest booking: ' . $e->getMessage());
+        }
+
+        try {
+            // Send email notification
+            Mail::to($booking->email)->send(new GuestBookingConfirmed($booking));
+
+            // Notify the admin
+            Mail::to(config('services.admin_notification_email'))->send(new NewGuestBookingNotification($booking));
+        } catch (\Exception $e) {
+            Log::warning('Failed to send guest booking emails: ' . $e->getMessage());
+        }
     }
 }

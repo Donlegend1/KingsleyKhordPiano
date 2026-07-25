@@ -6,7 +6,7 @@
     <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
         <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
         <span>/</span>
-        <span class="text-[#6366F1] font-medium">Piano Exercise</span>
+        <span class="text-blue-600 font-medium">Piano Exercise</span>
     </div>
 </section>
 
@@ -73,7 +73,7 @@
                 </div>
 
                 <!-- Content -->
-                <h2 class="text-3xl font-extrabold text-[#1E293B] leading-tight mb-1">Technique<br><span class="text-amber-500">Drills</span></h2>
+                <h2 class="text-3xl font-extrabold text-[#1E293B] leading-tight mb-1">Harmonic<br><span class="text-amber-500">Drills</span></h2>
                 <div class="w-10 h-1 rounded-full bg-amber-400 mb-5"></div>
                 <p class="text-[#64748B] text-[15px] leading-relaxed mb-8 max-w-[260px] relative z-10">
                     Sharpen your technique with focused drills designed to improve speed, accuracy, and control.

@@ -25,11 +25,6 @@
         </details>
 
         <details class="border rounded-lg p-4 cursor-pointer">
-          <summary class="font-semibold text-black">Will you transcribe this song for me? I am unable to catch every chord being played</summary>
-          <p class=" text-gray-600 mt-2">While I don’t transcribe personal midi files anymore (my membership site is my top focus at the moment), I am willing to assist you in identifying the chords for a song. Post a link to a song in the Activity Feed and me or other members can jump in and help.</p>
-        </details>
-
-        <details class="border rounded-lg p-4 cursor-pointer">
           <summary class="font-semibold text-black">I must admit, I'm just starting out. Much of what you do appears to be quite advanced. Do you offer resources for beginners?</summary>
           <p class=" text-gray-600 mt-2">Certainly! While many of my YouTube videos tend to cater to intermediate and advanced players, we understand the importance of providing instruction for all skill levels. Our website features a Roadmap tool that guides you from Beginner to Advanced stages. This Roadmap not only outlines the precise steps necessary for skill progression but also includes a comprehensive Beginner Course. This course covers all the essential scales, chords, and theory that beginners need to get started.</p>
         </details>

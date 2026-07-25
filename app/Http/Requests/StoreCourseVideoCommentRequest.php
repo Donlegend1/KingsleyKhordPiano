@@ -25,7 +25,7 @@ class StoreCourseVideoCommentRequest extends FormRequest
             'category' => 'required|string|in:course,quiz,others',
             'course_id' => 'required|integer',
             'comment' => 'required|string',
-            'url' => 'required|string'
+            'url' => 'nullable|string'
         ];
     }
 }

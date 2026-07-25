@@ -66,62 +66,25 @@
                     <!-- Body -->
                     <tr>
                         <td style="padding:36px 40px;">
-                            <p style="margin:0 0 12px;font-size:17px;color:#111827;font-weight:600;">Hey {{ $user->first_name }},</p>
-
-                            <p style="margin:0 0 16px;font-size:15px;color:#4B5563;line-height:1.7;">
-                                I'm excited to announce a brand new live session — and I want you there!
-                                This is going to be a great time of learning, playing, and growing together at the keys.
+                            <p style="margin:0 0 16px;font-size:15px;color:#111827;line-height:1.7;">
+                                A new Live Show is coming up!
                             </p>
 
-                            @if(!empty($show['description']))
-                            <p style="margin:0 0 16px;font-size:15px;color:#4B5563;line-height:1.7;">
-                                {{ $show['description'] }}
+                            <p style="margin:0 0 12px;font-size:15px;color:#111827;line-height:1.7;">
+                                📅 {{ $startLocal->format('l, F j, Y') }}
                             </p>
-                            @endif
 
-                            <!-- What to expect box -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F3FF;border-left:4px solid #7C3AED;border-radius:0 8px 8px 0;margin:24px 0;">
-                                <tr>
-                                    <td style="padding:20px 24px;">
-                                        <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:1px;">What to expect</p>
-                                        <ul style="margin:0;padding:0 0 0 18px;color:#374151;font-size:14px;line-height:2;">
-                                            <li>Live piano instruction and Q&amp;A</li>
-                                            <li>Techniques you can apply immediately</li>
-                                            <li>Real-time feedback and tips</li>
-                                            <li>Community connection with fellow students</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </table>
+                            <p style="margin:0 0 16px;font-size:15px;color:#111827;line-height:1.7;">
+                                🕗 {{ $startLocal->format('g:i A') }} ({{ $gmtLabel }})
+                            </p>
 
-                            <!-- CTA Button -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 8px;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="{{ url('/member/live-session') }}"
-                                           style="display:inline-block;background:#7C3AED;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 40px;border-radius:10px;letter-spacing:0.3px;">
-                                            View Live Show →
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                            <p style="margin:0 0 24px;font-size:15px;color:#111827;line-height:1.7;">
+                                Join here: <a href="{{ $show['zoom_link'] ?? url('/member/live-session') }}" style="color:#7C3AED;text-decoration:underline;font-weight:600;">{{ $show['zoom_link'] ?? url('/member/live-session') }}</a>
+                            </p>
 
-                            <!-- Add to Calendar -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 0;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ urlencode($show['title'] ?? 'Kingsley Khord Live Show') }}&dates={{ $startUtc->format('Ymd\THis\Z') }}/{{ $endUtc->format('Ymd\THis\Z') }}&details={{ urlencode('Join the live session at kingsleykhord.com') }}"
-                                           target="_blank"
-                                           style="display:inline-block;border:1.5px solid #D1D5DB;color:#6B7280;text-decoration:none;font-size:13px;font-weight:600;padding:11px 28px;border-radius:8px;">
-                                            📅 Add to Google Calendar
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin:32px 0 0;font-size:15px;color:#374151;line-height:1.7;">
-                                See you at the show,<br/>
-                                <strong style="color:#1E1B4B;">Kingsley Khord</strong>
+                            <p style="margin:24px 0 0;font-size:15px;color:#374151;line-height:1.7;">
+                                Hope to see you there.<br/><br/>
+                                Kingsley.
                             </p>
                         </td>
                     </tr>

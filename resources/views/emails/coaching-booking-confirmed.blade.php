@@ -16,8 +16,15 @@
                     🕗 <strong>Time:</strong> {{ $timeFormatted }} ({{ $timezone }})
                     📍 <strong>Platform:</strong> Zoom
                 </p>
-                
-                <p>Your meeting link and session details will be sent to your email before the session.</p>
+
+                @if($zoomLink)
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{{ $zoomLink }}" style="background-color: #2D8CFF; color: #fff; text-decoration: none; padding: 12px 25px; border-radius: 6px; display: inline-block;">Join Zoom Session</a>
+                    </div>
+                @else
+                    <p>Your meeting link and session details will be sent to your email before the session.</p>
+                @endif
+
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="{{ $setupLink }}" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 12px 25px; border-radius: 6px; display: inline-block;">Watch Setup Tutorial</a>
                 </div>

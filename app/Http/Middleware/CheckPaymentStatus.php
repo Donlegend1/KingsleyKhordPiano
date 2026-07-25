@@ -15,15 +15,20 @@ class CheckPaymentStatus
      */
     public function handle(Request $request, Closure $next)
     {
-        // if (app()->environment('local')) {
-        //     return $next($request);
-        // }
-
         $user = Auth::user();
 
         if ($user && $user->role === 'member') {
 
             $hasActiveSubscription = $user->subscribed('default');
+
+            // Block if stripe subscription exists but is still pending
+            $hasPendingStripeSubscription = $user->subscriptions()
+                ->where('stripe_status', 'pending')
+                ->exists();
+
+            if ($hasPendingStripeSubscription) {
+                return redirect('/member/plan')->with('info', 'Your subscription is still being processed. Please wait a moment.');
+            }
 
             $activePayment = $user->payments()
                 ->where('status', 'successful')

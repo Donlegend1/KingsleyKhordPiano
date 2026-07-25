@@ -3,35 +3,31 @@
 @section('content')
 
 @php
-    $levels = ['Basic', 'Competent', 'Challenging'];
     $cards = [
         [
             'id' => 'independence',
             'title' => 'Hand Independence',
             'desc' => 'Develop the ability to move each hand independently with control.',
-            'bg' => 'bg-blue-50',
-            'stroke' => 'text-blue-500',
         ],
         [
             'id' => 'flexibility',
             'title' => 'Hand Flexibility',
             'desc' => 'Improve your range of motion and adapt to different musical situations.',
-            'bg' => 'bg-blue-50',
-            'stroke' => 'text-blue-500',
         ],
         [
             'id' => 'dexterity',
             'title' => 'Hand Dexterity',
             'desc' => 'Enhance finger agility and coordination for smooth execution.',
-            'bg' => 'bg-orange-50',
-            'stroke' => 'text-orange-500',
         ],
         [
             'id' => 'strength',
             'title' => 'Finger Strength',
             'desc' => 'Build finger strength and endurance for powerful playing.',
-            'bg' => 'bg-green-50',
-            'stroke' => 'text-green-500',
+        ],
+        [
+            'id' => 'technique',
+            'title' => 'Technique',
+            'desc' => 'Sharpen your overall piano technique with focused, guided drills.',
         ],
     ];
 @endphp
@@ -40,65 +36,185 @@
     <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
         <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
         <span>/</span>
-        <a href="{{ route('piano.exercise') }}" class="hover:text-gray-700">Piano Exercise</a>
-        <span>/</span>
-        <span class="text-[#6366F1] font-medium">Finger Exercises</span>
+        <span class="text-blue-600 font-medium">Piano Exercise</span>
     </div>
 </section>
 
-<div class="min-h-screen bg-[#F4F5F7] py-10 px-4">
+<div class="min-h-screen bg-[#F4F5F7] py-10 px-4" x-data="{ activeTab: 'finger' }">
     <div class="max-w-6xl mx-auto">
 
-        <!-- Skill Level Toggle -->
+        <!-- Tabs -->
         <div class="flex justify-center mb-10">
-            <div class="inline-flex flex-col sm:flex-row bg-gray-100 rounded-2xl p-1.5 gap-1">
-                @foreach($levels as $index => $level)
-                    @php $isActive = strtolower($skillLevel) === strtolower($level); @endphp
-                    <a href="{{ route('piano.exercise.finger', ['skill_level' => $level]) }}"
-                       class="relative flex items-center justify-center gap-2 px-7 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 min-w-[120px]
-                       {{ $isActive
-                           ? 'bg-[#6366F1] text-white shadow-md scale-[1.03]'
-                           : 'text-gray-400 hover:text-gray-600' }}">
-                        @if($isActive)
-                            <span class="w-1.5 h-1.5 rounded-full bg-white/70 absolute top-2 right-2"></span>
-                        @endif
-                        {{ $level }}
-                    </a>
-                @endforeach
+            <div class="inline-flex items-stretch bg-gray-100 rounded-xl p-1.5">
+                <button type="button" @click="activeTab = 'finger'"
+                    class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
+                    :class="activeTab === 'finger' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    Finger Exercise
+                </button>
+                <button type="button" @click="activeTab = 'etudes'"
+                    class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
+                    :class="activeTab === 'etudes' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    Etudes &amp; Pieces
+                </button>
             </div>
         </div>
 
-        <!-- Header -->
-        <div class="text-center mb-10">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">Choose Your Focus Area</h1>
-            <p class="text-gray-400 text-sm">Select the skill you want to develop</p>
-        </div>
-
-        <!-- Card Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Finger Exercise Tab -->
+        <div x-show="activeTab === 'finger'" x-cloak class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($cards as $card)
-            <div class="flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 p-6">
+            @php
+                $cardLessons = \App\Models\Upload::where('category', 'piano exercise')
+                    ->where('level', $card['id'])
+                    ->where('status', 'active')
+                    ->orderBy('id')
+                    ->get();
+                $firstLesson = $cardLessons->first();
+                $lessonCount = $cardLessons->count();
 
-                <!-- Icon Badge -->
-                <div class="w-20 h-20 rounded-full {{ $card['bg'] }} flex items-center justify-center mb-5">
-                    <svg class="w-9 h-9 {{ $card['stroke'] }}" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 11V6a2 2 0 0 0-4 0v0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
-                    </svg>
-                </div>
+                $isNew = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $cardLessons);
 
-                <!-- Content -->
-                <h2 class="text-base font-bold text-gray-900 mb-2">{{ $card['title'] }}</h2>
-                <p class="text-gray-400 text-sm leading-relaxed mb-5 flex-1">{{ $card['desc'] }}</p>
+                $watchUrl = route('piano.exercise.player', ['level' => $card['id']]);
+            @endphp
+            <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
-                <a href="{{ route('piano.exercise.player', ['level' => $card['id'], 'skill_level' => strtolower($skillLevel)]) }}"
-                   class="w-full flex items-center justify-center gap-2 border border-indigo-200 text-[#6366F1] font-semibold text-sm py-2.5 rounded-xl hover:bg-indigo-50 transition-colors duration-200">
-                    Watch Now
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                    </svg>
+                <!-- Thumbnail -->
+                <a href="{{ $watchUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+                    @if($firstLesson && $firstLesson->thumbnail_url)
+                        <img src="{{ $firstLesson->thumbnail_url }}" alt="{{ $card['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900 to-purple-900">
+                            <i class="fa fa-hand-paper text-5xl text-white/30"></i>
+                        </div>
+                    @endif
+
+                    @if($isNew)
+                        <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wide">
+                            NEW
+                        </div>
+                    @endif
+
+                    <!-- Lesson count badge -->
+                    <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
+                        {{ $lessonCount }} {{ Str::plural('Lesson', $lessonCount) }}
+                    </div>
+
+                    <!-- Play overlay -->
+                    <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
+                            <i class="fa fa-play text-black text-sm ml-0.5"></i>
+                        </div>
+                    </div>
                 </a>
+
+                <!-- Card Body -->
+                <div class="p-5 flex flex-col gap-3 flex-1">
+                    <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug">
+                        {{ $card['title'] }}
+                    </h3>
+
+                    <p class="text-gray-400 text-sm leading-relaxed flex-1">{{ $card['desc'] }}</p>
+
+                    <!-- Level Badge -->
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-black text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            All Levels
+                        </span>
+                    </div>
+
+                    <!-- Watch Now Button -->
+                    <a href="{{ $watchUrl }}"
+                       class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
+                        Watch Now
+                    </a>
+                </div>
             </div>
             @endforeach
+        </div>
+
+        <!-- Etudes & Pieces Tab -->
+        <div x-show="activeTab === 'etudes'" x-cloak class="space-y-12">
+            @forelse($etudeCategories as $category)
+                @if($category->etudes->count() > 0)
+                    <div>
+                        <!-- Category Header -->
+                        <div class="flex items-center gap-2.5 mb-6">
+                            <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
+                                {{ $category->category }}
+                            </h3>
+                            <span class="text-xs bg-gray-200 text-gray-600 px-2.5 py-0.5 rounded-full font-medium">
+                                {{ $category->etudes->count() }} {{ Str::plural('Item', $category->etudes->count()) }}
+                            </span>
+                        </div>
+
+                        <!-- Etudes Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            @foreach($category->etudes as $etude)
+                                @php
+                                    $watchUrl = "/member/lesson/{$etude->id}?type=etudes";
+                                    $isNew = $etude->created_at
+                                        && $etude->created_at->gt(now()->subDays(7))
+                                        && !\App\Models\LessonView::hasViewed(auth()->id(), $etude);
+                                @endphp
+                                <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+                                    
+                                    <!-- Thumbnail -->
+                                    <a href="{{ $watchUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+                                        @if($etude->thumbnail_url)
+                                            <img src="{{ $etude->thumbnail_url }}" alt="{{ $etude->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-950">
+                                                <i class="fa fa-music text-4xl text-white/20"></i>
+                                            </div>
+                                        @endif
+
+                                        @if($isNew)
+                                            <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wide shadow-sm shadow-red-500/20 uppercase">
+                                                NEW
+                                            </div>
+                                        @endif
+
+                                        <!-- Play overlay -->
+                                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
+                                                <i class="fa fa-play text-black text-sm ml-0.5"></i>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <!-- Card Body -->
+                                    <div class="p-5 flex flex-col gap-3 flex-grow">
+                                        <div>
+                                            <h4 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug group-hover:text-blue-600 transition-colors">
+                                                {{ Str::title($etude->title) }}
+                                            </h4>
+                                            @if($etude->author)
+                                                <p class="text-gray-400 text-xs mt-1 font-medium">Composer: {{ $etude->author }}</p>
+                                            @endif
+                                        </div>
+
+                                        @if($etude->description)
+                                            <p class="text-gray-500 text-xs leading-relaxed line-clamp-2">{{ $etude->description }}</p>
+                                        @endif
+
+                                        <!-- Watch Now Button -->
+                                        <a href="{{ $watchUrl }}"
+                                           class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
+                                            Watch Now
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @empty
+                <div class="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-400">
+                    <i class="fa fa-music text-4xl mb-3 block text-gray-300"></i>
+                    No etudes or pieces available yet.
+                </div>
+            @endforelse
         </div>
 
     </div>

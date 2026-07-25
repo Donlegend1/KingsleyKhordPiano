@@ -17,4 +17,9 @@
 
 </div>
 
+<script>
+    window.authUser = @json(Auth::user());
+    window.isSubscribed = @json(Auth::user() ? Auth::user()->hasActiveSubscription() : false);
+</script>
+
 @endsection

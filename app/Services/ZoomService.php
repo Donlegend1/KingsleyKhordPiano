@@ -11,9 +11,9 @@ class ZoomService
     {
         // Cache token to avoid repeated calls
         return Cache::remember('zoom_access_token', 3500, function () {
-            $clientId = 'zzgTBR6hT2qxXI5OfLAxHQ';
-            $clientSecret = 'PLXKN43fN4uVjqwIYlPxSFzbNnbSCSrH';
-            $accountId = '2074695877';
+            $clientId = config('services.zoom.client_id');
+            $clientSecret = config('services.zoom.client_secret');
+            $accountId = config('services.zoom.account_id');
 
             $basicAuth = base64_encode("$clientId:$clientSecret");
 

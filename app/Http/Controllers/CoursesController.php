@@ -21,52 +21,59 @@ class CoursesController extends Controller
      */
     public function extraCourses(Request $request)
     {
+        \App\Models\CategoryView::markViewed(auth()->id(), 'extra_courses');
+
         $search = $request->input('name');
-        $activeTab = $request->input('tab', 'beginner');
+        $activeTab = $request->input('tab', 'all');
+        $page = $request->input('page', 1);
 
-        $fetchLevelCategories = function($level) use ($search) {
-            $query = \App\Models\ExtraCourseCategory::where('level', $level)
-                ->orderBy('position');
-
-            $query->with(['courses' => function($q) use ($search, $level) {
-                $q->where('level', $level)
-                  ->where('status', 'active')
+        $query = \App\Models\ExtraCourseCategory::query()
+            ->when($activeTab !== 'all', fn($q) => $q->where('level', $activeTab))
+            ->with(['courses' => function($q) use ($search) {
+                $q->where('status', 'active')
                   ->when($search, function($subQ) use ($search) {
                       $subQ->where('title', 'like', "%{$search}%")
                            ->orWhere('description', 'like', "%{$search}%");
                   })
                   ->orderBy('position');
-            }]);
+            }])
+            ->whereHas('courses', function($q) use ($search) {
+                $q->where('status', 'active')
+                  ->when($search, function($subQ) use ($search) {
+                      $subQ->where('title', 'like', "%{$search}%")
+                           ->orWhere('description', 'like', "%{$search}%");
+                  });
+            })
+            ->withMax(['courses as latest_course_at' => function($q) {
+                $q->where('status', 'active');
+            }], 'created_at')
+            ->orderByDesc('latest_course_at');
 
-            $categories = $query->get();
+        $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
 
-            if ($search) {
-                $categories = $categories->filter(function($category) {
-                    return $category->courses->isNotEmpty();
-                });
-            }
-
-            return $categories;
-        };
-
-        $beginnerCategories = $fetchLevelCategories('beginner');
-        $intermediateCategories = $fetchLevelCategories('intermediate');
-        $advancedCategories = $fetchLevelCategories('advanced');
-
-        return view('memberpages.extracources', compact(
-            'beginnerCategories',
-            'intermediateCategories',
-            'advancedCategories',
-            'search',
-            'activeTab'
-        ));
+        return view('memberpages.extracources', compact('categories', 'search', 'activeTab'));
     }
 
-    public function singleCourse($id, BookmarkService $service) 
+    public function singleCourse($id, BookmarkService $service, Request $request)
     {
-        // Try ExtraCourse
-        $lesson = \App\Models\ExtraCourse::find($id);
-        $type = 'extra_course';
+        // ExtraCourse, LearnSong, and Upload each have their own auto-incrementing
+        // id, so the same numeric id can legitimately belong to all three. Links
+        // built after this fix always pass ?type=... to resolve unambiguously;
+        $type = $request->query('type');
+
+        $lesson = match ($type) {
+            'extra_course' => \App\Models\ExtraCourse::find($id),
+            'learn_song'   => \App\Models\LearnSong::find($id),
+            'etudes'       => \App\Models\Etude::find($id),
+            'upload'       => Upload::find($id),
+            default        => null,
+        };
+
+        if (!$lesson) {
+            // Try ExtraCourse
+            $lesson = \App\Models\ExtraCourse::find($id);
+            $type = 'extra_course';
+        }
 
         if (!$lesson) {
             // Try LearnSong
@@ -75,10 +82,20 @@ class CoursesController extends Controller
         }
 
         if (!$lesson) {
+            // Try Etudes
+            $lesson = \App\Models\Etude::find($id);
+            if ($lesson) {
+                $type = 'etudes';
+            }
+        }
+
+        if (!$lesson) {
             // Fallback to general Upload
             $lesson = Upload::findOrFail($id);
             $type = 'upload';
         }
+
+        \App\Models\LessonView::record(auth()->id(), $lesson);
 
         $comments = CourseVideoComment::where('category', 'others')
             ->whereNot('course_id', $id)
@@ -88,19 +105,23 @@ class CoursesController extends Controller
             ->get();
 
         $relatedUploads = collect();
-        // if ($type === 'learn_song') {
-        //     if (is_array($lesson->related_songs) && count($lesson->related_songs)) {
-        //         $relatedUploads = \App\Models\LearnSong::whereIn('id', $lesson->related_songs)->get();
-        //     }
-        // } elseif ($type === 'extra_course') {
-        //     if (is_array($lesson->related_courses) && count($lesson->related_courses)) {
-        //         $relatedUploads = \App\Models\ExtraCourse::whereIn('id', $lesson->related_courses)->get();
-        //     }
-        // } else {
-        //     if (is_array($lesson->tags) && count($lesson->tags)) {
-        //         $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
-        //     }
-        // }
+        if ($type === 'learn_song') {
+            if (is_array($lesson->related_songs) && count($lesson->related_songs)) {
+                $relatedUploads = \App\Models\LearnSong::whereIn('id', $lesson->related_songs)->get();
+            }
+        } elseif ($type === 'extra_course') {
+            if (is_array($lesson->related_courses) && count($lesson->related_courses)) {
+                $relatedUploads = \App\Models\ExtraCourse::whereIn('id', $lesson->related_courses)->get();
+            }
+        } elseif ($type === 'etudes') {
+            if (is_array($lesson->related_etudes) && count($lesson->related_etudes)) {
+                $relatedUploads = \App\Models\Etude::whereIn('id', $lesson->related_etudes)->get();
+            }
+        } else {
+            if (is_array($lesson->tags) && count($lesson->tags)) {
+                $relatedUploads = Upload::whereIn('id', $lesson->tags)->get();
+            }
+        }
 
         $isBookmarked = $service->isBookmarked($lesson);
         $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($lesson);
@@ -127,6 +148,16 @@ class CoursesController extends Controller
                 ->first();
 
             $nextVideo = \App\Models\ExtraCourse::where('extra_course_category_id', $lesson->extra_course_category_id)
+                ->where('position', '>', $lesson->position)
+                ->orderBy('position', 'asc')
+                ->first();
+        } elseif ($type === 'etudes') {
+            $previousVideo = \App\Models\Etude::where('etude_category_id', $lesson->etude_category_id)
+                ->where('position', '<', $lesson->position)
+                ->orderBy('position', 'desc')
+                ->first();
+
+            $nextVideo = \App\Models\Etude::where('etude_category_id', $lesson->etude_category_id)
                 ->where('position', '>', $lesson->position)
                 ->orderBy('position', 'asc')
                 ->first();

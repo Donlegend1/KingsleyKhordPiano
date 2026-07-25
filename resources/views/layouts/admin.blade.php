@@ -58,16 +58,18 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school-icon lucide-school"><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M18 5v16"/><path d="m4 6 7.106-3.79a2 2 0 0 1 1.788 0L20 6"/><path d="m6 11-3.52 2.147a1 1 0 0 0-.48.854V19a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a1 1 0 0 0-.48-.853L18 11"/>
                 <path d="M6 5v16"/><circle cx="12" cy="9" r="2"/></svg> <span>Extra Courses</span>
             </a>
-            <a href="/admin/uploads/quick-lessons" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-check-icon lucide-book-open-check"><path d="M12 21V7"/><path d="m16 12 2 2 4-4"/><path d="M22 6V4a1 1 0 0 0-1-1h-5a4 4 0 0 0-4 4 4 4 0 0 0-4-4H3a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h6a3 3 0 0 1 3 3 3 3 0 0 1 3-3h6a1 1 0 0 0 1-1v-1.3"/>
-              </svg> <span>Quick Lessons</span>
-            </a>
             <a href="/admin/uploads/learn-songs" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-disc-icon lucide-disc">
                 <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/></svg> <span>Learn Songs</span>
             </a>
+            <a href="/admin/uploads/etudes" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa-solid fa-feather-pointed"></i> <span>Etudes & Pieces</span>
+            </a>
             <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>
+            </a>
+            <a href="{{ route('admin.shop.index', ['type' => 'midi']) }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa-solid fa-store w-6 text-center"></i> <span>Shop</span>
             </a>
             <a href="/admin/website-video" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-video-icon lucide-list-video"><path d="M21 5H3"/><path d="M10 12H3"/><path d="M10 19H3"/><path d="M15 12.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997a1 1 0 0 1-1.517-.86z"/>
@@ -157,6 +159,9 @@
         </a>
         <a href="/admin/uploads/list" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-upload"></i> <span>Others</span>
+        </a>
+        <a href="/admin/uploads/etudes" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa-solid fa-feather-pointed"></i> <span>Etudes & Pieces</span>
         </a>
         <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>

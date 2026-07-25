@@ -8,6 +8,7 @@ import {
 } from "../Alert/FlashMessageContext";
 import Select from "react-select";
 import Modal from "../Modal/Modal";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const UploadList = () => {
     const [courses, setCourses] = useState([]);
@@ -72,6 +73,10 @@ const UploadList = () => {
     );
     const [thumbnail, setThumbnail] = useState(null);
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
+    const [audioResourceFile, setAudioResourceFile] = useState(null);
+    const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
+    const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const fileInputRef = useRef(null);
     const handleChangeCreate = (e) => {
         const { name, value } = e.target;
@@ -101,6 +106,43 @@ const UploadList = () => {
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
+
+    const fetchTagOptions = async () => {
+        try {
+            const response = await axios.get(`/admin/upload-list?category=${category}`, {
+                headers: { "X-CSRF-TOKEN": csrfToken },
+                withCredentials: true,
+            });
+            const formatted = response.data.map(item => ({
+                value: item.id,
+                label: item.title
+            }));
+            setUploadList(formatted);
+        } catch (error) {
+            console.error("Error fetching tag options:", error);
+        }
+    };
+
+    const handleOnDragEnd = async (result) => {
+        if (!result.destination) return;
+        const items = Array.from(courses);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        setCourses(items);
+
+        try {
+            await axios.post("/admin/reorder-uploads", {
+                items: items.map(item => item.id),
+            }, {
+                headers: { "X-CSRF-TOKEN": csrfToken }
+            });
+            showMessage("Order updated successfully.", "success");
+        } catch (error) {
+            console.error("Error updating order:", error);
+            showMessage("Error saving order.", "error");
+        }
+    };
 
     const fetchCourses = async (page = 1) => {
         setLoading(true);
@@ -153,7 +195,8 @@ const UploadList = () => {
 
     useEffect(() => {
         fetchCourses();
-    }, []);
+        fetchTagOptions();
+    }, [category]);
 
     const handlePageChange = (page) => {
         fetchCourses(page);
@@ -163,6 +206,16 @@ const UploadList = () => {
         setSelectedCourse(course);
         setThumbnail(null);
         setDescriptionImageFiles([]);
+        setEditAudioResourceFile(null);
+        setEditPdfResourceFile(null);
+
+        if (course.tags && Array.isArray(course.tags)) {
+            const selected = tagOptions.filter(opt => course.tags.includes(opt.value) || course.tags.includes(String(opt.value)));
+            setSelectedTags(selected);
+        } else {
+            setSelectedTags([]);
+        }
+
         setIsEditModalOpen(true);
     };
 
@@ -205,12 +258,22 @@ const UploadList = () => {
         formData.append("video_type", selectedCourse.video_type);
         formData.append("series", selectedCourse.series || "");
 
+        selectedTags.forEach((tag, index) => {
+            formData.append(`tags[${index}]`, tag.value);
+        });
+
         if (thumbnail instanceof File) {
             formData.append("thumbnail", thumbnail);
         }
         descriptionImageFiles.forEach((file, idx) => {
             formData.append(`images[${idx}]`, file);
         });
+        if (editAudioResourceFile instanceof File) {
+            formData.append("audio_resource", editAudioResourceFile);
+        }
+        if (editPdfResourceFile instanceof File) {
+            formData.append("pdf_resource", editPdfResourceFile);
+        }
 
         try {
             const response = await axios.post(
@@ -247,6 +310,12 @@ const UploadList = () => {
         descriptionImageFiles.forEach((file, idx) => {
             formData.append(`images[${idx}]`, file);
         });
+        if (audioResourceFile instanceof File) {
+            formData.append("audio_resource", audioResourceFile);
+        }
+        if (pdfResourceFile instanceof File) {
+            formData.append("pdf_resource", pdfResourceFile);
+        }
 
         // Upload fields
         Object.entries(upload).forEach(([key, value]) =>
@@ -266,14 +335,18 @@ const UploadList = () => {
             showMessage("Record Saved successfully.", "success");
             setUpload({
                 title: "",
+                category: category,
                 description: "",
                 video_url: "",
                 level: "",
                 skill_level: "",
                 status: "active",
+                video_type: "",
                 series: "",
             });
             setSelectedTags([]);
+            setAudioResourceFile(null);
+            setPdfResourceFile(null);
             fetchCourses();
             closeCreateModal();
         } catch (error) {
@@ -301,83 +374,71 @@ const UploadList = () => {
                 <p>Loading...</p>
             ) : (
                 <>
-                    <table className="min-w-full bg-white mb-4">
-                        <thead className="bg-gray-800 text-white">
-                            <tr>
-                                <th className="py-2 px-4 text-left">S/N</th>
-                                <th className="py-2 px-4 text-left">
-                                    Course Title
-                                </th>
-                                <th className="py-2 px-4 text-left">
-                                    Banner Image
-                                </th>
-                                <th className="py-2 px-4 text-left">
-                                    Category
-                                </th>
-                                <th className="py-2 px-4 text-left">Level</th>
-                                <th className="py-2 px-4 text-left">Status</th>
-                                <th className="py-2 px-4 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {courses && courses.length > 0 ? (
-                                courses.map((upload, index) => (
-                                    <tr key={upload.id} className="border-b">
-                                        <td className="py-2 px-4">
-                                            {index + 1}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {upload.title}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                                                <img
-                                                    src={upload.thumbnail_url}
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {upload.category}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {upload.level}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {upload.status}
-                                        </td>
-                                        <td className="py-2 px-4 flex justify-center text-center items-center">
-                                            <button
-                                                onClick={() =>
-                                                    openEditModal(upload)
-                                                }
-                                                className="bg-blue-500 text-white px-2 py-1 rounded"
-                                            >
-                                                <span className="fa fa-edit"></span>
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    openDeleteModal(upload)
-                                                }
-                                                className="bg-red-500 text-white px-2 py-1 rounded ml-2"
-                                            >
-                                                <span className="fa fa-trash"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td
-                                        colSpan="6"
-                                        className="py-2 px-4 text-center"
-                                    >
-                                        No Upload found.
-                                    </td>
-                                </tr>
+                    <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="uploads-list">
+                            {(provided) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.droppableProps}
+                                    className="space-y-3 mb-4"
+                                >
+                                    {courses && courses.length > 0 ? (
+                                        courses.map((upload, index) => (
+                                            <Draggable key={upload.id} draggableId={`item-${upload.id}`} index={index}>
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        className={`flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all ${
+                                                            snapshot.isDragging ? "ring-2 ring-black scale-[1.01] bg-black/5" : ""
+                                                        }`}
+                                                    >
+                                                        {/* Left side: Drag handle, S/N, Thumbnail, Title info */}
+                                                        <div className="flex items-center gap-4">
+                                                            <div {...provided.dragHandleProps} className="p-2 cursor-move hover:bg-gray-100 rounded">
+                                                                <i className="fa fa-bars text-gray-400"></i>
+                                                            </div>
+                                                            <span className="text-sm font-semibold text-gray-400">#{index + 1}</span>
+                                                            <div className="w-16 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                                <img src={upload.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="font-semibold text-gray-800 text-base">{upload.title}</h4>
+                                                                <div className="flex items-center gap-2 mt-1">
+                                                                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">{upload.category}</span>
+                                                                    <span className="text-xs px-2 py-0.5 bg-purple-50 text-purple-600 rounded font-medium">{upload.level}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Right side: Status and Actions */}
+                                                        <div className="flex items-center gap-4">
+                                                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${upload.status === 'active' ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}>
+                                                                {upload.status}
+                                                            </span>
+                                                            <div className="flex gap-2">
+                                                                <button type="button" onClick={() => openEditModal(upload)} className="bg-blue-50 hover:bg-blue-100 text-blue-600 p-2 rounded-lg transition-colors">
+                                                                    <span className="fa fa-edit"></span>
+                                                                </button>
+                                                                <button type="button" onClick={() => openDeleteModal(upload)} className="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-lg transition-colors">
+                                                                    <span className="fa fa-trash"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))
+                                    ) : (
+                                        <div className="py-12 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+                                            No entries found.
+                                        </div>
+                                    )}
+                                    {provided.placeholder}
+                                </div>
                             )}
-                        </tbody>
-                    </table>
+                        </Droppable>
+                    </DragDropContext>
 
                     <div className="flex items-center justify-center gap-6 mt-6">
                         <CustomPagination
@@ -512,6 +573,8 @@ const UploadList = () => {
                                 onChange={handleChange}
                                 className="w-full p-3 border rounded-lg"
                             />
+
+
                         </div>
 
                         {/* Description Field */}
@@ -548,6 +611,34 @@ const UploadList = () => {
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Course Resources (Optional) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => setEditAudioResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                                {selectedCourse?.audio_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">Audio track already uploaded.</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => setEditPdfResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                                {selectedCourse?.pdf_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">PDF already uploaded.</div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Submit Button */}
@@ -763,24 +854,7 @@ const UploadList = () => {
                                     </select>
                                 </div>
                             )}
-                            <div>
-                                <label
-                                    htmlFor="tags"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Related Courses
-                                </label>
-                                <Select
-                                    id="tags"
-                                    isMulti
-                                    name="tags"
-                                    options={tagOptions}
-                                    value={selectedTags}
-                                    onChange={handleTagsChange}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                />
-                            </div>
+
 
                             {/* Status */}
                             <div>
@@ -855,6 +929,28 @@ const UploadList = () => {
                             )}
                         </div>
 
+                        {/* Course Resources (Optional) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Audio Track (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => setAudioResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => setPdfResourceFile(e.target.files[0] || null)}
+                                    className="w-full p-3 border rounded-lg outline-none"
+                                />
+                            </div>
+                        </div>
+
                         {/* Submit Button */}
                         <button
                             disabled={saving}
@@ -902,10 +998,8 @@ if (document.getElementById("uploads")) {
     const Index = ReactDOM.createRoot(document.getElementById("uploads"));
 
     Index.render(
-        <React.StrictMode>
-            <FlashMessageProvider>
-                <UploadList />
-            </FlashMessageProvider>
-        </React.StrictMode>,
+        <FlashMessageProvider>
+            <UploadList />
+        </FlashMessageProvider>
     );
 }

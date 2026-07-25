@@ -1,15 +1,12 @@
 @extends('layouts.community')
 
+@section('breadcrumb-parent', 'Overview')
+@section('breadcrumb-parent-url', '/member/my-library')
+@section('breadcrumb', 'Application')
+
 @section('content')
 
-<!-- Header Section -->
-<div class="bg-white dark:bg-[#161617] border-b border-gray-200 dark:border-white/10 mb-6">
-    <div class="px-6 py-5">
-        <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight">Application</h1>
-    </div>
-</div>
-
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
 
     @php
         $apps = [

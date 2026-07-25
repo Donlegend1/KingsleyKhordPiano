@@ -45,7 +45,13 @@
                     </tr>
                 </table>
 
-                <p><strong>Action needed:</strong> Prepare a Zoom meeting link for this session and add it to the booking in the admin panel so it gets sent to {{ $booking->name }} before their session.</p>
+                @if($booking->zoom_join_url)
+                    <div style="text-align: center; margin: 25px 0;">
+                        <a href="{{ $booking->zoom_join_url }}" style="background-color: #2D8CFF; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 6px; display: inline-block; font-weight: bold;">Join Zoom Session</a>
+                    </div>
+                @else
+                    <p style="color: #b91c1c;"><strong>⚠️ Action needed:</strong> No Zoom link was generated automatically for this session. Please prepare one manually and add it to the booking in the admin panel so it gets sent to {{ $booking->name }} before their session.</p>
+                @endif
 
                 <div style="text-align: center; margin: 25px 0;">
                     <a href="{{ route('admin.guest-bookings.index') }}" style="background-color: #007bff; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 6px; display: inline-block; font-weight: bold;">View Booking in Admin Panel</a>

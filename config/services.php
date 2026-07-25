@@ -55,14 +55,20 @@ return [
             ? env('PAYPAL_LIVE_CLIENT_ID')
             : env('PAYPAL_TEST_CLIENT_ID'),
         'secret' => $isLive
-            ? env('PAYPAL_LIVE_CLIENT_SECRET')
+            ? (env('PAYPAL_LIVE_CLIENT_SECRET') ?? env('PAYPAL_lIVE_CLIENT_SECRET'))
             : env('PAYPAL_TEST_CLIENT_SECRET'),
         'currency' => env('PAYPAL_CURRENCY', 'USD'),
-        'test_mode' => env('PAYPAL_MODE', 'sandbox')
+        'test_mode' => env('PAYPAL_MODE', 'sandbox') === 'sandbox'
     ],
 
     'google' => [
         'calendar_id' => env('GOOGLE_CALENDAR_ID', 'primary'),
+    ],
+
+    'zoom' => [
+        'account_id' => env('ZOOM_ACCOUNT_ID'),
+        'client_id' => env('ZOOM_CLIENT_ID'),
+        'client_secret' => env('ZOOM_CLIENT_SECRET'),
     ],
 
     'admin_notification_email' => env('ADMIN_NOTIFICATION_EMAIL', 'kingsleykhord@gmail.com'),

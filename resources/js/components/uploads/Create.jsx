@@ -39,7 +39,6 @@ const UploadForm = () => {
     const categories = [
         "piano exercise",
         "extra courses",
-        "quick lessons",
         "learn songs",
     ];
 
@@ -284,24 +283,7 @@ const UploadForm = () => {
                             </select>
                         </div>
                     )}
-                    <div>
-                        <label
-                            htmlFor="tags"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Related Courses
-                        </label>
-                        <Select
-                            id="tags"
-                            isMulti
-                            name="tags"
-                            options={tagOptions}
-                            value={selectedTags}
-                            onChange={handleTagsChange}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                        />
-                    </div>
+
 
                     {/* Status */}
                     <div>

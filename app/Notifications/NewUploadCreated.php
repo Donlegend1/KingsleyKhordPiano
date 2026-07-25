@@ -24,11 +24,14 @@ class NewUploadCreated extends Notification
 
     public function toArray($notifiable)
     {
+        $section = \Illuminate\Support\Str::title($this->post->category);
+
         return [
             'post_id' => $this->post->id,
             'title'   => $this->post->title,
-            'url' => "/member/lesson/{$this->post->id}",
-            'message' => "New video posted added in {$this->post->category}: {$this->post->title}",
+            'url' => "/member/lesson/{$this->post->id}?type=upload",
+            'message' => $this->post->title,
+            'section' => $section,
             'body'    => $this->post->body,
         ];
     }
