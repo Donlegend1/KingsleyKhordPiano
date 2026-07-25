@@ -125,7 +125,7 @@ class CoursesController extends Controller
 
         $isBookmarked = $service->isBookmarked($lesson);
         $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($lesson);
-        $midiPracticeFiles = \App\Models\MidiFile::whereNotNull('midi_file_path')->orderBy('name')->get();
+        $midiPracticeFiles = collect([$midiPracticeFile])->filter();
 
         // Find next and previous video in the same category (if applicable)
         $previousVideo = null;

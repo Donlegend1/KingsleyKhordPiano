@@ -502,7 +502,7 @@ const MidiPracticePlayer = ({ data }) => {
                 </div>
 
                 <div className="min-w-0 space-y-2">
-                    {files.length > 0 && (
+                    {files.length > 1 && (
                         <select
                             value={selectedFileId}
                             onChange={(event) => setSelectedFileId(event.target.value)}

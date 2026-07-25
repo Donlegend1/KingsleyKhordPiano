@@ -165,7 +165,7 @@ class ExerciseController extends Controller
             }
 
         $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($activeVideo);
-        $midiPracticeFiles = \App\Models\MidiFile::whereNotNull('midi_file_path')->orderBy('name')->get();
+        $midiPracticeFiles = collect([$midiPracticeFile])->filter();
 
         return view('memberpages.series-player', compact(
             'playlist',

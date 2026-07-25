@@ -1,6 +1,8 @@
 @php
     $midiPracticeFile = $midiPracticeFile ?? null;
-    $midiPracticeFiles = collect($midiPracticeFiles ?? []);
+    $midiPracticeFiles = $midiPracticeFile?->midi_file_path
+        ? collect($midiPracticeFiles ?? [$midiPracticeFile])->filter(fn ($file) => $file?->id === $midiPracticeFile->id)
+        : collect();
     $midiPracticeData = [
         'title' => $midiPracticeTitle ?? 'MIDI Practice',
         'selectedFileId' => $midiPracticeFile?->id,
@@ -16,7 +18,9 @@
     ];
 @endphp
 
+@if($midiPracticeFile?->midi_file_path && $midiPracticeFiles->isNotEmpty())
 <div
     class="midi-practice-player mt-8 mb-8"
     data-midi-practice='@json($midiPracticeData, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG)'
 ></div>
+@endif
