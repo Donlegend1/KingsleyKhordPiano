@@ -58,6 +58,10 @@ const getSequencePitchRange = (sequence) => {
 
 const getPlaybackState = (player) => player?.player?.getPlayState?.() || (player?.playing ? "started" : "stopped");
 const transposeOptions = Array.from({ length: 25 }, (_, index) => index - 12);
+const KEYBOARD_OCTAVE_COUNT = 8;
+const KEYBOARD_PITCH_COUNT = KEYBOARD_OCTAVE_COUNT * 12;
+const KEYBOARD_LOWEST_START_PITCH = 12;
+const KEYBOARD_HIGHEST_START_PITCH = 24;
 
 const cloneSequence = (sequence) => {
     if (mm.sequences?.clone) {
@@ -125,17 +129,29 @@ const MidiPracticePlayer = ({ data }) => {
 
     const keyboard = useMemo(() => {
         const { minNote, maxNote } = getSequencePitchRange(sequence);
-        let minPitch = clamp(Math.floor(minNote / 12) * 12, 36, 60);
-        let maxPitch = minPitch + 47;
+        let minPitch = clamp(
+            Math.floor((minNote - 12) / 12) * 12,
+            KEYBOARD_LOWEST_START_PITCH,
+            KEYBOARD_HIGHEST_START_PITCH,
+        );
+        let maxPitch = minPitch + KEYBOARD_PITCH_COUNT - 1;
 
         if (maxNote > maxPitch) {
-            minPitch = clamp(Math.floor((maxNote - 47) / 12) * 12, 36, 60);
-            maxPitch = minPitch + 47;
+            minPitch = clamp(
+                Math.ceil((maxNote - KEYBOARD_PITCH_COUNT + 1) / 12) * 12,
+                KEYBOARD_LOWEST_START_PITCH,
+                KEYBOARD_HIGHEST_START_PITCH,
+            );
+            maxPitch = minPitch + KEYBOARD_PITCH_COUNT - 1;
         }
 
         if (minNote < minPitch) {
-            minPitch = clamp(Math.floor(minNote / 12) * 12, 36, 60);
-            maxPitch = minPitch + 47;
+            minPitch = clamp(
+                Math.floor(minNote / 12) * 12,
+                KEYBOARD_LOWEST_START_PITCH,
+                KEYBOARD_HIGHEST_START_PITCH,
+            );
+            maxPitch = minPitch + KEYBOARD_PITCH_COUNT - 1;
         }
 
         const pitches = Array.from(
@@ -295,12 +311,14 @@ const MidiPracticePlayer = ({ data }) => {
     };
 
     return (
-        <section className="kk-midi-shell overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <section className="kk-midi-shell">
             <style>{`
                 .kk-midi-shell {
-                    --kk-midi-blue: #2563eb;
+                    --kk-midi-blue: #2f80ff;
                     --kk-midi-amber: #f59e0b;
-                    --kk-midi-track: #dbe3ef;
+                    --kk-midi-track: #485365;
+                    --kk-midi-panel: #101827;
+                    --kk-midi-panel-soft: #172033;
                 }
 
                 .kk-midi-engine {
@@ -318,16 +336,29 @@ const MidiPracticePlayer = ({ data }) => {
                     padding-bottom: 2px;
                 }
 
+                .kk-midi-keyboard-scroll::-webkit-scrollbar {
+                    height: 8px;
+                }
+
+                .kk-midi-keyboard-scroll::-webkit-scrollbar-track {
+                    background: rgba(148, 163, 184, 0.12);
+                    border-radius: 999px;
+                }
+
+                .kk-midi-keyboard-scroll::-webkit-scrollbar-thumb {
+                    background: rgba(148, 163, 184, 0.46);
+                    border-radius: 999px;
+                }
+
                 .kk-midi-keyboard {
                     --white-key-width: calc(100% / var(--white-key-count));
                     --black-key-width: calc(var(--white-key-width) * 0.58);
                     position: relative;
-                    height: 178px;
-                    min-width: 100%;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 8px;
-                    background: #f8fafc;
-                    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.1);
+                    height: 118px;
+                    min-width: max(100%, 1568px);
+                    border-radius: 4px;
+                    background: #0f172a;
+                    box-shadow: 0 16px 32px rgba(2, 6, 23, 0.22);
                 }
 
                 .kk-midi-white-row {
@@ -340,9 +371,9 @@ const MidiPracticePlayer = ({ data }) => {
                     position: relative;
                     height: 100%;
                     border-right: 1px solid #cbd5e1;
-                    border-bottom: 1px solid #cbd5e1;
-                    background: linear-gradient(180deg, #ffffff 0%, #ffffff 55%, #f3f6fb 100%);
-                    box-shadow: inset 0 -8px 12px rgba(148, 163, 184, 0.12);
+                    border-bottom: 1px solid #94a3b8;
+                    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 63%, #e5e7eb 100%);
+                    box-shadow: inset 0 -9px 11px rgba(15, 23, 42, 0.14);
                 }
 
                 .kk-midi-white-key:first-child {
@@ -357,8 +388,8 @@ const MidiPracticePlayer = ({ data }) => {
                 }
 
                 .kk-midi-white-key.is-active {
-                    background: linear-gradient(180deg, #dbeafe 0%, #93c5fd 100%);
-                    box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.38);
+                    background: linear-gradient(180deg, #dbeafe 0%, #60a5fa 100%);
+                    box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.58), 0 0 16px rgba(47, 128, 255, 0.42);
                 }
 
                 .kk-midi-black-key {
@@ -370,23 +401,23 @@ const MidiPracticePlayer = ({ data }) => {
                     transform: translateX(-50%);
                     border: 1px solid #111827;
                     border-top: 0;
-                    border-radius: 0 0 4px 4px;
-                    background: linear-gradient(180deg, #172033 0%, #020617 100%);
-                    box-shadow: 0 7px 12px rgba(15, 23, 42, 0.28);
+                    border-radius: 0 0 3px 3px;
+                    background: linear-gradient(180deg, #111827 0%, #020617 100%);
+                    box-shadow: 0 8px 14px rgba(2, 6, 23, 0.48);
                 }
 
                 .kk-midi-black-key.is-active {
-                    background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
-                    border-color: #92400e;
-                    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28), 0 8px 14px rgba(15, 23, 42, 0.25);
+                    background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+                    border-color: #1d4ed8;
+                    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.24), 0 8px 14px rgba(2, 6, 23, 0.34);
                 }
 
                 .kk-midi-key-label {
                     position: absolute;
                     right: 5px;
                     bottom: 5px;
-                    color: #94a3b8;
-                    font-size: 11px;
+                    color: #64748b;
+                    font-size: 10px;
                     font-weight: 800;
                     line-height: 1;
                     pointer-events: none;
@@ -396,54 +427,216 @@ const MidiPracticePlayer = ({ data }) => {
                     position: relative;
                 }
 
-                .kk-midi-controls {
+                .kk-midi-display-title {
+                    margin: 0 0 14px;
+                    color: #1f2937;
+                    font-size: 19px;
+                    font-weight: 800;
+                    letter-spacing: 0;
+                }
+
+                .kk-midi-display-panel {
+                    overflow: hidden;
+                    border-radius: 10px;
+                    background: var(--kk-midi-panel);
+                    padding: 14px 16px 18px;
+                    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.14);
+                }
+
+                .kk-midi-toolbar {
                     display: grid;
                     grid-template-columns: minmax(0, 1fr);
                     gap: 12px;
+                    align-items: center;
+                    padding-bottom: 14px;
+                    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+                }
+
+                .kk-midi-file-title {
+                    display: flex;
+                    min-width: 0;
+                    align-items: center;
+                    gap: 8px;
+                    color: #e2e8f0;
+                    font-size: 13px;
+                    font-weight: 700;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .kk-midi-file-title i {
+                    flex: 0 0 auto;
+                    color: #94a3b8;
+                    font-size: 12px;
+                }
+
+                .kk-midi-transport {
+                    display: flex;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    gap: 8px;
+                    min-width: max-content;
+                }
+
+                .kk-midi-button {
+                    display: inline-flex;
+                    height: 34px;
+                    min-width: 70px;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    border: 0;
+                    border-radius: 4px;
+                    padding: 0 13px;
+                    color: #e2e8f0;
+                    background: rgba(255, 255, 255, 0.09);
+                    font-size: 12px;
+                    font-weight: 800;
+                    transition: background 150ms ease, color 150ms ease;
+                }
+
+                .kk-midi-button:hover:not(:disabled) {
+                    background: rgba(255, 255, 255, 0.14);
+                }
+
+                .kk-midi-button-primary {
+                    color: #ffffff;
+                    background: var(--kk-midi-blue);
+                }
+
+                .kk-midi-button-primary:hover:not(:disabled) {
+                    background: #1d6df2;
+                }
+
+                .kk-midi-button:disabled {
+                    cursor: not-allowed;
+                    color: #64748b;
+                    background: rgba(100, 116, 139, 0.16);
+                }
+
+                .kk-midi-field {
+                    display: flex;
+                    min-width: 0;
+                    align-items: center;
+                    gap: 9px;
+                    color: #cbd5e1;
+                    font-size: 12px;
+                    font-weight: 700;
+                }
+
+                .kk-midi-field-label {
+                    flex: 0 0 auto;
+                }
+
+                .kk-midi-select,
+                .kk-midi-number {
+                    height: 34px;
+                    min-width: 0;
+                    border: 1px solid rgba(148, 163, 184, 0.2);
+                    border-radius: 4px;
+                    background: rgba(255, 255, 255, 0.06);
+                    color: #f8fafc;
+                    font-size: 12px;
+                    font-weight: 800;
+                    outline: none;
+                }
+
+                .kk-midi-select {
+                    width: 74px;
+                    padding: 0 8px;
+                }
+
+                .kk-midi-select option {
+                    color: #111827;
+                    background: #ffffff;
+                }
+
+                .kk-midi-tempo-control {
+                    display: grid;
+                    grid-template-columns: 64px minmax(90px, 1fr) 50px;
+                    align-items: center;
+                    gap: 8px;
+                    min-width: 0;
+                    flex: 1 1 auto;
+                }
+
+                .kk-midi-number {
+                    width: 64px;
+                    padding: 0 8px;
+                }
+
+                .kk-midi-reset {
+                    height: 34px;
+                    border: 0;
+                    border-radius: 4px;
+                    background: transparent;
+                    color: #93c5fd;
+                    font-size: 12px;
+                    font-weight: 800;
+                    transition: background 150ms ease, color 150ms ease;
+                }
+
+                .kk-midi-reset:hover:not(:disabled) {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: #bfdbfe;
+                }
+
+                .kk-midi-reset:disabled {
+                    color: #475569;
+                    cursor: not-allowed;
+                }
+
+                .kk-midi-progress {
+                    display: grid;
+                    grid-template-columns: 44px minmax(0, 1fr) 44px;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 15px 0;
+                    color: #cbd5e1;
+                    font-size: 12px;
+                    font-weight: 800;
                 }
 
                 .kk-midi-tempo-section {
                     min-width: 0;
                 }
 
-                @media (min-width: 900px) {
-                    .kk-midi-controls {
-                        grid-template-columns: auto minmax(220px, 1fr);
-                    }
-
-                    .kk-midi-tempo-section {
-                        grid-column: 1 / -1;
-                    }
-                }
-
-                @media (min-width: 1280px) {
-                    .kk-midi-controls {
-                        grid-template-columns: auto minmax(220px, 360px) minmax(380px, 1fr);
-                    }
-
-                    .kk-midi-tempo-section {
-                        grid-column: auto;
+                @media (min-width: 920px) {
+                    .kk-midi-toolbar {
+                        grid-template-columns: minmax(140px, 1fr) auto minmax(128px, auto) minmax(260px, 320px);
                     }
 
                     .kk-midi-control-section + .kk-midi-control-section {
-                        padding-left: 18px;
+                        padding-left: 14px;
+                        border-left: 1px solid rgba(148, 163, 184, 0.18);
+                    }
+                }
+
+                @media (max-width: 919px) {
+                    .kk-midi-toolbar {
+                        align-items: stretch;
                     }
 
-                    .kk-midi-control-section + .kk-midi-control-section::before {
-                        content: "";
-                        position: absolute;
-                        left: 0;
-                        top: 6px;
-                        bottom: 6px;
-                        width: 1px;
-                        background: #dbe3ef;
+                    .kk-midi-transport {
+                        min-width: 0;
+                        flex-wrap: wrap;
+                    }
+
+                    .kk-midi-field {
+                        align-items: flex-start;
+                        flex-direction: column;
+                    }
+
+                    .kk-midi-select {
+                        width: 100%;
                     }
                 }
 
                 .kk-midi-range {
                     -webkit-appearance: none;
                     appearance: none;
-                    height: 6px;
+                    height: 4px;
                     border: 0;
                     border-radius: 999px;
                     outline: none;
@@ -452,8 +645,8 @@ const MidiPracticePlayer = ({ data }) => {
                 .kk-midi-range::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
-                    width: 18px;
-                    height: 18px;
+                    width: 14px;
+                    height: 14px;
                     border-radius: 999px;
                     border: 3px solid #ffffff;
                     background: var(--kk-midi-blue);
@@ -461,8 +654,8 @@ const MidiPracticePlayer = ({ data }) => {
                 }
 
                 .kk-midi-range::-moz-range-thumb {
-                    width: 18px;
-                    height: 18px;
+                    width: 14px;
+                    height: 14px;
                     border-radius: 999px;
                     border: 3px solid #ffffff;
                     background: var(--kk-midi-blue);
@@ -479,68 +672,159 @@ const MidiPracticePlayer = ({ data }) => {
 
                 @media (max-width: 640px) {
                     .kk-midi-keyboard {
-                        height: 136px;
-                        min-width: 780px;
+                        height: 104px;
                     }
                 }
 
                 @media (max-width: 900px) and (orientation: landscape) {
                     .kk-midi-keyboard {
-                        height: 124px;
+                        height: 104px;
                     }
                 }
             `}</style>
 
-            <div className="grid gap-3 border-b border-slate-200 px-4 py-3 lg:grid-cols-[minmax(0,1fr)_minmax(260px,520px)] lg:items-center lg:px-5">
-                <div className="min-w-0 lg:flex lg:items-center lg:gap-3">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 lg:shrink-0">
-                        MIDI Practice
-                    </p>
-                    <h3 className="mt-1 truncate text-base font-bold leading-tight text-slate-950 lg:mt-0">
-                        {selectedFile?.name || data.title}
-                    </h3>
+            <h2 className="kk-midi-display-title">
+                MIDI Virtual Display
+            </h2>
+
+            <div className="kk-midi-display-panel">
+                <div className="kk-midi-engine" aria-hidden="true">
+                    <midi-player ref={playerRef} />
                 </div>
 
-                <div className="min-w-0 space-y-2">
-                    {files.length > 1 && (
-                        <select
-                            value={selectedFileId}
-                            onChange={(event) => setSelectedFileId(event.target.value)}
-                            className="h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                <div className="kk-midi-toolbar">
+                    <div className="kk-midi-control-section">
+                        <div className="kk-midi-file-title">
+                            <i className="fa fa-music"></i>
+                            <span className="truncate">{selectedFile?.name || data.title}</span>
+                        </div>
+                    </div>
+
+                    <div className="kk-midi-control-section kk-midi-transport">
+                        <button
+                            type="button"
+                            onClick={handlePlay}
+                            disabled={!canPlay || isPlaying}
+                            className="kk-midi-button kk-midi-button-primary"
                         >
-                            <option value="">Choose MIDI file</option>
-                            {files.map((file) => (
-                                <option key={file.id} value={file.id}>
-                                    {file.name}
+                            <i className="fa fa-play text-[10px]"></i>
+                            Play
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handlePause}
+                            disabled={!canPlay || !isPlaying}
+                            className="kk-midi-button"
+                        >
+                            <i className="fa fa-pause text-[10px]"></i>
+                            Pause
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleStop}
+                            disabled={!canPlay}
+                            className="kk-midi-button"
+                        >
+                            <i className="fa fa-stop text-[10px]"></i>
+                            Stop
+                        </button>
+                    </div>
+
+                    <label className="kk-midi-control-section kk-midi-field">
+                        <span className="kk-midi-field-label">
+                            Transpose
+                        </span>
+                        <select
+                            value={transpose}
+                            onChange={(event) => setTranspose(Number(event.target.value))}
+                            disabled={!canPlay}
+                            className="kk-midi-select"
+                        >
+                            {transposeOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option > 0 ? `+${option}` : option}
                                 </option>
                             ))}
                         </select>
-                    )}
-                </div>
-            </div>
+                    </label>
 
-            <div className="space-y-4 bg-slate-50 px-4 py-4 lg:px-5">
-                <div className="rounded-lg border border-slate-200 bg-white p-3">
+                    <label className="kk-midi-control-section kk-midi-field kk-midi-tempo-section">
+                        <span className="kk-midi-field-label">
+                            Tempo
+                        </span>
+                        <div className="kk-midi-tempo-control">
+                            <input
+                                type="number"
+                                min="40"
+                                max="220"
+                                step="1"
+                                value={tempo}
+                                onChange={(event) => handleTempoChange(event.target.value)}
+                                disabled={!canPlay}
+                                className="kk-midi-number"
+                            />
+                            <input
+                                type="range"
+                                min="40"
+                                max="220"
+                                step="1"
+                                value={tempo}
+                                onChange={(event) => handleTempoChange(event.target.value)}
+                                disabled={!canPlay}
+                                className="kk-midi-range"
+                                style={rangeFill(tempoPercent)}
+                                aria-label="MIDI tempo"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setTempo(baseTempo)}
+                                disabled={!canPlay || tempo === baseTempo}
+                                className="kk-midi-reset"
+                            >
+                                Reset
+                            </button>
+                        </div>
+                    </label>
+                </div>
+
+                <label className="kk-midi-progress">
+                    <span>{formatTime(timeInfo.current)}</span>
+                    <input
+                        type="range"
+                        min="0"
+                        max={timeInfo.duration || 0}
+                        step="0.01"
+                        value={timeInfo.current}
+                        onChange={handleSeek}
+                        disabled={!canPlay}
+                        className="kk-midi-range"
+                        style={rangeFill(progressPercent)}
+                        aria-label="MIDI progress"
+                    />
+                    <span className="text-right">{formatTime(timeInfo.duration)}</span>
+                </label>
+
+                <div>
                     {loadState === "loading" && (
-                        <div className="flex h-64 items-center justify-center text-sm font-semibold text-slate-500">
+                        <div className="flex h-40 items-center justify-center text-sm font-semibold text-slate-400">
                             Loading MIDI...
                         </div>
                     )}
 
                     {loadState === "empty" && (
-                        <div className="flex h-64 items-center justify-center px-6 text-center text-sm font-semibold text-slate-500">
+                        <div className="flex h-40 items-center justify-center px-6 text-center text-sm font-semibold text-slate-400">
                             No MIDI files have been uploaded yet.
                         </div>
                     )}
 
                     {loadState === "choose" && (
-                        <div className="flex h-64 items-center justify-center px-6 text-center text-sm font-semibold text-slate-500">
+                        <div className="flex h-40 items-center justify-center px-6 text-center text-sm font-semibold text-slate-400">
                             Choose a MIDI file to begin.
                         </div>
                     )}
 
                     {loadState === "error" && (
-                        <div className="flex h-64 items-center justify-center px-6 text-center text-sm font-semibold text-red-600">
+                        <div className="flex h-40 items-center justify-center px-6 text-center text-sm font-semibold text-red-300">
                             {loadError}
                         </div>
                     )}
@@ -588,115 +872,6 @@ const MidiPracticePlayer = ({ data }) => {
                             </div>
                         </div>
                     )}
-                </div>
-
-                <div className="kk-midi-engine" aria-hidden="true">
-                    <midi-player ref={playerRef} />
-                </div>
-
-                <label className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3 text-sm font-bold text-slate-500">
-                    <span>{formatTime(timeInfo.current)}</span>
-                    <input
-                        type="range"
-                        min="0"
-                        max={timeInfo.duration || 0}
-                        step="0.01"
-                        value={timeInfo.current}
-                        onChange={handleSeek}
-                        disabled={!canPlay}
-                        className="kk-midi-range w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-                        style={rangeFill(progressPercent)}
-                        aria-label="MIDI progress"
-                    />
-                    <span className="text-right">{formatTime(timeInfo.duration)}</span>
-                </label>
-
-                <div className="kk-midi-controls min-w-0 items-center rounded-lg border border-slate-200 bg-white p-3">
-                    <div className="kk-midi-control-section flex min-w-0 flex-wrap items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={handlePlay}
-                            disabled={!canPlay || isPlaying}
-                            className="inline-flex h-10 min-w-[88px] items-center justify-center gap-2 rounded-md bg-indigo-600 px-3 text-sm font-bold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-                        >
-                            <i className="fa fa-play text-xs"></i>
-                            Play
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handlePause}
-                            disabled={!canPlay || !isPlaying}
-                            className="inline-flex h-10 min-w-[88px] items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
-                        >
-                            <i className="fa fa-pause text-xs"></i>
-                            Pause
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleStop}
-                            disabled={!canPlay}
-                            className="inline-flex h-10 min-w-[82px] items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
-                        >
-                            <i className="fa fa-stop text-xs"></i>
-                            Stop
-                        </button>
-                    </div>
-
-                    <label className="kk-midi-control-section flex min-w-0 items-center gap-2">
-                        <span className="shrink-0 text-xs font-bold uppercase tracking-wide text-slate-500">
-                            Key
-                        </span>
-                        <select
-                            value={transpose}
-                            onChange={(event) => setTranspose(Number(event.target.value))}
-                            disabled={!canPlay}
-                            className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-45"
-                        >
-                            {transposeOptions.map((option) => (
-                                <option key={option} value={option}>
-                                    {option > 0 ? `+${option}` : option} st
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-
-                    <label className="kk-midi-control-section kk-midi-tempo-section flex min-w-0 items-center gap-2">
-                        <span className="shrink-0 text-xs font-bold uppercase tracking-wide text-slate-500">
-                            Tempo
-                        </span>
-                        <div className="grid min-w-0 flex-1 grid-cols-[72px_minmax(0,1fr)_64px] items-center gap-2">
-                            <input
-                                type="number"
-                                min="40"
-                                max="220"
-                                step="1"
-                                value={tempo}
-                                onChange={(event) => handleTempoChange(event.target.value)}
-                                disabled={!canPlay}
-                                className="h-10 w-full rounded-md border border-slate-300 bg-white px-2 text-sm font-bold text-slate-700 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-45"
-                            />
-                            <input
-                                type="range"
-                                min="40"
-                                max="220"
-                                step="1"
-                                value={tempo}
-                                onChange={(event) => handleTempoChange(event.target.value)}
-                                disabled={!canPlay}
-                                className="kk-midi-range min-w-0 w-full disabled:opacity-40"
-                                style={rangeFill(tempoPercent)}
-                                aria-label="MIDI tempo"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setTempo(baseTempo)}
-                                disabled={!canPlay || tempo === baseTempo}
-                                className="h-10 w-16 rounded-md px-2 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50 hover:text-indigo-700 disabled:text-slate-300 disabled:hover:bg-transparent"
-                            >
-                                Reset
-                            </button>
-                        </div>
-                    </label>
                 </div>
             </div>
         </section>
