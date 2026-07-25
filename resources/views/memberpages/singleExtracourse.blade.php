@@ -197,6 +197,12 @@
                         </div>
                     @endif
 
+                    @include('memberpages.partials.midi-practice-display', [
+                        'midiPracticeFile' => $midiPracticeFile,
+                        'midiPracticeFiles' => $midiPracticeFiles,
+                        'midiPracticeTitle' => Str::title($lesson->title),
+                    ])
+
                     {{-- Related Lessons (Only visible at the bottom if playlist is in sidebar) --}}
                     @if ($playlist->count() > 1 && $relatedUploads->count() > 0)
                         <div>

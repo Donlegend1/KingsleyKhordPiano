@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Upload;
 use App\Services\BookmarkService;
 use App\Models\CourseVideoComment;
+use App\Services\MidiPracticeFileResolver;
 
 class CoursesController extends Controller
 {
@@ -102,6 +103,8 @@ class CoursesController extends Controller
         // }
 
         $isBookmarked = $service->isBookmarked($lesson);
+        $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($lesson);
+        $midiPracticeFiles = \App\Models\MidiFile::whereNotNull('midi_file_path')->orderBy('name')->get();
 
         // Find next and previous video in the same category (if applicable)
         $previousVideo = null;
@@ -135,7 +138,9 @@ class CoursesController extends Controller
             'comments',
             'isBookmarked',
             'previousVideo',
-            'nextVideo'
+            'nextVideo',
+            'midiPracticeFile',
+            'midiPracticeFiles'
         ));
     }
 }

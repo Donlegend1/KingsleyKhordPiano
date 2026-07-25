@@ -41,6 +41,8 @@ class DatabaseSeeder extends Seeder
         ChatRoomSeeder::class,
         EarTrainingSeeder::class,
         LearnSongSeeder::class,
+        UploadSeeder::class,
+        MidiFileSeeder::class,
     ]);
     }
 }

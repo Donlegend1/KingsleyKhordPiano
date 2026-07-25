@@ -166,6 +166,12 @@
                         @include('memberpages.partials.lesson-playlist')
                     </div>
 
+                    @include('memberpages.partials.midi-practice-display', [
+                        'midiPracticeFile' => $midiPracticeFile,
+                        'midiPracticeFiles' => $midiPracticeFiles,
+                        'midiPracticeTitle' => Str::title($activeVideo->title),
+                    ])
+
                     {{-- Related Lessons --}}
                     @if ($relatedLessons->count() > 0)
                         <div>

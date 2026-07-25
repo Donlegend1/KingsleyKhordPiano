@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Upload;
 use App\Models\CourseVideoComment;
 use App\Models\User;
+use App\Services\MidiPracticeFileResolver;
 
 class ExerciseController extends Controller
 {
@@ -103,6 +104,9 @@ class ExerciseController extends Controller
             $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
         }
 
+        $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($activeVideo);
+        $midiPracticeFiles = \App\Models\MidiFile::whereNotNull('midi_file_path')->orderBy('name')->get();
+
         return view('memberpages.series-player', compact(
             'playlist', 
             'activeVideo', 
@@ -113,7 +117,9 @@ class ExerciseController extends Controller
             'levels', 
             'skillLevels', 
             'comments',
-            'related_courses'
+            'related_courses',
+            'midiPracticeFile',
+            'midiPracticeFiles'
         ));
     }
 
