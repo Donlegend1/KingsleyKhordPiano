@@ -396,7 +396,35 @@ const MidiPracticePlayer = ({ data }) => {
                     position: relative;
                 }
 
+                .kk-midi-controls {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr);
+                    gap: 12px;
+                }
+
+                .kk-midi-tempo-section {
+                    min-width: 0;
+                }
+
+                @media (min-width: 900px) {
+                    .kk-midi-controls {
+                        grid-template-columns: auto minmax(220px, 1fr);
+                    }
+
+                    .kk-midi-tempo-section {
+                        grid-column: 1 / -1;
+                    }
+                }
+
                 @media (min-width: 1280px) {
+                    .kk-midi-controls {
+                        grid-template-columns: auto minmax(220px, 360px) minmax(380px, 1fr);
+                    }
+
+                    .kk-midi-tempo-section {
+                        grid-column: auto;
+                    }
+
                     .kk-midi-control-section + .kk-midi-control-section {
                         padding-left: 18px;
                     }
@@ -583,8 +611,8 @@ const MidiPracticePlayer = ({ data }) => {
                     <span className="text-right">{formatTime(timeInfo.duration)}</span>
                 </label>
 
-                <div className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-200 bg-white p-3 xl:flex-nowrap">
-                    <div className="kk-midi-control-section flex shrink-0 items-center gap-2">
+                <div className="kk-midi-controls min-w-0 items-center rounded-lg border border-slate-200 bg-white p-3">
+                    <div className="kk-midi-control-section flex min-w-0 flex-wrap items-center gap-2">
                         <button
                             type="button"
                             onClick={handlePlay}
@@ -614,7 +642,7 @@ const MidiPracticePlayer = ({ data }) => {
                         </button>
                     </div>
 
-                    <label className="kk-midi-control-section flex min-w-[180px] flex-1 items-center gap-2 xl:max-w-[270px]">
+                    <label className="kk-midi-control-section flex min-w-0 items-center gap-2">
                         <span className="shrink-0 text-xs font-bold uppercase tracking-wide text-slate-500">
                             Key
                         </span>
@@ -632,11 +660,11 @@ const MidiPracticePlayer = ({ data }) => {
                         </select>
                     </label>
 
-                    <label className="kk-midi-control-section flex min-w-[260px] flex-[2] items-center gap-2">
+                    <label className="kk-midi-control-section kk-midi-tempo-section flex min-w-0 items-center gap-2">
                         <span className="shrink-0 text-xs font-bold uppercase tracking-wide text-slate-500">
                             Tempo
                         </span>
-                        <div className="grid flex-1 grid-cols-[72px_minmax(120px,1fr)_auto] items-center gap-2">
+                        <div className="grid min-w-0 flex-1 grid-cols-[72px_minmax(0,1fr)_64px] items-center gap-2">
                             <input
                                 type="number"
                                 min="40"
@@ -655,7 +683,7 @@ const MidiPracticePlayer = ({ data }) => {
                                 value={tempo}
                                 onChange={(event) => handleTempoChange(event.target.value)}
                                 disabled={!canPlay}
-                                className="kk-midi-range w-full disabled:opacity-40"
+                                className="kk-midi-range min-w-0 w-full disabled:opacity-40"
                                 style={rangeFill(tempoPercent)}
                                 aria-label="MIDI tempo"
                             />
@@ -663,7 +691,7 @@ const MidiPracticePlayer = ({ data }) => {
                                 type="button"
                                 onClick={() => setTempo(baseTempo)}
                                 disabled={!canPlay || tempo === baseTempo}
-                                className="h-10 rounded-md px-2 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50 hover:text-indigo-700 disabled:text-slate-300 disabled:hover:bg-transparent"
+                                className="h-10 w-16 rounded-md px-2 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50 hover:text-indigo-700 disabled:text-slate-300 disabled:hover:bg-transparent"
                             >
                                 Reset
                             </button>
