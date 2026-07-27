@@ -28,6 +28,7 @@ use App\Http\Controllers\AudioDownloadController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\Admin\AdminLearnSongController;
 use App\Http\Controllers\Admin\AdminExtraCourseController;
+use App\Http\Controllers\Admin\CourseCheckpointController;
 use App\Http\Controllers\LiveShowNotificationController;
 
 
@@ -73,6 +74,11 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('/courses/category/create', [CourseCategoryController::class, 'create']);
         Route::delete('/course/category/{name}/delete', [CourseCategoryController::class, 'delete']);
         Route::put('/course/category/{name}/update', [CourseCategoryController::class, 'update']);
+
+        // Checkpoints Admin API
+        Route::get('checkpoints/catalog', [CourseCheckpointController::class, 'catalog']);
+        Route::post('checkpoints/store', [CourseCheckpointController::class, 'store']);
+        Route::delete('checkpoints/{checkpoint}', [CourseCheckpointController::class, 'destroy']);
 
         // Learn Songs Admin API
         Route::get('learn-songs', [AdminLearnSongController::class, 'list']);

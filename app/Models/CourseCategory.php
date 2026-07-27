@@ -19,4 +19,9 @@ class CourseCategory extends Model
     {
         return $this->hasMany(Course::class, 'course_category_id');
     }
+
+    public function checkpoints()
+    {
+        return $this->hasMany(CourseCheckpoint::class, 'course_category_id');
+    }
 }
