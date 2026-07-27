@@ -55,6 +55,21 @@ class CheckpointCatalog
             'label' => 'Practice Checkpoint',
             'description' => 'Learn how to play the Melodic Minor Scale in all 12 keys.',
         ],
+        'major-add9-drop2' => [
+            'title' => 'Major add9 Drop 2',
+            'label' => 'Practice Checkpoint',
+            'description' => 'Learn how to build Drop 2 voicings for Major add9 chords.',
+        ],
+        'secondary-dominant-passing' => [
+            'title' => 'Secondary Dominant Passing',
+            'label' => 'Practice Checkpoint',
+            'description' => 'Learn how to use secondary dominants to smoothly connect diatonic chords.',
+        ],
+        '7th-chord-inversions' => [
+            'title' => '7th Chord Inversions',
+            'label' => 'Practice Checkpoint',
+            'description' => 'Learn how to build all four block chord inversions of a 7th chord.',
+        ],
     ];
 
     public static function all(): array

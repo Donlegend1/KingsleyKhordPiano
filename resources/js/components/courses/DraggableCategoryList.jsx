@@ -298,6 +298,9 @@ const DraggableCategoryList = ({
             if (selectedCourse.thumbnail_file) {
                 formData.append("thumbnail", selectedCourse.thumbnail_file);
             }
+            if (selectedCourse.pdf_resource_file) {
+                formData.append("pdf_resource", selectedCourse.pdf_resource_file);
+            }
             descriptionImageFiles.forEach((file, idx) => {
                 formData.append(`images[${idx}]`, file);
             });
@@ -393,6 +396,9 @@ const DraggableCategoryList = ({
             if (course.thumbnail_file) {
                 formData.append("thumbnail", course.thumbnail_file);
             }
+            if (course.pdf_resource_file) {
+                formData.append("pdf_resource", course.pdf_resource_file);
+            }
             descriptionImageFiles.forEach((file, idx) => {
                 formData.append(`images[${idx}]`, file);
             });
@@ -420,6 +426,7 @@ const DraggableCategoryList = ({
                 status: "active",
                 related_courses: [],
                 thumbnail_file: null,
+                pdf_resource_file: null,
             });
             setDescriptionImageFiles([]);
             fetchCourses();
@@ -869,6 +876,28 @@ const DraggableCategoryList = ({
                                 className="w-full p-2 border rounded-lg"
                             />
                         </div>
+
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                PDF Download (Optional)
+                            </label>
+                            <input
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(e) => {
+                                    setSelectedCourse({
+                                        ...selectedCourse,
+                                        pdf_resource_file: e.target.files[0]
+                                    });
+                                }}
+                                className="w-full p-2 border rounded-lg"
+                            />
+                            {selectedCourse?.pdf_resource_url && !selectedCourse?.pdf_resource_file && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Current file: <a href={selectedCourse.pdf_resource_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">View PDF</a>
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     <textarea
@@ -1098,6 +1127,23 @@ const DraggableCategoryList = ({
                             setCourse({
                                 ...course,
                                 thumbnail_file: e.target.files[0]
+                            });
+                        }}
+                        className="w-full p-2 border rounded-lg"
+                    />
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        PDF Download (Optional)
+                    </label>
+                    <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => {
+                            setCourse({
+                                ...course,
+                                pdf_resource_file: e.target.files[0]
                             });
                         }}
                         className="w-full p-2 border rounded-lg"

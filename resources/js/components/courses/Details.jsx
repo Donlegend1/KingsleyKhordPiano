@@ -377,19 +377,6 @@ const CourseDetails = ({
                 </div>
             )}
 
-            {course.image_urls && course.image_urls.length > 0 && (
-                <div className="mt-6 mb-6">
-                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-3">Course Walkthrough / Highlights</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {course.image_urls.map((url, idx) => (
-                            <div key={idx} className="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-900">
-                                <img src={url} alt="Description Highlight" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 mt-6">
                 <button
                     onClick={toggleBookmark}
@@ -422,6 +409,18 @@ const CourseDetails = ({
                         : "Mark as Completed"}
                 </button>
             </div>
+
+            {course.image_urls && course.image_urls.length > 0 && (
+                <div className="mt-6 mb-6">
+                    <div className="grid grid-cols-1 gap-4">
+                        {course.image_urls.map((url, idx) => (
+                            <div key={idx} className="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-900">
+                                <img src={url} alt="Description Highlight" className="w-full h-auto" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Downloads for this lesson */}
             {course.pdf_resource_url && (
@@ -958,7 +957,7 @@ const CoursesPage = () => {
                                                     key={course.id}
                                                     className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition ${
                                                         isSelected
-                                                            ? "bg-black"
+                                                            ? "bg-gray-800"
                                                             : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                     }`}
                                                     onClick={() => {

@@ -9,6 +9,9 @@ import SeventhChordsCheckpoint from "./SeventhChordsCheckpoint";
 import ChordExtensionsCheckpoint from "./ChordExtensionsCheckpoint";
 import Drop2ChordsCheckpoint from "./Drop2ChordsCheckpoint";
 import MelodicMinorScaleCheckpoint from "./MelodicMinorScaleCheckpoint";
+import MajorAdd9Drop2Checkpoint from "./MajorAdd9Drop2Checkpoint";
+import SecondaryDominantPassingCheckpoint from "./SecondaryDominantPassingCheckpoint";
+import SeventhChordInversionsCheckpoint from "./SeventhChordInversionsCheckpoint";
 
 // Registry of premade checkpoint content components, keyed by
 // `checkpoint_key` (see app/Support/Checkpoints/CheckpointCatalog.php on the
@@ -24,6 +27,9 @@ const CHECKPOINT_COMPONENTS = {
     "chord-extensions": ChordExtensionsCheckpoint,
     "drop-2-chords": Drop2ChordsCheckpoint,
     "melodic-minor-scale": MelodicMinorScaleCheckpoint,
+    "major-add9-drop2": MajorAdd9Drop2Checkpoint,
+    "secondary-dominant-passing": SecondaryDominantPassingCheckpoint,
+    "7th-chord-inversions": SeventhChordInversionsCheckpoint,
 };
 
 export const checkpointHasCta = (checkpoint) =>
