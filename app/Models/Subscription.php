@@ -12,10 +12,10 @@ class Subscription extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'type',
         'amount_naria',
         'amount_dollar',
         'duration',
-        'type',
         'status',
         'stripe_id',
         'stripe_status',
@@ -31,7 +31,13 @@ class Subscription extends Model
         'payment_method',
     ];
 
-    public function item()
+    protected $casts = [
+        'ends_at' => 'datetime',
+        'trial_ends_at' => 'datetime',
+        'notified_at' => 'datetime',
+    ];
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

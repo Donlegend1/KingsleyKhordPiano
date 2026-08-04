@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\AdminCoachingBookingNotification;
+use App\Services\SubscriptionService;
 
 class LiveCoachingBookingController extends Controller
 {

@@ -2,28 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Plan;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
-use Omnipay\Omnipay;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use App\Models\Plan;
+use Illuminate\Support\Facades\Log;
 
 class PayPalController extends Controller
 {
-    protected $paypalService;
-
-    public function __construct(PayPalService $paypalService)
+    public function __construct(protected PayPalService $paypalService)
     {
-        $this->paypalService = $paypalService;
     }
 
     public function pay(Request $request)
     {
+        $request->validate([
+            'plan_id' => 'nullable|integer|exists:plans,id',
+            'tier' => 'required|string',
+            'duration' => 'required|in:monthly,quarterly,yearly',
+            'currency' => 'required|in:USD,EUR',
+        ]);
+
         $user = Auth::user();
-        if (!$user) {
-            return redirect('register');
+        if (! $user) {
+            return redirect()->route('register');
         }
 
         if ($user->hasActiveSubscription()) {
@@ -31,45 +33,71 @@ class PayPalController extends Controller
         }
 
         try {
-            $plan = Plan::where('type', $request->duration)->where('tier', $request->tier)->first();
-            if (!$plan) {
+            $plan = $request->filled('plan_id')
+                ? Plan::findOrFail($request->plan_id)
+                : Plan::where('type', $request->duration)
+                    ->where('tier', $request->tier)
+                    ->first();
+
+            if (! $plan) {
                 return redirect()->back()->with('error', 'Selected plan not found.');
             }
 
-            $response = $this->paypalService->purchase($user, $plan, $request);
-
-            if ($response->isRedirect()) {
-                $response->redirect();
+            // Prefer looking up by plan_id; still validate duration matches.
+            if ($plan->type !== $request->duration) {
+                return redirect()->back()->with('error', 'Selected plan does not match the chosen duration.');
             }
-            return $response->getMessage();
-        } catch (\Throwable $th) {
-            return $th->getMessage();
+
+            $result = $this->paypalService->createSubscription(
+                $user,
+                $plan,
+                strtoupper($request->currency),
+                $request->tier,
+                $request->duration
+            );
+
+            return redirect()->away($result['approve_url']);
+        } catch (\Throwable $e) {
+            Log::error('PayPal checkout failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->with('error', 'Unable to start PayPal subscription. Please try again.');
         }
     }
 
     public function success(Request $request)
     {
-        if ($request->input('paymentId') && $request->input('payerID')) {
-            try {
-                $success = $this->paypalService->completePurchase(
-                    $request->input('paymentId'),
-                    $request->input('payerID')
-                );
+        $subscriptionId = $request->query('subscription_id')
+            ?? $request->query('ba_token')
+            ?? $request->input('subscription_id');
 
-                if ($success) {
-                    return redirect()->route('my-library')->with('success', 'Payment successful and subscription activated!');
-                }
-                return redirect()->route('my-library')->with('error', 'Payment not successful');
-            } catch (\Exception $e) {
-                return redirect()->route('my-library')->with('error', $e->getMessage());
-            }
+        // PayPal Billing returns subscription_id on the return URL.
+        if (! $subscriptionId) {
+            return redirect()->route('subscription.page')
+                ->with('error', 'Missing PayPal subscription reference.');
         }
 
-        return redirect()->route('my-library')->with('error', 'Payment is declined');
+        try {
+            $this->paypalService->activateFromReturn($subscriptionId);
+
+            return redirect()->route('community.index')
+                ->with('success', 'Payment successful and subscription activated!');
+        } catch (\Throwable $e) {
+            Log::error('PayPal activation failed', [
+                'subscription_id' => $subscriptionId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('subscription.page')
+                ->with('error', $e->getMessage());
+        }
     }
 
     public function error()
     {
-        return redirect()->route('my-library')->with('error', 'Payment is declined');
+        return redirect()->route('subscription.page')
+            ->with('error', 'PayPal checkout was cancelled.');
     }
 }

@@ -2,123 +2,586 @@
 
 namespace App\Services;
 
-use Omnipay\Omnipay;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\Subscription;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Throwable;
 
 class PayPalService
 {
-    private $gateway;
-
-    public function __construct()
+    /**
+     * Create a PayPal Billing subscription and return the approval URL.
+     *
+     * @throws Throwable
+     */
+    public function createSubscription(User $user, Plan $plan, string $currency, string $tier, string $duration): array
     {
-        $this->gateway = Omnipay::create('PayPal_Rest');
-        $this->gateway->setClientId(config('services.paypal.client_id'));
-        $this->gateway->setSecret(config('services.paypal.secret'));
-        $this->gateway->setTestMode(config('services.paypal.test_mode'));
+        $currency = strtoupper($currency);
+        $amount = $this->amountFor($plan, $currency);
+
+        if ($amount === null) {
+            throw new \InvalidArgumentException("Plan has no price for currency {$currency}.");
+        }
+
+        $provider = $this->provider($currency);
+        $paypalPlanId = $this->resolvePayPalPlanId($provider, $plan, $currency, $duration, $amount);
+
+        $productId = $plan->fresh()->paypal_product_id;
+        if (! $productId) {
+            throw new \RuntimeException('PayPal product could not be resolved for this plan.');
+        }
+
+        $subscription = $provider
+            ->setReturnAndCancelUrl(route('paypal.success'), route('paypal.cancel'))
+            ->setBrandName(config('app.name', 'Kingsley Khord Piano'))
+            ->addCustomId((string) $user->id)
+            ->addProductById($productId)
+            ->addBillingPlanById($paypalPlanId)
+            ->setupSubscription(
+                trim($user->first_name.' '.$user->last_name) ?: $user->email,
+                $user->email
+            );
+
+        if ($error = data_get($subscription, 'error')) {
+            Log::error('PayPal create subscription failed', ['response' => $subscription]);
+            throw new \RuntimeException(
+                data_get($error, 'details.0.description')
+                    ?? data_get($error, 'message')
+                    ?? 'Unable to create PayPal subscription.'
+            );
+        }
+
+        $subscriptionId = data_get($subscription, 'id');
+        if (! $subscriptionId) {
+            throw new \RuntimeException('PayPal did not return a subscription id.');
+        }
+
+        Cache::put($this->pendingCacheKey($subscriptionId), [
+            'user_id' => $user->id,
+            'plan_id' => $plan->id,
+            'tier' => $tier,
+            'duration' => $duration,
+            'currency' => $currency,
+            'amount' => $amount,
+        ], now()->addDay());
+
+        $approveUrl = collect(data_get($subscription, 'links', []))
+            ->firstWhere('rel', 'approve')['href'] ?? null;
+
+        if (! $approveUrl) {
+            throw new \RuntimeException('PayPal did not return an approval link.');
+        }
+
+        return [
+            'subscription_id' => $subscriptionId,
+            'approve_url' => $approveUrl,
+            'raw' => $subscription,
+        ];
     }
 
     /**
-     * Start the PayPal purchase process.
+     * Activate a subscription after the user returns from PayPal approval.
+     *
+     * @throws Throwable
      */
-    public function purchase($user, Plan $plan, $request)
+    public function activateFromReturn(string $subscriptionId): User
     {
-        $reference = Str::uuid()->toString();
+        $pending = Cache::get($this->pendingCacheKey($subscriptionId), []);
+        $currency = strtoupper($pending['currency'] ?? config('paypal.currency', 'USD'));
+        $provider = $this->provider($currency);
 
-        // Create or update subscription record as pending
-        Subscription::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'stripe_id' => 'paypal_pending_' . $reference,
-                'stripe_status' => 'pending',
-                'ends_at' => $request->duration === "monthly"
-                    ? now()->addMonth(1)
-                    : ($request->duration === "quarterly" ? now()->addMonths(3) : now()->addYear()),
-                'type' => 'default',
-                'payment_method' => 'paypal',
-            ]
+        $details = $provider->showSubscriptionDetails($subscriptionId);
+        if ($error = data_get($details, 'error')) {
+            throw new \RuntimeException(
+                data_get($error, 'details.0.description')
+                    ?? data_get($error, 'message')
+                    ?? 'Unable to verify PayPal subscription.'
+            );
+        }
+
+        $status = strtoupper((string) data_get($details, 'status', ''));
+        if (! in_array($status, ['ACTIVE', 'APPROVED'], true)) {
+            throw new \RuntimeException("PayPal subscription is not active yet (status: {$status}).");
+        }
+
+        $user = $this->activateLocalSubscription($details, $pending);
+
+        Cache::forget($this->pendingCacheKey($subscriptionId));
+
+        return $user;
+    }
+
+    /**
+     * Cancel an active PayPal subscription at period end (stop renewals).
+     *
+     * @throws Throwable
+     */
+    public function cancelSubscription(User $user, string $reason = 'User requested cancellation'): void
+    {
+        $subscription = Subscription::where('user_id', $user->id)
+            ->where('payment_method', 'paypal')
+            ->whereIn('stripe_status', ['active', 'trialing'])
+            ->latest()
+            ->first();
+
+        if (! $subscription || ! $subscription->stripe_id) {
+            throw new \RuntimeException('No active PayPal subscription found.');
+        }
+
+        $currency = strtoupper(data_get($user->metadata, 'currency', config('paypal.currency', 'USD')));
+        $provider = $this->provider($currency);
+
+        $details = $provider->showSubscriptionDetails($subscription->stripe_id);
+        $endsAt = $this->resolvePeriodEnd($details, $user);
+
+        $response = $provider->cancelSubscription($subscription->stripe_id, $reason);
+        if ($error = data_get($response, 'error')) {
+            throw new \RuntimeException(
+                data_get($error, 'details.0.description')
+                    ?? data_get($error, 'message')
+                    ?? 'Unable to cancel PayPal subscription.'
+            );
+        }
+
+        $subscription->update([
+            'stripe_status' => 'canceled',
+            'ends_at' => $endsAt,
+        ]);
+
+        $user->update([
+            'subscription_status' => 'canceled',
+            'subscription_expires_at' => $endsAt,
+        ]);
+    }
+
+    /**
+     * Handle PayPal webhook events for subscriptions and sales.
+     */
+    public function handleWebhook(array $payload): void
+    {
+        $eventType = data_get($payload, 'event_type');
+        $resource = data_get($payload, 'resource', []);
+
+        Log::info('PayPal webhook received', ['event_type' => $eventType]);
+
+        match ($eventType) {
+            'BILLING.SUBSCRIPTION.ACTIVATED',
+            'BILLING.SUBSCRIPTION.UPDATED' => $this->handleSubscriptionActivated($resource),
+            'BILLING.SUBSCRIPTION.CANCELLED',
+            'BILLING.SUBSCRIPTION.EXPIRED' => $this->handleSubscriptionCancelled($resource),
+            'BILLING.SUBSCRIPTION.SUSPENDED' => $this->handleSubscriptionSuspended($resource),
+            'PAYMENT.SALE.COMPLETED' => $this->handleSaleCompleted($resource),
+            default => null,
+        };
+    }
+
+    protected function handleSubscriptionActivated(array $resource): void
+    {
+        $subscriptionId = data_get($resource, 'id');
+        if (! $subscriptionId) {
+            return;
+        }
+
+        $pending = Cache::get($this->pendingCacheKey($subscriptionId), []);
+        $this->activateLocalSubscription($resource, $pending);
+        Cache::forget($this->pendingCacheKey($subscriptionId));
+    }
+
+    protected function handleSubscriptionCancelled(array $resource): void
+    {
+        $subscriptionId = data_get($resource, 'id');
+        if (! $subscriptionId) {
+            return;
+        }
+
+        $subscription = Subscription::where('stripe_id', $subscriptionId)
+            ->where('payment_method', 'paypal')
+            ->first();
+
+        if (! $subscription) {
+            return;
+        }
+
+        $endsAt = $this->resolvePeriodEnd($resource, $subscription->user)
+            ?? $subscription->ends_at
+            ?? now();
+
+        $subscription->update([
+            'stripe_status' => 'canceled',
+            'ends_at' => $endsAt,
+        ]);
+
+        optional($subscription->user)->update([
+            'subscription_status' => 'canceled',
+            'subscription_expires_at' => $endsAt,
+        ]);
+    }
+
+    protected function handleSubscriptionSuspended(array $resource): void
+    {
+        $subscriptionId = data_get($resource, 'id');
+        if (! $subscriptionId) {
+            return;
+        }
+
+        $subscription = Subscription::where('stripe_id', $subscriptionId)
+            ->where('payment_method', 'paypal')
+            ->first();
+
+        if (! $subscription) {
+            return;
+        }
+
+        $subscription->update([
+            'stripe_status' => 'past_due',
+        ]);
+
+        optional($subscription->user)->update([
+            'subscription_status' => 'past_due',
+            'payment_status' => 'pending',
+        ]);
+    }
+
+    protected function handleSaleCompleted(array $resource): void
+    {
+        $subscriptionId = data_get($resource, 'billing_agreement_id');
+        if (! $subscriptionId) {
+            return;
+        }
+
+        $subscription = Subscription::where('stripe_id', $subscriptionId)
+            ->where('payment_method', 'paypal')
+            ->first();
+
+        if (! $subscription || ! $subscription->user) {
+            return;
+        }
+
+        $user = $subscription->user;
+        $amount = (float) data_get($resource, 'amount.total', 0);
+        $currency = strtoupper((string) data_get($resource, 'amount.currency', 'USD'));
+        $reference = (string) data_get($resource, 'id', Str::uuid());
+        $duration = data_get($user->metadata, 'duration', 'monthly');
+        $endsAt = $this->periodEndFromDuration($duration);
+
+        $subscription->update([
+            'stripe_status' => 'active',
+            'ends_at' => null,
+        ]);
+
+        $user->update([
+            'payment_status' => 'successful',
+            'payment_method' => 'paypal',
+            'subscription_status' => 'active',
+            'subscription_expires_at' => $endsAt,
+            'last_payment_reference' => $reference,
+            'last_payment_amount' => $amount,
+            'last_payment_at' => now(),
+            'premium' => $this->isPremiumTier(data_get($user->metadata, 'tier')),
+        ]);
+
+        $this->recordPayment($user, $amount, $currency, $reference, $endsAt, [
+            'paypal_sale_id' => $reference,
+            'subscription_id' => $subscriptionId,
+            'event' => 'PAYMENT.SALE.COMPLETED',
+        ]);
+    }
+
+    /**
+     * Idempotently activate the local subscription + user entitlement fields.
+     */
+    protected function activateLocalSubscription(array $details, array $pending = []): User
+    {
+        $subscriptionId = data_get($details, 'id');
+        $userId = data_get($pending, 'user_id')
+            ?? data_get($details, 'custom_id');
+
+        $user = User::find($userId);
+        if (! $user) {
+            throw new \RuntimeException('Unable to match PayPal subscription to a user.');
+        }
+
+        $plan = isset($pending['plan_id'])
+            ? Plan::find($pending['plan_id'])
+            : null;
+
+        $tier = $pending['tier']
+            ?? data_get($user->metadata, 'tier')
+            ?? ($plan?->tier ?? 'standard');
+
+        $duration = $pending['duration']
+            ?? data_get($user->metadata, 'duration')
+            ?? ($plan?->type ?? 'monthly');
+
+        $currency = strtoupper(
+            $pending['currency']
+                ?? data_get($user->metadata, 'currency')
+                ?? config('paypal.currency', 'USD')
         );
 
-        $user->metadata = $request->all();
-        $user->payment_method = 'paypal';
-        $user->premium = $request->tier === 'premium';
-        $user->last_payment_reference = $reference;
-        $user->last_payment_amount = $plan->price_usd;
-        $user->last_payment_at = now();
-        $user->save();
+        $amount = $pending['amount']
+            ?? ($plan ? $this->amountFor($plan, $currency) : null)
+            ?? $user->last_payment_amount
+            ?? 0;
 
-        $response = $this->gateway->purchase([
-            'amount' => $plan->price_usd,
-            'currency' => $request->currency,
-            'returnUrl' => url('paypal/success'),
-            'cancelUrl' => url('paypal/cancel'),
-        ])->send();
+        $startedAt = now();
+        $expiresAt = $this->resolvePeriodEnd($details, $user)
+            ?? $this->periodEndFromDuration($duration);
 
-        return $response;
+        return DB::transaction(function () use (
+            $user,
+            $subscriptionId,
+            $plan,
+            $tier,
+            $duration,
+            $currency,
+            $amount,
+            $startedAt,
+            $expiresAt,
+            $details
+        ) {
+            // Drop abandoned incomplete PayPal rows for this user.
+            Subscription::where('user_id', $user->id)
+                ->where('payment_method', 'paypal')
+                ->where('stripe_status', 'incomplete')
+                ->where('stripe_id', '!=', $subscriptionId)
+                ->delete();
+
+            Subscription::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'type' => 'default',
+                ],
+                [
+                    'stripe_id' => $subscriptionId,
+                    'stripe_status' => 'active',
+                    'stripe_price' => $plan?->id,
+                    'quantity' => 1,
+                    'trial_ends_at' => null,
+                    'ends_at' => null,
+                    'payment_method' => 'paypal',
+                    'plan_code' => $plan?->id,
+                    'subscription_code' => $subscriptionId,
+                ]
+            );
+
+            $user->update([
+                'payment_method' => 'paypal',
+                'payment_status' => 'successful',
+                'premium' => $this->isPremiumTier($tier),
+                'subscription_type' => $duration,
+                'subscription_status' => 'active',
+                'subscription_started_at' => $startedAt,
+                'subscription_expires_at' => $expiresAt,
+                'last_payment_reference' => $subscriptionId,
+                'last_payment_amount' => $amount,
+                'last_payment_at' => $startedAt,
+                'metadata' => [
+                    'tier' => $tier,
+                    'duration' => $duration,
+                    'currency' => $currency,
+                    'plan_id' => $plan?->id,
+                    'paypal_subscription_id' => $subscriptionId,
+                ],
+            ]);
+
+            $this->recordPayment($user, (float) $amount, $currency, $subscriptionId, $expiresAt, [
+                'paypal_subscription' => data_get($details, 'id'),
+                'tier' => $tier,
+                'duration' => $duration,
+            ]);
+
+            return $user->fresh();
+        });
     }
 
     /**
-     * Complete the PayPal transaction.
+     * Create or reuse a PayPal product + billing plan for this local plan/currency.
+     *
+     * @throws Throwable
      */
-    public function completePurchase($paymentId, $payerId)
-    {
-        $transaction = $this->gateway->completePurchase([
-            'payer_id' => $payerId,
-            'transactionReference' => $paymentId
-        ])->send();
+    protected function resolvePayPalPlanId(
+        PayPalClient $provider,
+        Plan $plan,
+        string $currency,
+        string $duration,
+        float $amount
+    ): string {
+        $planIds = is_array($plan->paypal_plan_ids) ? $plan->paypal_plan_ids : [];
+        if (! empty($planIds[$currency])) {
+            return $planIds[$currency];
+        }
 
-        if ($transaction->isSuccessful()) {
-            $arr = $transaction->getData();
-            $user = Auth::user();
+        if (! $plan->paypal_product_id) {
+            $product = $provider->createProduct([
+                'name' => substr($this->planDisplayName($plan), 0, 127),
+                'description' => substr($this->planDisplayName($plan).' membership', 0, 256),
+                'type' => 'SERVICE',
+                'category' => 'SOFTWARE',
+            ]);
 
-            if (!$user) {
-                throw new \Exception('User session expired.');
-            }
-
-            // Find the pending subscription
-            $subscription = Subscription::where('user_id', $user->id)
-                ->where('payment_method', 'paypal')
-                ->latest()
-                ->first();
-
-            $endsAt = $subscription ? $subscription->ends_at : now()->addMonth();
-
-            if ($subscription) {
-                $subscription->update([
-                    'stripe_id' => 'paypal_' . $arr['id'],
-                    'stripe_status' => 'active',
-                ]);
-            } else {
-                Subscription::updateOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'name' => 'default',
-                        'stripe_id' => 'paypal_' . $arr['id'],
-                        'stripe_status' => 'active',
-                        'ends_at' => $endsAt,
-                        'type' => 'default',
-                        'payment_method' => 'paypal',
-                    ]
+            if ($error = data_get($product, 'error')) {
+                throw new \RuntimeException(
+                    data_get($error, 'details.0.description')
+                        ?? data_get($error, 'message')
+                        ?? 'Failed to create PayPal product.'
                 );
             }
 
-            // Update user premium status
-            $tier = $user->metadata['tier'] ?? 'standard';
+            $productId = data_get($product, 'id');
+            if (! $productId) {
+                throw new \RuntimeException('PayPal product id missing.');
+            }
 
-            $user->update([
-                'premium' => $tier === 'premium',
-                'payment_method' => 'paypal',
-                'last_payment_reference' => $arr['id'],
-                'last_payment_amount' => $arr['transactions'][0]['amount']['total'] ?? 0,
-                'payment_status' => 'successful',
-                'last_payment_at' => now(),
-            ]);
-
-            return true;
+            $plan->paypal_product_id = $productId;
+            $plan->save();
         }
 
-        return false;
+        $interval = match ($duration) {
+            'monthly' => ['unit' => 'MONTH', 'count' => 1],
+            'quarterly' => ['unit' => 'MONTH', 'count' => 3],
+            'yearly' => ['unit' => 'YEAR', 'count' => 1],
+            default => throw new \InvalidArgumentException("Unsupported duration: {$duration}"),
+        };
+
+        $created = $provider->createPlan([
+            'product_id' => $plan->paypal_product_id,
+            'name' => substr($this->planDisplayName($plan)." ({$currency})", 0, 127),
+            'description' => substr("Recurring {$duration} subscription", 0, 127),
+            'status' => 'ACTIVE',
+            'billing_cycles' => [[
+                'frequency' => [
+                    'interval_unit' => $interval['unit'],
+                    'interval_count' => $interval['count'],
+                ],
+                'tenure_type' => 'REGULAR',
+                'sequence' => 1,
+                'total_cycles' => 0,
+                'pricing_scheme' => [
+                    'fixed_price' => [
+                        'value' => number_format($amount, 2, '.', ''),
+                        'currency_code' => $currency,
+                    ],
+                ],
+            ]],
+            'payment_preferences' => [
+                'auto_bill_outstanding' => true,
+                'setup_fee_failure_action' => 'CONTINUE',
+                'payment_failure_threshold' => 3,
+            ],
+        ]);
+
+        if ($error = data_get($created, 'error')) {
+            throw new \RuntimeException(
+                data_get($error, 'details.0.description')
+                    ?? data_get($error, 'message')
+                    ?? 'Failed to create PayPal billing plan.'
+            );
+        }
+
+        $billingPlanId = data_get($created, 'id');
+        if (! $billingPlanId) {
+            throw new \RuntimeException('PayPal billing plan id missing.');
+        }
+
+        $planIds[$currency] = $billingPlanId;
+        $plan->paypal_plan_ids = $planIds;
+        $plan->save();
+
+        return $billingPlanId;
+    }
+
+    protected function provider(string $currency): PayPalClient
+    {
+        $provider = new PayPalClient;
+        $provider->setApiCredentials(config('paypal'));
+        $provider->getAccessToken();
+        $provider->setCurrency(strtoupper($currency));
+
+        return $provider;
+    }
+
+    public function amountFor(Plan $plan, string $currency): ?float
+    {
+        return match (strtoupper($currency)) {
+            'USD' => $plan->price_usd !== null ? (float) $plan->price_usd : null,
+            'EUR' => $plan->price_eur !== null ? (float) $plan->price_eur : null,
+            'NGN' => $plan->price_ngn !== null ? (float) $plan->price_ngn : null,
+            default => null,
+        };
+    }
+
+    public function isPremiumTier($tier): bool
+    {
+        return stripos((string) $tier, 'premium') !== false;
+    }
+
+    protected function planDisplayName(Plan $plan): string
+    {
+        $tier = ucwords(str_replace('-', ' ', (string) $plan->tier));
+        $type = ucfirst((string) $plan->type);
+
+        return trim("{$tier} {$type}");
+    }
+
+    protected function periodEndFromDuration(string $duration): Carbon
+    {
+        return match ($duration) {
+            'monthly' => now()->addMonth(),
+            'quarterly' => now()->addMonths(3),
+            'yearly' => now()->addYear(),
+            default => now()->addMonth(),
+        };
+    }
+
+    protected function resolvePeriodEnd(array $details, ?User $user = null): ?Carbon
+    {
+        $nextBilling = data_get($details, 'billing_info.next_billing_time');
+        if ($nextBilling) {
+            return Carbon::parse($nextBilling);
+        }
+
+        $duration = data_get($user?->metadata, 'duration', 'monthly');
+
+        return $this->periodEndFromDuration($duration);
+    }
+
+    protected function recordPayment(
+        User $user,
+        float $amount,
+        string $currency,
+        string $reference,
+        Carbon $endsAt,
+        array $metadata = []
+    ): void {
+        $existing = Payment::where('reference', $reference)->first();
+        if ($existing) {
+            return;
+        }
+
+        Payment::create([
+            'user_id' => $user->id,
+            'reference' => $reference,
+            'amount' => $amount,
+            'status' => 'successful',
+            'payment_method' => 'paypal',
+            'starts_at' => now()->toDateString(),
+            'ends_at' => $endsAt->toDateString(),
+            'metadata' => array_merge($metadata, [
+                'currency' => $currency,
+            ]),
+        ]);
+    }
+
+    protected function pendingCacheKey(string $subscriptionId): string
+    {
+        return "paypal_subscription:{$subscriptionId}";
     }
 }

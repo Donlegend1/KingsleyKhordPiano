@@ -276,7 +276,12 @@
                             </p>
                         </div>
 
-                        @if (auth()->user()->subscription('default') && auth()->user()->subscription('default')->active() && !auth()->user()->subscription('default')->onGracePeriod())
+                        @if (
+                            auth()->user()->subscription('default')
+                            && auth()->user()->subscription('default')->valid()
+                            && !auth()->user()->subscription('default')->canceled()
+                            && !auth()->user()->subscription('default')->onGracePeriod()
+                        )
                             <button 
                                 @click="openModal = true"
                                 class="text-indigo-600 hover:underline text-sm"
@@ -289,7 +294,12 @@
             </ul>
 
             <!-- Manage Subscription Modal -->
-           @if (auth()->user()->subscription('default') && auth()->user()->subscription('default')->active() && !auth()->user()->subscription('default')->onGracePeriod())
+           @if (
+                auth()->user()->subscription('default')
+                && auth()->user()->subscription('default')->valid()
+                && !auth()->user()->subscription('default')->canceled()
+                && !auth()->user()->subscription('default')->onGracePeriod()
+           )
             {{-- Modal for managing active subscription --}}
             <div 
                 x-show="openModal"

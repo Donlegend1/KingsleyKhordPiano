@@ -115,15 +115,16 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasActiveSubscription()
     {
-        // Stripe
         if ($this->subscribed('default')) {
             return true;
         }
 
-        // Manual
-        return $this->payments()
-            ->where('status', 'successful')
-            ->where('ends_at', '>', now())
+        return $this->subscriptions()
+            ->whereIn('stripe_status', ['active', 'trialing'])
+            ->where(function ($query) {
+                $query->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
             ->exists();
     }
 

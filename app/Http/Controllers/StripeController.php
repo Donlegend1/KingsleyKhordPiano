@@ -49,12 +49,34 @@ class StripeController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->subscription('default')) {
-            $user->subscription('default')->cancel();
-            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SubscriptionCanceledMail($user));
+        if (! $user) {
+            return back()->with('error', 'You must be logged in.');
         }
 
-        return back()->with('success', 'Subscription cancelled.');
+        try {
+            if (($user->payment_method === 'paypal')
+                || optional($user->subscription('default'))->payment_method === 'paypal'
+            ) {
+                app(\App\Services\PayPalService::class)->cancelSubscription($user);
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SubscriptionCanceledMail($user));
+
+                return back()->with('success', 'PayPal subscription cancelled. You keep access until the end of the billing period.');
+            }
+
+            if ($user->subscription('default')) {
+                $user->subscription('default')->cancel();
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SubscriptionCanceledMail($user));
+            }
+
+            return back()->with('success', 'Subscription cancelled.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Subscription cancel failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Unable to cancel subscription. Please try again.');
+        }
     }
 
     

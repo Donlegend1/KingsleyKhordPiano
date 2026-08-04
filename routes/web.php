@@ -130,9 +130,10 @@ Route::post('stripe/sub/cancel',[StripeController::class, 'cancelSubscription'])
 
 
 
-Route::post('paypal/create-order', [PayPalController::class, 'pay']);
-Route::get('paypal/success', [PayPalController::class, 'success']);
-Route::get('paypal/cancel', [PayPalController::class, 'error']);
+Route::post('paypal/create-order', [PayPalController::class, 'pay'])->middleware('auth')->name('paypal.create');
+Route::get('paypal/success', [PayPalController::class, 'success'])->name('paypal.success');
+Route::get('paypal/cancel', [PayPalController::class, 'error'])->name('paypal.cancel');
+Route::post('webhooks/paypal', [\App\Http\Controllers\PayPalWebhookController::class, 'handle'])->name('paypal.webhook');
 Route::post('/zoom-meeting-booking', [ZoomMeetingController::class, 'createZoomMeeting']);
 Route::get('/zoom/authorize', [ZoomMeetingController::class, 'redirectToZoom']);
 Route::get('/zoom/callback', [ZoomMeetingController::class, 'handleZoomCallback']);

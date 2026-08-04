@@ -26,7 +26,11 @@ class AdminController extends Controller
 
     public function usersList(Request $request)
     {
-        $query = User::with('plan', 'community', 'subscriptions');
+        $query = User::with([
+            'plan',
+            'community',
+            'subscriptions' => fn ($q) => $q->latest(),
+        ]);
 
         // ==== SORTING ====
         if ($request->filled('search')) {
@@ -42,7 +46,42 @@ class AdminController extends Controller
                 ->orderBy('created_at', 'desc');
         }
 
-        $users = $query->paginate($request->get('per_page', 10));
+        $perPage = $request->get('perPage', $request->get('per_page', 10));
+        $users = $query->paginate($perPage);
+
+        $users->getCollection()->transform(function (User $user) {
+            $latestSubscription = $user->subscriptions->first();
+            $metadata = is_array($user->metadata) ? $user->metadata : [];
+
+            $duration = $metadata['duration']
+                ?? $latestSubscription?->duration
+                ?? $user->subscription_type
+                ?? null;
+
+            $tier = $metadata['tier']
+                ?? ($user->premium ? 'premium' : null);
+
+            $paymentMethod = $user->payment_method
+                ?? $latestSubscription?->payment_method
+                ?? null;
+
+            $endsAt = $user->subscription_expires_at
+                ?? $latestSubscription?->ends_at;
+
+            $user->setAttribute('subscription_details', [
+                'type' => $duration,
+                'tier' => $tier,
+                'payment_method' => $paymentMethod,
+                'status' => $user->subscription_status
+                    ?? $latestSubscription?->stripe_status
+                    ?? null,
+                'started_at' => $user->subscription_started_at
+                    ?? $latestSubscription?->created_at,
+                'ends_at' => $endsAt,
+            ]);
+
+            return $user;
+        });
 
         return response()->json($users);
     }

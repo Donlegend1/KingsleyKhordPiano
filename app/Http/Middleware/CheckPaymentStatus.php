@@ -19,11 +19,15 @@ class CheckPaymentStatus
 
         if ($user && $user->role === 'member') {
 
-            $hasActiveSubscription = $user->subscribed('default');
+            $hasActiveSubscription = $user->subscribed('default') || $user->hasActiveSubscription();
 
-            // Block if stripe subscription exists but is still pending
+            // Block only incomplete Stripe checkouts, not abandoned PayPal approvals.
             $hasPendingStripeSubscription = $user->subscriptions()
                 ->where('stripe_status', 'pending')
+                ->where(function ($query) {
+                    $query->whereNull('payment_method')
+                        ->orWhere('payment_method', 'stripe');
+                })
                 ->exists();
 
             if ($hasPendingStripeSubscription) {

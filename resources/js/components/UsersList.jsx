@@ -220,6 +220,71 @@ const UsersList = () => {
         }
     };
 
+    const formatDate = (value) => {
+        if (!value) return null;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return null;
+        return date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    };
+
+    const formatLabel = (value) => {
+        if (!value) return null;
+        return String(value)
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+
+    const getSubscriptionDetails = (user) => {
+        const details = user.subscription_details || {};
+        const latestSub = user.subscriptions?.[0];
+        const metadata = user.metadata || {};
+
+        return {
+            type:
+                details.type ||
+                metadata.duration ||
+                user.subscription_type ||
+                null,
+            tier: details.tier || metadata.tier || (user.premium ? "premium" : null),
+            paymentMethod:
+                details.payment_method ||
+                user.payment_method ||
+                latestSub?.payment_method ||
+                null,
+            status:
+                details.status ||
+                user.subscription_status ||
+                latestSub?.stripe_status ||
+                null,
+            endsAt:
+                details.ends_at ||
+                user.subscription_expires_at ||
+                latestSub?.ends_at ||
+                null,
+        };
+    };
+
+    const providerBadgeClass = (method) => {
+        const normalized = String(method || "").toLowerCase();
+        if (normalized.includes("stripe")) {
+            return "bg-indigo-100 text-indigo-800";
+        }
+        if (normalized.includes("paystack")) {
+            return "bg-emerald-100 text-emerald-800";
+        }
+        if (normalized.includes("paypal")) {
+            return "bg-sky-100 text-sky-800";
+        }
+        if (normalized.includes("manual")) {
+            return "bg-gray-100 text-gray-700";
+        }
+        return "bg-slate-100 text-slate-700";
+    };
+
     return (
         <div className="flex flex-col h-full">
             {/* Header section */}
@@ -281,7 +346,23 @@ const UsersList = () => {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {userList.length > 0 ? (
-                                    userList.map((user, index) => (
+                                    userList.map((user, index) => {
+                                        const subscription =
+                                            getSubscriptionDetails(user);
+                                        const endsAtLabel = formatDate(
+                                            subscription.endsAt
+                                        );
+                                        const typeLabel = formatLabel(
+                                            subscription.type
+                                        );
+                                        const tierLabel = formatLabel(
+                                            subscription.tier
+                                        );
+                                        const providerLabel = formatLabel(
+                                            subscription.paymentMethod
+                                        );
+
+                                        return (
                                         <tr
                                             key={user.id}
                                             className="hover:bg-gray-50 transition-colors"
@@ -299,10 +380,6 @@ const UsersList = () => {
                                                     </div>
                                                     <div className="ml-4">
                                                         <AuthorNameWithVerification author={user}/>
-                                                        {/* <div className="text-sm font-medium text-gray-900">
-                                                            {user.first_name}{" "}
-                                                            {user.last_name}
-                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </td>
@@ -321,24 +398,35 @@ const UsersList = () => {
                                                     {user.payment_status ||
                                                         "Pending"}
                                                 </span>
-                                                <br />
-                                                <div>
-                                                    <span className="text-sm text-gray-600">Subscribed: </span>
-                                                    <span className="text-sm text-gray-600">{user.subscription?.created_at}</span>
-                                                    <br />
-                                                    <span className="text-sm text-gray-600">Expires: </span>
-                                                    <span className="text-sm text-gray-600">{user.subscription?.ends_at}</span>
-                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-600">
-                                                        {
-                                                            user.metadata
-                                                                ?.duration
-                                                        }{" "}
-                                                        ({user.metadata?.tier})
-                                                    </span>
+                                                <div className="space-y-1.5 min-w-[180px]">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        {typeLabel || tierLabel
+                                                            ? [
+                                                                  tierLabel,
+                                                                  typeLabel,
+                                                              ]
+                                                                  .filter(
+                                                                      Boolean
+                                                                  )
+                                                                  .join(" · ")
+                                                            : "No subscription"}
+                                                    </div>
+                                                    {providerLabel ? (
+                                                        <span
+                                                            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${providerBadgeClass(
+                                                                subscription.paymentMethod
+                                                            )}`}
+                                                        >
+                                                            {providerLabel}
+                                                        </span>
+                                                    ) : null}
+                                                    <div className="text-xs text-gray-500">
+                                                        {endsAtLabel
+                                                            ? `Ends ${endsAtLabel}`
+                                                            : "No end date"}
+                                                    </div>
                                                     <button
                                                         onClick={() =>
                                                             handleOpenPaymentModal(
@@ -374,7 +462,8 @@ const UsersList = () => {
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
+                                        );
+                                    })
                                 ) : (
                                     <tr>
                                         <td
