@@ -250,8 +250,9 @@
                 <input type="range" min="0" max="1" step="0.01" x-model.number="volume" @input="setVolume" class="flex-1 h-1 accent-[#FF6B35]">
             </div>
 
-            <audio x-ref="player" @timeupdate="onTimeUpdate" @loadedmetadata="onLoadedMetadata" @ended="onEnded"></audio>
+            <audio x-ref="player" @timeupdate="onTimeUpdate" @loadedmetadata="onLoadedMetadata" @ended="onEnded" @error="onPlaybackError"></audio>
         </div>
+        <p x-show="playbackError" x-text="playbackError" class="text-center text-xs text-red-500 pb-2"></p>
     </div>
 </section>
 
@@ -265,6 +266,7 @@
             currentTrack: null,
             currentIndex: -1,
             isPlaying: false,
+            playbackError: '',
             currentTime: 0,
             duration: 0,
             volume: 1,
@@ -281,13 +283,18 @@
                     this.togglePlay();
                     return;
                 }
+                this.playbackError = '';
                 this.currentTrack = track;
                 this.currentIndex = index;
                 this.$nextTick(() => {
                     const el = this.$refs.player;
                     el.src = track.src;
-                    el.play();
-                    this.isPlaying = true;
+                    el.play().then(() => {
+                        this.isPlaying = true;
+                    }).catch(() => {
+                        this.isPlaying = false;
+                        this.playbackError = `Couldn't play "${track.title}" — the audio file may be missing.`;
+                    });
                 });
             },
 
@@ -298,8 +305,20 @@
                     el.pause();
                     this.isPlaying = false;
                 } else {
-                    el.play();
-                    this.isPlaying = true;
+                    this.playbackError = '';
+                    el.play().then(() => {
+                        this.isPlaying = true;
+                    }).catch(() => {
+                        this.isPlaying = false;
+                        this.playbackError = `Couldn't play "${this.currentTrack.title}" — the audio file may be missing.`;
+                    });
+                }
+            },
+
+            onPlaybackError() {
+                this.isPlaying = false;
+                if (this.currentTrack) {
+                    this.playbackError = `Couldn't play "${this.currentTrack.title}" — the audio file may be missing.`;
                 }
             },
 

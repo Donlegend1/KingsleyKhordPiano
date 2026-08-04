@@ -25,10 +25,11 @@ class NewMusicalApplicationCreated extends Notification
             'application_id' => $this->application->id,
             'title'          => $this->application->title,
             'message'        => $this->application->title,
-            'section'        => 'Piano Exercise',
+            'section'        => 'Guided Practice',
             'url'            => route('piano.exercise.player', [
                 'series'      => $this->application->series,
                 'skill_level' => strtolower($this->application->skill_level),
+                'video_id'    => $this->application->id,
             ]),
         ];
     }

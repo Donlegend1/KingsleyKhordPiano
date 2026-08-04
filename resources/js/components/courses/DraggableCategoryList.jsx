@@ -25,6 +25,14 @@ const DraggableCategoryList = ({
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
+    const [isNewCheckpointModalOpen, setIsNewCheckpointModalOpen] = useState(false);
+    const [checkpointCatalog, setCheckpointCatalog] = useState([]);
+    const [newCheckpoint, setNewCheckpoint] = useState({
+        course_category_id: null,
+        checkpoint_key: "",
+        linked_course_id: null,
+        redirect_url: "",
+    });
 
     // Edit Category States
     const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
@@ -127,6 +135,18 @@ const DraggableCategoryList = ({
         fetchAllCourses();
     }, []);
 
+    useEffect(() => {
+        const fetchCheckpointCatalog = async () => {
+            try {
+                const response = await axios.get("/api/admin/checkpoints/catalog");
+                setCheckpointCatalog(response.data);
+            } catch (error) {
+                console.error("Error fetching checkpoint catalog:", error);
+            }
+        };
+        fetchCheckpointCatalog();
+    }, []);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setSelectedCourse({ ...selectedCourse, [name]: value });
@@ -173,6 +193,68 @@ const DraggableCategoryList = ({
         setIsNewCourseModalOpen(true);
     };
 
+    const openNewCheckpointModal = (level, category) => {
+        const categoryId = courses[level]?.category_ids?.[category];
+        setNewCheckpoint({
+            course_category_id: categoryId,
+            checkpoint_key: checkpointCatalog[0]?.key || "",
+            linked_course_id: null,
+            redirect_url: "",
+        });
+        setIsNewCheckpointModalOpen(true);
+    };
+
+    const closeNewCheckpointModal = () => {
+        setIsNewCheckpointModalOpen(false);
+    };
+
+    const handleCreateCheckpoint = async () => {
+        if (!newCheckpoint.course_category_id || !newCheckpoint.checkpoint_key) return;
+        setLoading(true);
+        try {
+            await axios.post(
+                "/api/admin/checkpoints/store",
+                {
+                    course_category_id: newCheckpoint.course_category_id,
+                    checkpoint_key: newCheckpoint.checkpoint_key,
+                    linked_course_id: newCheckpoint.linked_course_id,
+                    redirect_url: newCheckpoint.redirect_url || null,
+                },
+                {
+                    headers: { "X-CSRF-TOKEN": csrfToken },
+                    withCredentials: true,
+                }
+            );
+            showMessage("Checkpoint Added", "success");
+            closeNewCheckpointModal();
+            fetchCourses();
+        } catch (error) {
+            showMessage(
+                error.response?.data?.message || "Error adding checkpoint",
+                "error"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteCheckpoint = async (checkpoint) => {
+        if (!confirm(`Remove checkpoint "${checkpoint.title}"?`)) return;
+        setLoading(true);
+        try {
+            await axios.delete(`/api/admin/checkpoints/${checkpoint.id}`, {
+                headers: { "X-CSRF-TOKEN": csrfToken },
+                withCredentials: true,
+            });
+            showMessage("Checkpoint Deleted", "success");
+            fetchCourses();
+        } catch (error) {
+            showMessage("Error deleting checkpoint", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleDeleteCourse = async (page = 1) => {
         setLoading(true);
         try {
@@ -215,6 +297,9 @@ const DraggableCategoryList = ({
             }
             if (selectedCourse.thumbnail_file) {
                 formData.append("thumbnail", selectedCourse.thumbnail_file);
+            }
+            if (selectedCourse.pdf_resource_file) {
+                formData.append("pdf_resource", selectedCourse.pdf_resource_file);
             }
             descriptionImageFiles.forEach((file, idx) => {
                 formData.append(`images[${idx}]`, file);
@@ -277,10 +362,13 @@ const DraggableCategoryList = ({
 
             const targetCategory = updatedCategories.find(([cat]) => cat === categoryName);
             if (targetCategory) {
-                const coursesIds = targetCategory[1].map(c => c.id);
+                const items = targetCategory[1].map((c) => ({
+                    type: c.item_type === "checkpoint" ? "checkpoint" : "course",
+                    id: c.id,
+                }));
                 try {
                     await axios.post("/api/admin/reorder/courses/items", {
-                        courses: coursesIds,
+                        items,
                     });
                 } catch (error) {
                     console.error("Failed to persist course order:", error);
@@ -307,6 +395,9 @@ const DraggableCategoryList = ({
             }
             if (course.thumbnail_file) {
                 formData.append("thumbnail", course.thumbnail_file);
+            }
+            if (course.pdf_resource_file) {
+                formData.append("pdf_resource", course.pdf_resource_file);
             }
             descriptionImageFiles.forEach((file, idx) => {
                 formData.append(`images[${idx}]`, file);
@@ -335,6 +426,7 @@ const DraggableCategoryList = ({
                 status: "active",
                 related_courses: [],
                 thumbnail_file: null,
+                pdf_resource_file: null,
             });
             setDescriptionImageFiles([]);
             fetchCourses();
@@ -458,7 +550,18 @@ const DraggableCategoryList = ({
                                                                 : "max-h-[2000px] opacity-100 scale-y-100"
                                                         }`}
                                                     >
-                                                        <div className="mb-4 flex justify-end">
+                                                        <div className="mb-4 flex justify-end gap-2">
+                                                            <button
+                                                                className="rounded-md bg-indigo-600 p-2 text-white"
+                                                                onClick={() =>
+                                                                    openNewCheckpointModal(
+                                                                        level,
+                                                                        category
+                                                                    )
+                                                                }
+                                                            >
+                                                                Add Checkpoint
+                                                            </button>
                                                             <button
                                                                 className="rounded-md bg-black p-2 text-white"
                                                                 onClick={(e) =>
@@ -482,11 +585,53 @@ const DraggableCategoryList = ({
                                                                     {categoryCourses.map(
                                                                         (course, courseIndex) => (
                                                                             <Draggable
-                                                                                key={course.id}
-                                                                                draggableId={`course-${course.id}`}
+                                                                                key={`${course.item_type || "course"}-${course.id}`}
+                                                                                draggableId={`${course.item_type || "course"}-${course.id}`}
                                                                                 index={courseIndex}
                                                                             >
-                                                                                {(provided, snapshot) => (
+                                                                                {(provided, snapshot) =>
+                                                                                course.item_type === "checkpoint" ? (
+                                                                                    <div
+                                                                                        ref={provided.innerRef}
+                                                                                        {...provided.draggableProps}
+                                                                                        {...provided.dragHandleProps}
+                                                                                        className={`bg-indigo-50 dark:bg-gray-800 border border-indigo-100 dark:border-gray-700 p-4 rounded-lg shadow hover:shadow-md transition-all flex flex-col ${
+                                                                                            snapshot.isDragging
+                                                                                                ? "ring-2 ring-indigo-400 scale-[1.01]"
+                                                                                                : ""
+                                                                                        }`}
+                                                                                    >
+                                                                                        <div className="flex items-start justify-between mb-3">
+                                                                                            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex-shrink-0">
+                                                                                                <i className="fa fa-bullseye text-indigo-600"></i>
+                                                                                            </span>
+                                                                                            <span className="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
+                                                                                                Checkpoint
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <h3 className="font-semibold text-lg mb-1 truncate">
+                                                                                            {course.title}
+                                                                                        </h3>
+                                                                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 truncate">
+                                                                                            {course.description}
+                                                                                        </p>
+                                                                                        {course.linked_course && (
+                                                                                            <p className="text-xs text-gray-500 dark:text-gray-500 mb-3 truncate">
+                                                                                                Links to: {course.linked_course.title}
+                                                                                            </p>
+                                                                                        )}
+                                                                                        <div className="flex items-center justify-end gap-2 mt-auto">
+                                                                                            <button
+                                                                                                onClick={() =>
+                                                                                                    handleDeleteCheckpoint(course)
+                                                                                                }
+                                                                                                className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+                                                                                            >
+                                                                                                <i className="fa fa-trash"></i>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ) : (
                                                                                     <div
                                                                                         ref={provided.innerRef}
                                                                                         {...provided.draggableProps}
@@ -572,7 +717,8 @@ const DraggableCategoryList = ({
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
-                                                                                )}
+                                                                                )
+                                                                                }
                                                                             </Draggable>
                                                                         )
                                                                     )}
@@ -729,6 +875,28 @@ const DraggableCategoryList = ({
                                 }}
                                 className="w-full p-2 border rounded-lg"
                             />
+                        </div>
+
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                PDF Download (Optional)
+                            </label>
+                            <input
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(e) => {
+                                    setSelectedCourse({
+                                        ...selectedCourse,
+                                        pdf_resource_file: e.target.files[0]
+                                    });
+                                }}
+                                className="w-full p-2 border rounded-lg"
+                            />
+                            {selectedCourse?.pdf_resource_url && !selectedCourse?.pdf_resource_file && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Current file: <a href={selectedCourse.pdf_resource_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">View PDF</a>
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -967,6 +1135,23 @@ const DraggableCategoryList = ({
 
                 <div className="mt-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
+                        PDF Download (Optional)
+                    </label>
+                    <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => {
+                            setCourse({
+                                ...course,
+                                pdf_resource_file: e.target.files[0]
+                            });
+                        }}
+                        className="w-full p-2 border rounded-lg"
+                    />
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                         Related Courses
                     </label>
                     <Select
@@ -1026,6 +1211,102 @@ const DraggableCategoryList = ({
                             <span className="fa fa-spinner fa-spin"></span>
                         ) : (
                             "Save Course"
+                        )}
+                    </button>
+                </div>
+            </Modal>
+
+            <Modal
+                isOpen={isNewCheckpointModalOpen}
+                onClose={closeNewCheckpointModal}
+            >
+                <div className="text-center p-6">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                        Add Practice Checkpoint
+                    </h2>
+                    <p className="text-gray-600 mb-6">
+                        Insert a premade checkpoint into this category's lesson list.
+                    </p>
+                </div>
+
+                <div>
+                    <label className="block mb-2 font-medium">
+                        Checkpoint Template
+                    </label>
+                    <select
+                        value={newCheckpoint.checkpoint_key}
+                        onChange={(e) =>
+                            setNewCheckpoint({
+                                ...newCheckpoint,
+                                checkpoint_key: e.target.value,
+                            })
+                        }
+                        className="w-full px-3 py-2 border rounded-lg"
+                    >
+                        {checkpointCatalog.map((template) => (
+                            <option key={template.key} value={template.key}>
+                                {template.title}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Watch Lesson Link (Optional)
+                    </label>
+                    <Select
+                        options={allCourses}
+                        className="basic-select"
+                        classNamePrefix="select"
+                        isClearable
+                        onChange={(opt) =>
+                            setNewCheckpoint({
+                                ...newCheckpoint,
+                                linked_course_id: opt ? opt.value : null,
+                            })
+                        }
+                        value={
+                            allCourses.find(
+                                (opt) => opt.value === newCheckpoint.linked_course_id
+                            ) || null
+                        }
+                        placeholder="Select a lesson to link..."
+                    />
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Or Paste a Custom Redirect Link (Optional)
+                    </label>
+                    <input
+                        type="text"
+                        value={newCheckpoint.redirect_url}
+                        onChange={(e) =>
+                            setNewCheckpoint({
+                                ...newCheckpoint,
+                                redirect_url: e.target.value,
+                            })
+                        }
+                        placeholder="e.g. /member/course/beginner or https://..."
+                        className="w-full px-3 py-2 border rounded-lg"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                        If set, this takes priority over the lesson link above.
+                    </p>
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                    <button
+                        type="button"
+                        disabled={loading}
+                        onClick={handleCreateCheckpoint}
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? (
+                            <span className="fa fa-spinner fa-spin"></span>
+                        ) : (
+                            "Add Checkpoint"
                         )}
                     </button>
                 </div>
