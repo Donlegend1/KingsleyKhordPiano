@@ -28,7 +28,7 @@ class LiveCoachingBookingController extends Controller
 
     private const WINDOW_DAYS = 14;
 
-    public function index(SubscriptionService $subscriptionService)
+    public function index()
     {
         $user = Auth::user();
 
@@ -67,7 +67,7 @@ class LiveCoachingBookingController extends Controller
         ]);
     }
 
-    public function store(Request $request, SubscriptionService $subscriptionService)
+    public function store(Request $request)
     {
         $request->validate([
             'date' => 'required|date_format:Y-m-d',

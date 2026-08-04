@@ -23,6 +23,8 @@ use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CartController;
+use App\Support\ShopCatalog;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\CommunityIndexController;
 // use App\Http\Controllers\StripeWebhookController;
@@ -67,7 +69,74 @@ Route::get('/about', function () {
 });
 
 Route::get('/shop', function () {
-    return view('shop', ['pageTitle' => 'About Us']);
+    return view('shop', ['pageTitle' => 'Shop', 'products' => ShopCatalog::all()]);
+});
+
+Route::get('/shop/midi-files/{slug}', function ($slug) {
+    $product = ShopCatalog::find($slug);
+    if (!$product || $product['type'] !== 'midi') {
+        $product = ShopCatalog::find('gospel-chord-progressions');
+    }
+
+    return view('shop-product', ['product' => $product]);
+});
+
+Route::get('/shop/plugins/{slug}', function ($slug) {
+    $plugin = ShopCatalog::find($slug);
+    if (!$plugin || $plugin['type'] !== 'plugin') {
+        $plugin = ShopCatalog::find('chord-suite-plugin');
+    }
+
+    return view('shop-plugin', ['plugin' => $plugin]);
+});
+
+Route::get('/cart', [CartController::class, 'index']);
+Route::post('/cart/add', [CartController::class, 'add']);
+Route::post('/cart/remove', [CartController::class, 'remove']);
+Route::post('/cart/update', [CartController::class, 'updateQty']);
+Route::post('/cart/clear', [CartController::class, 'clear']);
+
+Route::get('/checkout', function () {
+    $items = CartController::hydrate();
+    $subtotal = collect($items)->sum(fn ($i) => $i['price'] * $i['qty']);
+
+    return view('checkout', [
+        'items' => $items,
+        'subtotal' => $subtotal,
+        'discount' => 0,
+        'total' => $subtotal,
+        'cartCount' => CartController::count(),
+    ]);
+});
+
+Route::get('/order-confirmation', function () {
+    $items = collect(CartController::hydrate())->map(fn ($item) => [
+        'name' => $item['name'],
+        'meta' => $item['type'],
+        'price' => $item['price'] * $item['qty'],
+        'qty' => $item['qty'],
+        'downloadLabel' => $item['type'] === 'Plugin' ? 'Download Plugin' : 'Download File',
+        'downloadUrl' => ShopCatalog::find($item['slug'])['download_url'] ?? null,
+        'thumbnail' => $item['thumbnail'],
+        'from' => $item['from'],
+        'to' => $item['to'],
+    ])->all();
+
+    $subtotal = collect($items)->sum('price');
+
+    // Simulate a completed purchase: this "pays" for whatever was in the cart, then empties it.
+    session(['cart' => []]);
+
+    return view('order-confirmation', [
+        'items' => $items,
+        'subtotal' => $subtotal,
+        'discount' => 0,
+        'total' => $subtotal,
+        'orderNumber' => '#KK-' . now()->format('Y') . '-' . random_int(1000, 9999),
+        'orderDate' => now()->format('F j, Y'),
+        'email' => 'john.doe@example.com',
+        'cartCount' => 0,
+    ]);
 });
 
 Route::get('/book-session', function () {
@@ -270,6 +339,9 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     
     // Community Tutorials Admin
     Route::resource('tutorials', \App\Http\Controllers\Admin\AdminTutorialController::class, ['as' => 'admin'])->except(['show']);
+
+    // Shop Products Admin (MIDI files & Plugins)
+    Route::resource('shop', \App\Http\Controllers\Admin\ShopProductController::class, ['as' => 'admin', 'parameters' => ['shop' => 'shopProduct']])->except(['show']);
 
     // Guest Bookings
     Route::prefix('guest-bookings')->name('admin.guest-bookings.')->group(function () {

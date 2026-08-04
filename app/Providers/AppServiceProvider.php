@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\CartController;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        
+        View::composer('layouts.app', function ($view) {
+            $view->with('cartCount', CartController::count());
+            $view->with('cartPreviewItems', CartController::hydrate());
+        });
     }
 }
