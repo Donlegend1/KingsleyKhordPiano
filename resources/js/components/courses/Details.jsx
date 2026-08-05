@@ -5,7 +5,11 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
-import { Bookmark, BookmarkMinus, Check } from "lucide-react";
+import { Bookmark, BookmarkMinus, Check, Target } from "lucide-react";
+import CheckpointDetails, {
+    CheckpointCta,
+    checkpointHasCta,
+} from "./checkpoints/CheckpointDetails";
 
 const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
@@ -373,19 +377,6 @@ const CourseDetails = ({
                 </div>
             )}
 
-            {course.image_urls && course.image_urls.length > 0 && (
-                <div className="mt-6 mb-6">
-                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-3">Course Walkthrough / Highlights</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {course.image_urls.map((url, idx) => (
-                            <div key={idx} className="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-900">
-                                <img src={url} alt="Description Highlight" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 mt-6">
                 <button
                     onClick={toggleBookmark}
@@ -418,6 +409,18 @@ const CourseDetails = ({
                         : "Mark as Completed"}
                 </button>
             </div>
+
+            {course.image_urls && course.image_urls.length > 0 && (
+                <div className="mt-6 mb-6">
+                    <div className="grid grid-cols-1 gap-4">
+                        {course.image_urls.map((url, idx) => (
+                            <div key={idx} className="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-900">
+                                <img src={url} alt="Description Highlight" className="w-full h-auto" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Downloads for this lesson */}
             {course.pdf_resource_url && (
@@ -721,6 +724,7 @@ const CoursesPage = () => {
     const selectedCourseId = searchParams.get("selected_course");
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState(null);
+    const [selectedCheckpoint, setSelectedCheckpoint] = useState(null);
     const [expandedCategories, setExpandedCategories] = useState({});
     const [showCourseModal, setShowCourseModal] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
@@ -861,80 +865,161 @@ const CoursesPage = () => {
                                 {isOpen ? "−" : "+"}
                             </span>
                         </div>
-                        {isOpen && (
-                            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                                {categoryObj.courses &&
-                                categoryObj.courses.length > 0 ? (
-                                    categoryObj.courses.map((course, idx) => {
-                                        const isSelected =
-                                            selectedCourse &&
-                                            selectedCourse.id === course.id;
-                                        return (
-                                            <div
-                                                key={course.id}
-                                                className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition ${
-                                                    isSelected
-                                                        ? "bg-gray-800"
-                                                        : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                }`}
-                                                onClick={() => {
-                                                    setSelectedCourse(course);
-                                                    setShowCourseModal(false);
-                                                    setExpandedCategories(
-                                                        (prev) => ({
-                                                            ...prev,
-                                                            __mobile: false,
-                                                        }),
-                                                    );
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-3 min-w-0">
-                                                    <span
-                                                        className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold flex-shrink-0 ${
+                        {isOpen && (() => {
+                            const items = [
+                                ...(categoryObj.courses || []).map((c) => ({
+                                    ...c,
+                                    item_type: "course",
+                                })),
+                                ...(categoryObj.checkpoints || []).map((c) => ({
+                                    ...c,
+                                    item_type: "checkpoint",
+                                })),
+                            ].sort((a, b) => {
+                                const posA = a.position ?? Infinity;
+                                const posB = b.position ?? Infinity;
+                                return posA !== posB ? posA - posB : a.id - b.id;
+                            });
+
+                            let lessonNumber = 0;
+
+                            return (
+                                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {items.length > 0 ? (
+                                        items.map((item) => {
+                                            if (item.item_type === "checkpoint") {
+                                                const isSelected =
+                                                    selectedCheckpoint &&
+                                                    selectedCheckpoint.id === item.id;
+                                                return (
+                                                    <div
+                                                        key={`checkpoint-${item.id}`}
+                                                        className={`relative flex items-center gap-3.5 pl-8 pr-4 py-4 cursor-pointer transition-colors ${
                                                             isSelected
-                                                                ? "bg-white/20 text-white"
-                                                                : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                                                                ? "bg-indigo-50 dark:bg-indigo-900/20"
+                                                                : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                         }`}
+                                                        onClick={() => {
+                                                            setSelectedCheckpoint(item);
+                                                            setSelectedCourse(null);
+                                                            setShowCourseModal(false);
+                                                            setExpandedCategories(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    __mobile: false,
+                                                                }),
+                                                            );
+                                                        }}
                                                     >
-                                                        {idx + 1}
-                                                    </span>
-                                                    <span
-                                                        className={`text-[15px] truncate font-medium ${
-                                                            isSelected
-                                                                ? "text-white"
-                                                                : "text-gray-800 dark:text-gray-100"
-                                                        }`}
-                                                    >
-                                                        {course.title}
-                                                    </span>
-                                                </div>
-                                                {course.progress?.course_id && (
-                                                    <span
-                                                        className={`flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 ${
-                                                            isSelected
-                                                                ? "bg-white/20"
-                                                                : "bg-green-500"
-                                                        }`}
-                                                    >
-                                                        <i
-                                                            className={`fa fa-check text-[10px] ${
+                                                        <span
+                                                            className="absolute left-4 top-0 bottom-0 border-l-2 border-dashed border-gray-200 dark:border-gray-700"
+                                                            aria-hidden="true"
+                                                        />
+                                                        <span
+                                                            className="absolute left-[13px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-400 ring-4 ring-white dark:ring-gray-900"
+                                                            aria-hidden="true"
+                                                        />
+                                                        <span
+                                                            className={`relative flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 shadow-sm transition-colors ${
+                                                                isSelected
+                                                                    ? "bg-indigo-600"
+                                                                    : "bg-indigo-50 dark:bg-indigo-900/40"
+                                                            }`}
+                                                        >
+                                                            <Target
+                                                                className={`w-[18px] h-[18px] ${
+                                                                    isSelected
+                                                                        ? "text-white"
+                                                                        : "text-indigo-600 dark:text-indigo-300"
+                                                                }`}
+                                                                strokeWidth={2}
+                                                            />
+                                                        </span>
+                                                        <div className="min-w-0">
+                                                            <span className="block text-sm font-semibold text-indigo-600 dark:text-indigo-300 truncate">
+                                                                {item.label || "Practice Checkpoint"}
+                                                            </span>
+                                                            <span className="block text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                                                                {item.description}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+
+                                            const course = item;
+                                            lessonNumber += 1;
+                                            const isSelected =
+                                                selectedCourse &&
+                                                selectedCourse.id === course.id;
+                                            return (
+                                                <div
+                                                    key={course.id}
+                                                    className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition ${
+                                                        isSelected
+                                                            ? "bg-gray-800"
+                                                            : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                    }`}
+                                                    onClick={() => {
+                                                        setSelectedCourse(course);
+                                                        setSelectedCheckpoint(null);
+                                                        setShowCourseModal(false);
+                                                        setExpandedCategories(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                __mobile: false,
+                                                            }),
+                                                        );
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-3 min-w-0">
+                                                        <span
+                                                            className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold flex-shrink-0 ${
+                                                                isSelected
+                                                                    ? "bg-white/20 text-white"
+                                                                    : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                                                            }`}
+                                                        >
+                                                            {lessonNumber}
+                                                        </span>
+                                                        <span
+                                                            className={`text-[15px] truncate font-medium ${
                                                                 isSelected
                                                                     ? "text-white"
-                                                                    : "text-white"
+                                                                    : "text-gray-800 dark:text-gray-100"
                                                             }`}
-                                                        ></i>
-                                                    </span>
-                                                )}
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <div className="text-sm text-gray-500 dark:text-gray-400 italic p-4">
-                                        No courses available in this category
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                                                        >
+                                                            {course.title}
+                                                        </span>
+                                                    </div>
+                                                    {course.progress?.course_id && (
+                                                        <span
+                                                            className={`flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 ${
+                                                                isSelected
+                                                                    ? "bg-white/20"
+                                                                    : "bg-green-500"
+                                                            }`}
+                                                        >
+                                                            <i
+                                                                className={`fa fa-check text-[10px] ${
+                                                                    isSelected
+                                                                        ? "text-white"
+                                                                        : "text-white"
+                                                                }`}
+                                                            ></i>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <div className="text-sm text-gray-500 dark:text-gray-400 italic p-4">
+                                            No courses available in this category
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()}
                     </div>
                 );
             })}
@@ -1118,46 +1203,68 @@ const CoursesPage = () => {
 
                 {/* Course Details */}
                 <div
-                    ref={contentScrollRef}
-                    className={`px-4 pb-4 pt-1 transition-all duration-300 ${
+                    className={`flex flex-col transition-all duration-300 ${
                         sidebarCollapsed ? "md:w-full" : "md:w-2/3"
                     }`}
-                    style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
+                    style={{ height: "calc(100vh - 90px)" }}
                 >
-                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-5 w-full max-w-7xl mx-auto mb-2">
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                            {calculateGeneralProgress()}% Completed
-                        </span>
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                            <div
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${generalProgress}%` }}
-                            ></div>
+                    <div
+                        ref={contentScrollRef}
+                        className="flex-1 overflow-y-auto px-4 pb-4 pt-1"
+                    >
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-5 w-full max-w-7xl mx-auto mb-2">
+                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                {calculateGeneralProgress()}% Completed
+                            </span>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+                                <div
+                                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                    style={{ width: `${generalProgress}%` }}
+                                ></div>
+                            </div>
                         </div>
+
+                        {selectedCourse ? (
+                            <CourseDetails
+                                course={selectedCourse}
+                                onComplete={handleCourseCompletion}
+                                onSelectCourse={setSelectedCourse}
+                                onPrevLesson={handlePrevCourse}
+                                onNextLesson={handleNextCourse}
+                                hasPrevLesson={currentIndex > 0}
+                                hasNextLesson={
+                                    currentIndex > -1 &&
+                                    currentIndex < flatCourses.length - 1
+                                }
+                            />
+                        ) : selectedCheckpoint ? (
+                            <CheckpointDetails checkpoint={selectedCheckpoint} />
+                        ) : (
+                            <div className="p-6 bg-white dark:bg-gray-500 rounded shadow-lg text-center">
+                                <h2 className="text-xl font-bold mb-4">
+                                    Select a Course
+                                </h2>
+                                <p>
+                                    Please select a course from the list to view
+                                    details.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
-                    {selectedCourse ? (
-                        <CourseDetails
-                            course={selectedCourse}
-                            onComplete={handleCourseCompletion}
-                            onSelectCourse={setSelectedCourse}
-                            onPrevLesson={handlePrevCourse}
-                            onNextLesson={handleNextCourse}
-                            hasPrevLesson={currentIndex > 0}
-                            hasNextLesson={
-                                currentIndex > -1 &&
-                                currentIndex < flatCourses.length - 1
-                            }
-                        />
-                    ) : (
-                        <div className="p-6 bg-white dark:bg-gray-500 rounded shadow-lg text-center">
-                            <h2 className="text-xl font-bold mb-4">
-                                Select a Course
-                            </h2>
-                            <p>
-                                Please select a course from the list to view
-                                details.
-                            </p>
+                    {/* Fixed action bar (outside the scroll area) so the
+                        checkpoint's CTA stays visible without scrolling. */}
+                    {selectedCheckpoint && checkpointHasCta(selectedCheckpoint) && (
+                        <div className="flex-shrink-0 px-4 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+                            <div className="max-w-7xl mx-auto">
+                                <CheckpointCta
+                                    checkpoint={selectedCheckpoint}
+                                    onSelectCourse={(course) => {
+                                        setSelectedCourse(course);
+                                        setSelectedCheckpoint(null);
+                                    }}
+                                />
+                            </div>
                         </div>
                     )}
                 </div>

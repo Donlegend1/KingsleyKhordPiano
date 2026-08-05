@@ -38,6 +38,9 @@ class AudioDownloadController extends Controller
 
             // Destination path in public_html
             $destination = base_path('../public_html/uploads/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/audio');
+            }
 
             // Create directory if not exists
             if (!file_exists($destination)) {
@@ -94,7 +97,7 @@ class AudioDownloadController extends Controller
 
             // Delete old file if exists
             if (!empty($audioDownload->audio_file)) {
-                $oldPath = base_path('../public_html/' . ltrim($audioDownload->audio_file, '/'));
+                $oldPath = $this->resolveFullPath($audioDownload->audio_file);
 
                 if (file_exists($oldPath)) {
                     unlink($oldPath);
@@ -108,6 +111,9 @@ class AudioDownloadController extends Controller
 
             // Destination
             $destination = base_path('../public_html/uploads/audio');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/audio');
+            }
 
             // Create folder if missing
             if (!file_exists($destination)) {
@@ -169,7 +175,14 @@ class AudioDownloadController extends Controller
  */
 private function resolveFullPath(string $relativePath): string
 {
-    return base_path('../public_html/' . ltrim($relativePath, '/'));
+    $relativePath = ltrim($relativePath, '/');
+    $publicHtmlPath = base_path('../public_html/' . $relativePath);
+
+    if (file_exists($publicHtmlPath)) {
+        return $publicHtmlPath;
+    }
+
+    return public_path($relativePath);
 }
 
 /**

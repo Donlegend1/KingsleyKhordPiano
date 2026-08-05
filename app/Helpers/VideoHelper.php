@@ -85,6 +85,22 @@ class VideoHelper
         return $url;
     }
 
+    public static function extractYoutubeId(string $url): ?string
+    {
+        if (preg_match('/youtu\.be\/([^\?&]+)|youtube\.com\/watch\?v=([^\&]+)|youtube\.com\/shorts\/([^\?&]+)|youtube\.com\/embed\/([^\?&]+)/', $url, $m)) {
+            return $m[1] ?: ($m[2] ?: ($m[3] ?: ($m[4] ?? null)));
+        }
+
+        // Not a recognizable YouTube URL — assume the caller already passed
+        // a bare video ID and store it as-is.
+        return $url;
+    }
+
+    public static function extractGoogleDriveId(string $url): ?string
+    {
+        return self::extractGoogleDriveFileId($url) ?? $url;
+    }
+
     public static function getLinkType(string $url): string
     {
         if (

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\CourseCategory;
+use App\Models\CourseCheckpoint;
+use App\Support\Checkpoints\CheckpointCatalog;
 use App\Models\Bookmark;
 use App\Models\User;
 use App\Notifications\NewCourseCreated;
@@ -259,18 +261,49 @@ class CourseController extends Controller
                 ->orderBy('position')
                 ->get(['id', 'category', 'position']);
 
-            $categories->load(['courses' => function ($q) use ($level) {
-                $q->where('level', $level)
-                ->orderBy('position');
-            }]);
+            $categories->load([
+                'courses' => function ($q) use ($level) {
+                    $q->where('level', $level)
+                        ->orderByRaw('position IS NULL, position ASC')
+                        ->orderBy('id');
+                },
+                'checkpoints' => function ($q) {
+                    $q->with('linkedCourse')
+                        ->orderByRaw('position IS NULL, position ASC')
+                        ->orderBy('id');
+                },
+            ]);
 
             $data = [];
+            $categoryIds = [];
             foreach ($categories as $cat) {
-                $data[$cat->category] = $cat->courses->values();
+                $categoryIds[$cat->category] = $cat->id;
+
+                $courseItems = $cat->courses->map(function ($course) {
+                    $course->item_type = 'course';
+                    return $course;
+                });
+
+                $checkpointItems = $cat->checkpoints->map(function ($checkpoint) {
+                    $template = CheckpointCatalog::get($checkpoint->checkpoint_key) ?? [];
+                    $checkpoint->item_type = 'checkpoint';
+                    $checkpoint->title = $checkpoint->title ?? ($template['title'] ?? $checkpoint->checkpoint_key);
+                    $checkpoint->description = $checkpoint->description ?? ($template['description'] ?? '');
+                    $checkpoint->label = $template['label'] ?? 'Practice Checkpoint';
+                    return $checkpoint;
+                });
+
+                $data[$cat->category] = $courseItems->concat($checkpointItems)
+                    ->sortBy([
+                        fn ($a, $b) => ($a->position ?? PHP_INT_MAX) <=> ($b->position ?? PHP_INT_MAX),
+                        fn ($a, $b) => $a->id <=> $b->id,
+                    ])
+                    ->values();
             }
 
             return [
                 'data' => $data,
+                'category_ids' => $categoryIds,
                 'current_page' => 1,
                 'last_page' => 1,
             ];
@@ -328,6 +361,11 @@ class CourseController extends Controller
                     ])
                     ->orderByRaw('position IS NULL, position ASC')
                     ->orderBy('id');
+            },
+            'checkpoints' => function ($query) {
+                $query->with('linkedCourse')
+                    ->orderByRaw('position IS NULL, position ASC')
+                    ->orderBy('id');
             }
         ])
         ->where('level', $level)
@@ -353,6 +391,15 @@ class CourseController extends Controller
                 }
 
                 return $course;
+            });
+
+            $category->checkpoints->transform(function ($checkpoint) {
+                $template = CheckpointCatalog::get($checkpoint->checkpoint_key) ?? [];
+                $checkpoint->title = $checkpoint->title ?? ($template['title'] ?? $checkpoint->checkpoint_key);
+                $checkpoint->description = $checkpoint->description ?? ($template['description'] ?? '');
+                $checkpoint->label = $template['label'] ?? 'Practice Checkpoint';
+
+                return $checkpoint;
             });
         });
 
@@ -391,12 +438,14 @@ class CourseController extends Controller
     public function updateCoursePositions(Request $request)
     {
         $validated = $request->validate([
-            'courses' => 'required|array',
-            'courses.*' => 'integer',
+            'items' => 'required|array',
+            'items.*.type' => 'required|in:course,checkpoint',
+            'items.*.id' => 'required|integer',
         ]);
 
-        foreach ($validated['courses'] as $index => $id) {
-            Course::where('id', $id)->update(['position' => $index + 1]);
+        foreach ($validated['items'] as $index => $item) {
+            $model = $item['type'] === 'checkpoint' ? CourseCheckpoint::class : Course::class;
+            $model::where('id', $item['id'])->update(['position' => $index + 1]);
         }
 
         return response()->json([

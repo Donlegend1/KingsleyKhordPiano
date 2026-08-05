@@ -190,7 +190,7 @@
     $resumeSectionLabel = match ($resumeType ?? null) {
         'App\Models\ExtraCourse' => 'Extra Courses',
         'App\Models\LearnSong' => 'Learn Songs',
-        'App\Models\MusicalApplication' => 'Piano Exercise',
+        'App\Models\MusicalApplication' => 'Guided Practice',
         'App\Models\Course' => 'Roadmap',
         'App\Models\Upload' => $resumeLesson->category ? \Illuminate\Support\Str::title($resumeLesson->category) : 'Lesson',
         default => null,
