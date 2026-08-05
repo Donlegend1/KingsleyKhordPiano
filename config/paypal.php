@@ -13,7 +13,9 @@ return [
 
     'live' => [
         'client_id' => env('PAYPAL_LIVE_CLIENT_ID', ''),
-        'client_secret' => env('PAYPAL_LIVE_CLIENT_SECRET', env('PAYPAL_lIVE_CLIENT_SECRET', '')),
+        // Accept both spellings — .env often has PAYPAL_lIVE_CLIENT_SECRET (typo).
+        'client_secret' => env('PAYPAL_LIVE_CLIENT_SECRET')
+            ?: env('PAYPAL_lIVE_CLIENT_SECRET', ''),
         'app_id' => env('PAYPAL_LIVE_APP_ID', ''),
     ],
 

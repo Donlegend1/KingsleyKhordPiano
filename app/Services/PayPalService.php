@@ -38,16 +38,36 @@ class PayPalService
             throw new \RuntimeException('PayPal product could not be resolved for this plan.');
         }
 
-        $subscription = $provider
-            ->setReturnAndCancelUrl(route('paypal.success'), route('paypal.cancel'))
-            ->setBrandName(config('app.name', 'Kingsley Khord Piano'))
-            ->addCustomId((string) $user->id)
-            ->addProductById($productId)
-            ->addBillingPlanById($paypalPlanId)
-            ->setupSubscription(
-                trim($user->first_name.' '.$user->last_name) ?: $user->email,
-                $user->email
-            );
+        $givenName = trim((string) $user->first_name) ?: 'Customer';
+        $surname = trim((string) $user->last_name) ?: 'Member';
+
+        // Build the payload explicitly — the package helper omits shipping_preference /
+        // user_action, which commonly makes PayPal's approval page fail with the
+        // generic /webapps/billing/error screen.
+        $subscription = $provider->createSubscription([
+            'plan_id' => $paypalPlanId,
+            'quantity' => '1',
+            'custom_id' => (string) $user->id,
+            'subscriber' => [
+                'name' => [
+                    'given_name' => substr($givenName, 0, 140),
+                    'surname' => substr($surname, 0, 140),
+                ],
+                'email_address' => $user->email,
+            ],
+            'application_context' => [
+                'brand_name' => substr((string) config('app.name', 'Kingsley Khord Piano'), 0, 127),
+                'locale' => 'en-US',
+                'shipping_preference' => 'NO_SHIPPING',
+                'user_action' => 'SUBSCRIBE_NOW',
+                'payment_method' => [
+                    'payer_selected' => 'PAYPAL',
+                    'payee_preferred' => 'IMMEDIATE_PAYMENT_REQUIRED',
+                ],
+                'return_url' => route('paypal.success'),
+                'cancel_url' => route('paypal.cancel'),
+            ],
+        ]);
 
         if ($error = data_get($subscription, 'error')) {
             Log::error('PayPal create subscription failed', ['response' => $subscription]);
@@ -473,8 +493,16 @@ class PayPalService
             ]],
             'payment_preferences' => [
                 'auto_bill_outstanding' => true,
+                'setup_fee' => [
+                    'value' => '0',
+                    'currency_code' => $currency,
+                ],
                 'setup_fee_failure_action' => 'CONTINUE',
                 'payment_failure_threshold' => 3,
+            ],
+            'taxes' => [
+                'percentage' => '0',
+                'inclusive' => false,
             ],
         ]);
 
