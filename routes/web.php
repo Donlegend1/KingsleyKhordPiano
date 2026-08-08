@@ -24,6 +24,7 @@ use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ShopCheckoutController;
 use App\Support\ShopCatalog;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\CommunityIndexController;
@@ -96,48 +97,12 @@ Route::post('/cart/remove', [CartController::class, 'remove']);
 Route::post('/cart/update', [CartController::class, 'updateQty']);
 Route::post('/cart/clear', [CartController::class, 'clear']);
 
-Route::get('/checkout', function () {
-    $items = CartController::hydrate();
-    $subtotal = collect($items)->sum(fn ($i) => $i['price'] * $i['qty']);
-
-    return view('checkout', [
-        'items' => $items,
-        'subtotal' => $subtotal,
-        'discount' => 0,
-        'total' => $subtotal,
-        'cartCount' => CartController::count(),
-    ]);
-});
-
-Route::get('/order-confirmation', function () {
-    $items = collect(CartController::hydrate())->map(fn ($item) => [
-        'name' => $item['name'],
-        'meta' => $item['type'],
-        'price' => $item['price'] * $item['qty'],
-        'qty' => $item['qty'],
-        'downloadLabel' => $item['type'] === 'Plugin' ? 'Download Plugin' : 'Download File',
-        'downloadUrl' => ShopCatalog::find($item['slug'])['download_url'] ?? null,
-        'thumbnail' => $item['thumbnail'],
-        'from' => $item['from'],
-        'to' => $item['to'],
-    ])->all();
-
-    $subtotal = collect($items)->sum('price');
-
-    // Simulate a completed purchase: this "pays" for whatever was in the cart, then empties it.
-    session(['cart' => []]);
-
-    return view('order-confirmation', [
-        'items' => $items,
-        'subtotal' => $subtotal,
-        'discount' => 0,
-        'total' => $subtotal,
-        'orderNumber' => '#KK-' . now()->format('Y') . '-' . random_int(1000, 9999),
-        'orderDate' => now()->format('F j, Y'),
-        'email' => 'john.doe@example.com',
-        'cartCount' => 0,
-    ]);
-});
+Route::get('/checkout', [ShopCheckoutController::class, 'index'])->name('shop.checkout');
+Route::post('/checkout/pay', [ShopCheckoutController::class, 'pay'])->name('shop.checkout.pay');
+Route::get('/checkout/stripe/success', [ShopCheckoutController::class, 'stripeSuccess'])->name('shop.checkout.stripe.success');
+Route::get('/checkout/paypal/success', [ShopCheckoutController::class, 'paypalSuccess'])->name('shop.checkout.paypal.success');
+Route::get('/checkout/cancel', [ShopCheckoutController::class, 'cancel'])->name('shop.checkout.cancel');
+Route::get('/order-confirmation', [ShopCheckoutController::class, 'confirmation'])->name('shop.order.confirmation');
 
 Route::get('/book-session', function () {
     return view('book-session', ['pageTitle' => 'Book a Session']);
