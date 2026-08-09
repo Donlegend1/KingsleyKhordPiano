@@ -308,6 +308,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Shop Products Admin (MIDI files & Plugins)
     Route::resource('shop', \App\Http\Controllers\Admin\ShopProductController::class, ['as' => 'admin', 'parameters' => ['shop' => 'shopProduct']])->except(['show']);
 
+    // Shop Orders (checkout customers)
+    Route::get('shop-orders', [\App\Http\Controllers\Admin\ShopOrderController::class, 'index'])->name('admin.shop-orders.index');
+    Route::get('shop-orders/{shopOrder}', [\App\Http\Controllers\Admin\ShopOrderController::class, 'show'])->name('admin.shop-orders.show');
+
     // Guest Bookings
     Route::prefix('guest-bookings')->name('admin.guest-bookings.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\GuestBookingController::class, 'index'])->name('index');

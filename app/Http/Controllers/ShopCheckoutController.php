@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ShopOrder;
 use App\Support\ShopCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,6 +76,22 @@ class ShopCheckoutController extends Controller
         ];
 
         Cache::put($this->pendingKey($reference), $pending, now()->addHours(6));
+
+        ShopOrder::updateOrCreate(
+            ['checkout_reference' => $reference],
+            [
+                'user_id' => Auth::id(),
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'country' => $request->country,
+                'payment_method' => $request->payment_method,
+                'status' => 'pending',
+                'total' => $total,
+                'currency' => 'USD',
+                'items' => $items,
+            ]
+        );
 
         try {
             return $request->payment_method === 'stripe'
@@ -308,6 +325,25 @@ class ShopCheckoutController extends Controller
     {
         $orderNumber = '#KK-'.now()->format('Y').'-'.random_int(1000, 9999);
 
+        ShopOrder::updateOrCreate(
+            ['checkout_reference' => $pending['reference']],
+            [
+                'order_number' => $orderNumber,
+                'user_id' => $pending['user_id'] ?? null,
+                'first_name' => $pending['first_name'],
+                'last_name' => $pending['last_name'],
+                'email' => $pending['email'],
+                'country' => $pending['country'],
+                'payment_method' => $pending['payment_method'],
+                'payment_reference' => $paymentReference,
+                'status' => 'paid',
+                'total' => $pending['total'],
+                'currency' => $pending['currency'] ?? 'USD',
+                'items' => $pending['items'],
+                'paid_at' => now(),
+            ]
+        );
+
         session([
             'shop_order' => [
                 'order_number' => $orderNumber,
@@ -339,7 +375,10 @@ class ShopCheckoutController extends Controller
                 'metadata' => [
                     'type' => 'shop_cart',
                     'order_number' => $orderNumber,
+                    'first_name' => $pending['first_name'],
+                    'last_name' => $pending['last_name'],
                     'email' => $pending['email'],
+                    'country' => $pending['country'],
                     'checkout_reference' => $pending['reference'],
                     'items' => collect($pending['items'])->map(fn ($i) => [
                         'slug' => $i['slug'],
