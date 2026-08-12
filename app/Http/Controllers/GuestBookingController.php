@@ -8,7 +8,6 @@ use App\Services\GoogleCalendarService;
 use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Stripe\Stripe;
@@ -16,6 +15,7 @@ use Stripe\Checkout\Session as StripeSession;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\GuestBookingConfirmed;
 use App\Mail\NewGuestBookingNotification;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class GuestBookingController extends Controller
 {
@@ -66,7 +66,7 @@ class GuestBookingController extends Controller
             'time' => 'required',
             'focus' => 'nullable|string',
             'skillLevel' => 'nullable|string',
-            'paymentMethod' => 'required|in:stripe,paystack',
+            'paymentMethod' => 'required|in:stripe,paypal',
             'timezone' => 'nullable|string|max:64',
         ]);
 
@@ -82,8 +82,6 @@ class GuestBookingController extends Controller
         if (\Carbon\Carbon::parse("{$request->date} {$request->time}") < $this->earliestBookableAt()) {
             return response()->json(['error' => 'Bookings must be made at least 24 hours in advance.'], 422);
         }
-
-        $reference = Str::uuid()->toString();
 
         $booking = GuestBooking::create([
             'name' => $request->name,
@@ -104,8 +102,8 @@ class GuestBookingController extends Controller
                 $booking->update(['stripe_session_id' => $fakeRef]);
                 $url = route('guest-booking.success', ['provider' => 'stripe']) . '?session_id=' . $fakeRef;
             } else {
-                $booking->update(['paystack_reference' => $fakeRef]);
-                $url = route('guest-booking.success', ['provider' => 'paystack']) . '?reference=' . $fakeRef;
+                $booking->update(['paypal_order_id' => $fakeRef]);
+                $url = route('guest-booking.success', ['provider' => 'paypal']) . '?token=' . $fakeRef;
             }
 
             return response()->json(['url' => $url]);
@@ -113,9 +111,9 @@ class GuestBookingController extends Controller
 
         if ($request->paymentMethod === 'stripe') {
             return $this->initiateStripe($booking);
-        } else {
-            return $this->initiatePaystack($booking, $reference);
         }
+
+        return $this->initiatePayPal($booking);
     }
 
     private function initiateStripe(GuestBooking $booking)
@@ -153,34 +151,59 @@ class GuestBookingController extends Controller
         }
     }
 
-    private function initiatePaystack(GuestBooking $booking, $reference)
+    private function initiatePayPal(GuestBooking $booking)
     {
         try {
-            $payload = [
-                'email' => $booking->email,
-                'amount' => 80000 * 100, // #80000.00 in cents
-              
-                'reference' => $reference,
-                'callback_url' => route('guest-booking.success', ['provider' => 'paystack']),
-                'metadata' => [
-                    'booking_id' => $booking->id,
+            $provider = new PayPalClient;
+            $provider->setApiCredentials(config('paypal'));
+            $provider->getAccessToken();
+            $provider->setCurrency('USD');
+
+            $order = $provider->createOrder([
+                'intent' => 'CAPTURE',
+                'purchase_units' => [[
+                    'reference_id' => (string) $booking->id,
+                    'custom_id' => (string) $booking->id,
+                    'description' => 'One-on-One Piano Lesson with Kingsley Khord',
+                    'amount' => [
+                        'currency_code' => 'USD',
+                        'value' => '60.00',
+                    ],
+                ]],
+                'application_context' => [
+                    'brand_name' => substr((string) config('app.name', 'Kingsley Khord Piano'), 0, 127),
+                    'shipping_preference' => 'NO_SHIPPING',
+                    'user_action' => 'PAY_NOW',
+                    'return_url' => route('guest-booking.success', ['provider' => 'paypal'], true),
+                    'cancel_url' => route('guest-booking.cancel', [], true),
                 ],
-            ];
+            ]);
 
-            $response = Http::withToken(config('services.paystack.secret_key'))
-                ->post('https://api.paystack.co/transaction/initialize', $payload);
+            if ($error = data_get($order, 'error')) {
+                Log::error('PayPal guest booking initiation failed', ['error' => $error]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $booking->update(['paystack_reference' => $reference]);
-                return response()->json(['url' => $data['data']['authorization_url']]);
+                return response()->json([
+                    'error' => data_get($error, 'details.0.description')
+                        ?? data_get($error, 'message')
+                        ?? 'PayPal initiation failed',
+                ], 500);
             }
 
-            Log::error('Paystack initiation failed: ' . $response->body());
-            return response()->json(['error' => 'Paystack initiation failed'], 500);
+            $orderId = data_get($order, 'id');
+            $approveUrl = collect(data_get($order, 'links', []))
+                ->firstWhere('rel', 'approve')['href'] ?? null;
+
+            if (! $orderId || ! $approveUrl) {
+                return response()->json(['error' => 'PayPal did not return an approval link.'], 500);
+            }
+
+            $booking->update(['paypal_order_id' => $orderId]);
+
+            return response()->json(['url' => $approveUrl]);
         } catch (\Exception $e) {
-            Log::error('Paystack initiation exception: ' . $e->getMessage());
-            return response()->json(['error' => 'Paystack initiation failed'], 500);
+            Log::error('PayPal guest booking initiation exception: ' . $e->getMessage());
+
+            return response()->json(['error' => 'PayPal initiation failed'], 500);
         }
     }
 
@@ -191,16 +214,43 @@ class GuestBookingController extends Controller
         if ($provider === 'stripe') {
             $sessionId = $request->query('session_id');
             $booking = GuestBooking::where('stripe_session_id', $sessionId)->first();
-            
-            // In a real app, we'd verify with Stripe API here
+
             if ($booking && $booking->payment_status === 'pending') {
                 $this->finalizeBooking($booking);
             }
-        } elseif ($provider === 'paystack') {
-            $reference = $request->query('reference');
-            $booking = GuestBooking::where('paystack_reference', $reference)->first();
+        } elseif ($provider === 'paypal') {
+            $orderId = $request->query('token') ?? $request->query('order_id');
+            $booking = GuestBooking::where('paypal_order_id', $orderId)->first();
 
             if ($booking && $booking->payment_status === 'pending') {
+                if (! config('services.fake_guest_payments')) {
+                    try {
+                        $providerClient = new PayPalClient;
+                        $providerClient->setApiCredentials(config('paypal'));
+                        $providerClient->getAccessToken();
+
+                        $capture = $providerClient->capturePaymentOrder($orderId);
+                        $status = strtoupper((string) data_get($capture, 'status', ''));
+
+                        if ($error = data_get($capture, 'error')) {
+                            Log::error('PayPal guest booking capture failed', [
+                                'order_id' => $orderId,
+                                'error' => $error,
+                            ]);
+
+                            return redirect('/book-session')->with('error', 'Unable to complete PayPal payment.');
+                        }
+
+                        if (! in_array($status, ['COMPLETED', 'APPROVED'], true)) {
+                            return redirect('/book-session')->with('error', "PayPal payment status: {$status}");
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('PayPal guest booking capture exception: ' . $e->getMessage());
+
+                        return redirect('/book-session')->with('error', 'Unable to complete PayPal payment.');
+                    }
+                }
+
                 $this->finalizeBooking($booking);
             }
         }

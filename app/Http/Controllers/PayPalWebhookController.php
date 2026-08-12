@@ -42,7 +42,7 @@ class PayPalWebhookController extends Controller
     protected function verifyWebhook(Request $request): bool
     {
         // Allow local/dev without webhook id configured.
-        $webhookId = env('PAYPAL_WEBHOOK_ID');
+        $webhookId = config('services.paypal.webhook_id') ?: env('PAYPAL_WEBHOOK_ID');
         if (! $webhookId) {
             Log::warning('PAYPAL_WEBHOOK_ID not set; skipping signature verification.');
 

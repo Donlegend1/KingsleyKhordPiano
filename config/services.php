@@ -47,7 +47,7 @@ return [
     'secret' => $isLive
         ? env('STRIPE_LIVE_SECRET')
         : env('STRIPE_TEST_SECRET'),
-    ' webhook_secret ' => env('STRIPE__WEBHOOK_SECRET'),  
+    'webhook_secret' => env('STRIPE_WEBHOOK_SECRET', env('STRIPE__WEBHOOK_SECRET')),
 ],
 
     'paypal' => [
