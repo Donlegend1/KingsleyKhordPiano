@@ -27,7 +27,6 @@ class ManualPaymentService
                 [
                     'stripe_id' => 'manual_' . $reference,
                     'stripe_status' => 'active',
-                    'status' => 'active',
                     'ends_at' => $endsAt,
                     'type' => 'default',
                     'payment_method' => 'Manual',

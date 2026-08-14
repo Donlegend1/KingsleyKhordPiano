@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('booking:generate-availability')->dailyAt('00:30');
         $schedule->command('community:sync-users')->dailyAt('01:00');
         $schedule->command('stripe:sync-subscribers')->everyThreeMinutes();
+        $schedule->command('paypal:sync-subscribers')->everyThreeMinutes();
 
         // Application Emails
         $schedule->command('email:welcome')->dailyAt('07:00');
