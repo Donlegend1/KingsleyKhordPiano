@@ -32,42 +32,25 @@ class PayPalService
 
         $provider = $this->provider($currency);
         $paypalPlanId = $this->resolvePayPalPlanId($provider, $plan, $currency, $duration, $amount);
+        $plan = $plan->fresh();
 
-        $productId = $plan->fresh()->paypal_product_id;
-        if (! $productId) {
-            throw new \RuntimeException('PayPal product could not be resolved for this plan.');
+        $payload = $this->subscriptionPayload($user, $paypalPlanId);
+        $subscription = $provider->createSubscription($payload);
+
+        if ($this->isMissingResource($subscription)) {
+            Log::warning('Stored PayPal plan ID was not found; recreating billing plan', [
+                'local_plan_id' => $plan->id,
+                'stale_paypal_plan_id' => $paypalPlanId,
+                'currency' => $currency,
+                'mode' => $this->paypalMode(),
+            ]);
+
+            $this->forgetBillingId($plan, $currency, true);
+            $plan = $plan->fresh();
+            $paypalPlanId = $this->resolvePayPalPlanId($provider, $plan, $currency, $duration, $amount);
+            $payload = $this->subscriptionPayload($user, $paypalPlanId);
+            $subscription = $provider->createSubscription($payload);
         }
-
-        $givenName = trim((string) $user->first_name) ?: 'Customer';
-        $surname = trim((string) $user->last_name) ?: 'Member';
-
-        // Build the payload explicitly — the package helper omits shipping_preference /
-        // user_action, which commonly makes PayPal's approval page fail with the
-        // generic /webapps/billing/error screen.
-        $subscription = $provider->createSubscription([
-            'plan_id' => $paypalPlanId,
-            'quantity' => '1',
-            'custom_id' => (string) $user->id,
-            'subscriber' => [
-                'name' => [
-                    'given_name' => substr($givenName, 0, 140),
-                    'surname' => substr($surname, 0, 140),
-                ],
-                'email_address' => $user->email,
-            ],
-            'application_context' => [
-                'brand_name' => substr((string) config('app.name', 'Kingsley Khord Piano'), 0, 127),
-                'locale' => 'en-US',
-                'shipping_preference' => 'NO_SHIPPING',
-                'user_action' => 'SUBSCRIBE_NOW',
-                'payment_method' => [
-                    'payer_selected' => 'PAYPAL',
-                    'payee_preferred' => 'IMMEDIATE_PAYMENT_REQUIRED',
-                ],
-                'return_url' => route('paypal.success'),
-                'cancel_url' => route('paypal.cancel'),
-            ],
-        ]);
 
         if ($error = data_get($subscription, 'error')) {
             Log::error('PayPal create subscription failed', ['response' => $subscription]);
@@ -615,14 +598,40 @@ class PayPalService
         string $duration,
         float $amount
     ): string {
-        $planIds = is_array($plan->paypal_plan_ids) ? $plan->paypal_plan_ids : [];
-        if (! empty($planIds[$currency])) {
-            return $planIds[$currency];
+        $stored = $this->storedBillingIds($plan);
+        $existingId = $stored[$currency] ?? null;
+
+        if ($existingId && $this->resourceExists($provider, 'plan', $existingId)) {
+            return $existingId;
         }
 
-        if (! $plan->paypal_product_id) {
+        if ($existingId) {
+            Log::warning('PayPal billing plan ID does not exist in the current environment; creating a new one', [
+                'local_plan_id' => $plan->id,
+                'stale_paypal_plan_id' => $existingId,
+                'currency' => $currency,
+                'mode' => $this->paypalMode(),
+            ]);
+            $this->forgetBillingId($plan, $currency, false);
+            $plan = $plan->fresh();
+            $stored = $this->storedBillingIds($plan);
+        }
+
+        $productId = $stored['product_id'] ?? null;
+        if ($productId && ! $this->resourceExists($provider, 'product', $productId)) {
+            Log::warning('PayPal product ID does not exist in the current environment; creating a new one', [
+                'local_plan_id' => $plan->id,
+                'stale_paypal_product_id' => $productId,
+                'mode' => $this->paypalMode(),
+            ]);
+            $this->persistBillingIds($plan, ['product_id' => null]);
+            $plan = $plan->fresh();
+            $productId = null;
+        }
+
+        if (! $productId) {
             $product = $provider->createProduct([
-                'name' => substr($this->planDisplayName($plan), 0, 127),
+                'name' => substr($this->planDisplayName($plan).' '.$this->paypalMode(), 0, 127),
                 'description' => substr($this->planDisplayName($plan).' membership', 0, 256),
                 'type' => 'SERVICE',
                 'category' => 'SOFTWARE',
@@ -641,8 +650,8 @@ class PayPalService
                 throw new \RuntimeException('PayPal product id missing.');
             }
 
-            $plan->paypal_product_id = $productId;
-            $plan->save();
+            $this->persistBillingIds($plan, ['product_id' => $productId]);
+            $plan = $plan->fresh();
         }
 
         $interval = match ($duration) {
@@ -653,8 +662,8 @@ class PayPalService
         };
 
         $created = $provider->createPlan([
-            'product_id' => $plan->paypal_product_id,
-            'name' => substr($this->planDisplayName($plan)." ({$currency})", 0, 127),
+            'product_id' => $productId,
+            'name' => substr($this->planDisplayName($plan)." ({$currency} ".$this->paypalMode().')', 0, 127),
             'description' => substr("Recurring {$duration} subscription", 0, 127),
             'status' => 'ACTIVE',
             'billing_cycles' => [[
@@ -700,11 +709,127 @@ class PayPalService
             throw new \RuntimeException('PayPal billing plan id missing.');
         }
 
-        $planIds[$currency] = $billingPlanId;
-        $plan->paypal_plan_ids = $planIds;
-        $plan->save();
+        $this->persistBillingIds($plan, [$currency => $billingPlanId]);
 
         return $billingPlanId;
+    }
+
+    protected function subscriptionPayload(User $user, string $paypalPlanId): array
+    {
+        $givenName = trim((string) $user->first_name) ?: 'Customer';
+        $surname = trim((string) $user->last_name) ?: 'Member';
+
+        return [
+            'plan_id' => $paypalPlanId,
+            'quantity' => '1',
+            'custom_id' => (string) $user->id,
+            'subscriber' => [
+                'name' => [
+                    'given_name' => substr($givenName, 0, 140),
+                    'surname' => substr($surname, 0, 140),
+                ],
+                'email_address' => $user->email,
+            ],
+            'application_context' => [
+                'brand_name' => substr((string) config('app.name', 'Kingsley Khord Piano'), 0, 127),
+                'locale' => 'en-US',
+                'shipping_preference' => 'NO_SHIPPING',
+                'user_action' => 'SUBSCRIBE_NOW',
+                'payment_method' => [
+                    'payer_selected' => 'PAYPAL',
+                    'payee_preferred' => 'IMMEDIATE_PAYMENT_REQUIRED',
+                ],
+                'return_url' => route('paypal.success'),
+                'cancel_url' => route('paypal.cancel'),
+            ],
+        ];
+    }
+
+    protected function paypalMode(): string
+    {
+        return config('paypal.mode') === 'live' ? 'live' : 'sandbox';
+    }
+
+    protected function storedBillingIds(Plan $plan): array
+    {
+        $ids = is_array($plan->paypal_plan_ids) ? $plan->paypal_plan_ids : [];
+        $modeIds = is_array($ids[$this->paypalMode()] ?? null) ? $ids[$this->paypalMode()] : [];
+
+        return [
+            'product_id' => $modeIds['product_id'] ?? $plan->paypal_product_id,
+            'USD' => $modeIds['USD'] ?? ($ids['USD'] ?? null),
+            'EUR' => $modeIds['EUR'] ?? ($ids['EUR'] ?? null),
+        ];
+    }
+
+    protected function persistBillingIds(Plan $plan, array $updates): void
+    {
+        $ids = is_array($plan->paypal_plan_ids) ? $plan->paypal_plan_ids : [];
+        $mode = $this->paypalMode();
+        $modeIds = is_array($ids[$mode] ?? null) ? $ids[$mode] : [];
+
+        foreach ($updates as $key => $value) {
+            $modeIds[$key] = $value;
+            if ($key === 'product_id') {
+                $plan->paypal_product_id = $value;
+            } elseif (in_array($key, ['USD', 'EUR'], true)) {
+                $ids[$key] = $value;
+            }
+        }
+
+        $ids[$mode] = $modeIds;
+        $plan->paypal_plan_ids = $ids;
+        $plan->save();
+    }
+
+    protected function forgetBillingId(Plan $plan, string $currency, bool $forgetProduct = false): void
+    {
+        $updates = [$currency => null];
+        if ($forgetProduct) {
+            $updates['product_id'] = null;
+        }
+
+        $this->persistBillingIds($plan, $updates);
+    }
+
+    protected function resourceExists(PayPalClient $provider, string $type, string $id): bool
+    {
+        try {
+            $details = $type === 'product'
+                ? $provider->showProductDetails($id)
+                : $provider->showPlanDetails($id);
+
+            if ($this->isMissingResource($details)) {
+                return false;
+            }
+
+            return (bool) data_get($details, 'id');
+        } catch (Throwable $e) {
+            Log::warning('PayPal resource lookup failed', [
+                'type' => $type,
+                'id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    protected function isMissingResource(mixed $response): bool
+    {
+        $name = strtoupper((string) (
+            data_get($response, 'error.name')
+            ?? data_get($response, 'name')
+            ?? ''
+        ));
+        $issue = strtoupper((string) (
+            data_get($response, 'error.details.0.issue')
+            ?? data_get($response, 'details.0.issue')
+            ?? ''
+        ));
+
+        return in_array($name, ['RESOURCE_NOT_FOUND', 'INVALID_RESOURCE_ID'], true)
+            || $issue === 'INVALID_RESOURCE_ID';
     }
 
     protected function provider(string $currency): PayPalClient

@@ -183,7 +183,7 @@ class PaymentSettingsController extends Controller
             'paypal.test_client_secret' => env('PAYPAL_TEST_CLIENT_SECRET', env('PAYPAL_SANDBOX_CLIENT_SECRET')),
             'paypal.live_client_id' => env('PAYPAL_LIVE_CLIENT_ID'),
             'paypal.live_client_secret' => env('PAYPAL_LIVE_CLIENT_SECRET', env('PAYPAL_lIVE_CLIENT_SECRET')),
-            'paypal.webhook_id' => env('PAYPAL_WEBHOOK_ID'),
+            'paypal.webhook_id' => env('PAYPAL_WEBHOOK_ID', env('PAYPAL_SANDBOX_WEBHOOK_ID', env('PAYPAL_LIVE_WEBHOOK_ID'))),
             'paystack.test_secret_key' => env('PAYSTACK_TEST_SECRET_KEY', env('PAYSTACK_SECRET_KEY')),
             'paystack.live_secret_key' => env('PAYSTACK_LIVE_SECRET_KEY'),
         ];

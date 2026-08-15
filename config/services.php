@@ -59,7 +59,9 @@ return [
             : env('PAYPAL_TEST_CLIENT_SECRET'),
         'currency' => env('PAYPAL_CURRENCY', 'USD'),
         'test_mode' => env('PAYPAL_MODE', 'sandbox') === 'sandbox',
-        'webhook_id' => env('PAYPAL_WEBHOOK_ID'),
+        'webhook_id' => env('PAYPAL_MODE', 'sandbox') === 'live'
+            ? (env('PAYPAL_LIVE_WEBHOOK_ID') ?: env('PAYPAL_WEBHOOK_ID'))
+            : (env('PAYPAL_SANDBOX_WEBHOOK_ID') ?: env('PAYPAL_WEBHOOK_ID')),
     ],
 
     'google' => [

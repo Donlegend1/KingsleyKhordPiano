@@ -113,17 +113,74 @@ class User extends Authenticatable implements MustVerifyEmail
     public function likes() { return $this->hasMany(Like::class); }
 
 
-    public function hasActiveSubscription()
+    public function hasActiveSubscription(): bool
     {
-        if ($this->subscribed('default')) {
+        if ($this->hasActiveLocalSubscription()) {
             return true;
         }
 
-        return $this->subscriptions()
-            ->whereIn('stripe_status', ['active', 'trialing'])
+        if ($this->hasActiveEntitlementWindow()) {
+            return true;
+        }
+
+        return $this->payments()
+            ->where('status', 'successful')
+            ->whereNotNull('ends_at')
+            ->where('ends_at', '>', now())
+            ->exists();
+    }
+
+    /**
+     * Stripe, PayPal, Paystack, and manual rows all live on `subscriptions`
+     * and share stripe_status / ends_at.
+     */
+    protected function hasActiveLocalSubscription(): bool
+    {
+        return Subscription::query()
+            ->where('user_id', $this->id)
             ->where(function ($query) {
-                $query->whereNull('ends_at')
-                    ->orWhere('ends_at', '>', now());
+                $query->where(function ($active) {
+                    $active->whereIn('stripe_status', ['active', 'trialing'])
+                        ->where(function ($period) {
+                            $period->whereNull('ends_at')
+                                ->orWhere('ends_at', '>', now());
+                        });
+                })->orWhere(function ($grace) {
+                    $grace->whereIn('stripe_status', ['canceled', 'cancelled'])
+                        ->where('ends_at', '>', now());
+                });
+            })
+            ->exists();
+    }
+
+    /**
+     * PayPal (and some Stripe webhooks) stamp period end on the user.
+     * Canceled-at-period-end still has access until subscription_expires_at.
+     */
+    protected function hasActiveEntitlementWindow(): bool
+    {
+        if (! $this->subscription_expires_at || $this->subscription_expires_at->isPast()) {
+            return false;
+        }
+
+        $status = strtolower((string) ($this->subscription_status ?? ''));
+
+        if (in_array($status, ['past_due', 'expired', 'failed', 'incomplete', 'pending'], true)) {
+            return false;
+        }
+
+        return in_array($status, ['active', 'trialing', 'canceled', 'cancelled'], true)
+            || $this->payment_status === 'successful';
+    }
+
+    public function hasPendingStripeCheckout(): bool
+    {
+        return Subscription::query()
+            ->where('user_id', $this->id)
+            ->whereIn('stripe_status', ['pending', 'incomplete'])
+            ->where(function ($query) {
+                $query->whereNull('payment_method')
+                    ->orWhereRaw('LOWER(payment_method) = ?', ['stripe']);
             })
             ->exists();
     }

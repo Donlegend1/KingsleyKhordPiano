@@ -151,8 +151,11 @@ class Setting extends Model
         }
 
         if (! empty($s['paypal.webhook_id'])) {
-            // Controllers currently read env(); also expose via config for future use.
-            config(['services.paypal.webhook_id' => $s['paypal.webhook_id']]);
+            $webhookId = $s['paypal.webhook_id'];
+            config([
+                'services.paypal.webhook_id' => $webhookId,
+                'paypal.'.($paypalIsLive ? 'live' : 'sandbox').'.webhook_id' => $webhookId,
+            ]);
         }
 
         $activePaypalId = $paypalIsLive

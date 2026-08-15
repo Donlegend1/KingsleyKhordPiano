@@ -9,6 +9,7 @@ return [
         'client_id' => env('PAYPAL_TEST_CLIENT_ID', env('PAYPAL_SANDBOX_CLIENT_ID', '')),
         'client_secret' => env('PAYPAL_TEST_CLIENT_SECRET', env('PAYPAL_SANDBOX_CLIENT_SECRET', '')),
         'app_id' => env('PAYPAL_SANDBOX_APP_ID', 'APP-80W284485P519543T'),
+        'webhook_id' => env('PAYPAL_SANDBOX_WEBHOOK_ID', env('PAYPAL_WEBHOOK_ID', '')),
     ],
 
     'live' => [
@@ -17,6 +18,7 @@ return [
         'client_secret' => env('PAYPAL_LIVE_CLIENT_SECRET')
             ?: env('PAYPAL_lIVE_CLIENT_SECRET', ''),
         'app_id' => env('PAYPAL_LIVE_APP_ID', ''),
+        'webhook_id' => env('PAYPAL_LIVE_WEBHOOK_ID', env('PAYPAL_WEBHOOK_ID', '')),
     ],
 
     'payment_action' => env('PAYPAL_PAYMENT_ACTION', 'Sale'),
