@@ -78,6 +78,12 @@
                         {{ Str::title($activeVideo->title) }}
                     </h1>
 
+                    @include('memberpages.partials.midi-practice-display', [
+                        'midiPracticeFile' => $midiPracticeFile,
+                        'midiPracticeFiles' => $midiPracticeFiles,
+                        'midiPracticeTitle' => Str::title($activeVideo->title),
+                    ])
+
                     @if (!empty($activeVideo->images) && is_array($activeVideo->images))
                         <div class="mt-6 mb-8">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Course Walkthrough / Highlights</h4>
