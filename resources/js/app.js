@@ -47,6 +47,9 @@ import "./components/Members/SinglePost.jsx"
 import "./components/PremiumChat/PremiumChat.jsx"
 import "./components/PremiumChat/PremiumChatButton.jsx"
 import './components/Midi/MidiFiles.jsx';
+if (document.querySelector('.midi-practice-player')) {
+    import('./components/Midi/MidiPracticePlayer.jsx');
+}
 import "./components/Calls/CallCard.jsx"
 import "./components/EmailCampaign/Index.jsx"
 import "./components/EmailCampaign/Create.jsx"

@@ -25,6 +25,7 @@
         "dayjs": "^1.11.13",
         "embla-carousel-react": "^8.6.0",
         "emoji-picker-react": "^4.16.1",
+        "html-midi-player": "^1.6.0",
         "lucide-react": "^0.539.0",
         "radix-ui": "^1.4.3",
         "react": "^18.3.1",
