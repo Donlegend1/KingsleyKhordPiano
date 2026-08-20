@@ -109,11 +109,32 @@ const PlanSwitchAndCurrencySelect = () => {
         "In-depth master classes",
     ];
 
+    const periodSuffix = {
+        daily: "day",
+        monthly: "month",
+        quarterly: "quarter",
+        yearly: "year",
+    };
+
+    const shortPeriodSuffix = {
+        daily: "day",
+        monthly: "mo",
+        quarterly: "qtr",
+        yearly: "yr",
+    };
+
     const saveBadge = {
+        daily: "Test",
         monthly: null,
         quarterly: "Save 10%",
         yearly: "Save 30%",
     };
+
+    const billingCycles = ["daily", "monthly", "quarterly", "yearly"].filter(
+        (cycle) => cycle !== "daily" || plans.some((plan) => plan.type === "daily"),
+    );
+
+    const isPaypalOnlyPlan = selectedPlanDetails?.type === "daily";
     if (isCheckoutOnly && selectedPlanDetails) {
         return (
             <div className="flex items-center justify-center py-6 px-4">
@@ -132,7 +153,7 @@ const PlanSwitchAndCurrencySelect = () => {
                             {currencySigns[currency]}
                             {matchAmountToCurrency(selectedPlanDetails)}
                             <span className="text-sm text-gray-400 font-medium font-normal">
-                                /{selectedPlanDetails.type === "monthly" ? "month" : selectedPlanDetails.type === "quarterly" ? "quarter" : "year"}
+                                /{periodSuffix[selectedPlanDetails.type] ?? selectedPlanDetails.type}
                             </span>
                         </div>
                     </div>
@@ -142,19 +163,21 @@ const PlanSwitchAndCurrencySelect = () => {
                     </p>
 
                     <div className="flex flex-col gap-4">
-                        <form action="/stripe/create" method="POST">
-                            <input type="hidden" name="_token" value={csrfToken} />
-                            <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
-                            <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
-                            <input type="hidden" name="duration" value={selectedPlanDetails.type} />
-                            <input type="hidden" name="currency" value={currency} />
-                            <button
-                                type="submit"
-                                className="bg-[#FFD736] hover:bg-[#E5C130] text-gray-900 py-3.5 rounded-xl text-center font-bold w-full transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                            >
-                                Pay with Stripe
-                            </button>
-                        </form>
+                        {!isPaypalOnlyPlan && (
+                            <form action="/stripe/create" method="POST">
+                                <input type="hidden" name="_token" value={csrfToken} />
+                                <input type="hidden" name="plan_id" value={selectedPlanDetails.id} />
+                                <input type="hidden" name="tier" value={selectedPlanDetails.tier} />
+                                <input type="hidden" name="duration" value={selectedPlanDetails.type} />
+                                <input type="hidden" name="currency" value={currency} />
+                                <button
+                                    type="submit"
+                                    className="bg-[#FFD736] hover:bg-[#E5C130] text-gray-900 py-3.5 rounded-xl text-center font-bold w-full transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                                >
+                                    Pay with Stripe
+                                </button>
+                            </form>
+                        )}
 
                         {/* <form action="/paystack" method="POST">
                             <input type="hidden" name="_token" value={csrfToken} />
@@ -237,7 +260,7 @@ const PlanSwitchAndCurrencySelect = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
-                    {["monthly", "quarterly", "yearly"].map((cycle) => (
+                    {billingCycles.map((cycle) => (
                         <button
                             key={cycle}
                             onClick={() => handlePlanToggle(cycle)}
@@ -323,7 +346,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                         {matchAmountToCurrency(plan).toLocaleString()}
                                     </span>
                                     <span className="text-sm text-gray-400 font-medium">
-                                        /{selectedPlan === "monthly" ? "mo" : selectedPlan === "quarterly" ? "qtr" : "yr"}
+                                        /{shortPeriodSuffix[selectedPlan] ?? selectedPlan}
                                     </span>
                                 </div>
 
@@ -382,6 +405,7 @@ const PlanSwitchAndCurrencySelect = () => {
                         <div className="flex flex-col gap-6">
                             {authUser ? (
                                 <>
+                                    {!isPaypalOnlyPlan && (
                                     <form action="/stripe/create" method="POST">
                                         <input
                                             type="hidden"
@@ -415,6 +439,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                             Pay with Stripe
                                         </button>
                                     </form>
+                                    )}
                                     {/* <form action="/paystack" method="POST">
                                         <input
                                             type="hidden"
@@ -466,6 +491,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                 </>
                             ) : (
                                 <>
+                                    {!isPaypalOnlyPlan && (
                                     <button
                                         type="button"
                                         onClick={() => handleGuestCheckoutChoice("stripe")}
@@ -473,6 +499,7 @@ const PlanSwitchAndCurrencySelect = () => {
                                     >
                                         Pay with Stripe
                                     </button>
+                                    )}
                                     {/* <button
                                         type="button"
                                         onClick={() => handleGuestCheckoutChoice("paystack")}

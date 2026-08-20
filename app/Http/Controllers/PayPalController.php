@@ -19,7 +19,7 @@ class PayPalController extends Controller
         $request->validate([
             'plan_id' => 'nullable|integer|exists:plans,id',
             'tier' => 'required|string',
-            'duration' => 'required|in:monthly,quarterly,yearly',
+            'duration' => 'required|in:daily,monthly,quarterly,yearly',
             'currency' => 'required|in:USD,EUR',
         ]);
 

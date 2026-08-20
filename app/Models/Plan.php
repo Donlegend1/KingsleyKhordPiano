@@ -31,5 +31,6 @@ class Plan extends Model
         'agent',
         'product_id',
         'price_id',
+        'slug',
     ];
 }
