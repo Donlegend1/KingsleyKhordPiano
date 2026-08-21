@@ -268,6 +268,7 @@
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
                         ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'music-note.svg', 'new' => $hasNewLearnSongs],
                         ['url' => 'member/live-session',    'label' => 'Live Shows',  'icon' => 'livesession.svg'],
+                        ['url' => 'member/audio-quiz',       'label' => 'Audio Quiz',  'icon' => 'sound.png'],
                     ];
                 @endphp
                 @foreach($subNav as $item)

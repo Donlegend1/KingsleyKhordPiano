@@ -2,15 +2,6 @@
 
 @section('title', $plugin['name'] . ' - Shop')
 
-@php
-    $related = [
-        ['name' => 'Worship Keys Plugin', 'price' => 49.99, 'from' => '#3b0f5c', 'to' => '#12021f'],
-        ['name' => 'Vintage Keys Plugin', 'price' => 59.99, 'from' => '#0f3b3b', 'to' => '#02100f'],
-        ['name' => 'Gospel Organ Plugin', 'price' => 39.99, 'from' => '#3b0f0f', 'to' => '#100202'],
-        ['name' => 'Ambient Pads Plugin', 'price' => 34.99, 'from' => '#241a3b', 'to' => '#05050a'],
-    ];
-@endphp
-
 @section('content')
 <div class="bg-white min-h-screen pt-32 pb-24 px-4">
     <div class="max-w-7xl mx-auto">
@@ -121,39 +112,6 @@
                 </div>
             </div>
         @endif
-
-        <!-- Related Plugins -->
-        <div class="mt-16">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Related Plugins</h2>
-            <div class="border-t border-gray-100 mb-8"></div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach($related as $item)
-                    <div class="flex flex-col">
-                        <div class="aspect-video rounded-xl overflow-hidden relative"
-                            style="background: linear-gradient(135deg, {{ $item['from'] }}, {{ $item['to'] }});">
-                            <div class="absolute top-3 left-3 text-white font-bold text-sm"
-                                style="text-shadow: 0 2px 6px rgba(0,0,0,0.6);">
-                                {{ $item['name'] }}
-                            </div>
-                            <div class="absolute bottom-0 left-0 right-0 h-8 flex">
-                                @for($i = 0; $i < 22; $i++)
-                                    <div class="flex-1 border-r border-black/30 bg-white/90"></div>
-                                @endfor
-                            </div>
-                        </div>
-
-                        <h3 class="mt-4 text-gray-900 font-semibold text-[15px]">{{ $item['name'] }}</h3>
-                        <p class="mt-1 text-gray-900 font-bold">${{ number_format($item['price'], 2) }}</p>
-
-                        <button class="mt-3 flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white text-sm font-semibold py-2.5 rounded-lg transition">
-                            <i class="fa-solid fa-cart-shopping text-xs"></i>
-                            Add to Cart
-                        </button>
-                    </div>
-                @endforeach
-            </div>
-        </div>
 
     </div>
 </div>

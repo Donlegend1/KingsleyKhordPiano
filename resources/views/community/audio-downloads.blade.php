@@ -250,7 +250,7 @@
                 <input type="range" min="0" max="1" step="0.01" x-model.number="volume" @input="setVolume" class="flex-1 h-1 accent-[#FF6B35]">
             </div>
 
-            <audio x-ref="player" @timeupdate="onTimeUpdate" @loadedmetadata="onLoadedMetadata" @ended="onEnded" @error="onPlaybackError"></audio>
+            <audio x-ref="player" @timeupdate="onTimeUpdate" @loadedmetadata="onLoadedMetadata" @ended="onEnded" x-on:error="onPlaybackError"></audio>
         </div>
         <p x-show="playbackError" x-text="playbackError" class="text-center text-xs text-red-500 pb-2"></p>
     </div>

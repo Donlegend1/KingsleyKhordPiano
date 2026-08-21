@@ -1,0 +1,23 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(php -l *)",
+            "Bash(php -v)",
+            "Bash(export NVM_DIR=*)",
+            "Bash(export PATH=*)",
+            "Bash(curl -s http://127.0.0.1:*)",
+            "Bash(curl -s http://localhost:*)",
+            "Bash(source \"$NVM_DIR/nvm.sh\")",
+            "Bash(source ~/.nvm/nvm.sh)",
+            "Bash(nohup php artisan serve *)",
+            "Bash(nohup npm run dev *)",
+            "Bash(npm run dev)",
+            "Bash(npm run build)",
+            "Bash(php artisan migrate:status)",
+            "Bash(php artisan route:list*)",
+            "Bash(php artisan config:clear)",
+            "Bash(php artisan view:clear)",
+            "Bash(php artisan cache:clear)"
+        ]
+    }
+}

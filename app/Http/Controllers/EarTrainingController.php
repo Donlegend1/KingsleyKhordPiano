@@ -49,6 +49,30 @@ class EarTrainingController extends Controller
         return view('memberpages.eartraining.show', compact('quiz', 'isCompleted'));
     }
 
+    public function siblings($id) {
+        $quiz = Quiz::findOrFail($id);
+
+        $siblings = Quiz::where('category', $quiz->category)
+            ->orderBy('id')
+            ->get(['id', 'title']);
+
+        $completedIds = \App\Models\LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_type', Quiz::class)
+            ->whereIn('completable_id', $siblings->pluck('id'))
+            ->pluck('completable_id')
+            ->all();
+
+        $siblings = $siblings->map(function ($sibling) use ($completedIds) {
+            return [
+                'id' => $sibling->id,
+                'title' => $sibling->title,
+                'completed' => in_array($sibling->id, $completedIds),
+            ];
+        });
+
+        return response()->json($siblings);
+    }
+
     public  function showadmin() {
         return view('admin.eartraining.show');
     }
