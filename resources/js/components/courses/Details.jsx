@@ -1206,7 +1206,7 @@ const CoursesPage = () => {
                     className={`flex flex-col transition-all duration-300 ${
                         sidebarCollapsed ? "md:w-full" : "md:w-2/3"
                     }`}
-                    style={{ height: "calc(100vh - 90px)" }}
+                    style={{ height: "calc(100dvh - 90px)" }}
                 >
                     <div
                         ref={contentScrollRef}
@@ -1255,7 +1255,7 @@ const CoursesPage = () => {
                     {/* Fixed action bar (outside the scroll area) so the
                         checkpoint's CTA stays visible without scrolling. */}
                     {selectedCheckpoint && checkpointHasCta(selectedCheckpoint) && (
-                        <div className="flex-shrink-0 px-4 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+                        <div className="sticky bottom-0 z-20 flex-shrink-0 px-4 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
                             <div className="max-w-7xl mx-auto">
                                 <CheckpointCta
                                     checkpoint={selectedCheckpoint}

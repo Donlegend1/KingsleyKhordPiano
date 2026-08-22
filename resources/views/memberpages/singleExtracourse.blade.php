@@ -106,20 +106,6 @@
                         <div class="mb-5"></div>
                     @endif
 
-                    @if (!empty($lesson->images) && is_array($lesson->images))
-                        <div class="mt-6 mb-8">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Course Walkthrough / Highlights</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                @foreach ($lesson->images as $imgPath)
-                                    <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50 aspect-video relative group">
-                                        <img src="{{ asset($imgPath) }}" alt="Walkthrough Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-
                     {{-- Action Buttons --}}
                     <div class="flex items-center flex-wrap gap-3 mb-10">
                         <form action="{{ route('bookmark.toggle') }}" method="POST" class="bookmark-form">
@@ -151,8 +137,20 @@
                         </form>
                     </div>
 
-                    @if ($lessonType === 'learn_songs')
-                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
+                    @if (!empty($lesson->images) && is_array($lesson->images))
+                        <div class="mb-10 grid grid-cols-1 gap-4">
+                            @foreach ($lesson->images as $imgPath)
+                                <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50 aspect-video relative group">
+                                    <img src="{{ asset($imgPath) }}" alt="Walkthrough Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if ($lesson->audio_resource_url || $lesson->pdf_resource_url)
+                        <div class="mb-10 rounded-xl overflow-hidden border-2 border-indigo-100 shadow-lg shadow-indigo-100/50">
+                            @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
+                        </div>
                     @endif
 
                     {{-- Lessons in this course (Mobile Only) --}}
@@ -195,8 +193,6 @@
                                     </a>
                                 @endforeach
                             </div>
-
-                            @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
 
                             {{-- Next/Prev Lesson buttons --}}
                             <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
@@ -283,8 +279,6 @@
                             @endforeach
                         </div>
 
-                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
-
                         {{-- Next Lesson button --}}
                         <div class="p-4 bg-white border-t border-gray-100 flex gap-2">
                             @if ($previousVideo)
@@ -339,8 +333,6 @@
                                 </a>
                             @endforeach
                         </div> --}}
-
-                        @include('memberpages.partials.sidebar-downloads', ['lesson' => $lesson])
                     @endif
 
                 </aside>

@@ -291,7 +291,51 @@
 
             {{-- 3. Feedback Widget --}}
             <div
-                x-data="{ rating: 0, hoverRating: 0, comment: '', submitted: false }"
+                x-data="{
+                    rating: 0,
+                    hoverRating: 0,
+                    comment: '',
+                    submitted: false,
+                    submitting: false,
+                    error: '',
+                    items: {{ \Illuminate\Support\Js::from($feedbackList->map(fn ($f) => [
+                        'id' => $f->id,
+                        'rating' => $f->rating,
+                        'comment' => $f->comment,
+                        'created_at' => $f->created_at->diffForHumans(),
+                        'user' => [
+                            'name' => trim($f->user->first_name . ' ' . $f->user->last_name),
+                            'passport' => $f->user->passport,
+                        ],
+                    ])) }},
+                    submit() {
+                        if (this.rating === 0 && this.comment.trim() === '') return;
+                        this.submitting = true;
+                        this.error = '';
+                        fetch('{{ route('community.feedback.store') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            },
+                            body: JSON.stringify({ rating: this.rating || null, comment: this.comment }),
+                        })
+                            .then(async (res) => {
+                                if (!res.ok) throw new Error((await res.json()).message || 'Failed to submit');
+                                return res.json();
+                            })
+                            .then((data) => {
+                                this.items.unshift(data.feedback);
+                                this.rating = 0;
+                                this.comment = '';
+                                this.submitted = true;
+                                setTimeout(() => this.submitted = false, 5000);
+                            })
+                            .catch((e) => this.error = e.message)
+                            .finally(() => this.submitting = false);
+                    }
+                }"
                 class="bg-white dark:bg-[#161617] border border-gray-200 dark:border-white/10 rounded-2xl p-8 shadow-sm"
             >
                 <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-2">Help Us Improve</h3>
@@ -332,20 +376,58 @@
 
                 <button
                     type="button"
-                    @click="if(rating > 0 || comment.trim() !== '') { submitted = true; rating = 0; comment = ''; setTimeout(() => submitted = false, 5000) }"
-                    class="inline-flex px-8 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition shadow-sm"
+                    :disabled="submitting"
+                    @click="submit()"
+                    class="inline-flex px-8 py-3 bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white rounded-xl text-sm font-bold transition shadow-sm"
                 >
-                    Submit Feedback
+                    <span x-text="submitting ? 'Submitting…' : 'Submit Feedback'"></span>
                 </button>
 
                 <!-- Success Alert -->
-                <div 
-                    x-show="submitted" 
-                    x-transition 
-                    x-cloak 
+                <div
+                    x-show="submitted"
+                    x-transition
+                    x-cloak
                     class="mt-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs p-3 rounded-xl text-center font-medium"
                 >
                     Thank you! Your feedback has been received. ✨
+                </div>
+
+                <!-- Error Alert -->
+                <div
+                    x-show="error"
+                    x-transition
+                    x-cloak
+                    x-text="error"
+                    class="mt-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs p-3 rounded-xl text-center font-medium"
+                ></div>
+
+                <!-- Suggestions List -->
+                <div class="mt-6 pt-6 border-t border-gray-100 dark:border-white/10" x-show="items.length > 0">
+                    <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Recent Suggestions</p>
+                    <div class="space-y-4 max-h-96 overflow-y-auto pr-1">
+                        <template x-for="item in items" :key="item.id">
+                            <div class="flex items-start gap-3">
+                                <img :src="item.user.passport || '/avatar1.jpg'" alt="" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-sm font-semibold text-gray-900 dark:text-white" x-text="item.user.name"></span>
+                                        <template x-if="item.rating">
+                                            <span class="flex items-center gap-0.5">
+                                                <template x-for="i in 5">
+                                                    <svg class="w-3 h-3" :class="item.rating >= i ? 'fill-amber-400 stroke-amber-500' : 'fill-transparent stroke-gray-300 dark:stroke-gray-600'" viewBox="0 0 24 24" stroke-width="1.5">
+                                                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                                                    </svg>
+                                                </template>
+                                            </span>
+                                        </template>
+                                        <span class="text-xs text-gray-400" x-text="item.created_at"></span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-0.5" x-text="item.comment" x-show="item.comment"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
 

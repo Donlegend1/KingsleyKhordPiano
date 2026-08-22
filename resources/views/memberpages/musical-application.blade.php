@@ -42,7 +42,7 @@
         ];
     @endphp
 
-    <div x-data="{ search: '' }">
+    <div>
 
     <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm text-gray-500 min-h-8">
@@ -53,23 +53,27 @@
             </div>
 
             <!-- Search Bar -->
-            <div class="relative w-full sm:w-72 group">
+            <form method="GET" action="{{ url()->current() }}" class="relative w-full sm:w-72 group" x-data="{ search: {{ \Illuminate\Support\Js::from($search ?? '') }} }">
+                <input type="hidden" name="skill_level" value="{{ $skillLevel }}">
                 <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
                 </svg>
                 <input
                     type="text"
+                    name="name"
+                    value="{{ $search }}"
                     x-model="search"
+                    x-on:input.debounce.500ms="$el.form.requestSubmit()"
                     placeholder="Search drills..."
                     class="w-full h-10 pl-10 pr-9 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-indigo-500/40 transition-all"
                 >
-                <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
+                <button type="button" x-show="search !== ''" x-cloak @click="search = ''; $el.form.requestSubmit()"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
                     </svg>
                 </button>
-            </div>
+            </form>
         </div>
     </section>
 
@@ -98,7 +102,7 @@
                         class="absolute left-0 right-0 mt-2 rounded-2xl bg-white border border-gray-100 shadow-xl overflow-hidden z-20"
                     >
                         @foreach ($skillLevels as $level)
-                            <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
+                            <a href="{{ route('piano.exercise.musical', ['skill_level' => $level, 'name' => $search]) }}"
                                 class="block px-6 py-3 font-semibold transition-colors duration-150
                            {{ $skillLevel === $level
                                ? 'bg-blue-600 text-white'
@@ -112,7 +116,7 @@
                 <!-- Desktop: Segmented Control -->
                 <div class="hidden sm:flex items-stretch bg-gray-100 rounded-xl p-1.5">
                     @foreach ($skillLevels as $level)
-                        <a href="{{ route('piano.exercise.musical', ['skill_level' => $level]) }}"
+                        <a href="{{ route('piano.exercise.musical', ['skill_level' => $level, 'name' => $search]) }}"
                             class="flex-1 flex items-center justify-center text-center px-6 py-4 rounded-lg font-semibold transition-all duration-300
                        {{ $skillLevel === $level
                            ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
@@ -139,10 +143,8 @@
                             $lessonCount = count($items);
                             $playerUrl = route('piano.exercise.player', ['series' => $seriesName, 'skill_level' => strtolower($firstItem->skill_level)]);
                             $isNew = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $items);
-                            $searchableText = Str::lower($seriesName);
                         @endphp
                         <div
-                            x-show="search === '' || {{ \Illuminate\Support\Js::from($searchableText) }}.includes(search.toLowerCase())"
                             class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
                             <!-- Thumbnail -->

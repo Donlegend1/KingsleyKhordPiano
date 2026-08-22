@@ -212,18 +212,20 @@ class ExerciseController extends Controller
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
         $page = $request->query('page', 1);
+        $search = $request->input('name');
 
         $baseQuery = fn() => \App\Models\MusicalApplication::where('status', 'active')
             ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel))
+            ->when($search, fn($q) => $q->where('series', 'like', "%{$search}%"))
             ->orderByRaw('position IS NULL, position ASC');
 
         $seriesPage = $baseQuery()
             ->select('series')
             ->selectRaw('MAX(created_at) as latest_created_at')
             ->groupBy('series')
-            ->orderByDesc('latest_created_at')
+            ->reorder('latest_created_at', 'desc')
             ->paginate(9, ['*'], 'page', $page)
-            ->appends(['skill_level' => $skillLevel]);
+            ->appends(['skill_level' => $skillLevel, 'name' => $search]);
 
         $seriesNames = collect($seriesPage->items())->pluck('series');
 
@@ -241,6 +243,6 @@ class ExerciseController extends Controller
             ->groupBy('series')
             ->sortBy(fn($items, $series) => $seriesNames->search($series));
 
-        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage'));
+        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage', 'search'));
     }
 }

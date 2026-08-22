@@ -258,6 +258,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/shop', [ShopController::class, 'index']);
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/my-library', [CommunityIndexController::class, 'index'])->name('community.index');
+    Route::post('/feedback', [CommunityIndexController::class, 'storeFeedback'])->name('community.feedback.store');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
     Route::get('/community/leaderboard', [CommunityIndexController::class, 'leaderboard'])->name('community.leaderboard');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
