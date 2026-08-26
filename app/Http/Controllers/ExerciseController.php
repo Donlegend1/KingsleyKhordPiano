@@ -245,4 +245,5 @@ class ExerciseController extends Controller
 
         return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage', 'search'));
     }
+
 }

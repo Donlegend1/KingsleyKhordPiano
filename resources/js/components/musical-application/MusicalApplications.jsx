@@ -41,6 +41,7 @@ const MusicalApplicationList = () => {
         series: "",
         status: "active",
         tags: [],
+        related_lessons: [],
     });
 
     const [upload, setUpload] = useState({
@@ -52,6 +53,7 @@ const MusicalApplicationList = () => {
         series: "",
         status: "active",
         tags: [],
+        related_lessons: [],
     });
 
     const [preview, setPreview] = useState(null);
@@ -174,7 +176,7 @@ const MusicalApplicationList = () => {
     };
 
     const openEditModal = (item) => {
-        setSelectedUpload(item);
+        setSelectedUpload({ ...item, related_lessons: item.related_lessons || [] });
         setPreview(item.thumbnail_url);
         
         // Convert array of IDs to Select objects
@@ -201,14 +203,22 @@ const MusicalApplicationList = () => {
 
         const formData = new FormData();
         Object.entries(selectedUpload).forEach(([key, value]) => {
-            if (key === 'tags') return; // Handled separately
+            if (key === 'tags' || key === 'related_lessons') return; // Handled separately
             if (value !== null) formData.append(key, value);
         });
-        
+
         // Append selected tag IDs
         selectedTags.forEach((tag, index) => {
             formData.append(`tags[${index}]`, tag.value);
         });
+
+        // Append related lessons (name + link pairs)
+        selectedUpload.related_lessons
+            .filter((rl) => rl.title.trim() && rl.url.trim())
+            .forEach((rl, idx) => {
+                formData.append(`related_lessons[${idx}][title]`, rl.title);
+                formData.append(`related_lessons[${idx}][url]`, rl.url);
+            });
 
         formData.append("_method", "PUT");
 
@@ -261,14 +271,22 @@ const MusicalApplicationList = () => {
         }
 
         Object.entries(upload).forEach(([key, value]) => {
-            if (key === 'tags') return;
+            if (key === 'tags' || key === 'related_lessons') return;
             formData.append(key, value);
         });
-        
+
         // Append selected tag IDs
         selectedTags.forEach((tag, index) => {
             formData.append(`tags[${index}]`, tag.value);
         });
+
+        // Append related lessons (name + link pairs)
+        upload.related_lessons
+            .filter((rl) => rl.title.trim() && rl.url.trim())
+            .forEach((rl, idx) => {
+                formData.append(`related_lessons[${idx}][title]`, rl.title);
+                formData.append(`related_lessons[${idx}][url]`, rl.url);
+            });
 
         try {
             await axios.post("/admin/musical-application", formData, {
@@ -288,6 +306,7 @@ const MusicalApplicationList = () => {
                 series: "",
                 status: "active",
                 tags: [],
+                related_lessons: [],
             });
             setSelectedTags([]);
             setThumbnailFile(null);
@@ -467,6 +486,51 @@ const MusicalApplicationList = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea name="description" value={upload.description} onChange={handleChangeCreate} className="w-full p-2 border rounded-lg" rows="3"></textarea>
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                        <div className="space-y-2">
+                            {upload.related_lessons.map((rl, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Lesson name"
+                                        value={rl.title}
+                                        onChange={(e) => {
+                                            const rows = [...upload.related_lessons];
+                                            rows[idx] = { ...rows[idx], title: e.target.value };
+                                            setUpload({ ...upload, related_lessons: rows });
+                                        }}
+                                        className="flex-1 p-2 border rounded-lg text-sm"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Link"
+                                        value={rl.url}
+                                        onChange={(e) => {
+                                            const rows = [...upload.related_lessons];
+                                            rows[idx] = { ...rows[idx], url: e.target.value };
+                                            setUpload({ ...upload, related_lessons: rows });
+                                        }}
+                                        className="flex-1 p-2 border rounded-lg text-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setUpload({ ...upload, related_lessons: upload.related_lessons.filter((_, i) => i !== idx) })}
+                                        className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                    >
+                                        <i className="fa fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => setUpload({ ...upload, related_lessons: [...upload.related_lessons, { title: "", url: "" }] })}
+                                className="text-xs font-semibold text-[#0FA9A0] hover:text-[#0d928a] flex items-center gap-1.5"
+                            >
+                                <i className="fa fa-plus"></i> Add related lesson
+                            </button>
+                        </div>
+                    </div>
                     <div className="flex justify-end gap-3 mt-6">
                         <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancel</button>
                         <button type="submit" disabled={saving} className="px-6 py-2 bg-[#0FA9A0] text-white rounded-lg hover:bg-[#0d928a] disabled:opacity-50">
@@ -544,6 +608,51 @@ const MusicalApplicationList = () => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea name="description" value={selectedUpload.description || ""} onChange={handleChange} className="w-full p-2 border rounded-lg" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                        <div className="space-y-2">
+                            {selectedUpload.related_lessons.map((rl, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Lesson name"
+                                        value={rl.title}
+                                        onChange={(e) => {
+                                            const rows = [...selectedUpload.related_lessons];
+                                            rows[idx] = { ...rows[idx], title: e.target.value };
+                                            setSelectedUpload({ ...selectedUpload, related_lessons: rows });
+                                        }}
+                                        className="flex-1 p-2 border rounded-lg text-sm"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Link"
+                                        value={rl.url}
+                                        onChange={(e) => {
+                                            const rows = [...selectedUpload.related_lessons];
+                                            rows[idx] = { ...rows[idx], url: e.target.value };
+                                            setSelectedUpload({ ...selectedUpload, related_lessons: rows });
+                                        }}
+                                        className="flex-1 p-2 border rounded-lg text-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedUpload({ ...selectedUpload, related_lessons: selectedUpload.related_lessons.filter((_, i) => i !== idx) })}
+                                        className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                    >
+                                        <i className="fa fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => setSelectedUpload({ ...selectedUpload, related_lessons: [...selectedUpload.related_lessons, { title: "", url: "" }] })}
+                                className="text-xs font-semibold text-[#0FA9A0] hover:text-[#0d928a] flex items-center gap-1.5"
+                            >
+                                <i className="fa fa-plus"></i> Add related lesson
+                            </button>
+                        </div>
                     </div>
                     <div className="flex justify-end gap-3 mt-6">
                         <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancel</button>

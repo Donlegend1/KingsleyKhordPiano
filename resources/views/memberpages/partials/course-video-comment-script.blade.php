@@ -138,6 +138,7 @@
                 const { data } = await res.json();
                 list.prepend(buildCommentNode(data));
                 textarea.value = '';
+                document.getElementById('comment-empty-state')?.remove();
             } catch (err) {
                 console.error('Failed to post comment:', err);
                 alert('Failed to post comment. Please try again.');

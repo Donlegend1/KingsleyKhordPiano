@@ -20,6 +20,7 @@ class MusicalApplication extends Model
         'duration',
         'status',
         'tags',
+        'related_lessons',
         'audio_resource',
         'pdf_resource',
         'position',
@@ -27,6 +28,7 @@ class MusicalApplication extends Model
 
     protected $casts = [
         'tags' => 'array',
+        'related_lessons' => 'array',
     ];
 
     protected $appends = ['thumbnail_url', 'category', 'audio_resource_url', 'pdf_resource_url'];

@@ -2,20 +2,16 @@
     @php
         $resourceCount = ($lesson->audio_resource_url ? 1 : 0) + ($lesson->pdf_resource_url ? 1 : 0);
     @endphp
-    <div class="bg-gradient-to-br from-indigo-50 via-white to-white">
-        <div class="flex items-center gap-3 px-5 py-4 border-b border-indigo-100">
-            <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex-shrink-0">
-                <i class="fa-solid fa-gift text-[15px]"></i>
-            </span>
-            <div class="flex-1 min-w-0">
-                <h3 class="text-gray-900 text-[14px] font-extrabold">
-                    Resources for this lesson
-                </h3>
-                <p class="text-indigo-500 text-[11px] font-semibold">{{ $resourceCount }} {{ Str::plural('file', $resourceCount) }} included</p>
-            </div>
+    <div class="bg-white">
+        <div class="flex items-center gap-2 px-5 py-2.5 bg-blue-50 border-b border-blue-100">
+            <i class="fa-solid fa-paperclip text-blue-600 text-xs flex-shrink-0"></i>
+            <h3 class="text-blue-900 text-[13px] font-semibold truncate">
+                Resources for this lesson
+            </h3>
+            <span class="text-blue-400 text-[11px] flex-shrink-0">&middot; {{ $resourceCount }} {{ Str::plural('file', $resourceCount) }}</span>
         </div>
 
-        <div class="divide-y divide-indigo-100/70">
+        <div class="divide-y divide-gray-100">
             @if ($lesson->audio_resource_url)
                 <div class="lesson-audio-player px-5 py-4">
                     <div class="flex items-center gap-3">
