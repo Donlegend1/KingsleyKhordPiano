@@ -99,6 +99,10 @@ class AdminController extends Controller
 
         $user->update($validated);
 
+        if (array_key_exists('premium', $validated) && $validated['premium']) {
+            $user->forceFill(['can_access_coaching' => true])->save();
+        }
+
         return response()->json($user);
     }
 

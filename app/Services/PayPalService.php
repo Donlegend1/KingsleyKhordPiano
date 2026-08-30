@@ -406,6 +406,7 @@ class PayPalService
         }
 
         $user = $subscription->user;
+        $previousPaidAt = $user->last_payment_at;
         $amount = (float) (
             data_get($resource, 'amount.total')
             ?? data_get($resource, 'amount.value')
@@ -441,6 +442,20 @@ class PayPalService
             'subscription_id' => $subscription->stripe_id,
             'event' => 'PAYMENT.SALE.COMPLETED',
         ]);
+
+        $plan = Plan::find($user->plan);
+        $lifecycle = app(SubscriptionLifecycleService::class);
+        $isRenewal = $previousPaidAt && $previousPaidAt->lt(now()->subHours(12));
+
+        if ($isRenewal) {
+            $lifecycle->notifyRenewed($user->fresh(), $reference, $plan);
+        } else {
+            $lifecycle->notifyActivated(
+                $user->fresh(),
+                (string) ($subscription->stripe_id ?: $reference),
+                $plan
+            );
+        }
     }
 
     /**
@@ -490,7 +505,7 @@ class PayPalService
             ?? $this->periodEndFromDuration($duration);
         $status = $this->mapStatus((string) data_get($details, 'status', 'ACTIVE'));
 
-        return DB::transaction(function () use (
+        $user = DB::transaction(function () use (
             $user,
             $subscriptionId,
             $paypalPlanId,
@@ -556,6 +571,16 @@ class PayPalService
 
             return $user->fresh();
         });
+
+        if ($status === 'active') {
+            app(SubscriptionLifecycleService::class)->notifyActivated(
+                $user,
+                (string) $subscriptionId,
+                $plan
+            );
+        }
+
+        return $user;
     }
 
     /**

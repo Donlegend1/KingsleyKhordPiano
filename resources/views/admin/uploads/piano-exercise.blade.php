@@ -25,7 +25,7 @@
     </div>
   </header>
 
-     <div id="uploads">
+     <div id="piano-exercise-admin">
 
      </div>
    </main>

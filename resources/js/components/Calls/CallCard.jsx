@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import {
     useFlashMessage,
@@ -9,24 +9,33 @@ import { KeyboardMusic } from "lucide-react";
 const CallCard = () => {
     const { showMessage } = useFlashMessage();
     const authUser = window.authUser || {};
-    const isPremium = authUser?.premium;
+    const canAccessCoaching = Boolean(authUser?.can_access_piano_coaching);
 
     const handleClick = (e) => {
-        if (!isPremium) {
-            e.preventDefault();
-            showMessage(
-                "You must be a Premium member to access Piano Coaching.",
-                "error",
-            );
+        if (canAccessCoaching) {
+            return;
         }
+
+        e.preventDefault();
+        showMessage(
+            authUser?.premium
+                ? "Piano Coaching is available to legacy Premium members."
+                : "You must be a Premium member to access Piano Coaching.",
+            "error",
+        );
     };
 
     return (
         <>
             <a
-                href="/member/live-coaching"
+                href={canAccessCoaching ? "/member/live-coaching" : "#"}
                 onClick={handleClick}
-                className="block transition-shadow hover:shadow-md"
+                aria-disabled={!canAccessCoaching}
+                className={`block transition-shadow ${
+                    canAccessCoaching
+                        ? "hover:shadow-md"
+                        : "cursor-not-allowed opacity-50"
+                }`}
             >
                 <div className="min-h-[120px] h-full flex justify-between items-center gap-3 p-6 bg-[#2A2E35] rounded-lg shadow-sm border border-gray-700">
                     <div className="flex items-center space-x-4 min-w-0">
@@ -47,7 +56,9 @@ const CallCard = () => {
                             </div>
 
                             <p className="text-sm text-gray-400 my-5 font-sf">
-                                One on One Live Session
+                                {canAccessCoaching
+                                    ? "One on One Live Session"
+                                    : "Available to legacy Premium members"}
                             </p>
                         </div>
                     </div>

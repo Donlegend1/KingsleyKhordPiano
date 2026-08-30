@@ -114,6 +114,11 @@ class SyncPayPalSubscribers extends Command
                 ]),
             ]);
 
+            if ($status === 'active' && $plan) {
+                app(\App\Services\SubscriptionLifecycleService::class)
+                    ->syncCoachingAccess($user->fresh(), $plan);
+            }
+
             $this->info("Updated {$user->email}: {$status}, plan={$plan?->id}, amount={$amount}, ends_at={$endDate}");
         }
 

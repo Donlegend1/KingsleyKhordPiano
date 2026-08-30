@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateLiveshowRequest;
  use Illuminate\Http\Request;
  use App\Notifications\NewLiveShowNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LiveShowController extends Controller
 {
@@ -42,11 +43,20 @@ class LiveShowController extends Controller
 
             $subscribers = LiveShowNotification::with('user')->get();
 
-            if ($subscribers->isNotEmpty()) {
-                foreach ($subscribers as $subscriber) {
-                    if ($subscriber->user && $subscriber->user->hasActiveSubscription()) {
-                        $subscriber->user->notify(new NewLiveShowNotification($liveshow, $subscriber->user));
-                    }
+            foreach ($subscribers as $subscriber) {
+                $user = $subscriber->user;
+                if (! $user || ! $user->email) {
+                    continue;
+                }
+
+                try {
+                    $user->notify(new NewLiveShowNotification($liveshow, $user));
+                } catch (\Throwable $notifyError) {
+                    Log::error('Live show announcement email failed', [
+                        'user_id' => $user->id,
+                        'liveshow_id' => $liveshow->id,
+                        'error' => $notifyError->getMessage(),
+                    ]);
                 }
             }
 

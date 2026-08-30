@@ -63,10 +63,14 @@
         <div x-show="activeTab === 'finger'" x-cloak class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($cards as $card)
             @php
-                $cardLessons = \App\Models\Upload::where('category', 'piano exercise')
-                    ->where('level', $card['id'])
-                    ->where('status', 'active')
-                    ->orderBy('id')
+                $cardLessons = \App\Models\Upload::where('uploads.category', 'piano exercise')
+                    ->where('uploads.level', $card['id'])
+                    ->where('uploads.status', 'active')
+                    ->leftJoin('piano_exercise_categories', 'uploads.piano_exercise_category_id', '=', 'piano_exercise_categories.id')
+                    ->orderByRaw('piano_exercise_categories.position IS NULL, piano_exercise_categories.position ASC')
+                    ->orderByRaw('uploads.position IS NULL, uploads.position ASC')
+                    ->orderBy('uploads.id')
+                    ->select('uploads.*')
                     ->get();
                 $firstLesson = $cardLessons->first();
                 $lessonCount = $cardLessons->count();

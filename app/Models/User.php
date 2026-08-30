@@ -38,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_payment_amount',
         'last_payment_at',
         'premium',
+        'can_access_coaching',
         'country',
         'passport',
         'metadata',
@@ -76,6 +77,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_payment_at' => 'datetime',
         'last_payment_amount' => 'decimal:2',
         'metadata' => 'array',
+        'premium' => 'boolean',
+        'can_access_coaching' => 'boolean',
+    ];
+
+    protected $appends = [
+        'can_access_piano_coaching',
     ];
 
 
@@ -112,6 +119,85 @@ class User extends Authenticatable implements MustVerifyEmail
     public function messages() { return $this->hasMany(ChatMessage::class); }
     public function likes() { return $this->hasMany(Like::class); }
 
+
+    public function latestLocalSubscription(): ?Subscription
+    {
+        return Subscription::query()
+            ->where('user_id', $this->id)
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * Latest Stripe or PayPal subscription that can still be cancelled
+     * (stops future renewals, access continues until period end).
+     */
+    public function cancellableSubscription(): ?Subscription
+    {
+        $subscription = $this->latestLocalSubscription();
+        if (! $subscription) {
+            return null;
+        }
+
+        $status = strtolower((string) $subscription->stripe_status);
+        if (! in_array($status, ['active', 'trialing'], true)) {
+            return null;
+        }
+
+        $userStatus = strtolower((string) ($this->subscription_status ?? ''));
+        if (in_array($userStatus, ['canceled', 'cancelled'], true)) {
+            return null;
+        }
+
+        $provider = $this->subscriptionProvider($subscription);
+        if (! in_array($provider, ['stripe', 'paypal'], true)) {
+            return null;
+        }
+
+        return $subscription;
+    }
+
+    public function subscriptionOnGracePeriod(): bool
+    {
+        $subscription = $this->latestLocalSubscription();
+        $endsAt = $this->subscription_expires_at ?? $subscription?->ends_at;
+        if (! $endsAt || $endsAt->isPast()) {
+            return false;
+        }
+
+        $status = strtolower((string) (
+            $this->subscription_status
+            ?? $subscription?->stripe_status
+            ?? ''
+        ));
+
+        return in_array($status, ['canceled', 'cancelled'], true);
+    }
+
+    public function subscriptionProvider(?Subscription $subscription = null): string
+    {
+        $subscription ??= $this->latestLocalSubscription();
+        $method = strtolower((string) (
+            $subscription?->payment_method
+            ?: $this->payment_method
+            ?: ''
+        ));
+        $gatewayId = (string) ($subscription?->stripe_id ?? '');
+
+        if ($method === 'paypal' || str_starts_with($gatewayId, 'I-')) {
+            return 'paypal';
+        }
+
+        if (in_array($method, ['paystack', 'manual'], true)) {
+            return $method;
+        }
+
+        if ($method === 'stripe' || str_starts_with($gatewayId, 'sub_')) {
+            return 'stripe';
+        }
+
+        return $method ?: 'stripe';
+    }
 
     public function hasActiveSubscription(): bool
     {
@@ -188,6 +274,29 @@ class User extends Authenticatable implements MustVerifyEmail
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
+    }
+
+    public function liveCoachingBookings()
+    {
+        return $this->hasMany(LiveCoachingBooking::class);
+    }
+
+    /**
+     * Piano coaching is limited to legacy Premium members.
+     * New Premium ($45 / €39 / ₦78,000) does not include it.
+     */
+    public function canAccessPianoCoaching(): bool
+    {
+        if (! (bool) ($this->attributes['can_access_coaching'] ?? false)) {
+            return false;
+        }
+
+        return (bool) $this->premium || $this->hasActiveSubscription();
+    }
+
+    public function getCanAccessPianoCoachingAttribute(): bool
+    {
+        return $this->canAccessPianoCoaching();
     }
 
     /**

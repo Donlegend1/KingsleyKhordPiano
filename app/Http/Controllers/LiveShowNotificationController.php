@@ -9,11 +9,19 @@ use App\Http\Requests\UpdateLiveShowNotificationRequest;
 class LiveShowNotificationController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Whether the current user is subscribed to live show emails.
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+
+        if (! $user) {
+            return response()->json(['subscribed' => false], 401);
+        }
+
+        return response()->json([
+            'subscribed' => LiveShowNotification::where('user_id', $user->id)->exists(),
+        ]);
     }
 
     /**
@@ -29,20 +37,20 @@ class LiveShowNotificationController extends Controller
      */
     public function store(StoreLiveShowNotificationRequest $request)
     {
-        $user = auth()->user();
+        $user = $request->user() ?? auth()->user();
 
-        // Check if the user is already subscribed
-        $existingSubscription = LiveShowNotification::where('user_id', $user->id)->first();
-        if ($existingSubscription) {
-            return response()->json(['message' => 'You are already subscribed to live show notifications.'], 400);
+        if (! $user) {
+            return response()->json(['message' => 'You must be logged in to subscribe.'], 401);
         }
 
-        // Create a new subscription
-        LiveShowNotification::create([
+        LiveShowNotification::firstOrCreate([
             'user_id' => $user->id,
         ]);
 
-        return response()->json(['message' => 'Subscribed to live show notifications successfully.']);
+        return response()->json([
+            'message' => 'Subscribed to live show notifications successfully.',
+            'subscribed' => true,
+        ]);
     }
 
     /**

@@ -32,6 +32,13 @@ class LiveCoachingBookingController extends Controller
     {
         $user = Auth::user();
 
+        if (! $user->canAccessPianoCoaching()) {
+            return redirect('/home')->with(
+                'error',
+                'Piano Coaching is available to legacy Premium members.'
+            );
+        }
+
         [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
 
         $sessionsIncluded = 1;
@@ -75,6 +82,13 @@ class LiveCoachingBookingController extends Controller
         ]);
 
         $user = Auth::user();
+
+        if (! $user->canAccessPianoCoaching()) {
+            return response()->json([
+                'error' => 'Piano Coaching is available to legacy Premium members.',
+            ], 403);
+        }
+
         $date = Carbon::parse($request->date);
         $time = $request->time;
 

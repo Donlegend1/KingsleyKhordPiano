@@ -24,6 +24,7 @@ class Upload extends Model
         'audio_resource',
         'pdf_resource',
         'position',
+        'piano_exercise_category_id',
     ];
 
     protected $casts = [
@@ -57,6 +58,11 @@ class Upload extends Model
             return [];
         }
         return array_map(fn($path) => asset($path), $this->images);
+    }
+
+    public function pianoExerciseCategory()
+    {
+        return $this->belongsTo(PianoExerciseCategory::class, 'piano_exercise_category_id');
     }
 
     public function bookmarks()

@@ -10,7 +10,7 @@ const currencySigns = {
 
 const PlanSwitchAndCurrencySelect = () => {
     const [selectedPlan, setSelectedPlan] = useState("monthly");
-    const [currency, setCurrency] = useState("EUR");
+    const [currency, setCurrency] = useState("US");
     const [modalOpen, setModalOpen] = useState(false);
     const [plans, setPlans] = useState([]);
     const [selectedPlanDetails, setSelectedPlanDetails] = useState(null);
@@ -96,7 +96,7 @@ const PlanSwitchAndCurrencySelect = () => {
         "Ear Training Quiz",
         "Songs and midi transcriptions",
         "Downloadable resources",
-        "Monthly live sessions",
+        "Exclusive Materials",
         "Supportive community",
     ];
 
@@ -105,7 +105,7 @@ const PlanSwitchAndCurrencySelect = () => {
         "Personalized practice plan",
         "Feedback on your playing",
         "Accountability framework",
-        "1-on-1 piano coaching",
+        "Weekly live workshop",
         "In-depth master classes",
     ];
 
@@ -128,6 +128,33 @@ const PlanSwitchAndCurrencySelect = () => {
         monthly: null,
         quarterly: "Save 10%",
         yearly: "Save 30%",
+    };
+
+    const monthlyDiscountedRates = {
+        quarterly: {
+            standard: { EUR: 23, USD: 25 },
+            premium: { EUR: 35, USD: 40 },
+        },
+        yearly: {
+            standard: { EUR: 17, USD: 22 },
+            premium: { EUR: 27, USD: 32 },
+        },
+    };
+
+    const isPremiumPlan = (plan) => plan.tier?.toLowerCase().includes("premium");
+
+    const getMonthlyDiscountedRate = (plan) => {
+        const rates = monthlyDiscountedRates[selectedPlan];
+        if (!rates) return null;
+        const tier = isPremiumPlan(plan) ? "premium" : "standard";
+        return rates[tier]?.[currency] ?? null;
+    };
+
+    const getMonthlyPlanAmount = (plan) => {
+        const monthlyPlan = plans.find(
+            (p) => p.type === "monthly" && isPremiumPlan(p) === isPremiumPlan(plan),
+        );
+        return monthlyPlan ? matchAmountToCurrency(monthlyPlan) : null;
     };
 
     const billingCycles = ["daily", "monthly", "quarterly", "yearly"].filter(
@@ -155,6 +182,16 @@ const PlanSwitchAndCurrencySelect = () => {
                             <span className="text-sm text-gray-400 font-medium font-normal">
                                 /{periodSuffix[selectedPlanDetails.type] ?? selectedPlanDetails.type}
                             </span>
+                            {getMonthlyDiscountedRate(selectedPlanDetails) != null && (
+                                <p className="text-sm font-semibold text-green-400 mt-2">
+                                    {currencySigns[currency]}{getMonthlyDiscountedRate(selectedPlanDetails)}/mo
+                                    {getMonthlyPlanAmount(selectedPlanDetails) != null && (
+                                        <span className="text-gray-400 line-through ml-2 font-medium">
+                                            {currencySigns[currency]}{getMonthlyPlanAmount(selectedPlanDetails)}/mo
+                                        </span>
+                                    )}
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -288,7 +325,7 @@ const PlanSwitchAndCurrencySelect = () => {
                     >
                         <option value="EUR">Euro €</option>
                         <option value="USD">USD $</option>
-                        <option value="NGN">Naira ₦</option>
+                       
                     </select>
                     <span className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none">
                         <svg className="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -301,7 +338,10 @@ const PlanSwitchAndCurrencySelect = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 {filteredPlans &&
                     filteredPlans.map((plan) => {
-                        const isPremium = plan.tier?.toLowerCase().includes("premium");
+                        const isPremium = isPremiumPlan(plan);
+                        const billedAmount = matchAmountToCurrency(plan);
+                        const monthlyRate = getMonthlyDiscountedRate(plan);
+                        const originalMonthly = getMonthlyPlanAmount(plan);
                         return (
                             <div
                                 key={plan.id}
@@ -340,15 +380,42 @@ const PlanSwitchAndCurrencySelect = () => {
                                     {plan.tier?.toLowerCase().includes("premium") ? "Premium" : "Standard"} Plan
                                 </h3>
 
-                                <div className="flex items-baseline gap-1.5 mt-3 mb-1">
-                                    <span className="text-4xl font-extrabold text-gray-900">
-                                        {currencySigns[currency]}
-                                        {matchAmountToCurrency(plan).toLocaleString()}
-                                    </span>
-                                    <span className="text-sm text-gray-400 font-medium">
-                                        /{shortPeriodSuffix[selectedPlan] ?? selectedPlan}
-                                    </span>
-                                </div>
+                                {monthlyRate != null ? (
+                                    <div className="mt-3 mb-1">
+                                        <div className="flex items-baseline gap-1.5">
+                                            <span className="text-4xl font-extrabold text-gray-900">
+                                                {currencySigns[currency]}
+                                                {monthlyRate}
+                                            </span>
+                                            <span className="text-sm text-gray-400 font-medium">/mo</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            {originalMonthly != null && originalMonthly > monthlyRate && (
+                                                <span className="text-sm text-gray-400 line-through">
+                                                    {currencySigns[currency]}{originalMonthly}/mo
+                                                </span>
+                                            )}
+                                            {saveBadge[selectedPlan] && (
+                                                <span className="text-[10px] font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full">
+                                                    {saveBadge[selectedPlan]}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Billed {currencySigns[currency]}{billedAmount.toLocaleString()} / {shortPeriodSuffix[selectedPlan]}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-baseline gap-1.5 mt-3 mb-1">
+                                        <span className="text-4xl font-extrabold text-gray-900">
+                                            {currencySigns[currency]}
+                                            {billedAmount.toLocaleString()}
+                                        </span>
+                                        <span className="text-sm text-gray-400 font-medium">
+                                            /{shortPeriodSuffix[selectedPlan] ?? selectedPlan}
+                                        </span>
+                                    </div>
+                                )}
 
                                 <div className="border-t border-gray-100 my-6"></div>
 
@@ -400,6 +467,16 @@ const PlanSwitchAndCurrencySelect = () => {
                             {currencySigns[currency]}
                             {matchAmountToCurrency(selectedPlanDetails)}
                              {" for "}{selectedPlanDetails.tier?.toLowerCase().includes("premium") ? "Premium" : "Standard"} Plan
+                            {getMonthlyDiscountedRate(selectedPlanDetails) != null && (
+                                <span className="block text-sm text-green-400 mt-1">
+                                    {currencySigns[currency]}{getMonthlyDiscountedRate(selectedPlanDetails)}/mo
+                                    {getMonthlyPlanAmount(selectedPlanDetails) != null && (
+                                        <span className="text-gray-400 line-through ml-2">
+                                            {currencySigns[currency]}{getMonthlyPlanAmount(selectedPlanDetails)}/mo
+                                        </span>
+                                    )}
+                                </span>
+                            )}
                         </p>
 
                         <div className="flex flex-col gap-6">

@@ -23,6 +23,7 @@ class MusicalApplication extends Model
         'audio_resource',
         'pdf_resource',
         'position',
+        'musical_application_category_id',
     ];
 
     protected $casts = [
@@ -49,6 +50,11 @@ class MusicalApplication extends Model
     public function getCategoryAttribute()
     {
         return 'musical application';
+    }
+
+    public function applicationCategory()
+    {
+        return $this->belongsTo(MusicalApplicationCategory::class, 'musical_application_category_id');
     }
 
     public function bookmarks()

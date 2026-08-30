@@ -79,7 +79,7 @@
                             </p>
 
                             <p style="margin:0 0 24px;font-size:15px;color:#111827;line-height:1.7;">
-                                Join here: <a href="{{ $show['zoom_link'] ?? url('/member/live-session') }}" style="color:#7C3AED;text-decoration:underline;font-weight:600;">{{ $show['zoom_link'] ?? url('/member/live-session') }}</a>
+                                Join here: <a href="{{ $show['zoom_link'] ?? $show['zoom_link'] ?? url('/member/live-session') }}" style="color:#7C3AED;text-decoration:underline;font-weight:600;">{{ $show['zoom_link'] ?? $show['zoom_link'] ?? url('/member/live-session') }}</a>
                             </p>
 
                             <p style="margin:24px 0 0;font-size:15px;color:#374151;line-height:1.7;">

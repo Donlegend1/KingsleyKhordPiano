@@ -20,6 +20,7 @@ use App\Http\Controllers\ZoomMeetingController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LiveShowController;
+use App\Http\Controllers\LiveShowNotificationController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
@@ -160,7 +161,7 @@ Route::get('/member/notifications', [App\Http\Controllers\NotificationController
 Route::post('/stripe/create', [StripeController::class, 'checkout'])->name('stripe.create');
 Route::get('/stripe/success', [StripeController::class, 'checkoutSuccess'])->name('checkout.success');
 Route::get('/stripe/cancel',[StripeController::class, 'checkoutCancel'])->name('checkout.cancel');
-Route::post('stripe/sub/cancel',[StripeController::class, 'cancelSubscription'])->name('subscription.cancel');
+Route::post('stripe/sub/cancel',[StripeController::class, 'cancelSubscription'])->middleware('auth')->name('subscription.cancel');
 
 
 
@@ -210,6 +211,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('live-session/{liveshow}/confirm', [LiveSessionController::class, 'confirmBooking'])->name('member.live-session.confirm');
     Route::post('live-session/{liveshow}/book', [LiveSessionController::class, 'bookSlot'])->name('member.live-session.book');
     Route::get('live-show/{liveshow}/recording', [LiveShowController::class, 'showRecording'])->name('member.live-show.recording');
+    Route::get('notifications/live-shows/status', [LiveShowNotificationController::class, 'index']);
+    Route::post('notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
     Route::post('/course/{course}/view', [CourseController::class, 'recordView']);
@@ -324,5 +327,13 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'availability'])->name('availability');
         Route::post('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'storeAvailability'])->name('store-availability');
         Route::delete('/availability/{availability}', [\App\Http\Controllers\Admin\GuestBookingController::class, 'destroyAvailability'])->name('destroy-availability');
+    });
+
+    // Piano coaching members (legacy premium + granted subscribers)
+    Route::prefix('piano-coaching')->name('admin.piano-coaching.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'index'])->name('index');
+        Route::get('/eligible', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'eligible'])->name('eligible');
+        Route::post('/', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'store'])->name('store');
+        Route::delete('/{user}', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'destroy'])->name('destroy');
     });
 });
