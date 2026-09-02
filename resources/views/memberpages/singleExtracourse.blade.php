@@ -106,6 +106,14 @@
                         <div class="mb-5"></div>
                     @endif
 
+                    @if ($lessonType === 'learn_songs')
+                        @include('memberpages.partials.midi-practice-display', [
+                            'midiPracticeFile' => $midiPracticeFile ?? null,
+                            'midiPracticeFiles' => $midiPracticeFiles ?? collect(),
+                            'midiPracticeTitle' => Str::title($lesson->title),
+                        ])
+                    @endif
+
                     @if (!empty($lesson->images) && is_array($lesson->images))
                         <div class="mt-6 mb-8">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Course Walkthrough / Highlights</h4>
