@@ -54,8 +54,10 @@ const CategorizedLessonsAdmin = ({ config }) => {
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
     const [audioResourceFile, setAudioResourceFile] = useState(null);
     const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [midiResourceFile, setMidiResourceFile] = useState(null);
     const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
     const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
+    const [editMidiResourceFile, setEditMidiResourceFile] = useState(null);
     const fileInputRef = useRef(null);
 
     const { showMessage } = useFlashMessage();
@@ -209,6 +211,7 @@ const CategorizedLessonsAdmin = ({ config }) => {
         descriptionImageFiles.forEach((file, idx) => formData.append(`images[${idx}]`, file));
         if (audioResourceFile) formData.append("audio_resource", audioResourceFile);
         if (pdfResourceFile) formData.append("pdf_resource", pdfResourceFile);
+        if (midiResourceFile) formData.append("midi_resource", midiResourceFile);
         try {
             await axios.post(config.endpoints.store, formData, {
                 headers: { "Content-Type": "multipart/form-data", "X-CSRF-TOKEN": csrfToken },
@@ -237,6 +240,7 @@ const CategorizedLessonsAdmin = ({ config }) => {
         descriptionImageFiles.forEach((file, idx) => formData.append(`images[${idx}]`, file));
         if (editAudioResourceFile) formData.append("audio_resource", editAudioResourceFile);
         if (editPdfResourceFile) formData.append("pdf_resource", editPdfResourceFile);
+        if (editMidiResourceFile) formData.append("midi_resource", editMidiResourceFile);
         try {
             await axios.post(`${config.endpoints.update}/${editingLesson.id}`, formData, {
                 headers: { "Content-Type": "multipart/form-data", "X-CSRF-TOKEN": csrfToken },
@@ -368,6 +372,7 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                                                                             setDescriptionImageFiles([]);
                                                                                             setAudioResourceFile(null);
                                                                                             setPdfResourceFile(null);
+                                                                                            setMidiResourceFile(null);
                                                                                             setIsCreateLessonModalOpen(true);
                                                                                         }}
                                                                                         className="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full hover:bg-blue-700 transition"
@@ -443,6 +448,7 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                                                                                                             setDescriptionImageFiles([]);
                                                                                                                             setEditAudioResourceFile(null);
                                                                                                                             setEditPdfResourceFile(null);
+                                                                                                                            setEditMidiResourceFile(null);
                                                                                                                             setIsEditLessonModalOpen(true);
                                                                                                                         }}
                                                                                                                         className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs"
@@ -547,6 +553,12 @@ const CategorizedLessonsAdmin = ({ config }) => {
                             <label className="block text-sm font-medium text-gray-700 mb-1">PDF File</label>
                             <input type="file" accept="application/pdf" onChange={(e) => setPdfResourceFile(e.target.files[0] || null)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
                         </div>
+                        {config.showMidi && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">MIDI File</label>
+                                <input type="file" accept=".mid,.midi,audio/midi,audio/x-midi" onChange={(e) => setMidiResourceFile(e.target.files[0] || null)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                            </div>
+                        )}
                         <div className="sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                             <textarea value={newLesson.description} onChange={(e) => setNewLesson({ ...newLesson, description: e.target.value })} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none" rows="3" />
@@ -604,6 +616,15 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">PDF File</label>
                                 <input type="file" accept="application/pdf" onChange={(e) => setEditPdfResourceFile(e.target.files[0] || null)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
                             </div>
+                            {config.showMidi && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">MIDI File</label>
+                                    {editingLesson.midi_resource_url && (
+                                        <p className="text-xs text-gray-500 mb-1 truncate">Current: {editingLesson.midi_resource_url.split("/").pop()}</p>
+                                    )}
+                                    <input type="file" accept=".mid,.midi,audio/midi,audio/x-midi" onChange={(e) => setEditMidiResourceFile(e.target.files[0] || null)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                                </div>
+                            )}
                             <div className="sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                 <textarea value={editingLesson.description || ""} onChange={(e) => setEditingLesson({ ...editingLesson, description: e.target.value })} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none" rows="3" />
@@ -671,6 +692,7 @@ const musicalConfig = {
     itemLabel: "Lesson",
     defaultVideoType: "vimeo",
     showImages: false,
+    showMidi: true,
     extraFields: [],
     endpoints: {
         list: "/api/admin/musical-applications-list",

@@ -65,6 +65,7 @@ class AdminMusicalApplicationLessonController extends Controller
             'thumbnail' => 'nullable|image|max:5000',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
+            'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
             'related_lessons' => 'nullable|array',
         ]);
 
@@ -94,6 +95,7 @@ class AdminMusicalApplicationLessonController extends Controller
             'tags' => $request->input('related_lessons'),
             'audio_resource' => $media['audio_resource'],
             'pdf_resource' => $media['pdf_resource'],
+            'midi_resource' => $media['midi_resource'],
         ]);
 
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -117,6 +119,7 @@ class AdminMusicalApplicationLessonController extends Controller
             'thumbnail' => 'nullable|image|max:5000',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
+            'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
             'related_lessons' => 'nullable|array',
         ]);
 
@@ -138,6 +141,7 @@ class AdminMusicalApplicationLessonController extends Controller
             'tags' => $request->has('related_lessons') ? $request->input('related_lessons') : $lesson->tags,
             'audio_resource' => $media['audio_resource'],
             'pdf_resource' => $media['pdf_resource'],
+            'midi_resource' => $media['midi_resource'],
         ]);
 
         return response()->json($lesson, 200);

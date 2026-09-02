@@ -83,11 +83,18 @@ trait HandlesLessonMedia
             $pdfResourcePath = $this->storePublicFile($request->file('pdf_resource'), 'resources/pdf');
         }
 
+        $midiResourcePath = $existing?->midi_resource;
+        if ($request->hasFile('midi_resource')) {
+            $this->deletePublicFile($existing?->midi_resource);
+            $midiResourcePath = $this->storePublicFile($request->file('midi_resource'), 'resources/midi');
+        }
+
         return [
             'thumbnail' => $thumbnailPath,
             'images' => $descriptionImages,
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
+            'midi_resource' => $midiResourcePath,
         ];
     }
 }
