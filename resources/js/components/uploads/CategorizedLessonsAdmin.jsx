@@ -669,6 +669,7 @@ const pianoConfig = {
     itemLabel: "Lesson",
     defaultVideoType: "iframe",
     showImages: true,
+    showMidi: true,
     extraFields: [
         { name: "skill_level", label: "Skill Group", options: ["Basic", "Competent", "Challenging"], default: "Basic" },
     ],
