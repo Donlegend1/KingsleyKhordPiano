@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <style>[x-cloak] { display: none !important; }</style>
   @viteReactRefresh
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -40,6 +41,9 @@
             </a>
             <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-leanpub"></i> <span>Ear Training</span>
+            </a>
+            <a href="/admin/audio-quiz" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa fa-headphones"></i> <span>Audio Quiz</span>
             </a>
             <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-television"></i> <span>Live Show</span>
@@ -147,6 +151,9 @@
         
         <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-leanpub"></i> <span>Ear Training</span>
+        </a>
+        <a href="/admin/audio-quiz" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-headphones"></i> <span>Audio Quiz</span>
         </a>
         <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-television"></i> <span>Live Show</span>

@@ -12,6 +12,122 @@ const shuffleArray = (array) => {
     return [...array].sort(() => Math.random() - 0.5);
 };
 
+const QUIZ_QUESTION_CAP = 25;
+
+// Builds the question set a student actually plays through: if the lesson has
+// fewer questions than the cap, the pool is reshuffled and repeated until the
+// cap is reached, instead of ending the quiz early after just the pool size.
+const buildQuestionSet = (questions, cap = QUIZ_QUESTION_CAP) => {
+    if (!questions || questions.length === 0) return [];
+    if (questions.length >= cap) {
+        return shuffleArray(questions).slice(0, cap);
+    }
+
+    const result = [];
+    while (result.length < cap) {
+        result.push(...shuffleArray(questions));
+    }
+    return result.slice(0, cap);
+};
+
+const formatAudioTime = (seconds) => {
+    if (!seconds || !isFinite(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${String(secs).padStart(2, "0")}`;
+};
+
+const ReferenceAudioItem = ({ name, src }) => {
+    const audioRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+
+    const toggle = () => {
+        const audioEl = audioRef.current;
+        if (!audioEl) return;
+        if (audioEl.paused) {
+            audioEl.play();
+            setIsPlaying(true);
+        } else {
+            audioEl.pause();
+            audioEl.currentTime = 0;
+            setProgress(0);
+            setCurrentTime(0);
+            setIsPlaying(false);
+        }
+    };
+
+    const seek = (event) => {
+        const audioEl = audioRef.current;
+        if (!audioEl || !audioEl.duration) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+        audioEl.currentTime = ratio * audioEl.duration;
+    };
+
+    const handleTimeUpdate = () => {
+        const audioEl = audioRef.current;
+        if (!audioEl || !audioEl.duration) return;
+        setProgress((audioEl.currentTime / audioEl.duration) * 100);
+        setCurrentTime(audioEl.currentTime);
+    };
+
+    return (
+        <div className="flex items-center gap-4">
+            <audio
+                ref={audioRef}
+                src={src}
+                onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={() => {
+                    setIsPlaying(false);
+                    setProgress(0);
+                    setCurrentTime(0);
+                }}
+                className="hidden"
+            />
+
+            <button
+                onClick={toggle}
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex-shrink-0 hover:bg-gray-800 dark:hover:bg-gray-100 active:scale-95 transition-all duration-150"
+            >
+                {isPlaying ? (
+                    <Square className="w-3.5 h-3.5 fill-current" />
+                ) : (
+                    <Play className="w-4 h-4 fill-current ml-0.5" />
+                )}
+            </button>
+
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+                        {name || "Reference Audio"}
+                    </p>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums flex-shrink-0 ml-3">
+                        {formatAudioTime(currentTime)} / {formatAudioTime(duration)}
+                    </span>
+                </div>
+
+                <div
+                    onClick={seek}
+                    className="group relative w-full h-1.5 bg-gray-100 dark:bg-white/10 rounded-full cursor-pointer"
+                >
+                    <div
+                        className="absolute inset-y-0 left-0 bg-gray-900 dark:bg-white rounded-full"
+                        style={{ width: `${progress}%` }}
+                    ></div>
+                    <div
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-gray-900 dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                        style={{ left: `${progress}%` }}
+                    ></div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // One octave, C3 -> C4.
 const PIANO_WHITE_KEYS = [
     { label: "C", note: "C3" },
@@ -213,50 +329,9 @@ const ShowEartraining = () => {
     );
     const [markingComplete, setMarkingComplete] = useState(false);
     const [siblings, setSiblings] = useState([]);
-    const [isRefAudioPlaying, setIsRefAudioPlaying] = useState(false);
-    const [refAudioProgress, setRefAudioProgress] = useState(0);
-    const [refAudioCurrentTime, setRefAudioCurrentTime] = useState(0);
-    const [refAudioDuration, setRefAudioDuration] = useState(0);
-    const refAudioRef = useRef(null);
     const [isQuestionPlaying, setIsQuestionPlaying] = useState(false);
     const questionAudioRef = useRef(null);
-
-    const toggleRefAudio = () => {
-        const audioEl = refAudioRef.current;
-        if (!audioEl) return;
-        if (audioEl.paused) {
-            audioEl.play();
-            setIsRefAudioPlaying(true);
-        } else {
-            audioEl.pause();
-            audioEl.currentTime = 0;
-            setRefAudioProgress(0);
-            setRefAudioCurrentTime(0);
-            setIsRefAudioPlaying(false);
-        }
-    };
-
-    const seekRefAudio = (event) => {
-        const audioEl = refAudioRef.current;
-        if (!audioEl || !audioEl.duration) return;
-        const rect = event.currentTarget.getBoundingClientRect();
-        const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
-        audioEl.currentTime = ratio * audioEl.duration;
-    };
-
-    const handleRefAudioTimeUpdate = () => {
-        const audioEl = refAudioRef.current;
-        if (!audioEl || !audioEl.duration) return;
-        setRefAudioProgress((audioEl.currentTime / audioEl.duration) * 100);
-        setRefAudioCurrentTime(audioEl.currentTime);
-    };
-
-    const formatAudioTime = (seconds) => {
-        if (!seconds || !isFinite(seconds)) return "0:00";
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${String(secs).padStart(2, "0")}`;
-    };
+    const videoEmbedRef = useRef(null);
 
     const toggleQuestionAudio = () => {
         const audioEl = questionAudioRef.current;
@@ -842,7 +917,7 @@ const ShowEartraining = () => {
                 let fetchedQuiz = response.data;
 
                 if (fetchedQuiz?.questions?.length) {
-                    fetchedQuiz.questions = shuffleArray(fetchedQuiz.questions);
+                    fetchedQuiz.questions = buildQuestionSet(fetchedQuiz.questions);
                 }
 
                 setQuiz(fetchedQuiz);
@@ -904,6 +979,22 @@ const ShowEartraining = () => {
         });
     }, [quiz?.video_url]);
 
+    // The injected iframe embed (e.g. VdoCipher) ships with fixed inline
+    // width/height — override it so it fills the responsive aspect-ratio box.
+    useEffect(() => {
+        if (videoEmbedRef.current) {
+            const iframe = videoEmbedRef.current.querySelector("iframe");
+            if (iframe) {
+                iframe.style.position = "absolute";
+                iframe.style.top = "0";
+                iframe.style.left = "0";
+                iframe.style.width = "100%";
+                iframe.style.height = "100%";
+                iframe.style.border = "0";
+            }
+        }
+    }, [quiz?.video_url]);
+
     if (!quiz || !quiz.questions?.length) {
         return (
             <div className="text-center p-6">
@@ -917,6 +1008,8 @@ const ShowEartraining = () => {
         (quiz.title?.startsWith("Melodic dictation") ?? false) ||
         quiz.category === "Melodic Dictation";
     const isKeyboardSequenceQuiz = quiz.category === "Melodic Dictation";
+    const isBlackKeyMelodyQuiz =
+        quiz.title === "Other Notes" || quiz.title === "chordal melodies";
     const correctSequence = isSequenceQuiz
         ? String(question.correct_option)
               .split(",")
@@ -1101,7 +1194,10 @@ const ShowEartraining = () => {
         setSelectedChordQuality([index]);
     };
     const handleChordDegreeToggle = toggleInArray(setSelectedChordDegree);
-    const handleExcludeToggle = toggleInArray(setSelectedExclude);
+    const handleExcludeSelect = (index) => {
+        if (isSubmitted) return;
+        setSelectedExclude([index]);
+    };
 
     const handleChordDegreeAccidentalSelect = (index, accidental) => {
         if (isSubmitted) return;
@@ -1113,7 +1209,7 @@ const ShowEartraining = () => {
 
     const handleProgressionSelect = (index) => {
         if (isSubmitted) return;
-        if (selectedProgression.length >= 3) return;
+        if (selectedProgression.length >= correctProgression.length) return;
         setSelectedProgression((prev) => [...prev, index]);
     };
 
@@ -1593,10 +1689,13 @@ const ShowEartraining = () => {
         // Check if it is an HTML embed snippet (contains HTML tags)
         if (/<[a-z][\s\S]*>/i.test(videoUrl)) {
             return (
-                <div
-                    className="w-full rounded shadow overflow-hidden"
-                    dangerouslySetInnerHTML={{ __html: videoUrl }}
-                />
+                <div className="relative w-full aspect-video rounded overflow-hidden shadow bg-black">
+                    <div
+                        ref={videoEmbedRef}
+                        className="absolute inset-0"
+                        dangerouslySetInnerHTML={{ __html: videoUrl }}
+                    />
+                </div>
             );
         }
 
@@ -1911,7 +2010,7 @@ const ShowEartraining = () => {
                                     Difficulty
                                 </p>
                                 <p className="text-sm font-bold text-gray-800 dark:text-gray-100">
-                                    Beginner
+                                    {quiz.difficulty || "Beginner"}
                                 </p>
                             </div>
                         </div>
@@ -1969,9 +2068,9 @@ const ShowEartraining = () => {
                     </div>
 
                     {/* Reference Audio */}
-                    {quiz.main_audio_path && (
-                        <div className="mt-3 bg-white dark:bg-[#161617] border border-gray-100 dark:border-white/10 rounded-2xl p-5 sm:p-6">
-                            <div className="flex items-center gap-2.5 mb-4">
+                    {quiz.reference_audios && quiz.reference_audios.length > 0 && (
+                        <div className="mt-3 bg-white dark:bg-[#161617] border border-gray-100 dark:border-white/10 rounded-2xl p-5 sm:p-6 space-y-5">
+                            <div className="flex items-center gap-2.5">
                                 <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400 flex-shrink-0">
                                     <Headphones className="w-4 h-4" />
                                 </span>
@@ -1980,56 +2079,13 @@ const ShowEartraining = () => {
                                 </p>
                             </div>
 
-                            <audio
-                                ref={refAudioRef}
-                                src={`${quiz.main_audio_path}`}
-                                onLoadedMetadata={(e) => setRefAudioDuration(e.currentTarget.duration)}
-                                onTimeUpdate={handleRefAudioTimeUpdate}
-                                onEnded={() => {
-                                    setIsRefAudioPlaying(false);
-                                    setRefAudioProgress(0);
-                                    setRefAudioCurrentTime(0);
-                                }}
-                                className="hidden"
-                            />
-
-                            <div className="flex items-center gap-4">
-                                <button
-                                    onClick={toggleRefAudio}
-                                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex-shrink-0 hover:bg-gray-800 dark:hover:bg-gray-100 active:scale-95 transition-all duration-150"
-                                >
-                                    {isRefAudioPlaying ? (
-                                        <Square className="w-3.5 h-3.5 fill-current" />
-                                    ) : (
-                                        <Play className="w-4 h-4 fill-current ml-0.5" />
-                                    )}
-                                </button>
-
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between mb-1.5">
-                                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
-                                            C Major Scale
-                                        </p>
-                                        <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums flex-shrink-0 ml-3">
-                                            {formatAudioTime(refAudioCurrentTime)} / {formatAudioTime(refAudioDuration)}
-                                        </span>
-                                    </div>
-
-                                    <div
-                                        onClick={seekRefAudio}
-                                        className="group relative w-full h-1.5 bg-gray-100 dark:bg-white/10 rounded-full cursor-pointer"
-                                    >
-                                        <div
-                                            className="absolute inset-y-0 left-0 bg-gray-900 dark:bg-white rounded-full"
-                                            style={{ width: `${refAudioProgress}%` }}
-                                        ></div>
-                                        <div
-                                            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-gray-900 dark:bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                                            style={{ left: `${refAudioProgress}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            </div>
+                            {quiz.reference_audios.map((refAudio) => (
+                                <ReferenceAudioItem
+                                    key={refAudio.id}
+                                    name={refAudio.name}
+                                    src={refAudio.audio_path}
+                                />
+                            ))}
                         </div>
                     )}
 
@@ -2076,7 +2132,9 @@ const ShowEartraining = () => {
                             </div>
 
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-8">
-                                {isChordInversionQuiz
+                                {quiz.question_prompt
+                                    ? quiz.question_prompt
+                                    : isChordInversionQuiz
                                     ? "Identify the chord quality and inversion you hear."
                                     : isSequenceQuiz
                                     ? `Identify the ${correctSequence.length}-note melody you hear.`
@@ -2383,6 +2441,31 @@ const ShowEartraining = () => {
                                                 );
                                             })}
                                             {OCTAVE_BLACK_KEYS.map((key, j) => {
+                                                if (!isBlackKeyMelodyQuiz) {
+                                                    // Sharps/flats are shown for a realistic octave but
+                                                    // are not used in this lesson, so never selectable.
+                                                    return (
+                                                        <button
+                                                            key={key.label}
+                                                            disabled
+                                                            title="Sharps/flats aren't used in this lesson"
+                                                            className="absolute top-0 h-[62%] w-[9%] flex items-end justify-center pb-2 rounded-b-md shadow-md z-10 bg-gray-900"
+                                                            style={{
+                                                                left: `${
+                                                                    ((key.afterIndex + 1) /
+                                                                        OCTAVE_WHITE_KEY_LABELS.length) *
+                                                                    100
+                                                                }%`,
+                                                                transform: "translateX(-50%)",
+                                                            }}
+                                                        >
+                                                            <span className="text-[10px] font-semibold text-gray-300">
+                                                                {key.label}
+                                                            </span>
+                                                        </button>
+                                                    );
+                                                }
+
                                                 const flatIndex = OCTAVE_WHITE_KEY_LABELS.length + j;
                                                 const isDisabled =
                                                     isSubmitted ||
@@ -2532,12 +2615,12 @@ const ShowEartraining = () => {
                                             {
                                                 num: 3,
                                                 label: "Exclude (if any)",
-                                                hint: "Select all that apply",
-                                                singleSelect: false,
+                                                hint: "Pick one",
+                                                singleSelect: true,
                                                 options: CHORD_NAMING_EXCLUDE_OPTIONS,
                                                 selected: selectedExclude,
                                                 correct: correctExclude,
-                                                onToggle: handleExcludeToggle,
+                                                onToggle: handleExcludeSelect,
                                                 note: 'Select "None" if no notes are excluded.',
                                             },
                                         ].map((group) => (
@@ -2558,7 +2641,7 @@ const ShowEartraining = () => {
                                                         {group.hint}
                                                     </span>
                                                 </div>
-                                                <div className="flex flex-wrap gap-1.5">
+                                                <div className="flex flex-wrap gap-2">
                                                     {group.options.map((opt, i) => {
                                                         const isCorrectOpt = group.correct.includes(i);
                                                         const isSelectedOpt = group.selected.includes(i);
@@ -2567,28 +2650,29 @@ const ShowEartraining = () => {
                                                             isSubmitted && isSelectedOpt && !isCorrectOpt;
                                                         const hasAccidental =
                                                             group.accidentalIndices?.includes(i);
+                                                        const showAccidentalSegment =
+                                                            hasAccidental && (isSelectedOpt || showCorrect);
                                                         const chosenAccidental = group.accidentals?.[i];
                                                         const correctAccidental =
                                                             group.correctAccidentals?.[i] || null;
+                                                        const toneClass = showCorrect
+                                                            ? "border-emerald-400 text-emerald-600 dark:text-emerald-400"
+                                                            : showWrong
+                                                            ? "border-rose-400 text-rose-600 dark:text-rose-400"
+                                                            : isSelectedOpt
+                                                            ? "border-gray-900 dark:border-white text-gray-900 dark:text-white"
+                                                            : "border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-white/20";
                                                         return (
                                                             <div
                                                                 key={i}
-                                                                className="flex items-center gap-1 flex-shrink-0"
+                                                                className={`inline-flex items-stretch rounded-full border overflow-hidden bg-white dark:bg-[#161617] transition-colors duration-200 flex-shrink-0 ${
+                                                                    isSubmitted ? "pointer-events-none" : ""
+                                                                } ${toneClass}`}
                                                             >
                                                                 <button
                                                                     onClick={() => group.onToggle(i)}
                                                                     aria-disabled={isSubmitted}
-                                                                    className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-full text-xs font-medium transition-all duration-200 bg-white dark:bg-[#161617] ${
-                                                                        isSubmitted ? "pointer-events-none" : ""
-                                                                    } ${
-                                                                        showCorrect
-                                                                            ? "border-emerald-400 text-emerald-600 dark:text-emerald-400"
-                                                                            : showWrong
-                                                                            ? "border-rose-400 text-rose-600 dark:text-rose-400"
-                                                                            : isSelectedOpt
-                                                                            ? "border-gray-900 dark:border-white text-gray-900 dark:text-white"
-                                                                            : "border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-white/20"
-                                                                    }`}
+                                                                    className="flex items-center gap-1.5 pl-3 pr-3 py-1.5 text-xs font-medium"
                                                                 >
                                                                     {(isSelectedOpt || showCorrect) &&
                                                                         (group.singleSelect ? (
@@ -2616,9 +2700,13 @@ const ShowEartraining = () => {
                                                                     <span>{opt}</span>
                                                                 </button>
 
-                                                                {hasAccidental && (
-                                                                    <div className="flex gap-1 flex-shrink-0">
-                                                                        {["#", "b"].map((sym) => {
+                                                                {showAccidentalSegment && (
+                                                                    <div
+                                                                        className={`flex items-stretch border-l ${
+                                                                            toneClass.split(" ")[0]
+                                                                        }`}
+                                                                    >
+                                                                        {["#", "b"].map((sym, symIdx) => {
                                                                             const isChosen = chosenAccidental === sym;
                                                                             const symCorrect =
                                                                                 isSubmitted &&
@@ -2636,16 +2724,18 @@ const ShowEartraining = () => {
                                                                                     onClick={() =>
                                                                                         group.onAccidentalToggle(i, sym)
                                                                                     }
-                                                                                    className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-bold transition-colors duration-150 ${
-                                                                                        isSubmitted ? "pointer-events-none" : ""
+                                                                                    className={`w-6 flex items-center justify-center text-[11px] font-bold transition-colors duration-150 ${
+                                                                                        symIdx === 0
+                                                                                            ? "border-r " + toneClass.split(" ")[0]
+                                                                                            : ""
                                                                                     } ${
                                                                                         symCorrect
-                                                                                            ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                                                                            ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                                                                             : symWrong
-                                                                                            ? "border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                                                                                            ? "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400"
                                                                                             : isChosen
-                                                                                            ? "border-gray-900 dark:border-white bg-gray-900 dark:bg-white text-white dark:text-gray-900"
-                                                                                            : "border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20"
+                                                                                            ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
+                                                                                            : "text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5"
                                                                                     }`}
                                                                                 >
                                                                                     {sym}

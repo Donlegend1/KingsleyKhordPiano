@@ -79,7 +79,7 @@ class EarTrainingController extends Controller
 
     public function show($id)
     {
-        $quiz = Quiz::with('questions')->findOrFail($id);
+        $quiz = Quiz::with('questions', 'referenceAudios')->findOrFail($id);
         return response()->json($quiz);
     }
 
@@ -118,11 +118,15 @@ class EarTrainingController extends Controller
                 'description'     => $request->description,
                 'video_url'       => $request->video_url,
                 'thumbnail_path'  => "/ear_training/thumbnails/$thumbnailName",
-                'main_audio_path' => $mainAudioName 
-                                        ? "/ear_training/main_audios/$mainAudioName"
-                                        : null,
                 'category'        => $request->category,
             ]);
+
+            if ($mainAudioName) {
+                $quiz->referenceAudios()->create([
+                    'name'       => null,
+                    'audio_path' => "/ear_training/main_audios/$mainAudioName",
+                ]);
+            }
 
             // Process questions
             foreach ($request->questions as $q) {
@@ -195,8 +199,11 @@ class EarTrainingController extends Controller
             }
     
             $mainAudio->move($destination, $mainAudioName);
-    
-            $quiz->main_audio_path = "/ear_training/main_audios/$mainAudioName";
+
+            $quiz->referenceAudios()->create([
+                'name'       => null,
+                'audio_path' => "/ear_training/main_audios/$mainAudioName",
+            ]);
         }
     
         $quiz->save();
