@@ -56,6 +56,7 @@ class AdminEtudeController extends Controller
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
+            'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
         ]);
 
         $categoryName = $request->input('category');
@@ -136,6 +137,21 @@ class AdminEtudeController extends Controller
             $pdfResourcePath = 'uploads/resources/pdf/' . $filename;
         }
 
+        $midiResourcePath = null;
+        if ($request->hasFile('midi_resource')) {
+            $midi = $request->file('midi_resource');
+            $filename = time() . '_' . $midi->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/midi');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/midi');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $midi->move($destination, $filename);
+            $midiResourcePath = 'uploads/resources/midi/' . $filename;
+        }
+
         $maxPos = Etude::where('etude_category_id', $category->id)->max('position') ?: 0;
 
         $etude = Etude::create([
@@ -152,6 +168,7 @@ class AdminEtudeController extends Controller
             'images' => $descriptionImages,
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
+            'midi_resource' => $midiResourcePath,
         ]);
 
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -179,6 +196,7 @@ class AdminEtudeController extends Controller
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
+            'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
         ]);
 
         $videoType = $request->input('video_type') ?? $etude->video_type;
@@ -275,6 +293,24 @@ class AdminEtudeController extends Controller
             $pdfResourcePath = 'uploads/resources/pdf/' . $filename;
         }
 
+        $midiResourcePath = $etude->midi_resource;
+        if ($request->hasFile('midi_resource')) {
+            $midi = $request->file('midi_resource');
+            $filename = time() . '_' . $midi->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/midi');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/midi');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($etude->midi_resource && file_exists(public_path($etude->midi_resource))) {
+                @unlink(public_path($etude->midi_resource));
+            }
+            $midi->move($destination, $filename);
+            $midiResourcePath = 'uploads/resources/midi/' . $filename;
+        }
+
         $etude->update([
             'title' => $request->input('title') ?? $etude->title,
             'author' => $request->has('author') ? $request->input('author') : $etude->author,
@@ -287,6 +323,7 @@ class AdminEtudeController extends Controller
             'images' => $descriptionImages,
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
+            'midi_resource' => $midiResourcePath,
         ]);
 
         return response()->json($etude, 200);

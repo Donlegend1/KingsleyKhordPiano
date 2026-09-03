@@ -10,6 +10,7 @@ class MidiPracticeFileResolver
     {
         if (! empty($lesson->midi_resource)) {
             $uploaded = new MidiFile;
+            $uploaded->incrementing = false;
             $uploaded->id = 'lesson-'.$lesson->id;
             $uploaded->name = $lesson->title;
             $uploaded->description = $lesson->description ?? null;

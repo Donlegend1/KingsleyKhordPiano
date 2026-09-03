@@ -161,7 +161,7 @@ class CoursesController extends Controller
                 ->first();
         }
 
-        $midiPracticeFile = $type === 'learn_song'
+        $midiPracticeFile = in_array($type, ['learn_song', 'etudes'], true)
             ? app(MidiPracticeFileResolver::class)->forLesson($lesson)
             : null;
         $midiPracticeFiles = collect([$midiPracticeFile])->filter();

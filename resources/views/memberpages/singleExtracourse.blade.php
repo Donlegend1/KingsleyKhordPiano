@@ -9,6 +9,8 @@
             $lessonType = 'learn_songs';
         } elseif ($lesson instanceof \App\Models\ExtraCourse) {
             $lessonType = 'extra_courses';
+        } elseif ($lesson instanceof \App\Models\Etude) {
+            $lessonType = 'etudes';
         }
 
         // Every lesson link on this page points to the same model as the
@@ -17,6 +19,7 @@
         $linkType = match ($lessonType) {
             'learn_songs' => 'learn_song',
             'extra_courses' => 'extra_course',
+            'etudes' => 'etudes',
             default => 'upload',
         };
 
@@ -106,7 +109,7 @@
                         <div class="mb-5"></div>
                     @endif
 
-                    @if ($lessonType === 'learn_songs')
+                    @if (in_array($lessonType, ['learn_songs', 'etudes']))
                         @include('memberpages.partials.midi-practice-display', [
                             'midiPracticeFile' => $midiPracticeFile ?? null,
                             'midiPracticeFiles' => $midiPracticeFiles ?? collect(),
