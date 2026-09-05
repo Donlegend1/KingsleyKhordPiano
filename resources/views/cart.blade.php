@@ -197,49 +197,7 @@
             </div>
         </div>
 
-        <!-- You May Also Like -->
         @endif
-        <div class="mt-16">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
-
-            <div class="relative">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach($related as $item)
-                        <div class="flex flex-col">
-                            @if(!empty($item['thumbnail']))
-                                <img src="/{{ $item['thumbnail'] }}" alt="{{ $item['name'] }}" class="aspect-video rounded-xl object-cover">
-                            @else
-                                <div class="aspect-video rounded-xl overflow-hidden relative"
-                                    style="background: linear-gradient(135deg, {{ $item['from'] }}, {{ $item['to'] }});">
-                                    @if(!empty($item['label']))
-                                        <div class="absolute inset-0 flex items-center justify-center p-4 text-center">
-                                            <span class="text-white font-extrabold uppercase text-sm leading-tight"
-                                                style="text-shadow: 0 2px 6px rgba(0,0,0,0.6);">
-                                                {{ $item['label'] }}
-                                            </span>
-                                        </div>
-                                    @endif
-                                    <div class="absolute bottom-0 left-0 right-0 h-8 flex">
-                                        @for($i = 0; $i < 22; $i++)
-                                            <div class="flex-1 border-r border-black/30 bg-white/90"></div>
-                                        @endfor
-                                    </div>
-                                </div>
-                            @endif
-
-                            <h3 class="mt-4 text-gray-900 font-semibold text-[15px]">{{ $item['name'] }}</h3>
-                            <p class="text-xs text-gray-500">{{ $item['type'] }}</p>
-                            <p class="mt-1 text-gray-900 font-bold">${{ number_format($item['price'], 2) }}</p>
-
-                            <button type="button" data-add-slug="{{ $item['slug'] }}" data-reload="1" class="add-to-cart-btn mt-3 flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white text-sm font-semibold py-2.5 rounded-lg transition">
-                                <i class="fa-solid fa-cart-shopping text-xs"></i>
-                                <span>Add to Cart</span>
-                            </button>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
 
     </div>
 </div>

@@ -76,6 +76,7 @@ const ExtraCoursesAdmin = () => {
         video_url: "",
         status: "active",
         related_courses: [],
+        related_lessons: [],
     });
 
     const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false);
@@ -262,6 +263,7 @@ const ExtraCoursesAdmin = () => {
             video_url: "",
             status: "active",
             related_courses: [],
+            related_lessons: [],
         });
         setThumbnailFile(null);
         setPreviewUrl(null);
@@ -290,6 +292,12 @@ const ExtraCoursesAdmin = () => {
         newCourse.related_courses.forEach((id, idx) => {
             formData.append(`related_courses[${idx}]`, id);
         });
+        newCourse.related_lessons
+            .filter((rl) => rl.title.trim() && rl.url.trim())
+            .forEach((rl, idx) => {
+                formData.append(`related_lessons[${idx}][title]`, rl.title);
+                formData.append(`related_lessons[${idx}][url]`, rl.url);
+            });
         if (audioResourceFile) {
             formData.append("audio_resource", audioResourceFile);
         }
@@ -321,7 +329,8 @@ const ExtraCoursesAdmin = () => {
     const openEditCourseModal = (course) => {
         setEditingCourse({
             ...course,
-            related_courses: course.related_courses || []
+            related_courses: course.related_courses || [],
+            related_lessons: course.related_lessons || []
         });
         setPreviewUrl(course.thumbnail_url);
         setThumbnailFile(null);
@@ -350,6 +359,12 @@ const ExtraCoursesAdmin = () => {
         editingCourse.related_courses.forEach((id, idx) => {
             formData.append(`related_courses[${idx}]`, id);
         });
+        editingCourse.related_lessons
+            .filter((rl) => rl.title.trim() && rl.url.trim())
+            .forEach((rl, idx) => {
+                formData.append(`related_lessons[${idx}][title]`, rl.title);
+                formData.append(`related_lessons[${idx}][url]`, rl.url);
+            });
         if (editAudioResourceFile) {
             formData.append("audio_resource", editAudioResourceFile);
         }
@@ -720,6 +735,54 @@ const ExtraCoursesAdmin = () => {
                                 rows="3"
                             ></textarea>
                         </div>
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                            <div className="space-y-2">
+                                {newCourse.related_lessons.map((rl, idx) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Lesson name"
+                                            value={rl.title}
+                                            onChange={(e) => {
+                                                const rows = [...newCourse.related_lessons];
+                                                rows[idx] = { ...rows[idx], title: e.target.value };
+                                                setNewCourse({ ...newCourse, related_lessons: rows });
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Link"
+                                            value={rl.url}
+                                            onChange={(e) => {
+                                                const rows = [...newCourse.related_lessons];
+                                                rows[idx] = { ...rows[idx], url: e.target.value };
+                                                setNewCourse({ ...newCourse, related_lessons: rows });
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const rows = newCourse.related_lessons.filter((_, i) => i !== idx);
+                                                setNewCourse({ ...newCourse, related_lessons: rows });
+                                            }}
+                                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                        >
+                                            <i className="fa fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setNewCourse({ ...newCourse, related_lessons: [...newCourse.related_lessons, { title: "", url: "" }] })}
+                                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                                >
+                                    <i className="fa fa-plus"></i> Add related lesson
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     {previewUrl && (
@@ -868,6 +931,54 @@ const ExtraCoursesAdmin = () => {
                                     className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none"
                                     rows="3"
                                 ></textarea>
+                            </div>
+                            <div className="col-span-1 sm:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                                <div className="space-y-2">
+                                    {editingCourse.related_lessons.map((rl, idx) => (
+                                        <div key={idx} className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Lesson name"
+                                                value={rl.title}
+                                                onChange={(e) => {
+                                                    const rows = [...editingCourse.related_lessons];
+                                                    rows[idx] = { ...rows[idx], title: e.target.value };
+                                                    setEditingCourse({ ...editingCourse, related_lessons: rows });
+                                                }}
+                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Link"
+                                                value={rl.url}
+                                                onChange={(e) => {
+                                                    const rows = [...editingCourse.related_lessons];
+                                                    rows[idx] = { ...rows[idx], url: e.target.value };
+                                                    setEditingCourse({ ...editingCourse, related_lessons: rows });
+                                                }}
+                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const rows = editingCourse.related_lessons.filter((_, i) => i !== idx);
+                                                    setEditingCourse({ ...editingCourse, related_lessons: rows });
+                                                }}
+                                                className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                            >
+                                                <i className="fa fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingCourse({ ...editingCourse, related_lessons: [...editingCourse.related_lessons, { title: "", url: "" }] })}
+                                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                                    >
+                                        <i className="fa fa-plus"></i> Add related lesson
+                                    </button>
+                                </div>
                             </div>
                         </div>
 

@@ -11,6 +11,8 @@ use App\Models\UserAssessment;
 use App\Models\LearnSong;
 use App\Models\ExtraCourse;
 use App\Models\Course;
+use App\Models\Feedback;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -99,15 +101,52 @@ class CommunityIndexController extends Controller
             }
         }
 
+        $feedbackList = Feedback::with('user')->latest()->take(20)->get();
+
         return view('community.index', compact(
-            'user', 
-            'assessment', 
-            'progress', 
-            'totalCompleted', 
-            'achievedCount', 
-            'resumeLesson', 
-            'resumeUrl'
+            'user',
+            'assessment',
+            'progress',
+            'totalCompleted',
+            'achievedCount',
+            'resumeLesson',
+            'resumeUrl',
+            'feedbackList'
         ));
+    }
+
+    public function storeFeedback(Request $request)
+    {
+        $validated = $request->validate([
+            'rating' => 'nullable|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:2000',
+        ]);
+
+        if (empty($validated['rating']) && empty($validated['comment'])) {
+            return response()->json(['message' => 'Please add a rating or comment.'], 422);
+        }
+
+        $feedback = Feedback::create([
+            'user_id' => auth()->id(),
+            'rating' => $validated['rating'] ?? null,
+            'comment' => $validated['comment'] ?? null,
+        ]);
+
+        $feedback->load('user');
+
+        return response()->json([
+            'message' => 'Feedback received',
+            'feedback' => [
+                'id' => $feedback->id,
+                'rating' => $feedback->rating,
+                'comment' => $feedback->comment,
+                'created_at' => $feedback->created_at->diffForHumans(),
+                'user' => [
+                    'name' => trim($feedback->user->first_name . ' ' . $feedback->user->last_name),
+                    'passport' => $feedback->user->passport,
+                ],
+            ],
+        ], 201);
     }
 
    public function space()

@@ -13,7 +13,9 @@ class ShopCatalog
      */
     public static function all(): array
     {
-        return ShopProduct::all()
+        return ShopProduct::orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get()
             ->mapWithKeys(fn (ShopProduct $product) => [$product->slug => static::toArray($product)])
             ->all();
     }

@@ -108,7 +108,7 @@
                     <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-users"></i> Community
                     </a>
-                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="https://kingsleykhordpiano.com/shop" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-shopping-bag"></i> Shop
                     </a>
                     <a href="/member/support" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
@@ -268,6 +268,7 @@
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
                         ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'music-note.svg', 'new' => $hasNewLearnSongs],
                         ['url' => 'member/live-session',    'label' => 'Live Shows',  'icon' => 'livesession.svg'],
+                        ['url' => 'member/audio-quiz',       'label' => 'Audio Quiz',  'icon' => 'sound.png'],
                     ];
                 @endphp
                 @foreach($subNav as $item)
@@ -323,7 +324,7 @@
                     <a href="/member/profile" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-user-circle w-4"></i> My Account
                     </a>
-                    <a href="https://khordsounds.com/product-category/piano-best-sellers/" target="_blank" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="https://kingsleykhordpiano.com/shop" target="_blank" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-shopping-bag w-4"></i> Shop
                     </a>
                     <a href="/member/support" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">

@@ -9,7 +9,7 @@
     <div class="max-w-7xl mx-auto">
         <!-- Page Title -->
         <div class="flex items-center gap-2.5 mb-8">
-            <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+            <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400">
                 <i class="fas fa-bookmark text-sm"></i>
             </div>
             <h2 class="text-xl font-bold text-gray-900 dark:text-white">My Bookmarks</h2>
@@ -67,28 +67,26 @@
                 }
             @endphp
 
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 flex flex-col hover:shadow-sm transition-shadow">
 
-                        <div class="flex items-center justify-between mb-5">
-                            <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 dark:text-indigo-400 flex-shrink-0">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400 flex-shrink-0">
                                 @if($isPost)
-                                    <i class="fas fa-comment-dots text-lg"></i>
+                                    <i class="fas fa-comment-dots text-sm"></i>
                                 @else
-                                    <i class="fas fa-play text-base"></i>
+                                    <i class="fas fa-play text-sm"></i>
                                 @endif
-                            </div>
-                            <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wide">
+                            </span>
+                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                                 {{ $categoryLabel }}
                             </span>
                         </div>
 
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 line-clamp-2 flex-1">{{ $title }}</h3>
+                        <h3 class="text-[15px] font-bold text-gray-900 dark:text-white mb-5 line-clamp-2 flex-1">{{ $title }}</h3>
 
                         <a href="{{ $url }}"
-                            class="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold uppercase tracking-wide transition-colors shadow-sm">
-                            <span class="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-play text-[9px] ml-0.5"></i>
-                            </span>
+                            class="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-gray-900 hover:bg-black text-white text-sm font-semibold transition-colors">
+                            <i class="fas fa-play text-[10px]"></i>
                             View
                         </a>
                     </div>

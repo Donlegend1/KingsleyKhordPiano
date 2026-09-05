@@ -49,13 +49,37 @@ class EarTrainingController extends Controller
         return view('memberpages.eartraining.show', compact('quiz', 'isCompleted'));
     }
 
+    public function siblings($id) {
+        $quiz = Quiz::findOrFail($id);
+
+        $siblings = Quiz::where('category', $quiz->category)
+            ->orderBy('id')
+            ->get(['id', 'title']);
+
+        $completedIds = \App\Models\LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_type', Quiz::class)
+            ->whereIn('completable_id', $siblings->pluck('id'))
+            ->pluck('completable_id')
+            ->all();
+
+        $siblings = $siblings->map(function ($sibling) use ($completedIds) {
+            return [
+                'id' => $sibling->id,
+                'title' => $sibling->title,
+                'completed' => in_array($sibling->id, $completedIds),
+            ];
+        });
+
+        return response()->json($siblings);
+    }
+
     public  function showadmin() {
         return view('admin.eartraining.show');
     }
 
     public function show($id)
     {
-        $quiz = Quiz::with('questions')->findOrFail($id);
+        $quiz = Quiz::with('questions', 'referenceAudios')->findOrFail($id);
         return response()->json($quiz);
     }
 
@@ -94,11 +118,15 @@ class EarTrainingController extends Controller
                 'description'     => $request->description,
                 'video_url'       => $request->video_url,
                 'thumbnail_path'  => "/ear_training/thumbnails/$thumbnailName",
-                'main_audio_path' => $mainAudioName 
-                                        ? "/ear_training/main_audios/$mainAudioName"
-                                        : null,
                 'category'        => $request->category,
             ]);
+
+            if ($mainAudioName) {
+                $quiz->referenceAudios()->create([
+                    'name'       => null,
+                    'audio_path' => "/ear_training/main_audios/$mainAudioName",
+                ]);
+            }
 
             // Process questions
             foreach ($request->questions as $q) {
@@ -171,8 +199,11 @@ class EarTrainingController extends Controller
             }
     
             $mainAudio->move($destination, $mainAudioName);
-    
-            $quiz->main_audio_path = "/ear_training/main_audios/$mainAudioName";
+
+            $quiz->referenceAudios()->create([
+                'name'       => null,
+                'audio_path' => "/ear_training/main_audios/$mainAudioName",
+            ]);
         }
     
         $quiz->save();

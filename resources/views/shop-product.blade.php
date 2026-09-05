@@ -2,15 +2,6 @@
 
 @section('title', $product['name'] . ' - Shop')
 
-@php
-    $related = [
-        ['name' => 'Thank You Lord MIDI', 'price' => 12.99, 'label' => 'THANK YOU LORD', 'sub' => 'LORD', 'from' => '#3b2f1e', 'to' => '#0d0d0d'],
-        ['name' => 'Great Is Thy Faithfulness MIDI', 'price' => 13.99, 'label' => 'GREAT IS THY FAITHFULNESS', 'sub' => 'MIDI', 'from' => '#5b21b6', 'to' => '#1e0a3c'],
-        ['name' => 'You Deserve The Glory MIDI', 'price' => 13.99, 'label' => 'YOU DESERVE THE GLORY', 'sub' => 'MIDI', 'from' => '#0f2942', 'to' => '#04101c'],
-        ['name' => 'What A Beautiful Name MIDI', 'price' => 13.99, 'label' => 'WHAT A BEAUTIFUL NAME', 'sub' => 'MIDI', 'from' => '#241a3b', 'to' => '#05050a'],
-    ];
-@endphp
-
 @section('content')
 <div class="bg-white min-h-screen pt-32 pb-24 px-4">
     <div class="max-w-7xl mx-auto">
@@ -95,35 +86,6 @@
                         </span>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Related MIDI Files -->
-        <div class="mt-20">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Related MIDI Files</h2>
-            <div class="border-t border-gray-100 mb-8"></div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach($related as $item)
-                    <div class="flex flex-col">
-                        <div class="aspect-video rounded-xl overflow-hidden relative flex items-end p-4"
-                            style="background: linear-gradient(135deg, {{ $item['from'] }}, {{ $item['to'] }});">
-                            <span class="text-white font-extrabold uppercase leading-tight text-lg"
-                                style="text-shadow: 0 2px 8px rgba(0,0,0,0.5);">
-                                {{ $item['label'] }}<br>
-                                <span class="text-[#FFD736]">{{ $item['sub'] }}</span>
-                            </span>
-                        </div>
-
-                        <h3 class="mt-4 text-gray-900 font-semibold text-[15px]">{{ $item['name'] }}</h3>
-                        <p class="mt-1 text-gray-900 font-bold">${{ number_format($item['price'], 2) }}</p>
-
-                        <button class="mt-3 flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white text-sm font-semibold py-2.5 rounded-lg transition">
-                            <i class="fa-solid fa-cart-shopping text-xs"></i>
-                            Add to Cart
-                        </button>
-                    </div>
-                @endforeach
             </div>
         </div>
 

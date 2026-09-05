@@ -54,23 +54,40 @@
             </p>
 
             {{-- Discussion / Comments --}}
-            <div class="pt-8 border-t border-gray-100" id="discussion-section" data-course-id="{{ $liveshow->id }}" data-comment-category="liveshow">
-                <h2 class="text-[17px] font-semibold text-gray-900 tracking-tight mb-5">Discussion</h2>
-                <form id="comment-form" class="mb-8">
+            <div class="border border-gray-100 rounded-2xl p-6 bg-white" id="discussion-section" data-course-id="{{ $liveshow->id }}" data-comment-category="liveshow">
+                <div class="flex items-center gap-2.5 mb-5">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 flex-shrink-0">
+                        <i class="fa-regular fa-comments text-sm"></i>
+                    </span>
+                    <div>
+                        <h2 class="text-[14px] font-semibold text-gray-900">Discussion</h2>
+                        <p class="text-[12px] text-gray-400">Share your thoughts, questions, and follow-up replies.</p>
+                    </div>
+                </div>
+
+                <form id="comment-form" class="mb-6">
                     <textarea name="comment" placeholder="Share your thoughts on this session..."
-                        class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
+                        class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
                     <div class="flex justify-end mt-3">
-                        <button type="submit" class="bg-gray-900 text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-black transition-colors">Comment</button>
+                        <button type="submit" class="flex items-center gap-2 bg-gray-900 text-white text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-black transition-colors">
+                            <i class="fa-solid fa-paper-plane text-[11px]"></i>
+                            Comment
+                        </button>
                     </div>
                 </form>
 
                 <div class="divide-y divide-gray-100" id="comment-list">
-                    @forelse ($comments as $comment)
+                    @foreach ($comments as $comment)
                         @include('memberpages.partials.course-video-comment', ['comment' => $comment])
-                    @empty
-                        <p class="text-sm text-gray-400 text-center py-6">No comments yet. Be the first to share your thoughts.</p>
-                    @endforelse
+                    @endforeach
                 </div>
+
+                @if ($comments->isEmpty())
+                    <div id="comment-empty-state" class="border border-dashed border-gray-200 rounded-2xl px-6 py-10 text-center">
+                        <i class="fa-regular fa-comment-dots text-2xl text-gray-300 mb-3"></i>
+                        <p class="text-[13px] font-medium text-gray-500">No comments yet. Be the first to share your thoughts.</p>
+                    </div>
+                @endif
             </div>
 
         </div>
