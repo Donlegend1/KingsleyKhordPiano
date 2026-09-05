@@ -35,6 +35,9 @@ class MusicalApplicationController extends Controller
             'status' => 'required|in:active,inactive,draft',
             'thumbnail' => 'nullable|image|max:2048',
             'tags' => 'nullable|array',
+            'related_lessons' => 'nullable|array',
+            'related_lessons.*.title' => 'required_with:related_lessons|string|max:255',
+            'related_lessons.*.url' => 'required_with:related_lessons|string|max:2048',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
         ]);
@@ -108,6 +111,9 @@ class MusicalApplicationController extends Controller
             'series' => 'nullable|string',
             'status' => 'required|in:active,inactive,draft',
             'tags' => 'nullable|array',
+            'related_lessons' => 'nullable|array',
+            'related_lessons.*.title' => 'required_with:related_lessons|string|max:255',
+            'related_lessons.*.url' => 'required_with:related_lessons|string|max:2048',
         ];
 
         if ($request->hasFile('thumbnail')) {

@@ -246,6 +246,7 @@ class ExerciseController extends Controller
 
         $seriesPage = $categoryPage;
 
-        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage'));
+        return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage', 'search'));
     }
+
 }

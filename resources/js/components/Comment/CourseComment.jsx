@@ -11,10 +11,10 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 
 const buttonBase =
-    "inline-flex items-center justify-center rounded-md text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:pointer-events-none disabled:opacity-50";
-const primaryButton = `${buttonBase} bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200`;
-const secondaryButton = `${buttonBase} border border-slate-200 bg-white px-3 py-2 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800`;
-const ghostButton = `${buttonBase} px-2.5 py-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white`;
+    "inline-flex items-center justify-center rounded-full text-sm font-medium transition focus:outline-none disabled:pointer-events-none disabled:opacity-40";
+const primaryButton = `${buttonBase} bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100`;
+const secondaryButton = `${buttonBase} rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:bg-[#161617] dark:text-gray-200 dark:hover:bg-white/5`;
+const ghostButton = `${buttonBase} rounded-lg px-2.5 py-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-500 dark:hover:bg-white/5 dark:hover:text-white`;
 
 function formatTimestamp(value) {
     if (!value) return "";
@@ -48,19 +48,19 @@ function CommentCard({
     const menuOpen = activeMenuId === comment.id;
 
     return (
-        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+        <article className="rounded-2xl border border-gray-100 bg-white p-4 dark:border-white/10 dark:bg-[#161617]">
             <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
                     <img
                         src={comment.user?.passport || "/avatar1.jpg"}
                         alt="Avatar"
-                        className="h-11 w-11 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                        className="h-10 w-10 rounded-full object-cover ring-1 ring-gray-100 dark:ring-white/10"
                     />
                     <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                        <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
                             {comment.user?.first_name} {comment.user?.last_name}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
                             {formatTimestamp(comment.created_at)}
                         </p>
                     </div>
@@ -76,11 +76,11 @@ function CommentCard({
                     </button>
 
                     {menuOpen && (
-                        <div className="absolute right-0 z-10 mt-2 w-32 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+                        <div className="absolute right-0 z-10 mt-2 w-32 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg dark:border-white/10 dark:bg-[#1c1c1d]">
                             <button
                                 type="button"
                                 onClick={() => onEditStart(comment)}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5"
                             >
                                 <Pencil className="h-4 w-4" />
                                 Edit
@@ -123,19 +123,19 @@ function CommentCard({
                     </div>
                 </div>
             ) : (
-                <p className="mt-4 text-sm leading-6 text-slate-700 dark:text-slate-200">
+                <p className="mt-4 text-sm leading-6 text-gray-700 dark:text-gray-200">
                     {comment.comment}
                 </p>
             )}
 
             {comment.replies?.length > 0 && (
-                <div className="mt-4 space-y-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+                <div className="mt-4 space-y-3 border-t border-gray-100 pt-4 dark:border-white/10">
                     {comment.replies.map((reply) => (
                         <div
                             key={reply.id}
-                            className="rounded-xl bg-slate-50 px-3 py-3 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            className="rounded-xl bg-gray-50 px-3 py-3 text-sm text-gray-700 dark:bg-white/5 dark:text-gray-300"
                         >
-                            <span className="font-semibold text-slate-900 dark:text-white">
+                            <span className="font-semibold text-gray-900 dark:text-white">
                                 {reply.user?.first_name}:
                             </span>{" "}
                             {reply.reply}
@@ -148,7 +148,7 @@ function CommentCard({
                 <button
                     type="button"
                     onClick={() => onToggleReply(comment.id)}
-                    className="inline-flex items-center gap-2 text-xs font-medium text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    className="inline-flex items-center gap-2 text-xs font-medium text-gray-500 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                 >
                     <Reply className="h-3.5 w-3.5" />
                     {isReplying ? "Cancel reply" : "Reply"}
@@ -330,22 +330,22 @@ const CourseComment = ({ course, group }) => {
     }
 
     return (
-        <section className="mt-10 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-black sm:p-6">
-            <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                    <MessageSquare className="h-5 w-5" />
-                </div>
+        <section className="mt-3 rounded-2xl border border-gray-100 bg-white p-5 dark:border-white/10 dark:bg-[#161617] sm:p-6">
+            <div className="flex items-center gap-2.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 text-gray-500 dark:bg-white/5 dark:text-gray-400">
+                    <MessageSquare className="h-4 w-4" />
+                </span>
                 <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Comments</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Comments</h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
                         Share your thoughts, questions, and follow-up replies.
                     </p>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmitComment} className="mt-6 space-y-3">
+            <form onSubmit={handleSubmitComment} className="mt-5 space-y-3">
                 <Textarea
-                    className="min-h-[120px]"
+                    className="min-h-[110px] rounded-xl dark:border-white/10"
                     rows="4"
                     placeholder="Write a comment..."
                     value={comment}
@@ -355,7 +355,7 @@ const CourseComment = ({ course, group }) => {
                     <button
                         type="submit"
                         disabled={commentSubmitting || !comment.trim()}
-                        className={`${primaryButton} gap-2 px-4 py-2`}
+                        className={`${primaryButton} gap-2 px-5 py-2.5`}
                     >
                         <Send className="h-4 w-4" />
                         {commentSubmitting ? "Posting..." : "Post Comment"}
@@ -363,11 +363,11 @@ const CourseComment = ({ course, group }) => {
                 </div>
             </form>
 
-            <div className="mt-8 space-y-4">
+            <div className="mt-6 space-y-3">
                 {comments.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-950">
-                        <MessageSquare className="mx-auto h-10 w-10 text-slate-400 dark:text-slate-500" />
-                        <p className="mt-3 text-sm font-medium text-slate-600 dark:text-slate-300">
+                    <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-10 text-center dark:border-white/10 dark:bg-white/[0.03]">
+                        <MessageSquare className="mx-auto h-8 w-8 text-gray-300 dark:text-gray-600" />
+                        <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">
                             No comments yet.
                         </p>
                     </div>

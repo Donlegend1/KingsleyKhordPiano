@@ -20,6 +20,7 @@ class ExtraCourse extends Model
         'status',
         'position',
         'related_courses',
+        'related_lessons',
         'images',
         'audio_resource',
         'pdf_resource',
@@ -27,6 +28,7 @@ class ExtraCourse extends Model
 
     protected $casts = [
         'related_courses' => 'array',
+        'related_lessons' => 'array',
         'images' => 'array',
     ];
 

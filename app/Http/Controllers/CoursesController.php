@@ -49,7 +49,7 @@ class CoursesController extends Controller
             }], 'created_at')
             ->orderByDesc('latest_course_at');
 
-        $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab]);
+        $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab, 'name' => $search]);
 
         return view('memberpages.extracources', compact('categories', 'search', 'activeTab'));
     }
