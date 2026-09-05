@@ -31,7 +31,11 @@ class NewLiveShowNotification extends Notification
         return (new MailMessage)
             ->subject('Kingsleykhord Live Show 🎹')
             ->view('emails.live-show-announcement', [
-                'show' => $this->liveshow,
+                'show' => [
+                    'title' => $this->liveshow->title,
+                    'start_time' => $this->liveshow->start_time,
+                    'zoom_link' => $this->liveshow->zoom_link ?? $this->liveshow->zoom_link,
+                ],
                 'user' => $this->user,
             ]);
     }

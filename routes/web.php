@@ -20,10 +20,12 @@ use App\Http\Controllers\ZoomMeetingController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LiveShowController;
+use App\Http\Controllers\LiveShowNotificationController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ShopCheckoutController;
 use App\Support\ShopCatalog;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\AudioQuizController;
@@ -97,48 +99,12 @@ Route::post('/cart/remove', [CartController::class, 'remove']);
 Route::post('/cart/update', [CartController::class, 'updateQty']);
 Route::post('/cart/clear', [CartController::class, 'clear']);
 
-Route::get('/checkout', function () {
-    $items = CartController::hydrate();
-    $subtotal = collect($items)->sum(fn ($i) => $i['price'] * $i['qty']);
-
-    return view('checkout', [
-        'items' => $items,
-        'subtotal' => $subtotal,
-        'discount' => 0,
-        'total' => $subtotal,
-        'cartCount' => CartController::count(),
-    ]);
-});
-
-Route::get('/order-confirmation', function () {
-    $items = collect(CartController::hydrate())->map(fn ($item) => [
-        'name' => $item['name'],
-        'meta' => $item['type'],
-        'price' => $item['price'] * $item['qty'],
-        'qty' => $item['qty'],
-        'downloadLabel' => $item['type'] === 'Plugin' ? 'Download Plugin' : 'Download File',
-        'downloadUrl' => ShopCatalog::find($item['slug'])['download_url'] ?? null,
-        'thumbnail' => $item['thumbnail'],
-        'from' => $item['from'],
-        'to' => $item['to'],
-    ])->all();
-
-    $subtotal = collect($items)->sum('price');
-
-    // Simulate a completed purchase: this "pays" for whatever was in the cart, then empties it.
-    session(['cart' => []]);
-
-    return view('order-confirmation', [
-        'items' => $items,
-        'subtotal' => $subtotal,
-        'discount' => 0,
-        'total' => $subtotal,
-        'orderNumber' => '#KK-' . now()->format('Y') . '-' . random_int(1000, 9999),
-        'orderDate' => now()->format('F j, Y'),
-        'email' => 'john.doe@example.com',
-        'cartCount' => 0,
-    ]);
-});
+Route::get('/checkout', [ShopCheckoutController::class, 'index'])->name('shop.checkout');
+Route::post('/checkout/pay', [ShopCheckoutController::class, 'pay'])->name('shop.checkout.pay');
+Route::get('/checkout/stripe/success', [ShopCheckoutController::class, 'stripeSuccess'])->name('shop.checkout.stripe.success');
+Route::get('/checkout/paypal/success', [ShopCheckoutController::class, 'paypalSuccess'])->name('shop.checkout.paypal.success');
+Route::get('/checkout/cancel', [ShopCheckoutController::class, 'cancel'])->name('shop.checkout.cancel');
+Route::get('/order-confirmation', [ShopCheckoutController::class, 'confirmation'])->name('shop.order.confirmation');
 
 Route::get('/book-session', function () {
     return view('book-session', ['pageTitle' => 'Book a Session']);
@@ -196,13 +162,14 @@ Route::get('/member/notifications', [App\Http\Controllers\NotificationController
 Route::post('/stripe/create', [StripeController::class, 'checkout'])->name('stripe.create');
 Route::get('/stripe/success', [StripeController::class, 'checkoutSuccess'])->name('checkout.success');
 Route::get('/stripe/cancel',[StripeController::class, 'checkoutCancel'])->name('checkout.cancel');
-Route::post('stripe/sub/cancel',[StripeController::class, 'cancelSubscription'])->name('subscription.cancel');
+Route::post('stripe/sub/cancel',[StripeController::class, 'cancelSubscription'])->middleware('auth')->name('subscription.cancel');
 
 
 
-Route::post('paypal/create-order', [PayPalController::class, 'pay']);
-Route::get('paypal/success', [PayPalController::class, 'success']);
-Route::get('paypal/cancel', [PayPalController::class, 'error']);
+Route::post('paypal/create-order', [PayPalController::class, 'pay'])->middleware('auth')->name('paypal.create');
+Route::get('paypal/success', [PayPalController::class, 'success'])->name('paypal.success');
+Route::get('paypal/cancel', [PayPalController::class, 'error'])->name('paypal.cancel');
+Route::post('webhooks/paypal', [\App\Http\Controllers\PayPalWebhookController::class, 'handle'])->name('paypal.webhook');
 Route::post('/zoom-meeting-booking', [ZoomMeetingController::class, 'createZoomMeeting']);
 Route::get('/zoom/authorize', [ZoomMeetingController::class, 'redirectToZoom']);
 Route::get('/zoom/callback', [ZoomMeetingController::class, 'handleZoomCallback']);
@@ -246,6 +213,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('live-session/{liveshow}/confirm', [LiveSessionController::class, 'confirmBooking'])->name('member.live-session.confirm');
     Route::post('live-session/{liveshow}/book', [LiveSessionController::class, 'bookSlot'])->name('member.live-session.book');
     Route::get('live-show/{liveshow}/recording', [LiveShowController::class, 'showRecording'])->name('member.live-show.recording');
+    Route::get('notifications/live-shows/status', [LiveShowNotificationController::class, 'index']);
+    Route::post('notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
     Route::get('audio-quiz', [AudioQuizController::class, 'index'])->name('member.audio-quiz');
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
@@ -355,6 +324,15 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Shop Products Admin (MIDI files & Plugins)
     Route::resource('shop', \App\Http\Controllers\Admin\ShopProductController::class, ['as' => 'admin', 'parameters' => ['shop' => 'shopProduct']])->except(['show']);
 
+    // Shop Orders (checkout customers)
+    Route::get('shop-orders', [\App\Http\Controllers\Admin\ShopOrderController::class, 'index'])->name('admin.shop-orders.index');
+    Route::get('shop-orders/{shopOrder}', [\App\Http\Controllers\Admin\ShopOrderController::class, 'show'])->name('admin.shop-orders.show');
+
+    // Payment Settings
+    Route::get('payment-settings', [\App\Http\Controllers\Admin\PaymentSettingsController::class, 'index'])->name('admin.payment-settings.index');
+    Route::put('payment-settings', [\App\Http\Controllers\Admin\PaymentSettingsController::class, 'update'])->name('admin.payment-settings.update');
+    Route::put('payment-settings/plans', [\App\Http\Controllers\Admin\PaymentSettingsController::class, 'updatePlans'])->name('admin.payment-settings.plans');
+
     // Guest Bookings
     Route::prefix('guest-bookings')->name('admin.guest-bookings.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\GuestBookingController::class, 'index'])->name('index');
@@ -362,5 +340,13 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'availability'])->name('availability');
         Route::post('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'storeAvailability'])->name('store-availability');
         Route::delete('/availability/{availability}', [\App\Http\Controllers\Admin\GuestBookingController::class, 'destroyAvailability'])->name('destroy-availability');
+    });
+
+    // Piano coaching members (legacy premium + granted subscribers)
+    Route::prefix('piano-coaching')->name('admin.piano-coaching.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'index'])->name('index');
+        Route::get('/eligible', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'eligible'])->name('eligible');
+        Route::post('/', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'store'])->name('store');
+        Route::delete('/{user}', [\App\Http\Controllers\Admin\PianoCoachingMembersController::class, 'destroy'])->name('destroy');
     });
 });

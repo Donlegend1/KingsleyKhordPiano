@@ -87,6 +87,11 @@ class SyncStripeSubscribers extends Command
                 'plan' => $plan?->id,
             ]);
 
+            if ($status === 'active' && $plan) {
+                app(\App\Services\SubscriptionLifecycleService::class)
+                    ->syncCoachingAccess($user->fresh(), $plan);
+            }
+
             $this->info("Updated {$user->email}: {$status}, plan={$plan?->id}, amount={$amount}, ends_at={$endDate}");
         }
 

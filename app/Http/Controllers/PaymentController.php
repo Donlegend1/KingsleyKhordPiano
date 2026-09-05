@@ -291,6 +291,15 @@ class PaymentController extends Controller
                     'payment_method' => 'paystack',
                 ]
             );
+
+            $plan = Plan::where('paystack_product_id', $data['plan']['plan_code'] ?? null)->first()
+                ?? app(\App\Services\SubscriptionLifecycleService::class)->resolvePlan($user);
+
+            app(\App\Services\SubscriptionLifecycleService::class)->notifyActivated(
+                $user->fresh(),
+                (string) $data['subscription_code'],
+                $plan
+            );
         }
     }
 
@@ -302,10 +311,32 @@ class PaymentController extends Controller
         $subscription = Subscription::where('subscription_code', $subscriptionCode)->first();
 
         if ($subscription) {
+            $createdAt = $subscription->created_at;
             $subscription->update([
                 'stripe_status' => 'active',
                 'ends_at' => \Carbon\Carbon::parse($data['period_end'] ?? '+1 month')
             ]);
+
+            if ($subscription->user) {
+                $plan = app(\App\Services\SubscriptionLifecycleService::class)
+                    ->resolvePlan($subscription->user);
+                $invoiceRef = (string) ($data['invoice_code'] ?? $data['id'] ?? $subscriptionCode);
+                $isRenewal = $createdAt && $createdAt->lt(now()->subHours(12));
+
+                if ($isRenewal) {
+                    app(\App\Services\SubscriptionLifecycleService::class)->notifyRenewed(
+                        $subscription->user->fresh(),
+                        $invoiceRef,
+                        $plan
+                    );
+                } else {
+                    app(\App\Services\SubscriptionLifecycleService::class)->notifyActivated(
+                        $subscription->user->fresh(),
+                        (string) $subscriptionCode,
+                        $plan
+                    );
+                }
+            }
         }
     }
 

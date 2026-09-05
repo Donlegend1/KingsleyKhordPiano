@@ -27,7 +27,6 @@ class ManualPaymentService
                 [
                     'stripe_id' => 'manual_' . $reference,
                     'stripe_status' => 'active',
-                    'status' => 'active',
                     'ends_at' => $endsAt,
                     'type' => 'default',
                     'payment_method' => 'Manual',
@@ -43,9 +42,22 @@ class ManualPaymentService
                 'last_payment_amount' => $request->amount,
                 'payment_status' => 'successful',
                 'last_payment_at' => now(),
+                'subscription_status' => 'active',
+                'subscription_started_at' => $startsAt,
+                'subscription_expires_at' => $endsAt,
             ]);
 
             DB::commit();
+
+            $plan = ! empty($request->plan_id) ? \App\Models\Plan::find($request->plan_id) : null;
+            $lifecycle = app(\App\Services\SubscriptionLifecycleService::class);
+            if ($user->premium && (! $plan || $plan->includesCoaching())) {
+                $user->forceFill(['can_access_coaching' => true])->save();
+            } else {
+                $lifecycle->syncCoachingAccess($user->fresh(), $plan);
+            }
+            $lifecycle->notifyActivated($user->fresh(), $reference, $plan);
+
             return true;
 
         } catch (\Throwable $e) {

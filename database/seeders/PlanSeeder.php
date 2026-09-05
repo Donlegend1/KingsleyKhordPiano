@@ -9,52 +9,6 @@ class PlanSeeder extends Seeder
 {
     public function run()
     {
-        // $plans = [
-        //     [
-        //         'tier' => 'standard',
-        //         'type' => 'monthly',
-        //         'price_ngn' => 38000,
-        //         'price_usd' => 26,
-        //         'price_eur' => 23,
-        //         'image' => '/icons/icon.png',
-        //         'background' => '',
-        //         'paystack_product_id' => 'PLN_brzt8hexwspqu9p',
-        //         'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc6'
-        //     ],
-        //     [
-        //         'tier' => 'premium',
-        //         'type' => 'monthly',
-        //         'price_ngn' => 70000,
-        //         'price_usd' => 45,
-        //         'price_eur' => 40,
-        //         'image' => '/icons/price2.png',
-        //         'background' => '/images/Background.jpg',
-        //         'paystack_product_id' => 'PLN_mb88lum57cm9dyy',
-        //         'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc7'
-        //     ],
-        //     [
-        //         'tier' => 'standard',
-        //         'type' => 'yearly',
-        //         'price_ngn' => 320000,
-        //         'price_usd' => 215,
-        //         'price_eur' => 189,
-        //         'image' => '/icons/icon.png',
-        //         'background' => '',
-        //         'paystack_product_id' => 'PLN_l4u5qel3amq3ukh',
-        //         'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc8'
-        //     ],
-        //     [
-        //         'tier' => 'premium',
-        //         'type' => 'yearly',
-        //         'price_ngn' => 650000,
-        //         'price_usd' => 420,
-        //         'price_eur' => 369,
-        //         'image' => '/icons/price2.png',
-        //         'background' => '/images/Background.jpg',
-        //         'paystack_product_id' => 'PLN_x7f11lzl66061dg',
-        //         'stripe_product_id' => 'price_1SF0RQB0pqpbXiCilRF4qMc9'
-        //     ],
-        // ];
 
         Plan::truncate(); // Clear existing records before seeding
          $plans = [
@@ -67,7 +21,7 @@ class PlanSeeder extends Seeder
                 'image' => '/icons/icon.png',
                 'background' => '',
                 'paystack_product_id' => 'PLN_brzt8hexwspqu9p',
-                'stripe_product_id' => 'price_1TmEw0B0pqpbXiCi4WJifhGG'
+                'stripe_product_id' => 'price_1U6bmA4msUcQGPMTmFTHw6xQ'
             ],
             [
                 'tier' => 'premium',
@@ -78,7 +32,7 @@ class PlanSeeder extends Seeder
                 'image' => '/icons/price2.png',
                 'background' => '/images/Background.jpg',
                 'paystack_product_id' => 'PLN_mb88lum57cm9dyy',
-                'stripe_product_id' => 'price_1TmF19B0pqpbXiCiG7cPdcU6'
+                'stripe_product_id' => 'price_1U6eaA4msUcQGPMTQdughSSf'
             ],
            
             [
@@ -90,7 +44,7 @@ class PlanSeeder extends Seeder
                 'image' => '/icons/icon.png',
                 'background' => '',
                 'paystack_product_id' => 'PLN_l4u5qel3amq3ukh',
-                'stripe_product_id' => 'price_1TmFAaB0pqpbXiCikJDqSE8T'
+                'stripe_product_id' => 'price_1U6boy4msUcQGPMT5lcwSnYn'
             ],
              [
                 'tier' => 'Premium 3-months',
@@ -101,7 +55,7 @@ class PlanSeeder extends Seeder
                 'image' => '/icons/price2.png',
                 'background' => '/images/Background.jpg',
                 'paystack_product_id' => 'PLN_mb88lum57cm9dyy',
-                'stripe_product_id' => 'price_1TmFHFB0pqpbXiCiKso7J8tY'
+                'stripe_product_id' => 'price_1U6eby4msUcQGPMTjxi05CVa'
             ],
              [
                 'tier' => 'standard',
@@ -112,7 +66,7 @@ class PlanSeeder extends Seeder
                 'image' => '/icons/icon.png',
                 'background' => '',
                 'paystack_product_id' => 'PLN_l4u5qel3amq3ukh',
-                'stripe_product_id' => 'price_1TmFUaB0pqpbXiCiQS6SALlX'
+                'stripe_product_id' => 'price_1U6bpd4msUcQGPMTMuQYaKoK'
             ],
             [
                 'tier' => 'premium',
@@ -123,7 +77,7 @@ class PlanSeeder extends Seeder
                 'image' => '/icons/price2.png',
                 'background' => '/images/Background.jpg',
                 'paystack_product_id' => 'PLN_x7f11lzl66061dg',
-                'stripe_product_id' => 'price_1TmFapB0pqpbXiCiWwZpbUDc'
+                'stripe_product_id' => 'price_1U6egB4msUcQGPMT0A6d1fhC'
             ],
         ];
 

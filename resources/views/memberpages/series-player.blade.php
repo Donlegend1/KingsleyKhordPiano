@@ -18,24 +18,6 @@
         $nextVideo = $playlist->values()->get($currentIndex + 1);
         $previousVideo = $currentIndex > 0 ? $playlist->values()->get($currentIndex - 1) : null;
 
-        // Priority: Use explicitly linked related courses if provided, otherwise fallback to playlist neighbors
-        if (isset($related_courses) && count($related_courses) > 0) {
-            $relatedLessons = collect($related_courses);
-        } else {
-            // Get related lessons (excluding the active video)
-            $otherLessons = $playlist
-                ->filter(function ($item) use ($activeVideo) {
-                    return $activeVideo ? $item->id != $activeVideo->id : true;
-                })
-                ->values();
-
-            // Try to get next 3 lessons in sequence, wrap around if needed
-            $relatedLessons = $otherLessons->slice($currentIndex, 3);
-            if ($relatedLessons->count() < 3) {
-                $relatedLessons = $otherLessons->take(3);
-            }
-        }
-
         $completableType = $series ? 'musical_applications' : 'uploads';
         $completableClass = $series ? \App\Models\MusicalApplication::class : \App\Models\Upload::class;
 
@@ -95,6 +77,12 @@
                     <h1 class="text-[22px] font-bold text-gray-900 mt-5 mb-5">
                         {{ Str::title($activeVideo->title) }}
                     </h1>
+
+                    @include('memberpages.partials.midi-practice-display', [
+                        'midiPracticeFile' => $midiPracticeFile,
+                        'midiPracticeFiles' => $midiPracticeFiles,
+                        'midiPracticeTitle' => Str::title($activeVideo->title),
+                    ])
 
                     @if (!empty($activeVideo->images) && is_array($activeVideo->images))
                         <div class="mt-6 mb-8">
@@ -166,81 +154,9 @@
                         @include($level ? 'memberpages.partials.lesson-playlist-grouped' : 'memberpages.partials.lesson-playlist')
                     </div>
 
-                    {{-- Related Lessons --}}
-                    @if ($relatedLessons->count() > 0)
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-[17px] font-bold text-gray-900">Related Lessons</h3>
-                                {{-- <a href="#" class="text-[#2563EB] text-[13px] font-semibold hover:underline">View
-                                    All</a> --}}
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach ($relatedLessons as $related)
-                                    @php
-                                        // If it's an Upload, we need to ensure level and skill_level are in the URL
-                                        $urlParams = ['video_id' => $related->id];
-                                        if (isset($related->level)) {
-                                            $urlParams['level'] = $related->level;
-                                            $urlParams['skill_level'] = $related->skill_level ?? 'Basic';
-                                            unset($urlParams['series']); // Remove series if it was present
-                                        }
-                                        $relatedLink = route('piano.exercise.player', $urlParams);
-                                    @endphp
-                                    <a href="{{ $relatedLink }}"
-                                        class="group bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-
-                                        {{-- Thumbnail --}}
-                                        <div class="relative aspect-video bg-black overflow-hidden">
-                                            <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
-                                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-
-                                            {{-- Duration badge top-left --}}
-                                            <div
-                                                class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded">
-                                                {{ $related->duration ?? '06:00' }}
-                                            </div>
-
-                                            {{-- Play button center --}}
-                                            <div class="absolute inset-0 flex items-center justify-center">
-                                                <div
-                                                    class="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-[#2563EB] transition-colors">
-                                                    <i class="fa-solid fa-play text-white text-xs ml-0.5"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Card text --}}
-                                        <div class="p-4">
-                                            <p
-                                                class="text-[13px] font-semibold text-gray-900 leading-snug line-clamp-2 mb-3 text-center">
-                                                {{ Str::title($related->title) }}
-                                            </p>
-                                            <div class="flex justify-center">
-                                                <span
-                                                    class="bg-[#2563EB]/10 text-[#2563EB] text-[11px] font-bold px-3 py-1 rounded-full">
-                                                    {{ ucfirst($skillLevel) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="mt-10 border border-gray-100 rounded-2xl p-6 bg-white" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
-                        <div class="flex items-center gap-2.5 mb-5">
-                            <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 flex-shrink-0">
-                                <i class="fa-regular fa-comments text-sm"></i>
-                            </span>
-                            <div>
-                                <h2 class="text-[14px] font-semibold text-gray-900">Discussion</h2>
-                                <p class="text-[12px] text-gray-400">Share your thoughts, questions, and follow-up replies.</p>
-                            </div>
-                        </div>
-
-                        <form id="comment-form" class="mb-6">
+                    <div class="mt-10 pt-8 border-t border-gray-100" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
+                        <h2 class="text-[17px] font-semibold text-gray-900 tracking-tight mb-5">Discussion</h2>
+                        <form id="comment-form" class="mb-8">
                             <textarea name="comment" placeholder="What did you learn from this lesson?"
                                 class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
                             <div class="flex justify-end mt-3">

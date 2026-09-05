@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Upload;
 use App\Models\CourseVideoComment;
 use App\Models\User;
+use App\Services\MidiPracticeFileResolver;
 
 class ExerciseController extends Controller
 {
@@ -98,6 +99,7 @@ class ExerciseController extends Controller
 
         if ($series) {
             $playlist = \App\Models\MusicalApplication::where('series', $series)
+                ->orderByRaw('position IS NULL, position ASC')
                 ->orderBy('id', 'asc')
                 ->get();
         } elseif ($level) {
@@ -110,10 +112,17 @@ class ExerciseController extends Controller
 
             $playlist = Upload::where('category', 'piano exercise')
                 ->where('level', $level)
+                ->with('pianoExerciseCategory')
                 ->orderByRaw('position IS NULL, position ASC')
                 ->orderBy('id', 'asc')
                 ->get()
-                ->sortBy(fn($item) => ($skillOrder[strtolower($item->skill_level ?? '')] ?? count($skillLevels)) * 1000000 + $item->id)
+                ->sortBy(function ($item) use ($skillOrder) {
+                    $skillPos = $skillOrder[strtolower($item->skill_level ?? '')] ?? 99;
+                    $catPos = $item->pianoExerciseCategory?->position ?? 9999;
+                    $lessonPos = $item->position ?? 9999;
+
+                    return sprintf('%03d-%05d-%05d-%010d', $skillPos, $catPos, $lessonPos, $item->id);
+                })
                 ->values();
 
             $groupedPlaylist = collect($skillLevels)
@@ -163,6 +172,9 @@ class ExerciseController extends Controller
                 }
             }
 
+        $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($activeVideo);
+        $midiPracticeFiles = collect([$midiPracticeFile])->filter();
+
         return view('memberpages.series-player', compact(
             'playlist',
             'groupedPlaylist',
@@ -174,7 +186,9 @@ class ExerciseController extends Controller
             'levels',
             'skillLevels',
             'comments',
-            'related_courses'
+            'related_courses',
+            'midiPracticeFile',
+            'midiPracticeFiles'
         ));
     }
 
@@ -211,37 +225,26 @@ class ExerciseController extends Controller
     {
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
-        $page = $request->query('page', 1);
-        $search = $request->input('name');
 
-        $baseQuery = fn() => \App\Models\MusicalApplication::where('status', 'active')
-            ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel))
-            ->when($search, fn($q) => $q->where('series', 'like', "%{$search}%"))
-            ->orderByRaw('position IS NULL, position ASC');
-
-        $seriesPage = $baseQuery()
-            ->select('series')
-            ->selectRaw('MAX(created_at) as latest_created_at')
-            ->groupBy('series')
-            ->reorder('latest_created_at', 'desc')
-            ->paginate(9, ['*'], 'page', $page)
-            ->appends(['skill_level' => $skillLevel, 'name' => $search]);
-
-        $seriesNames = collect($seriesPage->items())->pluck('series');
-
-        $applications = $baseQuery()
-            ->where(function($q) use ($seriesNames) {
-                $named = $seriesNames->filter()->values();
-                if ($named->isNotEmpty()) {
-                    $q->whereIn('series', $named);
-                }
-                if ($seriesNames->contains(null)) {
-                    $q->orWhereNull('series');
-                }
+        $categoryPage = \App\Models\MusicalApplicationCategory::query()
+            ->when($skillLevel !== 'ALL', fn ($q) => $q->where('level', strtolower($skillLevel)))
+            ->whereHas('lessons', function ($q) use ($skillLevel) {
+                $q->where('status', 'active')
+                    ->when($skillLevel !== 'ALL', fn ($qq) => $qq->where('skill_level', $skillLevel));
             })
+            ->orderBy('position')
+            ->paginate(9)
+            ->appends(['skill_level' => $skillLevel]);
+
+        $applications = \App\Models\MusicalApplication::where('status', 'active')
+            ->whereIn('musical_application_category_id', $categoryPage->pluck('id'))
+            ->when($skillLevel !== 'ALL', fn ($q) => $q->where('skill_level', $skillLevel))
+            ->orderByRaw('position IS NULL, position ASC')
             ->get()
             ->groupBy('series')
-            ->sortBy(fn($items, $series) => $seriesNames->search($series));
+            ->sortBy(fn ($items, $series) => $categoryPage->pluck('category')->search($series));
+
+        $seriesPage = $categoryPage;
 
         return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage', 'search'));
     }

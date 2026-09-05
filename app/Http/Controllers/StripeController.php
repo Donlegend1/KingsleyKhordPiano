@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Mail\SubscriptionCanceledMail;
 use App\Models\Plan;
+use App\Services\PayPalService;
+use App\Services\StripeService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class StripeController extends Controller
 {
@@ -21,18 +26,27 @@ class StripeController extends Controller
 
         $plan = Plan::find($request->plan_id);
 
-        return $request->user()
+        $user = $request->user()
             ->newSubscription('default', $plan->stripe_product_id)
+            ->withMetadata([
+                'user_id' => $request->user()->id,
+                'plan_id' => $plan->id,
+                'tier' => $request->tier,
+                'duration' => $request->duration,
+            ])
             ->allowPromotionCodes()
             ->checkout([
                 'success_url' => route('checkout.success'),
                 'cancel_url' => route('checkout.cancel'),
                 'metadata' => [
                     'user_id' => $request->user()->id,
+                    'plan_id' => $plan->id,
                     'tier' => $request->tier,
                     'duration' => $request->duration,
                 ]
             ]);
+
+        return $user;
     }
 
     public function checkoutSuccess()
@@ -49,12 +63,39 @@ class StripeController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->subscription('default')) {
-            $user->subscription('default')->cancel();
-            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SubscriptionCanceledMail($user));
+        if (! $user) {
+            return back()->with('error', 'You must be logged in.');
         }
 
-        return back()->with('success', 'Subscription cancelled.');
+        $subscription = $user->cancellableSubscription();
+        if (! $subscription) {
+            return back()->with('error', 'No active subscription to cancel.');
+        }
+
+        $provider = $user->subscriptionProvider($subscription);
+
+        try {
+            if ($provider === 'paypal') {
+                app(PayPalService::class)->cancelSubscription($user);
+                $message = 'Your PayPal subscription has been cancelled. You keep access until the end of the billing period.';
+            } else {
+                app(StripeService::class)->cancelSubscription($user);
+                $message = 'Your Stripe subscription has been cancelled. You keep access until the end of the billing period.';
+            }
+
+            Mail::to($user->email)->send(new SubscriptionCanceledMail($user));
+
+            return back()->with('success', $message);
+        } catch (\Throwable $e) {
+            Log::error('Subscription cancel failed', [
+                'user_id' => $user->id,
+                'provider' => $provider,
+                'subscription_id' => $subscription->stripe_id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Unable to cancel subscription. Please try again.');
+        }
     }
 
     

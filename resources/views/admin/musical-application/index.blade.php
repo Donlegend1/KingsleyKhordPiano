@@ -25,9 +25,9 @@
     </div>
   </header>
 
-     <div id="musical-applications">
+     <div id="musical-application-admin">
         <!-- React component will be mounted here -->
-     </div>
+    </div>
    </main>
 
 @endsection

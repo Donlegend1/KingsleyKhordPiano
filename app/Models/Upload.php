@@ -23,7 +23,9 @@ class Upload extends Model
         'images',
         'audio_resource',
         'pdf_resource',
+        'midi_resource',
         'position',
+        'piano_exercise_category_id',
     ];
 
     protected $casts = [
@@ -33,7 +35,7 @@ class Upload extends Model
         'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url', 'image_urls', 'audio_resource_url', 'pdf_resource_url'];
+    protected $appends = ['thumbnail_url', 'image_urls', 'audio_resource_url', 'pdf_resource_url', 'midi_resource_url'];
 
 
     public function getThumbnailUrlAttribute()
@@ -51,12 +53,22 @@ class Upload extends Model
         return $this->pdf_resource ? asset($this->pdf_resource) : null;
     }
 
+    public function getMidiResourceUrlAttribute()
+    {
+        return $this->midi_resource ? asset($this->midi_resource) : null;
+    }
+
     public function getImageUrlsAttribute()
     {
         if (!$this->images) {
             return [];
         }
         return array_map(fn($path) => asset($path), $this->images);
+    }
+
+    public function pianoExerciseCategory()
+    {
+        return $this->belongsTo(PianoExerciseCategory::class, 'piano_exercise_category_id');
     }
 
     public function bookmarks()

@@ -21,6 +21,7 @@ class GuestBooking extends Model
         'payment_method',
         'stripe_session_id',
         'paystack_reference',
+        'paypal_order_id',
         'zoom_meeting_id',
         'zoom_join_url',
         'google_meet_link',

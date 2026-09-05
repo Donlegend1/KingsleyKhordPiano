@@ -47,7 +47,7 @@ return [
     'secret' => $isLive
         ? env('STRIPE_LIVE_SECRET')
         : env('STRIPE_TEST_SECRET'),
-    ' webhook_secret ' => env('STRIPE__WEBHOOK_SECRET'),  
+    'webhook_secret' => env('STRIPE_WEBHOOK_SECRET', env('STRIPE__WEBHOOK_SECRET')),
 ],
 
     'paypal' => [
@@ -58,7 +58,10 @@ return [
             ? (env('PAYPAL_LIVE_CLIENT_SECRET') ?? env('PAYPAL_lIVE_CLIENT_SECRET'))
             : env('PAYPAL_TEST_CLIENT_SECRET'),
         'currency' => env('PAYPAL_CURRENCY', 'USD'),
-        'test_mode' => env('PAYPAL_MODE', 'sandbox') === 'sandbox'
+        'test_mode' => env('PAYPAL_MODE', 'sandbox') === 'sandbox',
+        'webhook_id' => env('PAYPAL_MODE', 'sandbox') === 'live'
+            ? (env('PAYPAL_LIVE_WEBHOOK_ID') ?: env('PAYPAL_WEBHOOK_ID'))
+            : (env('PAYPAL_SANDBOX_WEBHOOK_ID') ?: env('PAYPAL_WEBHOOK_ID')),
     ],
 
     'google' => [

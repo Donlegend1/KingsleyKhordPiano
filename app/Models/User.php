@@ -38,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_payment_amount',
         'last_payment_at',
         'premium',
+        'can_access_coaching',
         'country',
         'passport',
         'metadata',
@@ -76,6 +77,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_payment_at' => 'datetime',
         'last_payment_amount' => 'decimal:2',
         'metadata' => 'array',
+        'premium' => 'boolean',
+        'can_access_coaching' => 'boolean',
+    ];
+
+    protected $appends = [
+        'can_access_piano_coaching',
     ];
 
 
@@ -113,23 +120,183 @@ class User extends Authenticatable implements MustVerifyEmail
     public function likes() { return $this->hasMany(Like::class); }
 
 
-    public function hasActiveSubscription()
+    public function latestLocalSubscription(): ?Subscription
     {
-        // Stripe
-        if ($this->subscribed('default')) {
+        return Subscription::query()
+            ->where('user_id', $this->id)
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * Latest Stripe or PayPal subscription that can still be cancelled
+     * (stops future renewals, access continues until period end).
+     */
+    public function cancellableSubscription(): ?Subscription
+    {
+        $subscription = $this->latestLocalSubscription();
+        if (! $subscription) {
+            return null;
+        }
+
+        $status = strtolower((string) $subscription->stripe_status);
+        if (! in_array($status, ['active', 'trialing'], true)) {
+            return null;
+        }
+
+        $userStatus = strtolower((string) ($this->subscription_status ?? ''));
+        if (in_array($userStatus, ['canceled', 'cancelled'], true)) {
+            return null;
+        }
+
+        $provider = $this->subscriptionProvider($subscription);
+        if (! in_array($provider, ['stripe', 'paypal'], true)) {
+            return null;
+        }
+
+        return $subscription;
+    }
+
+    public function subscriptionOnGracePeriod(): bool
+    {
+        $subscription = $this->latestLocalSubscription();
+        $endsAt = $this->subscription_expires_at ?? $subscription?->ends_at;
+        if (! $endsAt || $endsAt->isPast()) {
+            return false;
+        }
+
+        $status = strtolower((string) (
+            $this->subscription_status
+            ?? $subscription?->stripe_status
+            ?? ''
+        ));
+
+        return in_array($status, ['canceled', 'cancelled'], true);
+    }
+
+    public function subscriptionProvider(?Subscription $subscription = null): string
+    {
+        $subscription ??= $this->latestLocalSubscription();
+        $method = strtolower((string) (
+            $subscription?->payment_method
+            ?: $this->payment_method
+            ?: ''
+        ));
+        $gatewayId = (string) ($subscription?->stripe_id ?? '');
+
+        if ($method === 'paypal' || str_starts_with($gatewayId, 'I-')) {
+            return 'paypal';
+        }
+
+        if (in_array($method, ['paystack', 'manual'], true)) {
+            return $method;
+        }
+
+        if ($method === 'stripe' || str_starts_with($gatewayId, 'sub_')) {
+            return 'stripe';
+        }
+
+        return $method ?: 'stripe';
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        if ($this->hasActiveLocalSubscription()) {
             return true;
         }
 
-        // Manual
+        if ($this->hasActiveEntitlementWindow()) {
+            return true;
+        }
+
         return $this->payments()
             ->where('status', 'successful')
+            ->whereNotNull('ends_at')
             ->where('ends_at', '>', now())
+            ->exists();
+    }
+
+    /**
+     * Stripe, PayPal, Paystack, and manual rows all live on `subscriptions`
+     * and share stripe_status / ends_at.
+     */
+    protected function hasActiveLocalSubscription(): bool
+    {
+        return Subscription::query()
+            ->where('user_id', $this->id)
+            ->where(function ($query) {
+                $query->where(function ($active) {
+                    $active->whereIn('stripe_status', ['active', 'trialing'])
+                        ->where(function ($period) {
+                            $period->whereNull('ends_at')
+                                ->orWhere('ends_at', '>', now());
+                        });
+                })->orWhere(function ($grace) {
+                    $grace->whereIn('stripe_status', ['canceled', 'cancelled'])
+                        ->where('ends_at', '>', now());
+                });
+            })
+            ->exists();
+    }
+
+    /**
+     * PayPal (and some Stripe webhooks) stamp period end on the user.
+     * Canceled-at-period-end still has access until subscription_expires_at.
+     */
+    protected function hasActiveEntitlementWindow(): bool
+    {
+        if (! $this->subscription_expires_at || $this->subscription_expires_at->isPast()) {
+            return false;
+        }
+
+        $status = strtolower((string) ($this->subscription_status ?? ''));
+
+        if (in_array($status, ['past_due', 'expired', 'failed', 'incomplete', 'pending'], true)) {
+            return false;
+        }
+
+        return in_array($status, ['active', 'trialing', 'canceled', 'cancelled'], true)
+            || $this->payment_status === 'successful';
+    }
+
+    public function hasPendingStripeCheckout(): bool
+    {
+        return Subscription::query()
+            ->where('user_id', $this->id)
+            ->whereIn('stripe_status', ['pending', 'incomplete'])
+            ->where(function ($query) {
+                $query->whereNull('payment_method')
+                    ->orWhereRaw('LOWER(payment_method) = ?', ['stripe']);
+            })
             ->exists();
     }
 
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
+    }
+
+    public function liveCoachingBookings()
+    {
+        return $this->hasMany(LiveCoachingBooking::class);
+    }
+
+    /**
+     * Piano coaching is limited to legacy Premium members.
+     * New Premium ($45 / €39 / ₦78,000) does not include it.
+     */
+    public function canAccessPianoCoaching(): bool
+    {
+        if (! (bool) ($this->attributes['can_access_coaching'] ?? false)) {
+            return false;
+        }
+
+        return (bool) $this->premium || $this->hasActiveSubscription();
+    }
+
+    public function getCanAccessPianoCoachingAttribute(): bool
+    {
+        return $this->canAccessPianoCoaching();
     }
 
     /**

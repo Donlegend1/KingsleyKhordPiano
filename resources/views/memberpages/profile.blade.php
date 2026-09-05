@@ -234,31 +234,20 @@
     {{-- Subscriptions --}}
 
     @if (auth()->user()->role === 'member' )
-  @php
-        $latestSubscription = $transactions->first();
-    @endphp
-
-    @if ($latestSubscription)
         @php
+            $latestSubscription = $latestSubscription ?? $transactions->first();
             $symbols = ['NGN' => '₦', 'USD' => '$', 'EUR' => '€', 'GBP' => '£'];
-            $symbol = $symbols[$latestSubscription->currency] ?? '';
-            $user = auth()->user();
-
-            if ($latestSubscription->interval === 'month') {
-                $planName = $user->is_premium
-                    ? 'Monthly Premium Plan'
-                    : 'Monthly Standard Plan';
-            } elseif ($latestSubscription->interval === 'year') {
-                $planName = $user->is_premium
-                    ? 'Yearly Premium Plan'
-                    : 'Yearly Standard Plan';
-            } else {
-                $planName = 'Standard Plan';
-            }
+            $symbol = $latestSubscription ? ($symbols[$latestSubscription->currency] ?? '') : '';
+            $planName = $latestSubscription->name ?? $latestSubscription->name ?? 'Standard Plan';
+            $canCancelSubscription = $canCancelSubscription ?? $canCancelSubscription ?? false;
+            $onGracePeriod = $onGracePeriod ?? $onGracePeriod ?? false;
+            $providerLabel = $providerLabel ?? $providerLabel ?? 'Stripe';
+            $graceEndsAt = $graceEndsAt ?? $graceEndsAt ?? null;
         @endphp
 
+        @if ($latestSubscription)
         <!-- Latest Subscription Card -->
-        <div 
+        <div
             x-data="{ openModal: false }"
             class="mt-10 bg-white p-6 rounded-2xl shadow-md"
         >
@@ -272,12 +261,15 @@
                                 Plan: {{ $planName }}
                             </p>
                             <p class="text-xs text-gray-500">
-                                Amount: {{ $symbol }}{{ number_format($latestSubscription->amount, 2) }} / {{ ucfirst($latestSubscription->interval) }}
+                                Amount: {{ $symbol }}{{ number_format($latestSubscription->amount ?? 0, 2) }} / {{ ucfirst($latestSubscription->interval) }}
+                            </p>
+                            <p class="text-xs text-gray-400 mt-1">
+                                Billed via {{ ucfirst($latestSubscription->payment_method ?? $providerLabel) }}
                             </p>
                         </div>
 
-                        @if (auth()->user()->subscription('default') && auth()->user()->subscription('default')->active() && !auth()->user()->subscription('default')->onGracePeriod())
-                            <button 
+                        @if ($canCancelSubscription)
+                            <button
                                 @click="openModal = true"
                                 class="text-indigo-600 hover:underline text-sm"
                             >
@@ -288,83 +280,83 @@
                 </li>
             </ul>
 
-            <!-- Manage Subscription Modal -->
-           @if (auth()->user()->subscription('default') && auth()->user()->subscription('default')->active() && !auth()->user()->subscription('default')->onGracePeriod())
-            {{-- Modal for managing active subscription --}}
-            <div 
+            @if ($canCancelSubscription)
+            <div
                 x-show="openModal"
                 x-cloak
                 class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
             >
-                <div 
+                <div
                     @click.away="openModal = false"
                     class="bg-white rounded-xl shadow-lg w-full max-w-md p-6"
                 >
                     <h2 class="text-lg font-semibold text-gray-800 mb-4">Manage Subscription</h2>
                     <p class="text-sm text-gray-600 mb-6">
-                        You are currently on the <strong>{{ $planName }}</strong>.<br>
-                        Do you want to cancel your subscription?
+                        You are currently on the <strong>{{ $planName }}</strong> via <strong>{{ $providerLabel }}</strong>.<br>
+                        Cancelling stops future renewals. You keep access until the end of the current billing period.
                     </p>
 
                     <div class="flex justify-end space-x-3">
-                        <button 
+                        <button
                             @click="openModal = false"
                             class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
                         >
                             Close
                         </button>
 
-                        <form 
-                            method="POST" 
+                        <form
+                            method="POST"
                             action="{{ route('subscription.cancel') }}"
                         >
                             @csrf
-                            <button 
+                            <button
                                 type="submit"
                                 class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                             >
-                                Cancel Subscription
+                                Cancel {{ $providerLabel }} Subscription
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
-            @elseif (auth()->user()->subscription('default') && auth()->user()->subscription('default')->onGracePeriod())
-                {{-- Subscription canceled but on grace period --}}
+            @elseif ($onGracePeriod)
                 <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 mt-6">
                     <p class="text-sm">
-                        Your subscription has been <strong>canceled</strong> but you still have access until <strong>{{ auth()->user()->subscription('default')->ends_at->format('M d, Y') }}</strong>. 
-                        You can renew anytime to regain access.
+                        Your {{ $providerLabel }} subscription has been <strong>canceled</strong>
+                        @if (!empty($graceEndsAt))
+                            but you still have access until <strong>{{ \Carbon\Carbon::parse($graceEndsAt)->format('M d, Y') }}</strong>.
+                        @else
+                            but you still have access until the end of the billing period.
+                        @endif
+                        You can renew anytime.
                     </p>
-                    <a 
-                        href="{{ route('subscription.page') }}" 
+                    <a
+                        href="{{ route('subscription.page') }}"
                         class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
                     >
                         View Subscription Plans
                     </a>
                 </div>
-            @elseif ($latestSubscription && $latestSubscription->stripe_status === 'canceled')
-                {{-- Subscription canceled: show renewal link --}}
+            @elseif ($latestSubscription && in_array($latestSubscription->stripe_status, ['canceled', 'cancelled'], true))
                 <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 mt-6">
                     <p class="text-sm">
-                        Your subscription has been <strong>canceled</strong>. 
+                        Your subscription has been <strong>canceled</strong>.
                         You can renew anytime to regain access.
                     </p>
-                    <a 
-                        href="{{ route('subscription.page') }}" 
+                    <a
+                        href="{{ route('subscription.page') }}"
                         class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
                     >
                         View Subscription Plans
                     </a>
                 </div>
             @else
-                {{-- No subscription at all --}}
                 <div class="bg-gray-50 border border-gray-200 text-gray-700 rounded-xl p-4 mt-6">
                     <p class="text-sm">
                         You don't have an active subscription.
                     </p>
-                    <a 
-                        href="{{ route('subscription.page') }}" 
+                    <a
+                        href="{{ route('subscription.page') }}"
                         class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
                     >
                         Subscribe Now

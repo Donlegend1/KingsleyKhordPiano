@@ -73,6 +73,7 @@ class AdminLearnSongController extends Controller
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
+            'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
         ]);
 
         $level = strtolower($request->input('level'));
@@ -156,6 +157,21 @@ class AdminLearnSongController extends Controller
             $pdfResourcePath = 'uploads/resources/pdf/' . $filename;
         }
 
+        $midiResourcePath = null;
+        if ($request->hasFile('midi_resource')) {
+            $midi = $request->file('midi_resource');
+            $filename = time() . '_' . $midi->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/midi');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/midi');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $midi->move($destination, $filename);
+            $midiResourcePath = 'uploads/resources/midi/' . $filename;
+        }
+
         $maxPos = LearnSong::where('learn_song_category_id', $category->id)->max('position') ?: 0;
 
         $song = LearnSong::create([
@@ -174,6 +190,7 @@ class AdminLearnSongController extends Controller
             'images' => $descriptionImages,
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
+            'midi_resource' => $midiResourcePath,
         ]);
 
         $members = User::where('role', UserRoles::MEMBER->value)->get();
@@ -202,6 +219,7 @@ class AdminLearnSongController extends Controller
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
+            'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
         ]);
 
         $videoType = $request->input('video_type') ?? $song->video_type;
@@ -298,6 +316,24 @@ class AdminLearnSongController extends Controller
             $pdfResourcePath = 'uploads/resources/pdf/' . $filename;
         }
 
+        $midiResourcePath = $song->midi_resource;
+        if ($request->hasFile('midi_resource')) {
+            $midi = $request->file('midi_resource');
+            $filename = time() . '_' . $midi->getClientOriginalName();
+            $destination = base_path('../public_html/uploads/resources/midi');
+            if (!file_exists($destination)) {
+                $destination = public_path('uploads/resources/midi');
+            }
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            if ($song->midi_resource && file_exists(public_path($song->midi_resource))) {
+                @unlink(public_path($song->midi_resource));
+            }
+            $midi->move($destination, $filename);
+            $midiResourcePath = 'uploads/resources/midi/' . $filename;
+        }
+
         $song->update([
             'title' => $request->input('title') ?? $song->title,
             'author' => $request->has('author') ? $request->input('author') : $song->author,
@@ -311,6 +347,7 @@ class AdminLearnSongController extends Controller
             'images' => $descriptionImages,
             'audio_resource' => $audioResourcePath,
             'pdf_resource' => $pdfResourcePath,
+            'midi_resource' => $midiResourcePath,
         ]);
 
         return response()->json($song, 200);

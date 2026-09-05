@@ -25,6 +25,7 @@ class LearnSong extends Model
         'images',
         'audio_resource',
         'pdf_resource',
+        'midi_resource',
     ];
 
     protected $casts = [
@@ -32,7 +33,7 @@ class LearnSong extends Model
         'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url', 'image_urls', 'audio_resource_url', 'pdf_resource_url'];
+    protected $appends = ['thumbnail_url', 'image_urls', 'audio_resource_url', 'pdf_resource_url', 'midi_resource_url'];
 
     public function getThumbnailUrlAttribute()
     {
@@ -47,6 +48,11 @@ class LearnSong extends Model
     public function getPdfResourceUrlAttribute()
     {
         return $this->pdf_resource ? asset($this->pdf_resource) : null;
+    }
+
+    public function getMidiResourceUrlAttribute()
+    {
+        return $this->midi_resource ? asset($this->midi_resource) : null;
     }
 
     public function getImageUrlsAttribute()

@@ -44,10 +44,14 @@ class CheckExpiredSubscriptions extends Command
                 );
 
                 // Update subscription and user
-                $subscription->update(['notified_at' => now()]);
+                $subscription->update([
+                    'notified_at' => now(),
+                    'stripe_status' => 'canceled',
+                ]);
                 $user->update([
                     'premium' => false,
                     'payment_status' => 'expired',
+                    'subscription_status' => 'expired',
                 ]);
 
                 $this->info("Notified: {$user->email}");
