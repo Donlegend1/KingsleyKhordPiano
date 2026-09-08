@@ -10,7 +10,7 @@ const currencySigns = {
 
 const PlanSwitchAndCurrencySelect = () => {
     const [selectedPlan, setSelectedPlan] = useState("monthly");
-    const [currency, setCurrency] = useState("US");
+    const [currency, setCurrency] = useState("USD");
     const [modalOpen, setModalOpen] = useState(false);
     const [plans, setPlans] = useState([]);
     const [selectedPlanDetails, setSelectedPlanDetails] = useState(null);
@@ -43,7 +43,8 @@ const PlanSwitchAndCurrencySelect = () => {
         const dur = params.get("duration");
 
         if (curr) {
-            setCurrency(curr);
+            const normalized = curr.toUpperCase() === "US" ? "USD" : curr.toUpperCase();
+            setCurrency(normalized === "EUR" || normalized === "USD" || normalized === "NGN" ? normalized : "USD");
         }
         if (dur) {
             setSelectedPlan(dur);
@@ -323,8 +324,8 @@ const PlanSwitchAndCurrencySelect = () => {
                         onChange={(e) => setCurrency(e.target.value)}
                         className="no-native-arrow bg-gray-900 pl-4 pr-9 py-2.5 border border-gray-900 rounded-full text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 transition cursor-pointer"
                     >
-                        <option value="EUR">Euro €</option>
                         <option value="USD">USD $</option>
+                        <option value="EUR">Euro €</option>
                        
                     </select>
                     <span className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none">
