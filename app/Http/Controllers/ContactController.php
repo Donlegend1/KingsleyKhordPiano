@@ -32,7 +32,7 @@ class ContactController extends Controller
 
         Mail::to('contact@kingsleykhordpiano.com')->send(new ContactMessage($validated));
 
-        return redirect()->back()->with('success', 'Your message has been recieved, we will get back to you.');
+        return redirect()->back()->with('success', 'Your message has been sent successfully.');
     }
 
     public function store(StoreContactRequest $request)
@@ -40,11 +40,23 @@ class ContactController extends Controller
         try {
             $user = auth()->user();
 
+            $attachmentPath = null;
+            $attachmentName = null;
+
+            if ($request->hasFile('attachment')) {
+                $file = $request->file('attachment');
+                $attachmentName = $file->getClientOriginalName();
+                $storedPath = $file->store('contact-attachments', 'public');
+                $attachmentPath = $storedPath;
+            }
+
             Contact::create([
                 'name' => $user->first_name . " " . $user->last_name,
                 'email' => $user->email,
                 'subject' => $request->subject,
                 'message' => $request->message,
+                'attachment_path' => $attachmentPath,
+                'attachment_name' => $attachmentName,
             ]);
 
             Mail::send('emails.contact', [
@@ -52,9 +64,15 @@ class ContactController extends Controller
                 'email' => $user->email,
                 'subject' => $request->subject,
                 'messageContent' => $request->message,
-            ], function ($msg) use ($request, $user) {
+            ], function ($msg) use ($request, $user, $attachmentPath, $attachmentName) {
                 $msg->to('contact@kingsleykhordpiano.com')
                     ->subject('Contact Form: ' . $request->subject);
+
+                if ($attachmentPath) {
+                    $msg->attach(\Storage::disk('public')->path($attachmentPath), [
+                        'as' => $attachmentName,
+                    ]);
+                }
             });
 
             return redirect()->back()->with('success', 'Your message has been sent successfully.');

@@ -10,7 +10,7 @@ class QuizQuestion extends Model
     use HasFactory;
 
 
-    protected $fillable = ['quiz_id', 'audio_path',  'correct_option'];
+    protected $fillable = ['quiz_id', 'audio_path', 'correct_option', 'reference_note'];
 
     protected $casts = [
         'options' => 'array',

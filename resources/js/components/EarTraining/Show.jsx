@@ -399,49 +399,49 @@ const ShowEartraining = () => {
         "Ti - Doh",
     ];
     const RELATIVE_OPTIONS = [
-        "Do - Mi",
-        "Re - Fa",
+        "Doh - Mi",
+        "Reh - Fah",
         "Mi - Sol",
-        "Fa - La",
+        "Fah - Lah",
         "Sol - Ti",
-        "La - Do",
-        "Ti - Re",
+        "Lah - Doh",
+        "Ti - Reh",
     ];
     const RELATIVE_FOURTH_OPTIONS = [
-        "Do - Fa",
-        "Re - Sol",
-        "Mi - La",
-        "Fa - Ti",
-        "Sol - Do'",
-        "La - Re'",
+        "Doh - Fah",
+        "Reh - Sol",
+        "Mi - Lah",
+        "Fah - Ti",
+        "Sol - Doh'",
+        "Lah - Reh'",
         "Ti - Mi'",
     ];
     const RELATIVE_FIFTH_OPTIONS = [
-        "Do - Sol",
-        "Re - La",
+        "Doh - Sol",
+        "Reh - Lah",
         "Mi - Ti",
-        "Fa - Do'",
-        "Sol - Re'",
-        "La - Mi'",
-        "Ti - Fa'",
+        "Fah - Doh'",
+        "Sol - Reh'",
+        "Lah - Mi'",
+        "Ti - Fah'",
     ];
     const RELATIVE_SIXTH_OPTIONS = [
-        "Do - La",
-        "Re - Ti",
-        "Mi - Do'",
-        "Fa - Re'",
+        "Doh - Lah",
+        "Reh - Ti",
+        "Mi - Doh'",
+        "Fah - Reh'",
         "Sol - Mi'",
-        "La - Fa'",
+        "Lah - Fah'",
         "Ti - Sol'",
     ];
     const RELATIVE_SEVENTH_OPTIONS = [
-        "Do - Ti",
-        "Re - Do'",
-        "Mi - Re'",
-        "Fa - Mi'",
-        "Sol - Fa'",
-        "La - Sol'",
-        "Ti - La'",
+        "Doh - Ti",
+        "Reh - Doh'",
+        "Mi - Reh'",
+        "Fah - Mi'",
+        "Sol - Fah'",
+        "Lah - Sol'",
+        "Ti - Lah'",
     ];
     const FIND_THE_KEY_OPTIONS = [
         "C",
@@ -457,6 +457,22 @@ const ShowEartraining = () => {
         "A♯/Bb",
         "B",
     ];
+    // Maps the admin's saved reference_note label (matching FIND_THE_KEY_OPTIONS)
+    // to the note string PianoKeyboard/PIANO_WHITE_KEYS/PIANO_BLACK_KEYS expect.
+    const REFERENCE_NOTE_TO_KEY = {
+        "C": "C3",
+        "C♯/Db": "C♯3",
+        "D": "D3",
+        "D♯/Eb": "D♯3",
+        "E": "E3",
+        "F": "F3",
+        "F♯/Gb": "F♯3",
+        "G": "G3",
+        "G♯/Ab": "G♯3",
+        "A": "A3",
+        "A♯/Bb": "A♯3",
+        "B": "B3",
+    };
     const SOLFA_NOTE_OPTIONS = ["Doh", "Re", "Mi", "Fa", "Sol", "La", "Ti"];
     const OCTAVE_WHITE_KEY_LABELS = ["Doh", "Re", "Mi", "Fa", "Sol", "La", "Ti", "Doh"];
     const OCTAVE_BLACK_KEYS = [
@@ -1036,6 +1052,11 @@ const ShowEartraining = () => {
             quiz.title === "drop 2 all keys");
     const isChordInversionQuiz =
         isTriadInversionQuiz || isSeventhInversionQuiz || isSecondaryInversionQuiz;
+    const isSingleToneQuiz =
+        quiz.category === "Relative Pitch" &&
+        (quiz.title === "Single tone Pitch" ||
+            quiz.title === "Single Tone Pitch" ||
+            quiz.title === "Single Tone Pitch 2");
     const isMultiSelectQuiz =
         (quiz.category === "Extentions recognition" &&
             (quiz.title === "Major Chord Extentions" ||
@@ -1409,7 +1430,9 @@ const ShowEartraining = () => {
     const getOptionsByCategory = (category, title) => {
         if (
             category === "Relative Pitch" &&
-            (title === "Single tone Pitch" || title === "Single Tone Pitch")
+            (title === "Single tone Pitch" ||
+                title === "Single Tone Pitch" ||
+                title === "Single Tone Pitch 2")
         ) {
             return SINGLE_TONE_SOLFA_OPTIONS;
         }
@@ -2148,6 +2171,8 @@ const ShowEartraining = () => {
                                     ? "Listen to the chord progression. Identify the chord quality and degree for each chord."
                                     : isProgressionDegreeQuiz
                                     ? "Listen to the chord progression. Identify the chord quality and every degree for each chord."
+                                    : isSingleToneQuiz
+                                    ? "Identify the note you hear."
                                     : "Identify the interval you hear."}
                             </h2>
 
@@ -2200,18 +2225,17 @@ const ShowEartraining = () => {
                                 </p>
                             </div>
 
-                            {quiz.title === "Find the Key" && (
+                            {(quiz.title === "Find the Key" || quiz.title === "Find the key #2") && (
                                 <div className="mb-8">
-                                    <PianoKeyboard includeOctaveC={false} />
-                                </div>
-                            )}
-
-                            {quiz.title === "Find the key #2" && (
-                                <div className="mb-8">
-                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 text-center">
-                                        The highlighted key is your reference note
-                                    </p>
-                                    <PianoKeyboard highlightNote="F♯3" includeOctaveC={false} />
+                                    {question.reference_note && (
+                                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 text-center">
+                                            The highlighted key is your reference note
+                                        </p>
+                                    )}
+                                    <PianoKeyboard
+                                        highlightNote={REFERENCE_NOTE_TO_KEY[question.reference_note] ?? null}
+                                        includeOctaveC={false}
+                                    />
                                 </div>
                             )}
 

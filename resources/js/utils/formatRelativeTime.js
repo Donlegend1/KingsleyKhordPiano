@@ -42,6 +42,20 @@ export const formatRelativeTime = (dateString) => {
             ?.join(" ");
     };
 
+    // Some subcategory slugs have a friendly display name that differs from
+    // a plain title-case of the slug (e.g. "beginner_guided_practice" should
+    // read "Beginner Group", not "Beginner Guided Practice").
+    const SUBCATEGORY_LABELS = {
+        beginner_guided_practice: "Beginner Group",
+        intermediate_guided_practice: "Intermediate Group",
+        advanced_guided_practice: "Advanced Group",
+        ask_question: "Discussions",
+    };
+
+    export const formatSubcategoryLabel = (text) => {
+        return SUBCATEGORY_LABELS[text] ?? capitaliseAndRemoveHyphen(text);
+    };
+
 
     export const calculateCountdown = (startTime) => {
         const now = dayjs();

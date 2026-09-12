@@ -33,7 +33,7 @@
   </div>
 
   {{-- ── Step Progress Bar ── --}}
-  <div class="max-w-5xl mx-auto mb-8 w-full">
+  <div class="max-w-5xl mx-auto mb-5 w-full">
     <div class="flex items-center w-full">
       @for ($i = 1; $i <= 4; $i++)
         {{-- Step circle --}}
@@ -67,53 +67,48 @@
 
   {{-- STEP 1 --}}
   <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
-    <div class="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-      <div class="flex flex-col md:flex-row" style="min-height:520px;">
+    <div class="border border-gray-100 rounded-3xl overflow-hidden shadow-xl shadow-gray-200/60 bg-white p-5 md:p-7">
 
-        {{-- Left Panel --}}
-        <div class="w-full md:w-2/5 p-8 flex flex-col justify-between">
-          <div>
-            <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-5">
-              Step 1 of 4
-            </span>
-            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white leading-tight mb-3">
-              Step 1: Take a tour of the website.
-            </h2>
-            <div class="w-10 h-1 bg-indigo-600 rounded mb-5"></div>
-            <p class="text-gray-500 text-sm leading-relaxed mb-8">
-              Watch this quick tour to get familiar with the platform and discover everything that's available to help you grow as a musician.
-            </p>
-          </div>
-
-          <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-start space-x-3">
-            <div class="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm font-semibold text-gray-800">Why take the tour?</p>
-              <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">It only takes a few minutes and helps you save time and get started with confidence.</p>
-            </div>
-          </div>
-        </div>
-
-        {{-- Right Panel – Video --}}
-        <div class="w-full md:w-3/5 bg-white flex items-center justify-center min-h-[340px]">
-          <script src="https://fast.wistia.com/player.js" async></script>
-          <script src="https://fast.wistia.com/embed/gd8m2mxi65.js" async type="module"></script>
-          <style>
-            wistia-player[media-id='gd8m2mxi65']:not(:defined) {
-              background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/gd8m2mxi65/swatch');
-              display: block;
-              filter: blur(5px);
-              padding-top: 56.25%;
-            }
-          </style>
-          <wistia-player media-id="gd8m2mxi65" aspect="1.7777777777777777" class="w-full"></wistia-player>
-        </div>
-
+      {{-- Header: centered eyebrow + heading + description --}}
+      <div class="max-w-2xl mx-auto text-center mb-4">
+        <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2.5 border border-indigo-100">
+          Step 1 of 4
+        </span>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight mb-1.5">
+          Take a Tour of the Website
+        </h2>
+        <p class="text-gray-500 text-xs md:text-sm leading-relaxed">
+          Watch this quick tour to get familiar with the platform and discover everything that's available to help you grow as a musician.
+        </p>
       </div>
+
+      {{-- Video --}}
+      <div class="max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-lg shadow-gray-300/40 ring-1 ring-black/5 mb-4">
+        <script src="https://fast.wistia.com/player.js" async></script>
+        <script src="https://fast.wistia.com/embed/gd8m2mxi65.js" async type="module"></script>
+        <style>
+          wistia-player[media-id='gd8m2mxi65']:not(:defined) {
+            background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/gd8m2mxi65/swatch');
+            display: block;
+            filter: blur(5px);
+            padding-top: 56.25%;
+          }
+        </style>
+        <wistia-player media-id="gd8m2mxi65" aspect="1.7777777777777777" class="w-full"></wistia-player>
+      </div>
+
+      {{-- "Why take the tour" callout --}}
+      <div class="max-w-2xl mx-auto flex items-center gap-3 bg-indigo-50/60 border border-indigo-100 rounded-xl px-4 py-2.5">
+        <div class="w-7 h-7 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+        </div>
+        <div class="text-left">
+          <p class="text-xs font-semibold text-gray-800">Why take the tour? <span class="font-normal text-gray-500">A brief walkthrough that orients you to the platform, so you can begin with clarity and confidence.</span></p>
+        </div>
+      </div>
+
     </div>
   </div>
 

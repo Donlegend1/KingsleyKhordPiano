@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'first_name',
         'last_name',
+        'display_name',
         'email',
         'password',
         'plan',
@@ -74,6 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'subscription_started_at' => 'datetime',
         'subscription_expires_at' => 'datetime',
         'last_payment_at' => 'datetime',
+        'last_login_at' => 'datetime',
         'last_payment_amount' => 'decimal:2',
         'metadata' => 'array',
     ];
@@ -97,6 +99,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFullNameAttribute()
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * The name shown across the community (posts, replies, profile) —
+     * a custom nickname if the user has set one, otherwise their real name.
+     */
+    public function getDisplayNameAttribute($value)
+    {
+        return $value ?: $this->full_name;
     }
 
     public function likedPosts()

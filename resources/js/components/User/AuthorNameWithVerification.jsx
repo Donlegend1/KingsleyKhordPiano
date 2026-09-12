@@ -6,7 +6,7 @@ const AuthorNameWithVerification = ({ author }) => {
     return (
         <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-[#1F2937] dark:text-white">
-                {author.first_name} {author.last_name}
+                {author.display_name || `${author.first_name} ${author.last_name}`}
             </h3>
 
             {author.verified ===1 && (

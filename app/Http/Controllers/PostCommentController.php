@@ -79,7 +79,17 @@ class PostCommentController extends Controller
      */
     public function destroy(PostComment $postComment)
     {
+        $user = auth()->user();
+
+        if ($postComment->user_id !== $user->id && $user->email !== 'kingsleykhord@gmail.com') {
+            return response()->json([
+                'message' => 'You are not authorized to delete this comment.'
+            ], 403);
+        }
+
+        $postComment->replies()->delete();
         $postComment->delete();
+
         return response()->json('Post Comment deleted successfully', 200);
     }
 }

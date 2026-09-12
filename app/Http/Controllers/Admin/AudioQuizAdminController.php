@@ -7,6 +7,7 @@ use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\QuizReferenceAudio;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AudioQuizAdminController extends Controller
 {
@@ -58,9 +59,6 @@ class AudioQuizAdminController extends Controller
     // addition to the usual white/diatonic notes (white keys are always
     // clickable for every Melodic Dictation lesson).
     protected const BLACK_KEY_LESSONS = ['Other Notes', 'chordal melodies'];
-
-    // These same lessons always use a fixed 5-note melody.
-    protected const FIXED_FIVE_NOTE_LESSONS = ['Other Notes', 'chordal melodies'];
 
     // Lessons with a three-part answer: one chord quality, one or more
     // degrees (some of which may carry a #/b accidental), and one or more
@@ -183,11 +181,11 @@ class AudioQuizAdminController extends Controller
             'Single Tone Pitch' => ['Doh', 'Reh', 'Mi', 'Fah', 'Sol', 'Lah', 'Ti'],
             'Single Tone Pitch 2' => ['Doh', 'Reh', 'Mi', 'Fah', 'Sol', 'Lah', 'Ti'],
             'Relative second pitch' => ['Doh - Reh', 'Reh - Mi', 'Mi - Fah', 'Fah - Sol', 'Sol - Lah', 'Lah - Ti', 'Ti - Doh'],
-            'Relative Thirds Pitch' => ['Do - Mi', 'Re - Fa', 'Mi - Sol', 'Fa - La', 'Sol - Ti', 'La - Do', 'Ti - Re'],
-            'Relative Fourth Pitch' => ["Do - Fa", "Re - Sol", "Mi - La", "Fa - Ti", "Sol - Do'", "La - Re'", "Ti - Mi'"],
-            'Relative Fifth Pitch' => ["Do - Sol", "Re - La", "Mi - Ti", "Fa - Do'", "Sol - Re'", "La - Mi'", "Ti - Fa'"],
-            'Relative Sixth Pitch' => ["Do - La", "Re - Ti", "Mi - Do'", "Fa - Re'", "Sol - Mi'", "La - Fa'", "Ti - Sol'"],
-            'Relative Seventh Pitch' => ["Do - Ti", "Re - Do'", "Mi - Re'", "Fa - Mi'", "Sol - Fa'", "La - Sol'", "Ti - La'"],
+            'Relative Thirds Pitch' => ['Doh - Mi', 'Reh - Fah', 'Mi - Sol', 'Fah - Lah', 'Sol - Ti', 'Lah - Doh', 'Ti - Reh'],
+            'Relative Fourth Pitch' => ["Doh - Fah", "Reh - Sol", "Mi - Lah", "Fah - Ti", "Sol - Doh'", "Lah - Reh'", "Ti - Mi'"],
+            'Relative Fifth Pitch' => ["Doh - Sol", "Reh - Lah", "Mi - Ti", "Fah - Doh'", "Sol - Reh'", "Lah - Mi'", "Ti - Fah'"],
+            'Relative Sixth Pitch' => ["Doh - Lah", "Reh - Ti", "Mi - Doh'", "Fah - Reh'", "Sol - Mi'", "Lah - Fah'", "Ti - Sol'"],
+            'Relative Seventh Pitch' => ["Doh - Ti", "Reh - Doh'", "Mi - Reh'", "Fah - Mi'", "Sol - Fah'", "Lah - Sol'", "Ti - Lah'"],
             'Find the Key' => ['C', 'C♯/Db', 'D', 'D♯/Eb', 'E', 'F', 'F♯/Gb', 'G', 'G♯/Ab', 'A', 'A♯/Bb', 'B'],
             'Find the key #2' => ['C', 'C♯/Db', 'D', 'D♯/Eb', 'E', 'F', 'F♯/Gb', 'G', 'G♯/Ab', 'A', 'A♯/Bb', 'B'],
         ],
@@ -287,6 +285,13 @@ class AudioQuizAdminController extends Controller
             'Phrygian Mode' => ['Phrygian', 'Phrygian Dominant', 'Phrygian #6', 'Phrygian b4', 'Melodic Phrygian'],
             'Mixolydian Mode' => ['Mixolydian', 'Mixolydian b9', 'Mixolydian #11', 'Mixolydian Altered', 'Mixolydian b13'],
         ],
+    ];
+
+    // Lessons where the member-facing player shows a mini piano keyboard with
+    // one key highlighted as the question's reference note. The admin picks
+    // that key per-question from the same chromatic list as FIXED_OPTIONS.
+    protected const PIANO_HIGHLIGHT_LESSONS = [
+        'Relative Pitch' => ['Find the Key', 'Find the key #2'],
     ];
 
     public function index(Request $request)
@@ -391,6 +396,10 @@ class AudioQuizAdminController extends Controller
             }
         }
 
+        $showReferenceNote = $activeLesson
+            && in_array($activeLesson->title, self::PIANO_HIGHLIGHT_LESSONS[$category] ?? [], true);
+        $referenceNoteOptions = $showReferenceNote ? $fixedOptions : [];
+
         $allCategories = collect(self::CATEGORY_ORDER)->map(fn ($name) => [
             'db_category' => $name,
             'label' => self::CATEGORY_LABELS[$name] ?? $name,
@@ -401,17 +410,16 @@ class AudioQuizAdminController extends Controller
             'answerType', 'fixedOptions', 'compoundOptions',
             'isSequenceCategory', 'sequenceLabels', 'sequenceNoteCount', 'allowBlackKeys',
             'chordSequenceOptions', 'chordSequenceLength', 'chordNamingOptions',
-            'progressionQualityOptions', 'progressionDegreeOptions'
+            'progressionQualityOptions', 'progressionDegreeOptions',
+            'showReferenceNote', 'referenceNoteOptions'
         ));
     }
 
-    // "3-note melody" -> 3, "Other Notes" / "chordal melodies" -> 5.
+    // "3-note melody" -> 3. "Other Notes" / "chordal melodies" have no fixed
+    // length — the picker (and validation) let the admin build a melody of
+    // any length for those two.
     protected function expectedSequenceLength(Quiz $quiz): ?int
     {
-        if (in_array($quiz->title, self::FIXED_FIVE_NOTE_LESSONS)) {
-            return 5;
-        }
-
         if (preg_match('/^(\d+)-note/i', $quiz->title, $matches)) {
             return (int) $matches[1];
         }
@@ -533,6 +541,7 @@ class AudioQuizAdminController extends Controller
     {
         $request->validate(['audio' => 'required|file|mimes:mp3,wav,ogg']);
         $correctOption = $this->validateCorrectOption($request, $quiz);
+        $referenceNote = $this->validateReferenceNote($request, $quiz);
 
         $audio = $request->file('audio');
         $audioName = time() . '_' . $audio->getClientOriginalName();
@@ -551,6 +560,7 @@ class AudioQuizAdminController extends Controller
             'quiz_id' => $quiz->id,
             'audio_path' => "/uploads/audio/$audioName",
             'correct_option' => $correctOption,
+            'reference_note' => $referenceNote,
         ]);
 
         return redirect()
@@ -572,8 +582,12 @@ class AudioQuizAdminController extends Controller
     {
         $quiz = $question->quiz;
         $correctOption = $this->validateCorrectOption($request, $quiz);
+        $referenceNote = $this->validateReferenceNote($request, $quiz);
 
-        $question->update(['correct_option' => $correctOption]);
+        $question->update([
+            'correct_option' => $correctOption,
+            'reference_note' => $referenceNote,
+        ]);
 
         return redirect()
             ->route('admin.audio-quiz', ['category' => $quiz->category, 'quiz' => $quiz->id])
@@ -743,5 +757,26 @@ class AudioQuizAdminController extends Controller
         ]);
 
         return (string) $validated['correct_option'];
+    }
+
+    /**
+     * For "Find the Key" style lessons, the key highlighted on the member
+     * player's mini keyboard for this question. Returns null for every other
+     * lesson, so it's always safe to call regardless of quiz type.
+     */
+    protected function validateReferenceNote(Request $request, Quiz $quiz): ?string
+    {
+        $lessons = self::PIANO_HIGHLIGHT_LESSONS[$quiz->category] ?? [];
+        if (! in_array($quiz->title, $lessons, true)) {
+            return null;
+        }
+
+        $options = self::FIXED_OPTIONS[$quiz->category][$quiz->title] ?? [];
+
+        $validated = $request->validate([
+            'reference_note' => ['required', Rule::in($options)],
+        ]);
+
+        return $validated['reference_note'];
     }
 }

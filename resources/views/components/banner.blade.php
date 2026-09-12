@@ -18,23 +18,25 @@
     {{-- Content: sits in flow, starts below the visible image area --}}
     <div class="relative px-6 pb-14 bg-transparent" style="padding-top: 54vh; z-index: 10;">
 
-      <p class="text-[#FFD736] text-[10px] font-semibold tracking-[0.22em] uppercase mb-4">
-        Master Gospel Piano
+      <p class="inline-block relative text-white text-[11px] font-semibold tracking-[0.22em] uppercase mb-6">
+        Master The Piano
+        <svg class="absolute left-0 -bottom-1.5 w-full" height="5" viewBox="0 0 120 5" preserveAspectRatio="none" fill="none" aria-hidden="true">
+          <path d="M1 3.5C22 1.2 68 0.8 119 3.2" stroke="#FFD736" stroke-width="2" stroke-linecap="round"/>
+        </svg>
       </p>
 
-      <h1 class="font-bold leading-[1.05] mb-0">
-        <span class="block text-white whitespace-nowrap" style="font-size: 9.5vw;">Play Gospel.</span>
-        <span class="block text-[#FFD736] italic font-playfair whitespace-nowrap" style="font-size: 9.5vw;">Play With Purpose.</span>
+      <h1 class="font-playfair italic font-medium leading-[1.08] mb-0 text-white">
+        <span class="block whitespace-nowrap" style="font-size: 9.5vw;">Play Piano.</span>
+        <span class="block text-[#FFD736] whitespace-nowrap" style="font-size: 9.5vw;">Play With Purpose.</span>
       </h1>
 
-      <div class="w-10 h-[3px] bg-[#FFD736] mt-5 mb-5"></div>
-
-      <p class="text-[1.1rem] text-gray-300 mb-8 leading-relaxed">
-        Learn gospel piano step-by-step<br>and play with confidence.
+      <p class="text-[1.05rem] text-gray-300 mt-6 mb-8 leading-relaxed">
+        Start wherever you are — we'll guide you one note at a time, until playing feels like second nature.
       </p>
 
       <a href="/plans#pricing"
-         class="flex items-center justify-center gap-2 bg-[#FFD736] text-black text-sm font-semibold px-7 py-4 rounded-full w-full hover:bg-[#e6c22e] transition">
+         class="flex items-center justify-center gap-2 text-black text-sm font-semibold px-7 py-4 rounded-full w-full transition shadow-[0_10px_30px_-8px_rgba(255,215,54,0.55)]"
+         style="background: linear-gradient(100deg, #FFE07A 0%, #FFD736 45%, #F2A93C 100%);">
         Start Your Journey
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -74,25 +76,27 @@
 
     {{-- Content: vertically centered below the fixed navbar --}}
     <div class="relative z-10 flex flex-col justify-center w-full" style="padding-top: 72px;">
-      <div class="px-16 lg:px-20 xl:px-28" style="max-width: 48%;">
+      <div class="px-16 lg:px-20 xl:px-28" style="max-width: 58%;">
 
-        <p class="text-[#FFD736] text-xs font-semibold tracking-[0.22em] uppercase mb-5">
-          Master Gospel Piano
+        <p class="inline-block relative text-white text-[13px] font-semibold tracking-[0.24em] uppercase mb-7">
+          Master The Piano
+          <svg class="absolute left-0 -bottom-2 w-full" height="6" viewBox="0 0 160 6" preserveAspectRatio="none" fill="none" aria-hidden="true">
+            <path d="M1 4.5C30 1.5 90 1 159 4" stroke="#FFD736" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
         </p>
 
-        <h1 class="font-bold leading-[1.05] mb-0">
-          <span class="block text-5xl lg:text-[4.5rem] xl:text-[5rem] text-white">Play Gospel.</span>
-          <span class="block text-5xl lg:text-[4.5rem] xl:text-[5rem] text-[#FFD736] italic font-playfair">Play With Purpose.</span>
+        <h1 class="font-playfair italic font-medium leading-[1.08] mb-0 text-white">
+          <span class="block text-5xl lg:text-[4.25rem] xl:text-[5rem]">Play Piano.</span>
+          <span class="block text-5xl lg:text-[4.25rem] xl:text-[5rem] text-[#FFD736]">Play With Purpose.</span>
         </h1>
 
-        <div class="w-12 h-[3px] bg-[#FFD736] mt-6 mb-6"></div>
-
-        <p class="text-base lg:text-lg text-gray-300 mb-10 leading-relaxed">
-          Learn gospel piano step-by-step<br>and play with confidence.
+        <p class="text-base lg:text-lg text-gray-300 mt-8 mb-10 leading-relaxed max-w-md">
+          Start wherever you are — we'll guide you one note at a time, until playing feels like second nature.
         </p>
 
         <a href="/plans#pricing"
-           class="inline-flex items-center gap-2 bg-[#FFD736] text-black text-sm font-semibold px-8 py-4 rounded-md hover:bg-[#e6c22e] transition">
+           class="inline-flex items-center gap-2 text-black text-sm font-semibold px-8 py-4 rounded-full transition hover:brightness-105 hover:-translate-y-0.5 duration-200 shadow-[0_10px_30px_-8px_rgba(255,215,54,0.55)]"
+           style="background: linear-gradient(100deg, #FFE07A 0%, #FFD736 45%, #F2A93C 100%);">
           Start Your Journey
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

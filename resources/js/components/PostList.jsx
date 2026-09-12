@@ -9,7 +9,18 @@ import {
     FlashMessageProvider,
 } from "./Alert/FlashMessageContext";
 
-const PostList = () => {
+const TOPIC_INFO = {
+    say_hello:
+        "👋 Hey, we'd love to get to know you! Drop a post about who you are, where you're from, how far along you are on piano, and what brought you here. And hey, say hi to a fellow newbie while you're at it!",
+    ask_question:
+        "💬 Stuck on something? Just ask! Technique, practice, gear, whatever's on your mind — we're all here to help each other out.",
+    announcement:
+        "📢 This is where Kingsley drops the latest news and updates. Keep an eye out so you don't miss anything good!",
+    suggestions:
+        "💡 Got an idea to make this place even better? We're all ears — share it with us here!",
+};
+
+const PostList = ({ fixedSubcategory, hideComposer, parentPostId } = {}) => {
     const { showMessage } = useFlashMessage();
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -19,6 +30,12 @@ const PostList = () => {
     const [commenting, setCommenting] = useState(false);
 
     const [sortBy, setSortBy] = useState("latest");
+    const [subcategoryFilter, setSubcategoryFilter] = useState(
+        () =>
+            fixedSubcategory ||
+            new URLSearchParams(window.location.search).get("subcategory") ||
+            "",
+    );
     const [posting, setPosting] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [selectedPost, setSelectedPost] = useState({});
@@ -35,7 +52,14 @@ const PostList = () => {
     const [showSkeleton, setShowSkeleton] = useState(false);
     const [mediaFiles, setMediaFiles] = useState([]);
 
+    // Member-profile URLs (e.g. /member/community/members/42) end in a numeric
+    // user ID, which this component uses to switch to a "posts by member" feed.
+    // A category feed (fixedSubcategory) is also sometimes mounted on a URL
+    // that happens to end in a number (e.g. /member/post/23), so it must never
+    // be treated as a member id in that case.
     const lastSegment = (() => {
+        if (fixedSubcategory) return null;
+
         const segment = window.location.pathname
             .split("/")
             .filter(Boolean)
@@ -89,6 +113,8 @@ const PostList = () => {
                 params: {
                     page: reqPage,
                     sort: sortBy,
+                    subcategory: parentPostId ? undefined : subcategoryFilter || undefined,
+                    parent_post_id: parentPostId || undefined,
                 },
             });
 
@@ -130,6 +156,7 @@ const PostList = () => {
                         params: {
                             page: reqPage,
                             sort: sortBy,
+                            subcategory: subcategoryFilter || undefined,
                         },
                     },
                 );
@@ -157,22 +184,67 @@ const PostList = () => {
                 setLoading(false);
             }
         },
-        [sortBy, hasMore, loading, page, lastSegment],
+        [sortBy, subcategoryFilter, hasMore, loading, page, lastSegment],
     );
 
     useEffect(() => {
         setPosts([]);
         setPage(1);
         setHasMore(true);
-    }, [sortBy]);
+
+        // Explicitly fetch page 1 here (rather than relying on the page-effect
+        // below) because the `hasMore` guard in fetchPosts still holds its old
+        // value in this same render pass — if the previous filter's list had
+        // already reached its last page, the guard would otherwise silently
+        // skip fetching the newly selected filter's posts.
+        if (lastSegment) {
+            fetchPostsByMember(1);
+        } else {
+            fetchPosts(1);
+        }
+    }, [sortBy, subcategoryFilter]);
+
+    // A post made through a separately-mounted composer (e.g. the standalone
+    // one on a forum category page) can't call fetchPosts directly since it's
+    // a different React root — it broadcasts this event instead.
+    useEffect(() => {
+        if (!fixedSubcategory) return;
+
+        const handlePostCreated = (event) => {
+            const detail = event.detail || {};
+
+            if (parentPostId) {
+                // This feed shows submissions to one specific topic only.
+                if (String(detail.parentPostId) !== String(parentPostId)) return;
+            } else {
+                // This feed shows a category's own topics — a submission to
+                // one of them doesn't belong here.
+                if (detail.subcategory !== fixedSubcategory || detail.parentPostId) return;
+            }
+
+            setPosts([]);
+            setPage(1);
+            setHasMore(true);
+            fetchPosts(1);
+        };
+
+        window.addEventListener("community:post-created", handlePostCreated);
+        return () => window.removeEventListener("community:post-created", handlePostCreated);
+    }, [fixedSubcategory, parentPostId, sortBy]);
 
     useEffect(() => {
+        if (page === 1) return;
+
         if (lastSegment) {
             fetchPostsByMember();
         } else {
             fetchPosts();
         }
-    }, [page, sortBy]);
+    }, [page]);
+
+    const handleFilterChange = (value) => {
+        setSubcategoryFilter(value);
+    };
 
     useEffect(() => {
         if (!hasMore || loading) return;
@@ -341,21 +413,57 @@ const PostList = () => {
 
     return (
         <>
-            <div className="flex-1 space-y-6 mb-5">
-                <CreatePostBox
-                    handlePost={handlePost}
-                    postDetails={postDetails}
-                    setPostDetails={setPostDetails}
-                    posting={posting}
-                    expanded={expanded}
-                    setExpanded={setExpanded}
-                    mediaFiles={mediaFiles}
-                    setMediaFiles={setMediaFiles}
-                    blocks={blocks}
-                    setBlocks={setBlocks}
-                    fetchPosts={fetchPosts}
-                />
-            </div>
+            {!hideComposer && (
+                <div className="flex-1 space-y-6 mb-5">
+                    <CreatePostBox
+                        handlePost={handlePost}
+                        postDetails={postDetails}
+                        setPostDetails={setPostDetails}
+                        posting={posting}
+                        expanded={expanded}
+                        setExpanded={setExpanded}
+                        mediaFiles={mediaFiles}
+                        setMediaFiles={setMediaFiles}
+                        blocks={blocks}
+                        setBlocks={setBlocks}
+                        fetchPosts={fetchPosts}
+                        initialTopic={subcategoryFilter}
+                    />
+                </div>
+            )}
+
+            {!fixedSubcategory && (
+                <div className="flex flex-nowrap sm:flex-wrap items-center gap-2 overflow-x-auto sm:overflow-visible -mx-4 px-4 sm:mx-0 sm:px-0 mb-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    {[
+                        { label: "All Posts", value: "" },
+                        { label: "Say Hello", value: "say_hello" },
+                        { label: "Discussions", value: "ask_question" },
+                        { label: "Announcements", value: "announcement" },
+                        { label: "Suggestions", value: "suggestions" },
+                    ].map((pill) => (
+                        <button
+                            key={pill.value}
+                            type="button"
+                            onClick={() => handleFilterChange(pill.value)}
+                            className={`flex-shrink-0 whitespace-nowrap text-sm font-medium px-4 py-2 rounded-lg border transition-colors ${
+                                subcategoryFilter === pill.value
+                                    ? "bg-black dark:bg-black border-black dark:border-black text-white shadow-sm"
+                                    : "bg-gray-100 dark:bg-gray-700 border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                            }`}
+                        >
+                            {pill.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {!fixedSubcategory && TOPIC_INFO[subcategoryFilter] && (
+                <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-xl p-4 mb-5">
+                    <p className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed">
+                        {TOPIC_INFO[subcategoryFilter]}
+                    </p>
+                </div>
+            )}
 
             <div className="post-list">
                 <div className="flex items-center justify-between mb-4">
@@ -413,6 +521,13 @@ const PostList = () => {
                     <p className="text-center text-sm text-gray-400 mb-4">
                         No more posts to load.
                     </p>
+                ) : !loading && posts.length > 0 && hasMore ? (
+                    <p
+                        onClick={() => setPage((prev) => prev + 1)}
+                        className="text-center text-sm font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 mb-4 cursor-pointer"
+                    >
+                        Load more
+                    </p>
                 ) : null}
 
                 {/* Sentinel for IntersectionObserver */}
@@ -431,6 +546,20 @@ if (document.getElementById("post-list")) {
         <React.StrictMode>
             <FlashMessageProvider>
                 <PostList />
+            </FlashMessageProvider>
+        </React.StrictMode>,
+    );
+}
+
+const categoryFeedMount = document.getElementById("category-post-feed");
+if (categoryFeedMount) {
+    const fixedSubcategory = categoryFeedMount.dataset.subcategory || "";
+    const parentPostId = categoryFeedMount.dataset.parentPostId || null;
+
+    ReactDOM.createRoot(categoryFeedMount).render(
+        <React.StrictMode>
+            <FlashMessageProvider>
+                <PostList fixedSubcategory={fixedSubcategory} hideComposer parentPostId={parentPostId} />
             </FlashMessageProvider>
         </React.StrictMode>,
     );

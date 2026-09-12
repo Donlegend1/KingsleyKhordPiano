@@ -16,6 +16,24 @@ class PostComment extends Model
     'body'
     ];
 
+    protected $appends = ['liked_by_user', 'likes_count'];
+
+    public function getLikedByUserAttribute(): bool
+    {
+        $userId = auth()->id();
+
+        if (!$userId) {
+            return false;
+        }
+
+        return $this->likes->contains('user_id', $userId);
+    }
+
+    public function getLikesCountAttribute(): int
+    {
+        return $this->likes->count();
+    }
+
     /**
      * Get the user associated with the Post
      *
@@ -34,6 +52,11 @@ class PostComment extends Model
     public function post()
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(CommentLike::class);
     }
 
 }

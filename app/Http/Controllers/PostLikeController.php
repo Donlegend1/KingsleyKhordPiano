@@ -34,16 +34,25 @@ class PostLikeController extends Controller
     {
         $post = Post::findOrFail($request->post_id);
         $user_id = auth()->id();
+        $type = $request->input('type', 'like');
 
         // Check if like already exists
         $existingLike = $post->likes()->where('user_id', $user_id)->first();
 
         if ($existingLike) {
-            $existingLike->delete();
-            $like = null;
+            if ($existingLike->type === $type) {
+                // same reaction tapped again -> remove it
+                $existingLike->delete();
+                $like = null;
+            } else {
+                // switching to a different reaction
+                $existingLike->update(['type' => $type]);
+                $like = $existingLike;
+            }
         } else {
             $like = $post->likes()->create([
                 'user_id' => $user_id,
+                'type' => $type,
             ]);
         }
 

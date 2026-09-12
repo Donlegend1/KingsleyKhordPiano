@@ -1,8 +1,10 @@
-@extends('layouts.community')
+@extends('layouts.hub')
 
-@section('breadcrumb-parent', 'Overview')
-@section('breadcrumb-parent-url', '/member/my-library')
-@section('breadcrumb', 'Bookmark')
+@section('title', 'Bookmarks')
+
+@section('breadcrumbs')
+    @include('community.partials.breadcrumbs', ['items' => [['label' => 'My Bookmarks']]])
+@endsection
 
 @section('content')
 <section class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white py-10 px-6 min-h-screen">

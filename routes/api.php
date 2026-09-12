@@ -12,6 +12,8 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostLikeController;
+use App\Http\Controllers\CommentLikeController;
+use App\Http\Controllers\ReplyLikeController;
 use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExerciseController;
@@ -168,6 +170,8 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('/comment', [PostCommentController::class, 'store'])->name('comment.store');
         Route::put('/comments/{postComment}', [PostCommentController::class, 'update'])->name('comment.update');
         Route::post('/like', [PostLikeController::class, 'store'])->name('like.toggle');
+        Route::post('/comment/{comment}/like', [CommentLikeController::class, 'toggle'])->name('comment.like.toggle');
+        Route::post('/reply/{reply}/like', [ReplyLikeController::class, 'toggle'])->name('reply.like.toggle');
         Route::post('/community/{user}/status', [AdminController::class, 'updateUserStatus']);
 
         Route::post('/comment/reply/{postComment}', [PostReplyController::class, 'store'])->name('reply.post');

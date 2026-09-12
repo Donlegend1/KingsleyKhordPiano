@@ -14,9 +14,12 @@ class PostBlock extends Model
         'post_id',
         'type',
         'content',
+        'original_name',
         'embed_url',
         'position'
     ];
+
+    protected $appends = ['file_size'];
 
     public function getEmbedUrlAttribute($value)
     {
@@ -25,5 +28,16 @@ class PostBlock extends Model
         }
 
         return $value;
+    }
+
+    public function getFileSizeAttribute(): ?int
+    {
+        if ($this->type !== 'file' || !$this->content) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($this->content)
+            ? \Illuminate\Support\Facades\Storage::disk('public')->size($this->content)
+            : null;
     }
 }

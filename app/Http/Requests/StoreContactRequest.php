@@ -24,6 +24,7 @@ class StoreContactRequest extends FormRequest
         return [
              'subject' => 'required|string|max:255',
              'message' => 'required|string|min:10',
+             'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,txt',
         ];
     }
 }

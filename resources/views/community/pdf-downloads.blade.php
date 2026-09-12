@@ -1,37 +1,44 @@
-@extends('layouts.community')
+@extends('layouts.hub')
 
-@section('breadcrumb-parent', 'Overview')
-@section('breadcrumb-parent-url', '/member/my-library')
-@section('breadcrumb', 'PDF Files')
+@section('title', 'PDF Files')
 
-@section('page-search')
-    <div class="relative group">
-        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
-        </svg>
-        <input
-            type="text"
-            x-model="search"
-            placeholder="Search PDF files..."
-            class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#FF6B35]/40 transition-all"
-        >
-        <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
-            </svg>
-        </button>
-    </div>
+@section('breadcrumbs')
+    @include('community.partials.breadcrumbs', ['items' => [['label' => 'PDF Files']]])
 @endsection
 
 @section('content')
 
 <!-- Main Content Section -->
-<section class="px-4 sm:px-6 pt-1 pb-6 bg-gray-50 dark:bg-black">
+<section class="px-4 sm:px-6 pt-6 pb-6">
     <div class="max-w-7xl mx-auto">
 
         <!-- Tabs Navigation -->
-        <div class="mb-8" x-data="{ activeType: 'all', tabsOpen: false, viewingPdfUrl: null, viewingPdfTitle: '' }">
+        <div class="mb-8" x-data="{ activeType: 'all', tabsOpen: false, viewingPdfUrl: null, viewingPdfTitle: '', search: '' }">
+
+            <!-- Page header -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm p-6 mb-6 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">PDF Files</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Browse and download sheet music, chord charts, and practice handouts.</p>
+                </div>
+                <div class="relative group w-full sm:w-72">
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+                    </svg>
+                    <input
+                        type="text"
+                        x-model="search"
+                        placeholder="Search PDF files..."
+                        class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#FF6B35]/40 transition-all"
+                    >
+                    <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
             @php
                 $typeTabs = [
