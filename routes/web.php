@@ -366,6 +366,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Community Tutorials Admin
     Route::resource('tutorials', \App\Http\Controllers\Admin\AdminTutorialController::class, ['as' => 'admin'])->except(['show']);
 
+    // Student Challenges Admin
+    Route::resource('student-challenges', \App\Http\Controllers\Admin\AdminStudentChallengeController::class, [
+        'as' => 'admin',
+        'parameters' => ['student-challenges' => 'studentChallenge'],
+    ])->except(['show']);
+
     // Shop Products Admin (MIDI files & Plugins)
     Route::resource('shop', \App\Http\Controllers\Admin\ShopProductController::class, ['as' => 'admin', 'parameters' => ['shop' => 'shopProduct']])->except(['show']);
 

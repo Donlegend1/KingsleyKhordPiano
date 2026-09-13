@@ -5,84 +5,7 @@
     {{-- Page Title --}}
     <div class="my-5">
  <h2 class="text-2xl font-bold text-gray-800 mb-6">Support Center</h2>
-    <p>Experiencing difficulties with your account? Are you having trouble navigating the website? Need help with your account? Refer to the below FAQs for a fast and convenient solution.</p>
-
     </div>
-   
-    {{-- FAQs --}}
-      <div x-data class="bg-white p-6 rounded-2xl shadow-md mb-10">
-    <h3 class="text-xl font-semibold text-gray-800 mb-4">Frequently Asked Questions</h3>
-
-    <div class="space-y-4">
-        {{-- FAQ Item 1 --}}
-         <div x-data="{ open: false }" class="border-b pb-2">
-            <button @click="open = !open" class="w-full text-left flex justify-between items-center text-gray-700 font-medium">
-                <span>How Can I cancel my account?</span>
-                <svg :class="open ? 'rotate-180' : ''" class="h-5 w-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            <p x-show="open" x-transition class="text-sm text-gray-600 mt-2">To terminate your account, visit your 
-             <a href="/member/profile" class="text-blue-500">account page </a>
-             
-             and click on the Subscriptions tab. You will find a ‘Cancel’ option next to your existing subscription</p>
-        </div>
-
-         <div x-data="{ open: false }" class="border-b pb-2">
-            <button @click="open = !open" class="w-full text-left flex justify-between items-center text-gray-700 font-medium">
-                <span>My payment has failed, please what should I do?</span>
-                <svg :class="open ? 'rotate-180' : ''" class="h-5 w-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            <p x-show="open" x-transition class="text-sm text-gray-600 mt-2">
-             Such occurrences are common! However, rest assured that your account will remain active unless your payment fails a total of 4 times.
-
-            If you update your credit/debit card information, you can find the ‘Update Card’ button on your
-            <a href="/member/profile" class="text-blue-500">account page </a>
-
-             under the Subscriptions tab. As soon as you update your card information, your payment will be processed right away.
-
-            Please make sure there are sufficient funds in your account to ensure successful payment upon retry.
-
-            Our payment processors will attempt to process payment again 4-5 days after a failed payment. However, your membership access will be suspended until payment goes through successfully. We will make 4 attempts to collect payment before automatically cancelling your account.
-
-            If your membership is revoked because of payment failures, you must create a new subscription to restore access to your membership.   
-             </p>
-        </div>
-        <div x-data="{ open: false }" class="border-b pb-2">
-            <button @click="open = !open" class="w-full text-left flex justify-between items-center text-gray-700 font-medium">
-                <span>How can I reset my password?</span>
-                <svg :class="open ? 'rotate-180' : ''" class="h-5 w-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            <p x-show="open" x-transition class="text-sm text-gray-600 mt-2">Go to your <a href="/member/profile" class="text-blue-500">account page </a> and follow the prompts.</p>
-        </div>
-
-        {{-- FAQ Item 2 --}}
-        <div x-data="{ open: false }" class="border-b pb-2">
-            <button @click="open = !open" class="w-full text-left flex justify-between items-center text-gray-700 font-medium">
-                <span>Where can I view my subscription details?</span>
-                <svg :class="open ? 'rotate-180' : ''" class="h-5 w-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            <p x-show="open" x-transition class="text-sm text-gray-600 mt-2">Check the Subscription section in your profile page to view or manage your plan.</p>
-        </div>
-
-        {{-- FAQ Item 3 --}}
-        <div x-data="{ open: false }" class="border-b pb-2">
-            <button @click="open = !open" class="w-full text-left flex justify-between items-center text-gray-700 font-medium">
-                <span>How do I contact support directly?</span>
-                <svg :class="open ? 'rotate-180' : ''" class="h-5 w-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            <p x-show="open" x-transition class="text-sm text-gray-600 mt-2">Use the form below to send us a message, and our team will respond via email.</p>
-        </div>
-    </div>
-</div>
 
 <div class="my-5">
  <p class="text-xl font-sf">If you have any questions not addressed above, please use the form below to contact me and I will respond as soon as possible. My goal is to respond to every email within a day.</p>
@@ -108,7 +31,7 @@
             </div>
         @endif
 
-        <form action="/support/send" method="POST" class="space-y-5">
+        <form action="/support/send" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             <div>
                 <label for="subject" class="block text-sm font-semibold text-gray-700 mb-1.5">Subject</label>
@@ -126,6 +49,21 @@
                           placeholder="Tell us how we can help..."
                           class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none resize-none">{{ old('message') }}</textarea>
                 @error('message')
+                    <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div x-data="{ fileName: null }">
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Attachment <span class="font-normal text-gray-400">(optional)</span></label>
+                <label for="attachment"
+                       class="flex items-center justify-center gap-2 w-full py-6 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 cursor-pointer hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/40 transition">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <span x-text="fileName ?? 'Click to attach a file'"></span>
+                </label>
+                <input type="file" name="attachment" id="attachment" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt"
+                       class="sr-only" @change="fileName = $event.target.files[0]?.name ?? null">
+                <p class="text-xs text-gray-400 mt-1.5">Images, PDF, or Word docs, up to 10MB.</p>
+                @error('attachment')
                     <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>
                 @enderror
             </div>

@@ -6,6 +6,25 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">{{ $category['description'] }}</p>
             </div>
 
+            @if(!empty($category['video_url']))
+                <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden mt-4">
+                    <div class="px-4 py-2.5 border-b border-gray-100 dark:border-gray-700 flex items-center gap-1.5">
+                        <span title="Pinned">📌</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Challenge Video</h3>
+                    </div>
+                    <div class="aspect-video">
+                        <iframe
+                            class="w-full h-full"
+                            src="{{ \App\Helpers\VideoHelper::linkToEmbed($category['video_url']) }}"
+                            title="{{ $category['title'] }} — Challenge Video"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                </div>
+            @endif
+
             <div class="bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl p-4 mt-4" x-data="{ showVideo: false }">
                 <p class="text-sm text-blue-900 dark:text-blue-200 leading-relaxed">
                     📹 Hey! Before you post your video, upload it to YouTube first, then just paste the link right into your post. Need a hand?

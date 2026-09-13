@@ -217,7 +217,7 @@ class ExerciseController extends Controller
         $baseQuery = fn() => \App\Models\MusicalApplication::where('status', 'active')
             ->when($skillLevel !== 'ALL', fn($q) => $q->where('skill_level', $skillLevel))
             ->when($search, fn($q) => $q->where('series', 'like', "%{$search}%"))
-            ->orderByRaw('position IS NULL, position ASC');
+            ->latest();
 
         $seriesPage = $baseQuery()
             ->select('series')
@@ -242,6 +242,10 @@ class ExerciseController extends Controller
             ->get()
             ->groupBy('series')
             ->sortBy(fn($items, $series) => $seriesNames->search($series));
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->view('memberpages.partials.musical-application-results', compact('applications', 'seriesPage', 'search'));
+        }
 
         return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage', 'search'));
     }

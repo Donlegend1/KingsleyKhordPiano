@@ -70,7 +70,10 @@
                             @endif
                         </a>
 
-                        @if ($isActive && !empty($item->related_lessons ?? null))
+                        @php
+                            $curatedRelated = $item->related_lessons ?? null;
+                        @endphp
+                        @if ($isActive && (!empty($curatedRelated) || ($relatedLessons ?? collect())->count() > 0))
                             <div class="bg-white border-b border-gray-50 px-5 py-4">
                                 <div class="flex items-center gap-1.5 mb-3">
                                     <i class="fa-solid fa-link text-indigo-500 text-[10px]"></i>
@@ -79,18 +82,43 @@
                                     </p>
                                 </div>
                                 <div class="space-y-2">
-                                    @foreach ($item->related_lessons as $related)
-                                        <a href="{{ $related['url'] }}"
-                                            class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all group">
-                                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 text-indigo-500 flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                                                <i class="fa-solid fa-play text-[8px] ml-0.5"></i>
-                                            </span>
-                                            <p class="text-[11px] font-semibold text-gray-700 group-hover:text-indigo-700 truncate flex-1 transition-colors">
-                                                {{ $related['title'] }}
-                                            </p>
-                                            <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-indigo-400 text-[9px] flex-shrink-0 transition-colors"></i>
-                                        </a>
-                                    @endforeach
+                                    @if (!empty($curatedRelated))
+                                        @foreach ($curatedRelated as $related)
+                                            <a href="{{ $related['url'] }}"
+                                                class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all group">
+                                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 text-indigo-500 flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                                                    <i class="fa-solid fa-play text-[8px] ml-0.5"></i>
+                                                </span>
+                                                <p class="text-[11px] font-semibold text-gray-700 group-hover:text-indigo-700 truncate flex-1 transition-colors">
+                                                    {{ $related['title'] }}
+                                                </p>
+                                                <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-indigo-400 text-[9px] flex-shrink-0 transition-colors"></i>
+                                            </a>
+                                        @endforeach
+                                    @else
+                                        @foreach ($relatedLessons as $related)
+                                            @php
+                                                $relatedUrlParams = ['video_id' => $related->id];
+                                                if (isset($related->level)) {
+                                                    $relatedUrlParams['level'] = $related->level;
+                                                    $relatedUrlParams['skill_level'] = $related->skill_level ?? 'Basic';
+                                                } elseif (isset($related->series)) {
+                                                    $relatedUrlParams['series'] = $related->series;
+                                                }
+                                                $relatedHref = route('piano.exercise.player', $relatedUrlParams);
+                                            @endphp
+                                            <a href="{{ $relatedHref }}"
+                                                class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all group">
+                                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 text-indigo-500 flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                                                    <i class="fa-solid fa-play text-[8px] ml-0.5"></i>
+                                                </span>
+                                                <p class="text-[11px] font-semibold text-gray-700 group-hover:text-indigo-700 truncate flex-1 transition-colors">
+                                                    {{ $related->title }}
+                                                </p>
+                                                <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-indigo-400 text-[9px] flex-shrink-0 transition-colors"></i>
+                                            </a>
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                         @endif

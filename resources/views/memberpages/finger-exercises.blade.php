@@ -45,15 +45,17 @@
 
         <!-- Tabs -->
         <div class="flex justify-center mb-10">
-            <div class="inline-flex items-stretch bg-gray-100 rounded-xl p-1.5">
+            <div class="inline-flex items-stretch bg-gray-100 rounded-lg overflow-hidden">
                 <button type="button" @click="activeTab = 'finger'"
-                    class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
-                    :class="activeTab === 'finger' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    class="px-8 py-3 text-xs font-bold uppercase tracking-wide transition-colors duration-200"
+                    :style="activeTab === 'finger' ? 'background-color: #C85A5A;' : ''"
+                    :class="activeTab === 'finger' ? 'text-white' : 'text-gray-500 hover:bg-gray-200'">
                     Finger Exercise
                 </button>
                 <button type="button" @click="activeTab = 'etudes'"
-                    class="px-8 py-3 rounded-lg text-sm font-semibold transition-all duration-300"
-                    :class="activeTab === 'etudes' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'text-gray-500 hover:text-gray-700'">
+                    class="px-8 py-3 text-xs font-bold uppercase tracking-wide border-l border-gray-200 transition-colors duration-200"
+                    :style="activeTab === 'etudes' ? 'background-color: #C85A5A;' : ''"
+                    :class="activeTab === 'etudes' ? 'text-white' : 'text-gray-500 hover:bg-gray-200'">
                     Etudes &amp; Pieces
                 </button>
             </div>

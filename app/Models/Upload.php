@@ -18,6 +18,7 @@ class Upload extends Model
         'skill_level',
         'thumbnail',
         'tags',
+        'related_lessons',
         'video_type',
         'series',
         'images',
@@ -30,6 +31,7 @@ class Upload extends Model
         'category' => 'string',
         'status' => 'string',
         'tags' => 'array',
+        'related_lessons' => 'array',
         'images' => 'array',
     ];
 

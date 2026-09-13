@@ -78,9 +78,11 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::put('/course/category/{name}/update', [CourseCategoryController::class, 'update']);
 
         // Checkpoints Admin API
-        Route::get('checkpoints/catalog', [CourseCheckpointController::class, 'catalog']);
         Route::post('checkpoints/store', [CourseCheckpointController::class, 'store']);
+        Route::post('checkpoints/{checkpoint}/update', [CourseCheckpointController::class, 'update']);
         Route::delete('checkpoints/{checkpoint}', [CourseCheckpointController::class, 'destroy']);
+        Route::post('checkpoints/{checkpoint}/downloads', [CourseCheckpointController::class, 'storeDownload']);
+        Route::delete('checkpoint-downloads/{download}', [CourseCheckpointController::class, 'destroyDownload']);
 
         // Learn Songs Admin API
         Route::get('learn-songs', [AdminLearnSongController::class, 'list']);

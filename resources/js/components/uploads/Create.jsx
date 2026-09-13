@@ -34,6 +34,7 @@ const UploadForm = () => {
         status: "active",
         series: "",
     });
+    const [relatedLessons, setRelatedLessons] = useState([]);
     const [saving, setSaving] = useState(false);
 
     const categories = [
@@ -101,6 +102,11 @@ const UploadForm = () => {
             formData.append(`tags[${index}]`, tag.value);
         });
 
+        relatedLessons.forEach((rl, idx) => {
+            formData.append(`related_lessons[${idx}][title]`, rl.title);
+            formData.append(`related_lessons[${idx}][url]`, rl.url);
+        });
+
         try {
             const response = await axios.post("/admin/upload/store", formData, {
                 headers: {
@@ -121,6 +127,7 @@ const UploadForm = () => {
             });
             setDescriptionImageFiles([]);
             setSelectedTags([]);
+            setRelatedLessons([]);
         } catch (error) {
             showMessage("Error creating upload.", "error");
             console.error("Error creating upload:", error);
@@ -284,6 +291,53 @@ const UploadForm = () => {
                         </div>
                     )}
 
+                    {upload.category === "piano exercise" && (
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                            <div className="space-y-2">
+                                {relatedLessons.map((rl, idx) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Lesson name"
+                                            value={rl.title}
+                                            onChange={(e) => {
+                                                const rows = [...relatedLessons];
+                                                rows[idx] = { ...rows[idx], title: e.target.value };
+                                                setRelatedLessons(rows);
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Link"
+                                            value={rl.url}
+                                            onChange={(e) => {
+                                                const rows = [...relatedLessons];
+                                                rows[idx] = { ...rows[idx], url: e.target.value };
+                                                setRelatedLessons(rows);
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setRelatedLessons(relatedLessons.filter((_, i) => i !== idx))}
+                                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                        >
+                                            <i className="fa fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setRelatedLessons([...relatedLessons, { title: "", url: "" }])}
+                                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                                >
+                                    <i className="fa fa-plus"></i> Add related lesson
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Status */}
                     <div>

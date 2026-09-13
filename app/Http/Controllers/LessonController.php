@@ -31,7 +31,6 @@ class LessonController extends Controller
                          ->orWhere('description', 'like', "%{$search}%");
                 });
             })
-            ->orderByRaw('position IS NULL, position ASC')
             ->latest();
 
         $songs = $query->paginate(9, ['*'], 'page', $page)->appends([
@@ -41,6 +40,10 @@ class LessonController extends Controller
         ]);
 
         $tonalCenters = \App\Enums\Music\TonalCenterEnum::options();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->view('memberpages.partials.learnsongs-results', compact('songs', 'search'));
+        }
 
         return view('memberpages.learnsongs', compact('songs', 'search', 'activeTab', 'tonalCenter', 'tonalCenters'));
     }

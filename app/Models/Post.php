@@ -16,7 +16,8 @@ class Post extends Model
     'subcategory',
     'user_id',
     'parent_post_id',
-    'is_pinned'
+    'is_pinned',
+    'video_url'
    ];
 
     public function user()

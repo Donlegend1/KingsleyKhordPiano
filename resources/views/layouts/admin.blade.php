@@ -75,6 +75,9 @@
             <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>
             </a>
+            <a href="{{ route('admin.student-challenges.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa fa-trophy w-6 text-center"></i> <span>Student Challenges</span>
+            </a>
             <a href="{{ route('admin.shop.index', ['type' => 'midi']) }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa-solid fa-store w-6 text-center"></i> <span>Shop</span>
             </a>
@@ -178,6 +181,9 @@
         </a>
         <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>
+        </a>
+        <a href="{{ route('admin.student-challenges.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-trophy w-6 text-center"></i> <span>Student Challenges</span>
         </a>
         <a href="/member/profile" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-cog"></i> <span>Settings</span>

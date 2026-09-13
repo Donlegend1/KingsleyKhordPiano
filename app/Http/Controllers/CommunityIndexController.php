@@ -809,6 +809,7 @@ class CommunityIndexController extends Controller
             // whole Student Challenges category.
             'count' => Post::where('parent_post_id', $post->id)->count(),
             'parent_post_id' => $post->id,
+            'video_url' => $post->video_url,
          ];
 
          $categoryStats = $this->forumCategoryStats($post->subcategory, $post->id);
