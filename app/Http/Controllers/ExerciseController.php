@@ -225,6 +225,9 @@ class ExerciseController extends Controller
     {
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
+        $search = $request->query('name');Uploaded Learn Songs videos not showing in admin 
+
+Group Etudes & Pieces Lessons Like Extra course and Guided Practice lesson page view
 
         $categoryPage = \App\Models\MusicalApplicationCategory::query()
             ->when($skillLevel !== 'ALL', fn ($q) => $q->where('level', strtolower($skillLevel)))
