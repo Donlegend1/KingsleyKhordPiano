@@ -215,6 +215,7 @@ class ExerciseController extends Controller
         $etudeCategories = \App\Models\EtudeCategory::with(['etudes' => function ($q) {
             $q->where('status', 'active')->orderByRaw('position IS NULL, position ASC');
         }])
+        ->whereHas('etudes', fn ($q) => $q->where('status', 'active'))
         ->orderByRaw('position IS NULL, position ASC')
         ->get();
 

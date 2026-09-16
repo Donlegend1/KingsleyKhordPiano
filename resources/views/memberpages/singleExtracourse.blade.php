@@ -43,6 +43,10 @@
             $playlist = \App\Models\ExtraCourse::where('extra_course_category_id', $lesson->extra_course_category_id)
                 ->orderBy('position')
                 ->get();
+        } elseif ($lessonType === 'etudes') {
+            $playlist = \App\Models\Etude::where('etude_category_id', $lesson->etude_category_id)
+                ->orderByRaw('position IS NULL, position ASC')
+                ->get();
         }
 
         // Find current index safely with loose comparison
@@ -80,6 +84,8 @@
                 <span>/</span>
                 @if ($lessonType === 'learn_songs')
                     <a href="{{ route('learn.songs') }}" class="hover:text-gray-700">Learn Songs</a>
+                @elseif ($lessonType === 'etudes')
+                    <a href="{{ route('piano.exercise.finger', ['tab' => 'etudes']) }}" class="hover:text-gray-700">Etudes &amp; Pieces</a>
                 @else
                     <a href="{{ route('extra.courses') }}" class="hover:text-gray-700">Extra Courses</a>
                 @endif
@@ -447,7 +453,7 @@
                 <i class="fa-regular fa-folder-open text-gray-200 text-6xl block mb-5"></i>
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">No lesson found</h2>
                 <p class="text-gray-400 mb-7">There is currently no lesson available.</p>
-                <a href="{{ route('extra.courses') }}"
+                <a href="{{ $lessonType === 'etudes' ? route('piano.exercise.finger', ['tab' => 'etudes']) : route('extra.courses') }}"
                     class="inline-block bg-[#2563EB] text-white px-7 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-colors">
                     Go Back
                 </a>

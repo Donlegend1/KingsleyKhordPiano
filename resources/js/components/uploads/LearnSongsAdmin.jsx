@@ -339,7 +339,7 @@ const LearnSongsAdmin = () => {
             fetchAllSongsDropdown();
         } catch (error) {
             console.error("Error creating song:", error);
-            showMessage("Error adding song", "error");
+            showMessage(error.response?.data?.message || "Error adding song", "error");
         } finally {
             setLoading(false);
         }

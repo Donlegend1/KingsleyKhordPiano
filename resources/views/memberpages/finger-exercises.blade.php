@@ -30,6 +30,8 @@
             'desc' => 'Sharpen your overall piano technique with focused, guided drills.',
         ],
     ];
+
+    $exerciseTab = request('tab') === 'etudes' ? 'etudes' : 'finger';
 @endphp
 
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
@@ -40,7 +42,7 @@
     </div>
 </section>
 
-<div class="min-h-screen bg-[#F4F5F7] py-10 px-4" x-data="{ activeTab: 'finger' }">
+<div class="min-h-screen bg-[#F4F5F7] py-10 px-4" x-data="{ activeTab: '{{ $exerciseTab }}' }">
     <div class="max-w-6xl mx-auto">
 
         <!-- Tabs -->
@@ -136,85 +138,65 @@
             @endforeach
         </div>
 
-        <!-- Etudes & Pieces Tab -->
-        <div x-show="activeTab === 'etudes'" x-cloak class="space-y-12">
+        <!-- Etudes & Pieces Tab: one card per category, like Extra Courses / Guided Practice -->
+        <div x-show="activeTab === 'etudes'" x-cloak class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($etudeCategories as $category)
-                @if($category->etudes->count() > 0)
-                    <div>
-                        <!-- Category Header -->
-                        <div class="flex items-center gap-2.5 mb-6">
-                            <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
-                                {{ $category->category }}
-                            </h3>
-                            <span class="text-xs bg-gray-200 text-gray-600 px-2.5 py-0.5 rounded-full font-medium">
-                                {{ $category->etudes->count() }} {{ Str::plural('Item', $category->etudes->count()) }}
-                            </span>
+                @php
+                    $firstEtude = $category->etudes->first();
+                    $lessonCount = $category->etudes->count();
+                    $watchUrl = $firstEtude ? "/member/lesson/{$firstEtude->id}?type=etudes" : '#';
+                    $isNew = \App\Models\LessonView::anyNewUnviewed(auth()->id(), $category->etudes);
+                @endphp
+                <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+
+                    <!-- Thumbnail -->
+                    <a href="{{ $watchUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+                        @if($firstEtude && $firstEtude->thumbnail_url)
+                            <img src="{{ $firstEtude->thumbnail_url }}" alt="{{ $category->category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900 to-purple-900">
+                                <i class="fa fa-music text-5xl text-white/30"></i>
+                            </div>
+                        @endif
+
+                        @if($isNew)
+                            <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-md tracking-wide">
+                                NEW
+                            </div>
+                        @endif
+
+                        <!-- Lesson count badge -->
+                        <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
+                            {{ $lessonCount }} {{ Str::plural('Lesson', $lessonCount) }}
                         </div>
 
-                        <!-- Etudes Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @foreach($category->etudes as $etude)
-                                @php
-                                    $watchUrl = "/member/lesson/{$etude->id}?type=etudes";
-                                    $isNew = $etude->created_at
-                                        && $etude->created_at->gt(now()->subDays(7))
-                                        && !\App\Models\LessonView::hasViewed(auth()->id(), $etude);
-                                @endphp
-                                <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
-                                    
-                                    <!-- Thumbnail -->
-                                    <a href="{{ $watchUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
-                                        @if($etude->thumbnail_url)
-                                            <img src="{{ $etude->thumbnail_url }}" alt="{{ $etude->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-950">
-                                                <i class="fa fa-music text-4xl text-white/20"></i>
-                                            </div>
-                                        @endif
-
-                                        @if($isNew)
-                                            <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wide shadow-sm shadow-red-500/20 uppercase">
-                                                NEW
-                                            </div>
-                                        @endif
-
-                                        <!-- Play overlay -->
-                                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
-                                                <i class="fa fa-play text-black text-sm ml-0.5"></i>
-                                            </div>
-                                        </div>
-                                    </a>
-
-                                    <!-- Card Body -->
-                                    <div class="p-5 flex flex-col gap-3 flex-grow">
-                                        <div>
-                                            <h4 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug group-hover:text-blue-600 transition-colors">
-                                                {{ Str::title($etude->title) }}
-                                            </h4>
-                                            @if($etude->author)
-                                                <p class="text-gray-400 text-xs mt-1 font-medium">Composer: {{ $etude->author }}</p>
-                                            @endif
-                                        </div>
-
-                                        @if($etude->description)
-                                            <p class="text-gray-500 text-xs leading-relaxed line-clamp-2">{{ $etude->description }}</p>
-                                        @endif
-
-                                        <!-- Watch Now Button -->
-                                        <a href="{{ $watchUrl }}"
-                                           class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
-                                            Watch Now
-                                        </a>
-                                    </div>
-                                </div>
-                            @endforeach
+                        <!-- Play overlay -->
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl scale-90 group-hover:scale-100 transition duration-300">
+                                <i class="fa fa-play text-black text-sm ml-0.5"></i>
+                            </div>
                         </div>
+                    </a>
+
+                    <!-- Card Body -->
+                    <div class="p-5 flex flex-col gap-3 flex-1">
+                        <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug">
+                            {{ $category->category }}
+                        </h3>
+
+                        @if($firstEtude && $firstEtude->author)
+                            <p class="text-gray-400 text-sm leading-relaxed">{{ $firstEtude->author }}</p>
+                        @endif
+
+                        <!-- Watch Now Button -->
+                        <a href="{{ $watchUrl }}"
+                           class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
+                            Watch Now
+                        </a>
                     </div>
-                @endif
+                </div>
             @empty
-                <div class="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-400">
+                <div class="col-span-full text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300 text-gray-400">
                     <i class="fa fa-music text-4xl mb-3 block text-gray-300"></i>
                     No etudes or pieces available yet.
                 </div>

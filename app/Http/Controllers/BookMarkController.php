@@ -54,6 +54,7 @@ class BookMarkController extends Controller
             'posts'   => \App\Models\Post::class,
             'learn_songs' => \App\Models\LearnSong::class,
             'extra_courses' => \App\Models\ExtraCourse::class,
+            'etudes' => \App\Models\Etude::class,
             'musical_applications' => \App\Models\MusicalApplication::class,
             'audio_downloads' => \App\Models\AudioDownload::class,
             default   => null,

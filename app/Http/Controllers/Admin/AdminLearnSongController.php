@@ -26,9 +26,10 @@ class AdminLearnSongController extends Controller
                 ->orderBy('position')
                 ->get(['id', 'category', 'position']);
 
-            $categories->load(['songs' => function ($q) use ($level) {
-                $q->where('level', $level)
-                  ->orderBy('position');
+            // Show every song in the category. Filtering again by song.level
+            // hid uploads whose stored level did not exactly match the category.
+            $categories->load(['songs' => function ($q) {
+                $q->orderBy('position');
             }]);
 
             $data = [];

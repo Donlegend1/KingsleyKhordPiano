@@ -60,6 +60,7 @@ class LessonCompletionController extends Controller
             'courses' => \App\Models\Course::class,
             'learn_songs' => \App\Models\LearnSong::class,
             'extra_courses' => \App\Models\ExtraCourse::class,
+            'etudes' => \App\Models\Etude::class,
             'quizzes' => \App\Models\Quiz::class,
             'musical_applications' => \App\Models\MusicalApplication::class,
             default => null,
