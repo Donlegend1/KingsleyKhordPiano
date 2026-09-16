@@ -215,6 +215,7 @@ class ExerciseController extends Controller
         $etudeCategories = \App\Models\EtudeCategory::with(['etudes' => function ($q) {
             $q->where('status', 'active')->orderByRaw('position IS NULL, position ASC');
         }])
+        ->whereHas('etudes', fn ($q) => $q->where('status', 'active'))
         ->orderByRaw('position IS NULL, position ASC')
         ->get();
 
@@ -225,8 +226,7 @@ class ExerciseController extends Controller
     {
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
-        $page = $request->query('page', 1);
-        $search = $request->input('name');
+        $search = $request->query('name');
 
         $categoryPage = \App\Models\MusicalApplicationCategory::query()
             ->when($skillLevel !== 'ALL', fn ($q) => $q->where('level', strtolower($skillLevel)))
