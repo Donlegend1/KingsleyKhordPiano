@@ -10,7 +10,10 @@ use App\Models\Payment;
 use Stripe\Stripe;
 use Stripe\Price;
 use Laravel\Cashier\Subscription;
+use App\Models\Plan;
+use App\Models\Subscription as BillingSubscription;
 use App\Models\Course;
+use Illuminate\Support\Facades\Log;
 use App\Models\Upload;
 use App\Models\UserAssessment;
 use App\Models\UserDailyLogin;
@@ -231,42 +234,113 @@ class HomeController extends Controller
 
     public function profile()
     {
+        $user = auth()->user();
         Stripe::setApiKey(config('cashier.secret'));
 
-        $transactions = Subscription::with('items')
-            ->where('user_id', auth()->id())
+        $metadata = $user->metadata ?? $user->metadata ?? [];
+        $transactions = BillingSubscription::query()
+            ->where('user_id', $user->id)
             ->latest()
             ->get()
-            ->map(function ($subscription) {
-                $item = $subscription->items->first();
-                $priceAmount = null;
-                $currency = 'USD';
-                $interval = null;
+            ->map(function (BillingSubscription $subscription) use ($user, $metadata) {
+                $provider = $user->subscriptionProvider($subscription);
+                $amount = $user->last_payment_amount ?? $user->last_payment_amount;
+                $currency = strtoupper((string) data_get($metadata, 'currency', 'USD'));
+                $interval = $subscription->duration
+                    ?? data_get($metadata, 'duration')
+                    ?? $user->subscription_type
+                    ?? $user->subscription_type;
 
-                if ($item && $item->stripe_price) {
-                    $stripePrice = Price::retrieve($item->stripe_price);
-                    $priceAmount = $stripePrice->unit_amount / 100;
-                    $currency = strtoupper($stripePrice->currency);
-                    $interval = $stripePrice->recurring->interval ?? null;
+                $planId = $subscription->plan_code ?? $subscription->plan_code;
+                $plan = is_numeric($planId) ? Plan::find($planId) : null;
+
+                if ($plan) {
+                    $currency = strtoupper((string) data_get($metadata, 'currency', $currency));
+                    $amount = match ($currency) {
+                        'NGN' => $plan->price_ngn ?? $plan->price_ngn,
+                        'EUR' => $plan->price_eur,
+                        default => $plan->price_usd,
+                    };
+                    $interval = $plan->type ?: $interval;
                 }
 
+                $priceId = $subscription->stripe_price
+                    ?? $subscription->stripe_price
+                    ?? DB::table('subscription_items')
+                        ->where('subscription_id', $subscription->id)
+                        ->value('stripe_price');
+
+                if ($provider === 'stripe' && is_string($priceId) && str_starts_with($priceId, 'price_')) {
+                    try {
+                        $stripePrice = Price::retrieve($priceId);
+                        $amount = ($stripePrice->unit_amount ?? 0) / 100;
+                        $currency = strtoupper((string) ($stripePrice->currency ?? $currency));
+                        $interval = $stripePrice->recurring->interval ?? $interval;
+                    } catch (\Throwable $e) {
+                        Log::warning('Unable to load Stripe price for profile', [
+                            'subscription_id' => $subscription->id,
+                            'price_id' => $priceId,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                $intervalKey = strtolower((string) $interval);
+                $displayInterval = match ($intervalKey) {
+                    'month', 'monthly' => 'month',
+                    'quarter', 'quarterly' => 'quarter',
+                    'year', 'yearly' => 'year',
+                    default => $intervalKey ?: 'month',
+                };
+
+                $tier = strtolower((string) (
+                    data_get($metadata, 'tier')
+                    ?? (($user->premium || $user->is_premium) ? 'premium' : 'standard')
+                ));
+                $isPremium = str_contains($tier, 'premium');
+                $planName = match ($displayInterval) {
+                    'month' => $isPremium ? 'Monthly Premium Plan' : 'Monthly Standard Plan',
+                    'quarter' => $isPremium ? 'Quarterly Premium Plan' : 'Quarterly Standard Plan',
+                    'year' => $isPremium ? 'Yearly Premium Plan' : 'Yearly Standard Plan',
+                    default => $isPremium ? 'Premium Plan' : 'Standard Plan',
+                };
+
                 return (object) [
-                    'name' => $subscription->name,
-                    'amount' => $priceAmount,
+                    'name' => $planName,
+                    'amount' => $amount,
                     'currency' => $currency,
-                    'interval' => $interval,
+                    'interval' => $displayInterval,
                     'starts_at' => $subscription->created_at,
+                    'ends_at' => $subscription->ends_at,
                     'stripe_status' => $subscription->stripe_status,
+                    'payment_method' => $provider,
                 ];
             });
 
-            // dd($transactions);
+        $latestSubscription = $transactions->first();
+        $canCancelSubscription = (bool) $user->cancellableSubscription();
+        $onGracePeriod = $user->subscriptionOnGracePeriod();
+        $graceEndsAt = $user->subscription_expires_at
+            ?? $user->latestLocalSubscription()?->ends_at;
+        $providerLabel = match ($user->subscriptionProvider()) {
+            'paypal' => 'PayPal',
+            'paystack' => 'Paystack',
+            default => 'Stripe',
+        };
 
         $countries = DB::table('countries')
             ->orderBy('country_name')
             ->pluck('country_name', 'country_code');
 
-        return view('memberpages.profile', compact('transactions', 'countries'));
+        return view('memberpages.profile', compact(
+            'transactions',
+            'countries',
+            'latestSubscription',
+            'canCancelSubscription',
+            'onGracePeriod',
+            'graceEndsAt',
+            'providerLabel'
+        ));
     }
 
     public function update(Request $request)

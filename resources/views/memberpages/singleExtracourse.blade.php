@@ -9,6 +9,8 @@
             $lessonType = 'learn_songs';
         } elseif ($lesson instanceof \App\Models\ExtraCourse) {
             $lessonType = 'extra_courses';
+        } elseif ($lesson instanceof \App\Models\Etude) {
+            $lessonType = 'etudes';
         }
 
         // Every lesson link on this page points to the same model as the
@@ -17,6 +19,7 @@
         $linkType = match ($lessonType) {
             'learn_songs' => 'learn_song',
             'extra_courses' => 'extra_course',
+            'etudes' => 'etudes',
             default => 'upload',
         };
 
@@ -107,6 +110,28 @@
                     @else
                         <div class="mb-5"></div>
                     @endif
+
+                    @if (in_array($lessonType, ['learn_songs', 'etudes']))
+                        @include('memberpages.partials.midi-practice-display', [
+                            'midiPracticeFile' => $midiPracticeFile ?? null,
+                            'midiPracticeFiles' => $midiPracticeFiles ?? collect(),
+                            'midiPracticeTitle' => Str::title($lesson->title),
+                        ])
+                    @endif
+
+                    @if (!empty($lesson->images) && is_array($lesson->images))
+                        <div class="mt-6 mb-8">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Course Walkthrough / Highlights</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach ($lesson->images as $imgPath)
+                                    <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50 aspect-video relative group">
+                                        <img src="{{ asset($imgPath) }}" alt="Walkthrough Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
 
                     {{-- Action Buttons --}}
                     <div class="flex items-center flex-wrap gap-3 mb-10">

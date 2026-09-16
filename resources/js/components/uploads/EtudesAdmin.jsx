@@ -79,8 +79,10 @@ const EtudesAdmin = () => {
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
     const [audioResourceFile, setAudioResourceFile] = useState(null);
     const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [midiResourceFile, setMidiResourceFile] = useState(null);
     const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
     const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
+    const [editMidiResourceFile, setEditMidiResourceFile] = useState(null);
     const fileInputRef = useRef(null);
 
     const { showMessage } = useFlashMessage();
@@ -192,6 +194,9 @@ const EtudesAdmin = () => {
         if (pdfResourceFile) {
             formData.append("pdf_resource", pdfResourceFile);
         }
+        if (midiResourceFile) {
+            formData.append("midi_resource", midiResourceFile);
+        }
         descriptionImageFiles.forEach((f) => {
             formData.append("images[]", f);
         });
@@ -224,6 +229,7 @@ const EtudesAdmin = () => {
             setDescriptionImageFiles([]);
             setAudioResourceFile(null);
             setPdfResourceFile(null);
+            setMidiResourceFile(null);
             showMessage("Etude/Piece created successfully", "success");
         } catch (error) {
             showMessage(error.response?.data?.message || "Error creating etude", "error");
@@ -240,6 +246,7 @@ const EtudesAdmin = () => {
         setPreviewUrl(etude.thumbnail_url);
         setEditAudioResourceFile(null);
         setEditPdfResourceFile(null);
+        setEditMidiResourceFile(null);
         setDescriptionImageFiles([]);
         setThumbnailFile(null);
         setIsEditEtudeModalOpen(true);
@@ -265,6 +272,9 @@ const EtudesAdmin = () => {
         if (editPdfResourceFile) {
             formData.append("pdf_resource", editPdfResourceFile);
         }
+        if (editMidiResourceFile) {
+            formData.append("midi_resource", editMidiResourceFile);
+        }
         descriptionImageFiles.forEach((f) => {
             formData.append("images[]", f);
         });
@@ -288,6 +298,7 @@ const EtudesAdmin = () => {
             setPreviewUrl(null);
             setEditAudioResourceFile(null);
             setEditPdfResourceFile(null);
+            setEditMidiResourceFile(null);
             setDescriptionImageFiles([]);
             showMessage("Etude/Piece updated successfully", "success");
         } catch (error) {
@@ -659,6 +670,15 @@ const EtudesAdmin = () => {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                                 />
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">MIDI File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept=".mid,.midi,audio/midi,audio/x-midi"
+                                    onChange={(e) => setMidiResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                            </div>
 
                             <div className="col-span-1 sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -804,6 +824,18 @@ const EtudesAdmin = () => {
                                     />
                                     {editingEtude.pdf_resource_url && (
                                         <div className="text-xs text-gray-400 mt-1">PDF already uploaded.</div>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">MIDI File (Optional)</label>
+                                    <input
+                                        type="file"
+                                        accept=".mid,.midi,audio/midi,audio/x-midi"
+                                        onChange={(e) => setEditMidiResourceFile(e.target.files[0] || null)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                    />
+                                    {editingEtude.midi_resource_url && (
+                                        <div className="text-xs text-gray-400 mt-1">MIDI file already uploaded.</div>
                                     )}
                                 </div>
                                 <div className="col-span-1 sm:col-span-2">

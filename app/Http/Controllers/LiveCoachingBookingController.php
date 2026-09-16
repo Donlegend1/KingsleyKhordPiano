@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\AdminCoachingBookingNotification;
+use App\Services\SubscriptionService;
 
 class LiveCoachingBookingController extends Controller
 {
@@ -30,6 +31,13 @@ class LiveCoachingBookingController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        if (! $user->canAccessPianoCoaching()) {
+            return redirect('/home')->with(
+                'error',
+                'Piano Coaching is available to legacy Premium members.'
+            );
+        }
 
         [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
 
@@ -74,6 +82,13 @@ class LiveCoachingBookingController extends Controller
         ]);
 
         $user = Auth::user();
+
+        if (! $user->canAccessPianoCoaching()) {
+            return response()->json([
+                'error' => 'Piano Coaching is available to legacy Premium members.',
+            ], 403);
+        }
+
         $date = Carbon::parse($request->date);
         $time = $request->time;
 

@@ -13,16 +13,10 @@
 >
 
   {{-- ── Header ── --}}
-  <div class="max-w-5xl mx-auto mb-6 w-full flex items-start justify-between">
-    <div class="flex items-start space-x-3">
-      <div class="text-indigo-600 mt-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19a2 2 0 11-4 0 2 2 0 014 0zm12 0a2 2 0 11-4 0 2 2 0 014 0z"/>
-        </svg>
-      </div>
-      <div>
-        <h1 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">Get Started</h1>
-      </div>
+  <div class="max-w-5xl mx-auto w-full flex items-start justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+    <div>
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">Get Started</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Your journey begins here, <span class="font-semibold text-gray-700 dark:text-gray-300">{{ auth()->user()->first_name }}</span></p>
     </div>
     <a href="/member/dashboard" class="flex items-center space-x-1.5 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -33,28 +27,36 @@
   </div>
 
   {{-- ── Step Progress Bar ── --}}
-  <div class="max-w-5xl mx-auto mb-5 w-full">
-    <div class="flex items-center w-full">
+  @php
+    $stepLabels = [1 => 'Take a Tour', 2 => 'Find Best Path', 3 => 'Select a Course', 4 => 'Join Community'];
+  @endphp
+  <div class="max-w-5xl mx-auto mt-6 mb-6 w-full border border-gray-100 dark:border-gray-800 rounded-2xl bg-white dark:bg-gray-900 shadow-sm p-6">
+    <div class="flex items-start w-full">
       @for ($i = 1; $i <= 4; $i++)
-        {{-- Step circle --}}
-        <div
-          class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all duration-300 flex-shrink-0"
-          :class="{
-            'bg-indigo-600 border-indigo-600 text-white': step === {{ $i }},
-            'bg-indigo-600 border-indigo-600 text-white': step > {{ $i }},
-            'bg-white border-gray-300 text-gray-400': step < {{ $i }}
-          }"
-        >
-          <span x-show="step <= {{ $i }}">{{ $i }}</span>
-          <span x-show="step > {{ $i }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-          </span>
+        <div class="flex flex-col items-center flex-shrink-0">
+          {{-- Step circle --}}
+          <div
+            class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all duration-300"
+            :class="{
+              'bg-indigo-600 border-indigo-600 text-white': step >= {{ $i }},
+              'bg-white border-gray-300 text-gray-400': step < {{ $i }}
+            }"
+          >
+            <span x-show="step <= {{ $i }}">{{ $i }}</span>
+            <span x-show="step > {{ $i }}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </span>
+          </div>
+          <span
+            class="mt-2 text-xs font-medium whitespace-nowrap"
+            :class="step >= {{ $i }} ? 'text-indigo-600' : 'text-gray-400'"
+          >{{ $stepLabels[$i] }}</span>
         </div>
         {{-- Connector line (skip after last) --}}
         @if ($i < 4)
-          <div class="flex-1 h-px mx-2"
+          <div class="flex-1 h-px mx-2 mt-[18px]"
             :class="step > {{ $i }} ? 'bg-indigo-600' : 'bg-gray-200'"
           ></div>
         @endif
@@ -67,23 +69,20 @@
 
   {{-- STEP 1 --}}
   <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
-    <div class="border border-gray-100 rounded-3xl overflow-hidden shadow-xl shadow-gray-200/60 bg-white p-5 md:p-7">
+    <div>
 
-      {{-- Header: centered eyebrow + heading + description --}}
-      <div class="max-w-2xl mx-auto text-center mb-4">
-        <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2.5 border border-indigo-100">
-          Step 1 of 4
-        </span>
+      {{-- Header: centered heading + description --}}
+      <div class="max-w-2xl mx-auto text-center mb-6">
         <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight mb-1.5">
-          Take a Tour of the Website
+          Take a tour of the website
         </h2>
         <p class="text-gray-500 text-xs md:text-sm leading-relaxed">
-          Watch this quick tour to get familiar with the platform and discover everything that's available to help you grow as a musician.
+          A quick walkthrough of the platform, so you know exactly where everything is.
         </p>
       </div>
 
       {{-- Video --}}
-      <div class="max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-lg shadow-gray-300/40 ring-1 ring-black/5 mb-4">
+      <div class="max-w-3xl mx-auto overflow-hidden shadow-lg shadow-gray-300/40 ring-1 ring-black/5">
         <script src="https://fast.wistia.com/player.js" async></script>
         <script src="https://fast.wistia.com/embed/gd8m2mxi65.js" async type="module"></script>
         <style>
@@ -97,71 +96,55 @@
         <wistia-player media-id="gd8m2mxi65" aspect="1.7777777777777777" class="w-full"></wistia-player>
       </div>
 
-      {{-- "Why take the tour" callout --}}
-      <div class="max-w-2xl mx-auto flex items-center gap-3 bg-indigo-50/60 border border-indigo-100 rounded-xl px-4 py-2.5">
-        <div class="w-7 h-7 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-          </svg>
-        </div>
-        <div class="text-left">
-          <p class="text-xs font-semibold text-gray-800">Why take the tour? <span class="font-normal text-gray-500">A brief walkthrough that orients you to the platform, so you can begin with clarity and confidence.</span></p>
-        </div>
-      </div>
-
     </div>
   </div>
 
   {{-- STEP 2 --}}
   <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
 
-    {{-- Step label + heading --}}
-    <div class="text-center mb-8">
-      <p class="text-indigo-600 text-xs font-bold uppercase tracking-widest mb-2">Step 2 of 4</p>
-      <h2 class="text-3xl font-extrabold text-gray-900 leading-tight">Find Your Best Path &amp; Choose Your Skill Level</h2>
+    {{-- Heading --}}
+    <div class="max-w-2xl mx-auto text-center mb-8">
+      <h2 class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight mb-1.5">Find Your Best Path</h2>
+      <p class="text-gray-500 text-xs md:text-sm leading-relaxed">Take a quick assessment or get a personalized roadmap — whichever fits you best.</p>
     </div>
 
     {{-- Two-card choice row --}}
-    <div class="flex flex-col md:flex-row items-stretch gap-0 relative">
+    <div class="flex flex-col md:flex-row items-stretch gap-4">
 
       {{-- Card 1: Discover Your Level --}}
-      <div class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm p-8 flex flex-col items-center text-center">
+      <div class="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col">
 
         {{-- Icon --}}
-        <div class="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-400 -ml-2 mt-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9 19V6l12-3v13M9 19a2 2 0 11-4 0 2 2 0 014 0zm12 0a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
         </div>
 
-        <h3 class="text-xl font-bold text-gray-900 mb-6">Discover Your Level</h3>
+        <h3 class="text-base font-bold text-gray-900 mb-3">Discover your level</h3>
+
+        <div class="border-t border-gray-100 mb-3"></div>
 
         {{-- Features --}}
-        <ul class="divide-y divide-gray-100 mb-8 w-full text-left">
-          <li class="flex items-center space-x-3 py-3">
+        <ul class="divide-y divide-gray-100 mb-5 w-full text-left flex-1">
+          <li class="flex items-center gap-3 py-3">
             <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              {{-- Clock icon – "less than 2 minutes" --}}
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <span class="text-sm text-gray-700">Takes less than 2 minutes</span>
           </li>
-          <li class="flex items-center space-x-3 py-3">
+          <li class="flex items-center gap-3 py-3">
             <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              {{-- Lightning bolt icon – "instant results" --}}
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
               </svg>
             </div>
             <span class="text-sm text-gray-700">Instant results</span>
           </li>
-          <li class="flex items-center space-x-3 py-3">
+          <li class="flex items-center gap-3 py-3">
             <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              {{-- Clipboard check icon – "skill evaluation" --}}
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
               </svg>
@@ -170,19 +153,9 @@
           </li>
         </ul>
 
-        <a href="/member/quiz" class="mt-auto w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-xl transition text-sm">
-          <span>Start Assessment</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-          </svg>
+        <a href="/member/quiz" class="w-full flex items-center justify-center border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2.5 rounded-lg transition text-sm">
+          Start Assessment
         </a>
-      </div>
-
-      {{-- OR divider --}}
-      <div class="flex md:flex-col items-center justify-center px-4 py-4 md:py-0 z-10">
-        <div class="flex-1 h-px md:h-auto md:w-px bg-gray-200 md:flex-1"></div>
-        <span class="mx-3 md:mx-0 md:my-3 w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0 shadow-sm">OR</span>
-        <div class="flex-1 h-px md:h-auto md:w-px bg-gray-200 md:flex-1"></div>
       </div>
 
       {{-- Card 2: Personalized Guidance --}}
@@ -406,10 +379,6 @@
       </svg>
       <span>Previous</span>
     </button>
-
-    <span class="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">
-      Step <span x-text="step"></span> of <span x-text="totalSteps"></span>
-    </span>
 
     <button
       @click="if (step < totalSteps) { step++ } else { window.location.href = '{{ route('home') }}' }"

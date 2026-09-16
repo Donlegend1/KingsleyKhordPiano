@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('courses', function (Blueprint $table) {
-            $table->integer('position')->nullable()->after('course_category_id');
-        });
+        if (! Schema::hasColumn('courses', 'position')) {
+            Schema::table('courses', function (Blueprint $table) {
+                $table->string('position')->nullable()->after('course_category_id');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('courses', function (Blueprint $table) {
-            $table->dropColumn('position');
-        });
+        if (Schema::hasColumn('courses', 'position')) {
+            Schema::table('courses', function (Blueprint $table) {
+                $table->dropColumn('position');
+            });
+        }
     }
 };

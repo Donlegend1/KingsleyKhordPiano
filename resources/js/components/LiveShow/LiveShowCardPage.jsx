@@ -35,7 +35,17 @@ const PremiumVideoSection = () => {
             }
         };
 
+        const fetchSubscription = async () => {
+            try {
+                const res = await axios.get("/member/notifications/live-shows/status");
+                setNotifySubscribed(Boolean(res.data?.subscribed));
+            } catch (error) {
+                // Not subscribed yet
+            }
+        };
+
         fetchVideos();
+        fetchSubscription();
     }, []);
 
     useEffect(() => {
@@ -83,11 +93,25 @@ const PremiumVideoSection = () => {
         if (notifySubscribed) return;
 
         try {
-            await axios.post("/api/notifications/subscribe-live-shows");
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
+            await axios.post(
+                "/member/notifications/subscribe-live-shows",
+                {},
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                }
+            );
             setNotifySubscribed(true);
             showMessage("You'll be notified about upcoming live shows!", "success");
         } catch (error) {
             console.error("Failed to subscribe to live show notifications:", error);
+            if (error.response?.status === 400) {
+                setNotifySubscribed(true);
+                return;
+            }
             showMessage("Failed to subscribe for notifications. Please try again later.", "error");
         }
     };

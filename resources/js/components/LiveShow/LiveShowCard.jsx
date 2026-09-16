@@ -46,7 +46,17 @@ const LiveShowCard = () => {
             }
         };
 
+        const fetchSubscription = async () => {
+            try {
+                const res = await axios.get("/member/notifications/live-shows/status");
+                setNotifyClicked(Boolean(res.data?.subscribed));
+            } catch (error) {
+                // Not subscribed or unauthenticated
+            }
+        };
+
         fetchShows();
+        fetchSubscription();
     }, []);
 
     useEffect(() => {
@@ -69,6 +79,39 @@ const LiveShowCard = () => {
             "This content is available for premium users only.",
             "error"
         );
+    };
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
+
+    const handleNotifyClick = async () => {
+        if (notifyClicked) return;
+
+        try {
+            await axios.post(
+                "/member/notifications/subscribe-live-shows",
+                {},
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                }
+            );
+            setNotifyClicked(true);
+            showMessage
+                ? showMessage("You'll be notified when a live show is scheduled!", "success")
+                : alert("You'll be notified when a live show is scheduled!");
+        } catch (error) {
+            console.error("Failed to subscribe to live show notifications:", error);
+            const alreadySubscribed = error.response?.status === 400;
+            if (alreadySubscribed) {
+                setNotifyClicked(true);
+                return;
+            }
+            showMessage
+                ? showMessage("Could not subscribe for notifications. Please try again.", "error")
+                : alert("Could not subscribe for notifications. Please try again.");
+        }
     };
 
 
@@ -296,13 +339,7 @@ const LiveShowCard = () => {
                             Check back later for upcoming live sessions<br/>and workshops.
                         </p>
                         <button
-                            onClick={() => {
-                                if (notifyClicked) return;
-                                setNotifyClicked(true);
-                                showMessage
-                                    ? showMessage("You'll be notified when a live show is scheduled!", "success")
-                                    : alert("You'll be notified when a live show is scheduled!");
-                            }}
+                            onClick={handleNotifyClick}
                             disabled={notifyClicked}
                             className={`flex items-center gap-2 text-sm font-semibold px-7 py-3 rounded-xl shadow-md transition-all duration-150 ${
                                 notifyClicked

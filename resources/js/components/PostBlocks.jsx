@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
+// Only these are actually embeddable as a video/media iframe — any other
+// pasted link (a homepage, an article, etc.) should render as a plain
+// clickable link instead of trying to iframe the whole site.
+const EMBEDDABLE_LINK_PATTERN = /youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|drive\.google\.com\/file|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos|instagram\.com\/(p|reel|tv)\//i;
+const isEmbeddableLink = (url) => Boolean(url) && EMBEDDABLE_LINK_PATTERN.test(url);
+
 const PDFJS_VERSION = "4.5.136";
 let pdfjsLoadPromise = null;
 
@@ -132,19 +138,33 @@ function PreviewModal({ preview, onClose }) {
 function renderTextWithLinks(content, onLinkClick) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const parts = content.split(urlRegex);
-    return parts.map((part, i) =>
-        urlRegex.test(part) ? (
-            <button
+    return parts.map((part, i) => {
+        if (!urlRegex.test(part)) return part;
+
+        if (isEmbeddableLink(part)) {
+            return (
+                <button
+                    key={i}
+                    onClick={() => onLinkClick(part)}
+                    className="text-indigo-600 underline break-all cursor-pointer bg-transparent border-none p-0"
+                >
+                    {part}
+                </button>
+            );
+        }
+
+        return (
+            <a
                 key={i}
-                onClick={() => onLinkClick(part)}
-                className="text-indigo-600 underline break-all cursor-pointer bg-transparent border-none p-0"
+                href={part}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-600 underline break-all"
             >
                 {part}
-            </button>
-        ) : (
-            part
-        )
-    );
+            </a>
+        );
+    });
 }
 
 function FileCard({ block, onPreview }) {
@@ -267,30 +287,38 @@ export default function PostBlocks({ post }) {
                         return <FileCard key={idx} block={block} onPreview={setPreview} />;
 
                     case "link": {
-                        const embedSrc = block.embed_url || block.content || "";
-                        const isVertical = /instagram\.com|tiktok\.com/.test(embedSrc);
-                        return block.content ? (
-                            <div
+                        const rawUrl = block.content || "";
+
+                        if (rawUrl && isEmbeddableLink(rawUrl)) {
+                            const embedSrc = block.embed_url || rawUrl;
+                            const isVertical = /instagram\.com|tiktok\.com/.test(embedSrc);
+                            return (
+                                <div
+                                    key={idx}
+                                    className={`relative rounded-lg overflow-hidden ${isVertical ? "aspect-[9/16] max-w-sm mx-auto" : "aspect-video"}`}
+                                >
+                                    <iframe
+                                        src={block.embed_url}
+                                        className="w-full h-full"
+                                        frameBorder="0"
+                                        allow="autoplay; fullscreen; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                </div>
+                            );
+                        }
+
+                        return rawUrl ? (
+                            <a
                                 key={idx}
-                                className={`relative rounded-lg overflow-hidden ${isVertical ? "aspect-[9/16] max-w-sm mx-auto" : "aspect-video"}`}
+                                href={rawUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-indigo-600 underline break-all"
                             >
-                                <iframe
-                                    src={block.embed_url}
-                                    className="w-full h-full"
-                                    frameBorder="0"
-                                    allow="autoplay; fullscreen; picture-in-picture"
-                                    allowFullScreen
-                                />
-                            </div>
-                        ) : (
-                            <button
-                                key={idx}
-                                onClick={() => openPreview(block.content)}
-                                className="text-indigo-600 underline break-all bg-transparent border-none p-0 cursor-pointer"
-                            >
-                                {block.content}
-                            </button>
-                        );
+                                {rawUrl}
+                            </a>
+                        ) : null;
                     }
 
                     default:

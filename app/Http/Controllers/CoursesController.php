@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Upload;
 use App\Services\BookmarkService;
 use App\Models\CourseVideoComment;
+use App\Services\MidiPracticeFileResolver;
 
 class CoursesController extends Controller
 {
@@ -175,13 +176,20 @@ class CoursesController extends Controller
                 ->first();
         }
 
+        $midiPracticeFile = in_array($type, ['learn_song', 'etudes'], true)
+            ? app(MidiPracticeFileResolver::class)->forLesson($lesson)
+            : null;
+        $midiPracticeFiles = collect([$midiPracticeFile])->filter();
+
         return view('memberpages.singleExtracourse', compact(
             'lesson',
             'relatedUploads',
             'comments',
             'isBookmarked',
             'previousVideo',
-            'nextVideo'
+            'nextVideo',
+            'midiPracticeFile',
+            'midiPracticeFiles'
         ));
     }
 }

@@ -106,8 +106,10 @@ const LearnSongsAdmin = () => {
     const [descriptionImageFiles, setDescriptionImageFiles] = useState([]);
     const [audioResourceFile, setAudioResourceFile] = useState(null);
     const [pdfResourceFile, setPdfResourceFile] = useState(null);
+    const [midiResourceFile, setMidiResourceFile] = useState(null);
     const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
     const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
+    const [editMidiResourceFile, setEditMidiResourceFile] = useState(null);
     const fileInputRef = useRef(null);
 
     const { showMessage } = useFlashMessage();
@@ -284,6 +286,7 @@ const LearnSongsAdmin = () => {
         setThumbnailFile(null);
         setPreviewUrl(null);
         setDescriptionImageFiles([]);
+        setMidiResourceFile(null);
         setIsCreateSongModalOpen(true);
     };
 
@@ -316,6 +319,9 @@ const LearnSongsAdmin = () => {
         if (pdfResourceFile) {
             formData.append("pdf_resource", pdfResourceFile);
         }
+        if (midiResourceFile) {
+            formData.append("midi_resource", midiResourceFile);
+        }
 
         try {
             await axios.post("/api/admin/learn-songs/store", formData, {
@@ -328,6 +334,7 @@ const LearnSongsAdmin = () => {
             setIsCreateSongModalOpen(false);
             setAudioResourceFile(null);
             setPdfResourceFile(null);
+            setMidiResourceFile(null);
             fetchSongs();
             fetchAllSongsDropdown();
         } catch (error) {
@@ -348,6 +355,7 @@ const LearnSongsAdmin = () => {
         setDescriptionImageFiles([]);
         setEditAudioResourceFile(null);
         setEditPdfResourceFile(null);
+        setEditMidiResourceFile(null);
         setIsEditSongModalOpen(true);
     };
 
@@ -377,6 +385,9 @@ const LearnSongsAdmin = () => {
         }
         if (editPdfResourceFile) {
             formData.append("pdf_resource", editPdfResourceFile);
+        }
+        if (editMidiResourceFile) {
+            formData.append("midi_resource", editMidiResourceFile);
         }
 
         try {
@@ -760,6 +771,15 @@ const LearnSongsAdmin = () => {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">MIDI File (Optional)</label>
+                            <input
+                                type="file"
+                                accept=".mid,.midi,audio/midi,audio/x-midi"
+                                onChange={(e) => setMidiResourceFile(e.target.files[0] || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                            />
+                        </div>
                         <div className="col-span-1 sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                             <textarea
@@ -929,6 +949,18 @@ const LearnSongsAdmin = () => {
                                 />
                                 {editingSong.pdf_resource_url && (
                                     <div className="text-xs text-gray-500 mt-1">PDF already uploaded.</div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">MIDI File (Optional)</label>
+                                <input
+                                    type="file"
+                                    accept=".mid,.midi,audio/midi,audio/x-midi"
+                                    onChange={(e) => setEditMidiResourceFile(e.target.files[0] || null)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                {editingSong.midi_resource_url && (
+                                    <div className="text-xs text-gray-500 mt-1">MIDI file already uploaded.</div>
                                 )}
                             </div>
                             <div className="col-span-1 sm:col-span-2">

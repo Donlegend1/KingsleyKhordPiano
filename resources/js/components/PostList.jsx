@@ -205,21 +205,27 @@ const PostList = ({ fixedSubcategory, hideComposer, parentPostId } = {}) => {
     }, [sortBy, subcategoryFilter]);
 
     // A post made through a separately-mounted composer (e.g. the standalone
-    // one on a forum category page) can't call fetchPosts directly since it's
-    // a different React root — it broadcasts this event instead.
+    // one on a forum category page, or this same component's composer in a
+    // different browser tab/instance) can't call fetchPosts directly since
+    // it's a different React root — it broadcasts this event instead.
     useEffect(() => {
-        if (!fixedSubcategory) return;
-
         const handlePostCreated = (event) => {
             const detail = event.detail || {};
 
-            if (parentPostId) {
-                // This feed shows submissions to one specific topic only.
-                if (String(detail.parentPostId) !== String(parentPostId)) return;
+            if (fixedSubcategory) {
+                if (parentPostId) {
+                    // This feed shows submissions to one specific topic only.
+                    if (String(detail.parentPostId) !== String(parentPostId)) return;
+                } else {
+                    // This feed shows a category's own topics — a submission to
+                    // one of them doesn't belong here.
+                    if (detail.subcategory !== fixedSubcategory || detail.parentPostId) return;
+                }
             } else {
-                // This feed shows a category's own topics — a submission to
-                // one of them doesn't belong here.
-                if (detail.subcategory !== fixedSubcategory || detail.parentPostId) return;
+                // Generic feed (e.g. Activity Feed pills). "All Posts" (empty
+                // filter) should refresh for every new post; a specific pill
+                // only refreshes when it matches that post's subcategory.
+                if (subcategoryFilter && detail.subcategory !== subcategoryFilter) return;
             }
 
             setPosts([]);
@@ -230,7 +236,7 @@ const PostList = ({ fixedSubcategory, hideComposer, parentPostId } = {}) => {
 
         window.addEventListener("community:post-created", handlePostCreated);
         return () => window.removeEventListener("community:post-created", handlePostCreated);
-    }, [fixedSubcategory, parentPostId, sortBy]);
+    }, [fixedSubcategory, parentPostId, subcategoryFilter, sortBy]);
 
     useEffect(() => {
         if (page === 1) return;
@@ -282,6 +288,18 @@ const PostList = ({ fixedSubcategory, hideComposer, parentPostId } = {}) => {
                 },
             });
             showMessage("Posted successfully.", "success");
+
+            // Let any other mounted PostList instance (e.g. this same
+            // Activity Feed open in another tab, or a category page) know a
+            // post was created, so it can refresh instead of going stale.
+            window.dispatchEvent(
+                new CustomEvent("community:post-created", {
+                    detail: {
+                        subcategory: postDetails.subcategory,
+                        parentPostId: parentPostId || null,
+                    },
+                }),
+            );
 
             // setPostDetails({ category: "", subcategory: "" });
             setBlocks([]);

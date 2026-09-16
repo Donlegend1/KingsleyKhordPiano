@@ -21,9 +21,11 @@ class Payment extends Model
 
     protected $fillable = [
         'user_id',
+        'reference',
         'amount',
-        'currency',
         'status',
+        'payment_method',
+        'starts_at',
         'ends_at',
         'notified_at',
         'metadata',

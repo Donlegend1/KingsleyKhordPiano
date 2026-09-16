@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Subscription;
+use App\Models\User;
+use Carbon\Carbon;
 use Stripe\StripeClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -189,5 +192,87 @@ class StripeService
                 break;
         }
         return response('Webhook received', 200);
+    }
+
+    /**
+     * Cancel the user's latest Stripe subscription at period end.
+     */
+    public function cancelSubscription(User $user): void
+    {
+        $subscription = Subscription::query()
+            ->where('user_id', $user->id)
+            ->where(function ($query) {
+                $query->whereNull('payment_method')
+                    ->orWhereRaw('LOWER(payment_method) = ?', ['stripe']);
+            })
+            ->whereIn('stripe_status', ['active', 'trialing'])
+            ->latest()
+            ->first();
+
+        if (! $subscription && $user->subscription('default')) {
+            $cashier = $user->subscription('default');
+            if (in_array($cashier->stripe_status, ['active', 'trialing'], true)
+                && is_string($cashier->stripe_id)
+                && str_starts_with($cashier->stripe_id, 'sub_')
+            ) {
+                $subscription = Subscription::query()
+                    ->where('user_id', $user->id)
+                    ->where('stripe_id', $cashier->stripe_id)
+                    ->first() ?? $cashier;
+            }
+        }
+
+        $stripeId = $subscription->stripe_id ?? null;
+        if (! $subscription || ! is_string($stripeId) || ! str_starts_with($stripeId, 'sub_')) {
+            throw new \RuntimeException('No active Stripe subscription found.');
+        }
+
+        $secret = config('cashier.secret') ?: config('services.stripe.secret');
+        if (! $secret) {
+            throw new \RuntimeException('Stripe is not configured.');
+        }
+
+        $client = new StripeClient($secret);
+
+        try {
+            $stripeSub = $client->subscriptions->update($stripeId, [
+                'cancel_at_period_end' => true,
+            ]);
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            $stripeSub = $client->subscriptions->retrieve($stripeId);
+            $alreadyCanceling = (bool) ($stripeSub->cancel_at_period_end ?? false)
+                || in_array((string) ($stripeSub->status ?? ''), ['canceled', 'cancelled'], true);
+
+            if (! $alreadyCanceling) {
+                throw $e;
+            }
+        }
+
+        $endsAt = $this->stripePeriodEnd($stripeSub) ?? now();
+
+        if ($subscription instanceof Subscription) {
+            $subscription->update([
+                'stripe_status' => 'canceled',
+                'ends_at' => $endsAt,
+            ]);
+        } else {
+            $subscription->stripe_status = 'canceled';
+            $subscription->ends_at = $endsAt;
+            $subscription->save();
+        }
+
+        $user->update([
+            'subscription_status' => 'canceled',
+            'subscription_expires_at' => $endsAt,
+        ]);
+    }
+
+    protected function stripePeriodEnd(object $stripeSub): ?Carbon
+    {
+        $timestamp = $stripeSub->cancel_at
+            ?? $stripeSub->current_period_end
+            ?? data_get($stripeSub, 'items.data.0.current_period_end');
+
+        return $timestamp ? Carbon::createFromTimestamp((int) $timestamp) : null;
     }
 }

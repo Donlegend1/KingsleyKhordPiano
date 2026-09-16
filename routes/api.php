@@ -53,7 +53,10 @@ use App\Http\Controllers\LiveShowNotificationController;
     });
 
     Route::get('/live-shows', [LiveShowController::class, 'list'])->middleware('web');
-    Route::post('/notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
+    Route::middleware(['web', 'auth'])->group(function () {
+        Route::get('/notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'index']);
+        Route::post('/notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
+    });
     
 
     Route::get('/plans', [PlanController::class, 'index']);
@@ -107,6 +110,30 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::put('extra-courses/category/{name}/update', [AdminExtraCourseController::class, 'updateCategory']);
         Route::post('reorder/extra-courses', [AdminExtraCourseController::class, 'updatePositions']);
         Route::post('reorder/extra-courses/items', [AdminExtraCourseController::class, 'updateCoursePositions']);
+
+        // Piano Exercise Admin API (Learn Songs-style categories)
+        Route::get('piano-exercises-list', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'list']);
+        Route::get('all-piano-exercises', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'allLessons']);
+        Route::post('piano-exercises/store', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'storeLesson']);
+        Route::post('piano-exercises/update/{id}', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updateLesson']);
+        Route::delete('piano-exercises/{id}', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'deleteLesson']);
+        Route::post('piano-exercises/category/create', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'createCategory']);
+        Route::delete('piano-exercises/category/{name}/delete', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'deleteCategory']);
+        Route::put('piano-exercises/category/{name}/update', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updateCategory']);
+        Route::post('reorder/piano-exercises', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updatePositions']);
+        Route::post('reorder/piano-exercises/items', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updateLessonPositions']);
+
+        // Musical Application Admin API (Learn Songs-style categories)
+        Route::get('musical-applications-list', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'list']);
+        Route::get('all-musical-applications', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'allLessons']);
+        Route::post('musical-applications/store', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'storeLesson']);
+        Route::post('musical-applications/update/{id}', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updateLesson']);
+        Route::delete('musical-applications/{id}', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'deleteLesson']);
+        Route::post('musical-applications/category/create', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'createCategory']);
+        Route::delete('musical-applications/category/{name}/delete', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'deleteCategory']);
+        Route::put('musical-applications/category/{name}/update', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updateCategory']);
+        Route::post('reorder/musical-applications', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updatePositions']);
+        Route::post('reorder/musical-applications/items', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updateLessonPositions']);
 
         // Etudes Admin API
         Route::get('etudes-list', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'list']);

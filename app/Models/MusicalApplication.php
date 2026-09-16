@@ -19,19 +19,19 @@ class MusicalApplication extends Model
         'series',
         'duration',
         'status',
-        'tags',
         'related_lessons',
         'audio_resource',
         'pdf_resource',
+        'midi_resource',
         'position',
+        'musical_application_category_id',
     ];
 
     protected $casts = [
-        'tags' => 'array',
         'related_lessons' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url', 'category', 'audio_resource_url', 'pdf_resource_url'];
+    protected $appends = ['thumbnail_url', 'category', 'audio_resource_url', 'pdf_resource_url', 'midi_resource_url'];
 
     public function getThumbnailUrlAttribute()
     {
@@ -48,9 +48,19 @@ class MusicalApplication extends Model
         return $this->pdf_resource ? asset($this->pdf_resource) : null;
     }
 
+    public function getMidiResourceUrlAttribute()
+    {
+        return $this->midi_resource ? asset($this->midi_resource) : null;
+    }
+
     public function getCategoryAttribute()
     {
         return 'musical application';
+    }
+
+    public function applicationCategory()
+    {
+        return $this->belongsTo(MusicalApplicationCategory::class, 'musical_application_category_id');
     }
 
     public function bookmarks()

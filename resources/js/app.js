@@ -22,6 +22,7 @@ import './components/ZoomMeetingBooking';
 import './components/uploads/Uploads';
 import './components/uploads/LearnSongsAdmin';
 import './components/uploads/ExtraCoursesAdmin';
+import './components/uploads/CategorizedLessonsAdmin';
 import './components/uploads/EtudesAdmin';
 import './components/uploads/Create';
 import './components/uploads/Single.jsx';
@@ -48,6 +49,9 @@ import "./components/Members/SinglePost.jsx"
 import "./components/PremiumChat/PremiumChat.jsx"
 import "./components/PremiumChat/PremiumChatButton.jsx"
 import './components/Midi/MidiFiles.jsx';
+if (document.querySelector('.midi-practice-player')) {
+    import('./components/Midi/MidiPracticePlayer.jsx');
+}
 import "./components/Calls/CallCard.jsx"
 import "./components/EmailCampaign/Index.jsx"
 import "./components/EmailCampaign/Create.jsx"

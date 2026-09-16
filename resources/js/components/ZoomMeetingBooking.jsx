@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import axios from "axios";
-import { Clock, Video, Tag, Check, Calendar, Pencil, CreditCard, Wallet, Lock } from "lucide-react";
+import { Clock, Video, Tag, Check, Calendar, Pencil, CreditCard, Lock } from "lucide-react";
 import {
     useFlashMessage,
     FlashMessageProvider,
@@ -496,11 +496,11 @@ const ZoomMeetingBooking = () => {
                                                         <span className="text-[15px]">Pay with <span className="font-extrabold italic">Stripe</span></span>
                                                     </button>
                                                     <button
-                                                        onClick={() => handlePayment("paystack")}
-                                                        className="w-full flex items-center justify-center gap-2.5 py-4 px-6 bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 rounded-xl shadow-sm transition-colors"
+                                                        onClick={() => handlePayment("paypal")}
+                                                        className="w-full flex items-center justify-center gap-2.5 py-4 px-6 bg-[#FFD736] hover:bg-[#e6c22e] text-gray-900 rounded-xl shadow-sm transition-colors"
                                                     >
-                                                        <Wallet className="w-5 h-5 text-[#00C3F7]" strokeWidth={2} />
-                                                        <span className="text-[15px]">Pay with <span className="font-extrabold text-[#00C3F7]">Paystack</span></span>
+                                                        <i className="fa-brands fa-paypal text-lg"></i>
+                                                        <span className="text-[15px]">Pay with <span className="font-extrabold">PayPal</span></span>
                                                     </button>
                                                 </div>
                                             </div>
