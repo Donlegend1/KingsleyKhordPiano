@@ -11,10 +11,19 @@ class CourseCheckpoint extends Model
         'checkpoint_key',
         'title',
         'description',
+        'video_url',
+        'overview',
         'linked_course_id',
         'redirect_url',
         'position',
     ];
+
+    protected $appends = ['video_embed_url'];
+
+    public function getVideoEmbedUrlAttribute()
+    {
+        return $this->video_url ? \App\Helpers\VideoHelper::linkToEmbed($this->video_url) : null;
+    }
 
     public function category()
     {
@@ -24,5 +33,10 @@ class CourseCheckpoint extends Model
     public function linkedCourse()
     {
         return $this->belongsTo(Course::class, 'linked_course_id');
+    }
+
+    public function downloads()
+    {
+        return $this->hasMany(CourseCheckpointDownload::class)->orderBy('position');
     }
 }

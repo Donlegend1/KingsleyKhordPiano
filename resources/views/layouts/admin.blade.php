@@ -51,6 +51,9 @@
             <a href="{{ route('admin.guest-bookings.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-calendar-check"></i> <span>Guest Bookings</span>
             </a>
+            <a href="{{ route('admin.personalized-guidance.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa fa-graduation-cap"></i> <span>Guidance Requests</span>
+            </a>
             <a href="{{ route('admin.piano-coaching.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-chalkboard-teacher"></i> <span>Piano Coaching</span>
             </a>
@@ -74,6 +77,9 @@
             </a>
             <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>
+            </a>
+            <a href="{{ route('admin.student-challenges.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+              <i class="fa fa-trophy w-6 text-center"></i> <span>Student Challenges</span>
             </a>
             <a href="{{ route('admin.shop.index', ['type' => 'midi']) }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa-solid fa-store w-6 text-center"></i> <span>Shop</span>
@@ -170,6 +176,9 @@
         <a href="{{ route('admin.guest-bookings.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-calendar-check"></i> <span>Guest Bookings</span>
         </a>
+        <a href="{{ route('admin.personalized-guidance.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-graduation-cap"></i> <span>Guidance Requests</span>
+        </a>
         <a href="{{ route('admin.piano-coaching.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-chalkboard-teacher"></i> <span>Piano Coaching</span>
         </a>
@@ -184,6 +193,9 @@
         </a>
         <a href="{{ route('admin.tutorials.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-video w-6 text-center"></i> <span>Community Tutorials</span>
+        </a>
+        <a href="{{ route('admin.student-challenges.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
+          <i class="fa fa-trophy w-6 text-center"></i> <span>Student Challenges</span>
         </a>
         <a href="{{ route('admin.shop.index', ['type' => 'midi']) }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa-solid fa-store w-6 text-center"></i> <span>Shop</span>

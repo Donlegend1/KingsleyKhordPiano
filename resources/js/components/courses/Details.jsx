@@ -425,23 +425,65 @@ const CourseDetails = ({
             {/* Downloads for this lesson */}
             {course.pdf_resource_url && (
                 <div className="mt-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                    <div className="bg-red-600 px-5 py-3">
-                        <h3 className="text-white text-sm font-bold tracking-wide uppercase">
+                    <div className="bg-red-600 px-4 py-2.5 sm:px-5 sm:py-3">
+                        <h3 className="text-white text-xs sm:text-sm font-bold tracking-wide uppercase whitespace-nowrap">
                             Downloads for this lesson
                         </h3>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-800 px-5 py-4 flex items-center gap-4">
-                        <div className="w-16 h-10 rounded bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:px-5 sm:py-4 flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 h-9 sm:w-16 sm:h-10 rounded bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">
                             PDF
                         </div>
                         <a
                             href={course.pdf_resource_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-red-500 hover:text-red-600 font-bold"
+                            className="text-sm sm:text-base text-red-500 hover:text-red-600 font-bold truncate"
                         >
                             View the Chart
                         </a>
+                    </div>
+                </div>
+            )}
+
+            {/* Related Lessons Section */}
+            {course.related && course.related.length > 0 && (
+                <div className="mt-8 border-t pt-6 dark:border-gray-700">
+                    <div className="flex items-center gap-1.5 mb-3">
+                        <i className="fa-solid fa-link text-indigo-500 text-[10px]"></i>
+                        <p className="text-[10px] font-bold text-gray-400 tracking-[0.14em] uppercase">
+                            Related Lessons
+                        </p>
+                    </div>
+                    <div className="space-y-2">
+                        {course.related.map((related, idx) => {
+                            const content = (
+                                <>
+                                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                                        <i className="fa-solid fa-play text-[8px] ml-0.5"></i>
+                                    </span>
+                                    <p className="text-[11px] font-semibold text-gray-700 dark:text-gray-200 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 truncate flex-1 transition-colors">
+                                        {related.title}
+                                    </p>
+                                    <i className="fa-solid fa-chevron-right text-gray-300 group-hover:text-indigo-400 text-[9px] flex-shrink-0 transition-colors"></i>
+                                </>
+                            );
+                            const className = "flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-indigo-200 hover:shadow-sm transition-all cursor-pointer group";
+
+                            // Admin-curated related lessons carry a plain `url`
+                            // (any link, not necessarily another course) and no
+                            // `id`, so they navigate as a real link instead of
+                            // switching the in-app selected course.
+                            return related.url ? (
+                                <a key={related.id ?? idx} href={related.url} className={className}>
+                                    {content}
+                                </a>
+                            ) : (
+                                <div key={related.id ?? idx} onClick={() => onSelectCourse(related)} className={className}>
+                                    {content}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -670,51 +712,6 @@ const CourseDetails = ({
                     )}
                 </div>
             </div>
-
-            {/* Related Courses Section */}
-            {course.related && course.related.length > 0 && (
-                <div className="mt-12 border-t pt-8">
-                    <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
-                        <i className="fa fa-link text-blue-500"></i>
-                        Related Courses
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {course.related.map((related) => (
-                            <div
-                                key={related.id}
-                                onClick={() => onSelectCourse(related)}
-                                className="group cursor-pointer bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300"
-                            >
-                                <div className="aspect-video relative overflow-hidden bg-gray-200 dark:bg-gray-700">
-                                    {related.thumbnail ? (
-                                        <img
-                                            src={related.thumbnail}
-                                            alt={related.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                            <i className="fa fa-play-circle fa-3x"></i>
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
-                                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 text-white text-[10px] rounded uppercase font-bold">
-                                        {related.level}
-                                    </div>
-                                </div>
-                                <div className="p-4">
-                                    <h4 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                        {related.title}
-                                    </h4>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {related.category}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

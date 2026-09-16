@@ -39,6 +39,7 @@ import './components/Comment/CourseComment';
 import './components/Comment/OtherComment';
 import "./components/CreatePostBox.jsx";
 import "./components/PostList.jsx";
+import "./components/StandalonePostComposer.jsx";
 import "./components/Members/MemberList.jsx"
 import "./components/Members/ProfileSection.jsx"
 import "./components/Members/MemberSpaces.jsx"

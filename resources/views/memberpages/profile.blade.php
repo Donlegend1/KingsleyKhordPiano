@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="max-w-5xl mx-auto py-10 px-6">
-        <h2 class="text-3xl font-semibold text-gray-800 mb-8">My Profile</h2>
+        <h2 class="text-3xl font-semibold text-gray-800 mb-8">My Account</h2>
 
     <div x-data="{ open: false }" class="space-y-6">
 

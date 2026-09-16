@@ -3,7 +3,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import axios from "axios";
 import {
     formatRelativeTime,
-    capitaliseAndRemoveHyphen,
+    formatSubcategoryLabel,
 } from "../../utils/formatRelativeTime";
 
 import { useFlashMessage } from "../Alert/FlashMessageContext";
@@ -107,7 +107,7 @@ const Comments = ({ member }) => {
 
                             {/* Category */}
                             <h4 className="font-medium text-gray-800 dark:text-gray-100">
-                                {capitaliseAndRemoveHyphen(comment.subcategory)}
+                                {formatSubcategoryLabel(comment.subcategory)}
                             </h4>
 
                             {/* Comment text */}

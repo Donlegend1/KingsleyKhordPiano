@@ -14,5 +14,7 @@ class Contact extends Model
         'email',
         'subject',
         'message',
+        'attachment_path',
+        'attachment_name',
     ];
 }

@@ -24,6 +24,7 @@ const CourseForm = () => {
         likes: 0,
         dislikes: 0,
         related_courses: [],
+        related_lessons: [],
     });
 
     const [allCourses, setAllCourses] = useState([]);
@@ -79,6 +80,12 @@ const CourseForm = () => {
                     formData.append("related_courses[]", id);
                 });
             }
+            if (course.related_lessons) {
+                course.related_lessons.forEach((rl, idx) => {
+                    formData.append(`related_lessons[${idx}][title]`, rl.title);
+                    formData.append(`related_lessons[${idx}][url]`, rl.url);
+                });
+            }
             if (course.thumbnail_file) {
                 formData.append("thumbnail", course.thumbnail_file);
             }
@@ -114,6 +121,7 @@ const CourseForm = () => {
                 likes: 0,
                 dislikes: 0,
                 related_courses: [],
+                related_lessons: [],
                 thumbnail_file: null,
                 pdf_resource_file: null,
             });
@@ -261,6 +269,56 @@ const CourseForm = () => {
                             placeholder="Select related courses..."
                         />
                     </div>
+
+                    <div className="col-span-1 sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                        <div className="space-y-2">
+                            {course.related_lessons.map((rl, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Lesson name"
+                                        value={rl.title}
+                                        onChange={(e) => {
+                                            const rows = [...course.related_lessons];
+                                            rows[idx] = { ...rows[idx], title: e.target.value };
+                                            setCourse({ ...course, related_lessons: rows });
+                                        }}
+                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Link"
+                                        value={rl.url}
+                                        onChange={(e) => {
+                                            const rows = [...course.related_lessons];
+                                            rows[idx] = { ...rows[idx], url: e.target.value };
+                                            setCourse({ ...course, related_lessons: rows });
+                                        }}
+                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const rows = course.related_lessons.filter((_, i) => i !== idx);
+                                            setCourse({ ...course, related_lessons: rows });
+                                        }}
+                                        className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                    >
+                                        <i className="fa fa-trash text-xs"></i>
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => setCourse({ ...course, related_lessons: [...course.related_lessons, { title: "", url: "" }] })}
+                                className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                            >
+                                <i className="fa fa-plus"></i> Add related lesson
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="col-span-1 sm:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Thumbnail Image (Optional)

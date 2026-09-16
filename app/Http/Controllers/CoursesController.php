@@ -35,7 +35,7 @@ class CoursesController extends Controller
                       $subQ->where('title', 'like', "%{$search}%")
                            ->orWhere('description', 'like', "%{$search}%");
                   })
-                  ->orderBy('position');
+                  ->latest();
             }])
             ->whereHas('courses', function($q) use ($search) {
                 $q->where('status', 'active')
@@ -51,7 +51,22 @@ class CoursesController extends Controller
 
         $categories = $query->paginate(9, ['*'], 'page', $page)->appends(['tab' => $activeTab, 'name' => $search]);
 
-        return view('memberpages.extracources', compact('categories', 'search', 'activeTab'));
+        $levelLabels = [
+            'beginner'     => 'Beginner',
+            'intermediate' => 'Intermediate',
+            'advanced'     => 'Advanced',
+        ];
+        $levelStyles = [
+            'beginner'     => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+            'intermediate' => 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+            'advanced'     => 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400',
+        ];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->view('memberpages.partials.extra-courses-results', compact('categories', 'search', 'levelLabels', 'levelStyles'));
+        }
+
+        return view('memberpages.extracources', compact('categories', 'search', 'activeTab', 'levelLabels', 'levelStyles'));
     }
 
     public function singleCourse($id, BookmarkService $service, Request $request)

@@ -102,10 +102,7 @@
                     <a href="/member/getstarted" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-play-circle"></i> Get Started
                     </a>
-                    <a href="/member/my-library" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
-                        <i class="fa fa-book"></i> Library
-                    </a>
-                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="/member/community/activity-feed" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-users"></i> Community
                     </a>
                     <a href="https://kingsleykhordpiano.com/shop" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
@@ -315,10 +312,7 @@
                     <a href="/member/getstarted" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-play-circle w-4"></i> Get Started
                     </a>
-                    <a href="/member/my-library" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
-                        <i class="fa fa-book w-4"></i> Library
-                    </a>
-                    <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="/member/community/activity-feed" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-users w-4"></i> Community
                     </a>
                     <a href="/member/profile" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">

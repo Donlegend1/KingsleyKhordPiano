@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Select from "react-select";
 import CustomPagination from "../Pagination/CustomPagination";
 import Modal from "../Modal/Modal";
+import RichTextEditor from "../common/RichTextEditor";
 import {
     useFlashMessage,
     FlashMessageProvider,
@@ -26,13 +27,21 @@ const DraggableCategoryList = ({
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
     const [isNewCheckpointModalOpen, setIsNewCheckpointModalOpen] = useState(false);
-    const [checkpointCatalog, setCheckpointCatalog] = useState([]);
     const [newCheckpoint, setNewCheckpoint] = useState({
         course_category_id: null,
-        checkpoint_key: "",
-        linked_course_id: null,
+        title: "",
+        video_url: "",
+        overview: "",
         redirect_url: "",
+        downloads: [],
     });
+
+    // Edit Checkpoint states
+    const [isEditCheckpointModalOpen, setIsEditCheckpointModalOpen] = useState(false);
+    const [editingCheckpoint, setEditingCheckpoint] = useState(null);
+    const [newDownloadTitle, setNewDownloadTitle] = useState("");
+    const [newDownloadFile, setNewDownloadFile] = useState(null);
+    const [uploadingDownload, setUploadingDownload] = useState(false);
 
     // Edit Category States
     const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
@@ -90,6 +99,7 @@ const DraggableCategoryList = ({
         level: "beginner",
         status: "active",
         related_courses: [],
+        related_lessons: [],
     });
 
     const [allCourses, setAllCourses] = useState([]);
@@ -133,18 +143,6 @@ const DraggableCategoryList = ({
             }
         };
         fetchAllCourses();
-    }, []);
-
-    useEffect(() => {
-        const fetchCheckpointCatalog = async () => {
-            try {
-                const response = await axios.get("/api/admin/checkpoints/catalog");
-                setCheckpointCatalog(response.data);
-            } catch (error) {
-                console.error("Error fetching checkpoint catalog:", error);
-            }
-        };
-        fetchCheckpointCatalog();
     }, []);
 
     const handleChange = (e) => {
@@ -197,9 +195,11 @@ const DraggableCategoryList = ({
         const categoryId = courses[level]?.category_ids?.[category];
         setNewCheckpoint({
             course_category_id: categoryId,
-            checkpoint_key: checkpointCatalog[0]?.key || "",
-            linked_course_id: null,
+            title: "",
+            video_url: "",
+            overview: "",
             redirect_url: "",
+            downloads: [],
         });
         setIsNewCheckpointModalOpen(true);
     };
@@ -209,22 +209,29 @@ const DraggableCategoryList = ({
     };
 
     const handleCreateCheckpoint = async () => {
-        if (!newCheckpoint.course_category_id || !newCheckpoint.checkpoint_key) return;
+        if (!newCheckpoint.course_category_id || !newCheckpoint.title.trim()) return;
         setLoading(true);
         try {
-            await axios.post(
-                "/api/admin/checkpoints/store",
-                {
-                    course_category_id: newCheckpoint.course_category_id,
-                    checkpoint_key: newCheckpoint.checkpoint_key,
-                    linked_course_id: newCheckpoint.linked_course_id,
-                    redirect_url: newCheckpoint.redirect_url || null,
-                },
-                {
-                    headers: { "X-CSRF-TOKEN": csrfToken },
-                    withCredentials: true,
+            const formData = new FormData();
+            formData.append("course_category_id", newCheckpoint.course_category_id);
+            formData.append("title", newCheckpoint.title || "");
+            formData.append("video_url", newCheckpoint.video_url || "");
+            formData.append("overview", newCheckpoint.overview || "");
+            formData.append("redirect_url", newCheckpoint.redirect_url || "");
+            newCheckpoint.downloads.forEach((download, index) => {
+                if (download.title && download.file) {
+                    formData.append(`downloads[${index}][title]`, download.title);
+                    formData.append(`downloads[${index}][file]`, download.file);
                 }
-            );
+            });
+
+            await axios.post("/api/admin/checkpoints/store", formData, {
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
             showMessage("Checkpoint Added", "success");
             closeNewCheckpointModal();
             fetchCourses();
@@ -252,6 +259,98 @@ const DraggableCategoryList = ({
             showMessage("Error deleting checkpoint", "error");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const openEditCheckpointModal = (checkpoint) => {
+        setEditingCheckpoint({
+            ...checkpoint,
+            downloads: checkpoint.downloads || [],
+        });
+        setNewDownloadTitle("");
+        setNewDownloadFile(null);
+        setIsEditCheckpointModalOpen(true);
+    };
+
+    const closeEditCheckpointModal = () => {
+        setIsEditCheckpointModalOpen(false);
+        setEditingCheckpoint(null);
+    };
+
+    const handleUpdateCheckpoint = async () => {
+        if (!editingCheckpoint) return;
+        setLoading(true);
+        try {
+            const response = await axios.post(
+                `/api/admin/checkpoints/${editingCheckpoint.id}/update`,
+                {
+                    title: editingCheckpoint.title || "",
+                    description: editingCheckpoint.description || "",
+                    video_url: editingCheckpoint.video_url || "",
+                    overview: editingCheckpoint.overview || "",
+                },
+                {
+                    headers: { "X-CSRF-TOKEN": csrfToken },
+                    withCredentials: true,
+                }
+            );
+            showMessage("Checkpoint Updated", "success");
+            setEditingCheckpoint(response.data);
+            fetchCourses();
+        } catch (error) {
+            showMessage("Error updating checkpoint", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUploadCheckpointDownload = async () => {
+        if (!editingCheckpoint || !newDownloadTitle.trim() || !newDownloadFile) return;
+        setUploadingDownload(true);
+        try {
+            const formData = new FormData();
+            formData.append("title", newDownloadTitle);
+            formData.append("file", newDownloadFile);
+
+            const response = await axios.post(
+                `/api/admin/checkpoints/${editingCheckpoint.id}/downloads`,
+                formData,
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                }
+            );
+            setEditingCheckpoint({
+                ...editingCheckpoint,
+                downloads: [...editingCheckpoint.downloads, response.data],
+            });
+            setNewDownloadTitle("");
+            setNewDownloadFile(null);
+            showMessage("File Uploaded", "success");
+        } catch (error) {
+            showMessage("Error uploading file", "error");
+        } finally {
+            setUploadingDownload(false);
+        }
+    };
+
+    const handleDeleteCheckpointDownload = async (download) => {
+        if (!confirm(`Remove "${download.title}"?`)) return;
+        try {
+            await axios.delete(`/api/admin/checkpoint-downloads/${download.id}`, {
+                headers: { "X-CSRF-TOKEN": csrfToken },
+                withCredentials: true,
+            });
+            setEditingCheckpoint({
+                ...editingCheckpoint,
+                downloads: editingCheckpoint.downloads.filter((d) => d.id !== download.id),
+            });
+            showMessage("File Removed", "success");
+        } catch (error) {
+            showMessage("Error removing file", "error");
         }
     };
 
@@ -293,6 +392,12 @@ const DraggableCategoryList = ({
             if (selectedCourse.related_courses) {
                 selectedCourse.related_courses.forEach((id) => {
                     formData.append("related_courses[]", id);
+                });
+            }
+            if (selectedCourse.related_lessons) {
+                selectedCourse.related_lessons.forEach((rl, idx) => {
+                    formData.append(`related_lessons[${idx}][title]`, rl.title);
+                    formData.append(`related_lessons[${idx}][url]`, rl.url);
                 });
             }
             if (selectedCourse.thumbnail_file) {
@@ -393,6 +498,12 @@ const DraggableCategoryList = ({
                     formData.append("related_courses[]", id);
                 });
             }
+            if (course.related_lessons) {
+                course.related_lessons.forEach((rl, idx) => {
+                    formData.append(`related_lessons[${idx}][title]`, rl.title);
+                    formData.append(`related_lessons[${idx}][url]`, rl.url);
+                });
+            }
             if (course.thumbnail_file) {
                 formData.append("thumbnail", course.thumbnail_file);
             }
@@ -425,6 +536,7 @@ const DraggableCategoryList = ({
                 level: "beginner",
                 status: "active",
                 related_courses: [],
+                related_lessons: [],
                 thumbnail_file: null,
                 pdf_resource_file: null,
             });
@@ -621,6 +733,14 @@ const DraggableCategoryList = ({
                                                                                             </p>
                                                                                         )}
                                                                                         <div className="flex items-center justify-end gap-2 mt-auto">
+                                                                                            <button
+                                                                                                onClick={() =>
+                                                                                                    openEditCheckpointModal(course)
+                                                                                                }
+                                                                                                className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100"
+                                                                                            >
+                                                                                                <i className="fa fa-edit"></i>
+                                                                                            </button>
                                                                                             <button
                                                                                                 onClick={() =>
                                                                                                     handleDeleteCheckpoint(course)
@@ -858,6 +978,55 @@ const DraggableCategoryList = ({
                                 value={allCourses.filter(opt => selectedCourse?.related_courses?.includes(opt.value))}
                                 placeholder="Select related courses..."
                             />
+                        </div>
+
+                        <div className="col-span-1 sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                            <div className="space-y-2">
+                                {(selectedCourse?.related_lessons || []).map((rl, idx) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Lesson name"
+                                            value={rl.title}
+                                            onChange={(e) => {
+                                                const rows = [...(selectedCourse.related_lessons || [])];
+                                                rows[idx] = { ...rows[idx], title: e.target.value };
+                                                setSelectedCourse({ ...selectedCourse, related_lessons: rows });
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Link"
+                                            value={rl.url}
+                                            onChange={(e) => {
+                                                const rows = [...(selectedCourse.related_lessons || [])];
+                                                rows[idx] = { ...rows[idx], url: e.target.value };
+                                                setSelectedCourse({ ...selectedCourse, related_lessons: rows });
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const rows = (selectedCourse.related_lessons || []).filter((_, i) => i !== idx);
+                                                setSelectedCourse({ ...selectedCourse, related_lessons: rows });
+                                            }}
+                                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                        >
+                                            <i className="fa fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedCourse({ ...selectedCourse, related_lessons: [...(selectedCourse.related_lessons || []), { title: "", url: "" }] })}
+                                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                                >
+                                    <i className="fa fa-plus"></i> Add related lesson
+                                </button>
+                            </div>
                         </div>
 
                         <div className="col-span-1 sm:col-span-2">
@@ -1165,6 +1334,55 @@ const DraggableCategoryList = ({
                     />
                 </div>
 
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                    <div className="space-y-2">
+                        {(course.related_lessons || []).map((rl, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Lesson name"
+                                    value={rl.title}
+                                    onChange={(e) => {
+                                        const rows = [...(course.related_lessons || [])];
+                                        rows[idx] = { ...rows[idx], title: e.target.value };
+                                        setCourse({ ...course, related_lessons: rows });
+                                    }}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Link"
+                                    value={rl.url}
+                                    onChange={(e) => {
+                                        const rows = [...(course.related_lessons || [])];
+                                        rows[idx] = { ...rows[idx], url: e.target.value };
+                                        setCourse({ ...course, related_lessons: rows });
+                                    }}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const rows = (course.related_lessons || []).filter((_, i) => i !== idx);
+                                        setCourse({ ...course, related_lessons: rows });
+                                    }}
+                                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                >
+                                    <i className="fa fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => setCourse({ ...course, related_lessons: [...(course.related_lessons || []), { title: "", url: "" }] })}
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                        >
+                            <i className="fa fa-plus"></i> Add related lesson
+                        </button>
+                    </div>
+                </div>
+
                 <div>
                     <label
                         htmlFor="description"
@@ -1225,59 +1443,121 @@ const DraggableCategoryList = ({
                         Add Practice Checkpoint
                     </h2>
                     <p className="text-gray-600 mb-6">
-                        Insert a premade checkpoint into this category's lesson list.
+                        Insert a checkpoint into this category's lesson list.
                     </p>
                 </div>
 
                 <div>
-                    <label className="block mb-2 font-medium">
-                        Checkpoint Template
-                    </label>
-                    <select
-                        value={newCheckpoint.checkpoint_key}
-                        onChange={(e) =>
-                            setNewCheckpoint({
-                                ...newCheckpoint,
-                                checkpoint_key: e.target.value,
-                            })
-                        }
-                        className="w-full px-3 py-2 border rounded-lg"
-                    >
-                        {checkpointCatalog.map((template) => (
-                            <option key={template.key} value={template.key}>
-                                {template.title}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="mt-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Watch Lesson Link (Optional)
+                        Page Title
                     </label>
-                    <Select
-                        options={allCourses}
-                        className="basic-select"
-                        classNamePrefix="select"
-                        isClearable
-                        onChange={(opt) =>
-                            setNewCheckpoint({
-                                ...newCheckpoint,
-                                linked_course_id: opt ? opt.value : null,
-                            })
+                    <input
+                        type="text"
+                        value={newCheckpoint.title}
+                        onChange={(e) =>
+                            setNewCheckpoint({ ...newCheckpoint, title: e.target.value })
                         }
-                        value={
-                            allCourses.find(
-                                (opt) => opt.value === newCheckpoint.linked_course_id
-                            ) || null
-                        }
-                        placeholder="Select a lesson to link..."
+                        placeholder="e.g. Major Scale"
+                        className="w-full px-3 py-2 border rounded-lg"
                     />
                 </div>
 
                 <div className="mt-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Or Paste a Custom Redirect Link (Optional)
+                        Embedded Video (Optional)
+                    </label>
+                    <input
+                        type="text"
+                        value={newCheckpoint.video_url}
+                        onChange={(e) =>
+                            setNewCheckpoint({ ...newCheckpoint, video_url: e.target.value })
+                        }
+                        placeholder="e.g. https://www.youtube.com/watch?v=..."
+                        className="w-full px-3 py-2 border rounded-lg"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                        Shown at the top of the checkpoint page. Supports YouTube, Vimeo, and Google Drive links.
+                    </p>
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Course Overview (Optional)
+                    </label>
+                    <RichTextEditor
+                        id="new-checkpoint-overview"
+                        value={newCheckpoint.overview}
+                        onChange={(html) =>
+                            setNewCheckpoint({ ...newCheckpoint, overview: html })
+                        }
+                        placeholder="Explain what this checkpoint covers..."
+                    />
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Downloads for this Course (Optional)
+                    </label>
+                    <div className="space-y-2">
+                        {newCheckpoint.downloads.map((download, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="File title"
+                                    value={download.title}
+                                    onChange={(e) => {
+                                        const rows = [...newCheckpoint.downloads];
+                                        rows[idx] = { ...rows[idx], title: e.target.value };
+                                        setNewCheckpoint({ ...newCheckpoint, downloads: rows });
+                                    }}
+                                    className="flex-1 px-3 py-2 border rounded-lg text-sm"
+                                />
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        const rows = [...newCheckpoint.downloads];
+                                        rows[idx] = {
+                                            ...rows[idx],
+                                            file,
+                                            title: rows[idx].title || (file ? file.name.replace(/\.pdf$/i, "") : ""),
+                                        };
+                                        setNewCheckpoint({ ...newCheckpoint, downloads: rows });
+                                    }}
+                                    className="flex-1 text-sm"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const rows = newCheckpoint.downloads.filter((_, i) => i !== idx);
+                                        setNewCheckpoint({ ...newCheckpoint, downloads: rows });
+                                    }}
+                                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                >
+                                    <i className="fa fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setNewCheckpoint({
+                                    ...newCheckpoint,
+                                    downloads: [...newCheckpoint.downloads, { title: "", file: null }],
+                                })
+                            }
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                        >
+                            <i className="fa fa-plus"></i> Add a PDF file
+                        </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">PDF files only, up to 20MB each.</p>
+                </div>
+
+                <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Custom Redirect Link (Optional)
                     </label>
                     <input
                         type="text"
@@ -1292,7 +1572,7 @@ const DraggableCategoryList = ({
                         className="w-full px-3 py-2 border rounded-lg"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                        If set, this takes priority over the lesson link above.
+                        Shows a "Watch Lesson" button on the checkpoint page linking here.
                     </p>
                 </div>
 
@@ -1309,6 +1589,144 @@ const DraggableCategoryList = ({
                             "Add Checkpoint"
                         )}
                     </button>
+                </div>
+            </Modal>
+
+            {/* Edit Checkpoint Modal */}
+            <Modal
+                isOpen={isEditCheckpointModalOpen}
+                onClose={closeEditCheckpointModal}
+            >
+                <div className="p-2">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                        Edit Practice Checkpoint
+                    </h2>
+
+                    {editingCheckpoint && (
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                <input
+                                    type="text"
+                                    value={editingCheckpoint.title || ""}
+                                    onChange={(e) =>
+                                        setEditingCheckpoint({ ...editingCheckpoint, title: e.target.value })
+                                    }
+                                    className="w-full px-3 py-2 border rounded-lg"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea
+                                    value={editingCheckpoint.description || ""}
+                                    onChange={(e) =>
+                                        setEditingCheckpoint({ ...editingCheckpoint, description: e.target.value })
+                                    }
+                                    rows="2"
+                                    className="w-full px-3 py-2 border rounded-lg resize-none"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Video URL (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={editingCheckpoint.video_url || ""}
+                                    onChange={(e) =>
+                                        setEditingCheckpoint({ ...editingCheckpoint, video_url: e.target.value })
+                                    }
+                                    placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                    className="w-full px-3 py-2 border rounded-lg"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Shown as an embedded video above the checkpoint content. Supports YouTube, Vimeo, and Google Drive links.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Course Overview (Optional)</label>
+                                <RichTextEditor
+                                    id="edit-checkpoint-overview"
+                                    value={editingCheckpoint.overview || ""}
+                                    onChange={(html) =>
+                                        setEditingCheckpoint({ ...editingCheckpoint, overview: html })
+                                    }
+                                    placeholder="Explain what this checkpoint covers..."
+                                />
+                            </div>
+
+                            <div className="flex justify-end">
+                                <button
+                                    type="button"
+                                    disabled={loading}
+                                    onClick={handleUpdateCheckpoint}
+                                    className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+                                >
+                                    {loading ? <span className="fa fa-spinner fa-spin"></span> : "Save Changes"}
+                                </button>
+                            </div>
+
+                            <div className="pt-4 border-t">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Downloads for this Course
+                                </label>
+
+                                <div className="space-y-2 mb-3">
+                                    {editingCheckpoint.downloads.map((download) => (
+                                        <div key={download.id} className="flex items-center gap-2 bg-gray-50 border rounded-lg px-3 py-2">
+                                            <i className="fa fa-file-pdf text-red-500"></i>
+                                            <span className="flex-1 min-w-0 text-sm truncate">{download.title}</span>
+                                            <a href={download.file_url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline">
+                                                View
+                                            </a>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteCheckpointDownload(download)}
+                                                className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-gray-400 hover:text-red-600 rounded hover:bg-red-50 transition"
+                                            >
+                                                <i className="fa fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {editingCheckpoint.downloads.length === 0 && (
+                                        <p className="text-xs text-gray-400 italic">No files uploaded yet.</p>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        value={newDownloadTitle}
+                                        onChange={(e) => setNewDownloadTitle(e.target.value)}
+                                        placeholder="File title"
+                                        className="flex-1 px-3 py-2 border rounded-lg text-sm"
+                                    />
+                                    <input
+                                        type="file"
+                                        accept="application/pdf"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            setNewDownloadFile(file);
+                                            if (file && !newDownloadTitle.trim()) {
+                                                setNewDownloadTitle(file.name.replace(/\.pdf$/i, ""));
+                                            }
+                                        }}
+                                        className="flex-1 text-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        disabled={uploadingDownload || !newDownloadTitle.trim() || !newDownloadFile}
+                                        onClick={handleUploadCheckpointDownload}
+                                        className="flex-shrink-0 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm hover:bg-black transition disabled:opacity-50"
+                                    >
+                                        {uploadingDownload ? <span className="fa fa-spinner fa-spin"></span> : "Upload"}
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">PDF files only, up to 20MB.</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Modal>
         </div>

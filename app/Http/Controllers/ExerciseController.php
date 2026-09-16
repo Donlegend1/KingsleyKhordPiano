@@ -230,13 +230,14 @@ class ExerciseController extends Controller
 
         $categoryPage = \App\Models\MusicalApplicationCategory::query()
             ->when($skillLevel !== 'ALL', fn ($q) => $q->where('level', strtolower($skillLevel)))
+            ->when($search, fn ($q) => $q->where('category', 'like', "%{$search}%"))
             ->whereHas('lessons', function ($q) use ($skillLevel) {
                 $q->where('status', 'active')
                     ->when($skillLevel !== 'ALL', fn ($qq) => $qq->where('skill_level', $skillLevel));
             })
             ->orderBy('position')
-            ->paginate(9)
-            ->appends(['skill_level' => $skillLevel]);
+            ->paginate(9, ['*'], 'page', $page)
+            ->appends(['skill_level' => $skillLevel, 'name' => $search]);
 
         $applications = \App\Models\MusicalApplication::where('status', 'active')
             ->whereIn('musical_application_category_id', $categoryPage->pluck('id'))
@@ -247,6 +248,10 @@ class ExerciseController extends Controller
             ->sortBy(fn ($items, $series) => $categoryPage->pluck('category')->search($series));
 
         $seriesPage = $categoryPage;
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->view('memberpages.partials.musical-application-results', compact('applications', 'seriesPage', 'search'));
+        }
 
         return view('memberpages.musical-application', compact('skillLevel', 'skillLevels', 'applications', 'seriesPage', 'search'));
     }

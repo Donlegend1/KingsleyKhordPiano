@@ -18,10 +18,6 @@ select.no-native-arrow::-ms-expand {
   display: none !important;
 }
 
-html {
-  scrollbar-gutter: stable;
-}
-
 @layer base {
   .theme {
     --font-heading: var(--font-sans);

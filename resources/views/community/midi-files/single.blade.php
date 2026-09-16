@@ -1,12 +1,17 @@
-@extends('layouts.community')
+@extends('layouts.hub')
 
-@section('breadcrumb-parent', 'MIDI Files')
-@section('breadcrumb-parent-url', '/member/community/space/midi-downloads')
-@section('breadcrumb', $MidiFile->name)
+@section('title', $MidiFile->name)
+
+@section('breadcrumbs')
+    @include('community.partials.breadcrumbs', ['items' => [
+        ['label' => 'MIDI Files', 'url' => route('community.midi-downloads')],
+        ['label' => $MidiFile->name],
+    ]])
+@endsection
 
 @section('content')
 
-<div class="w-full flex justify-center py-10">
+<div class="w-full flex justify-center py-10 px-6">
 
     <div class="w-full max-w-4xl">
     <div class="w-full rounded-md overflow-hidden shadow-lg">

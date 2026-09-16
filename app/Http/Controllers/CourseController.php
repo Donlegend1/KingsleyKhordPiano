@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\CourseCheckpoint;
-use App\Support\Checkpoints\CheckpointCatalog;
 use App\Models\Bookmark;
 use App\Models\User;
 use App\Notifications\NewCourseCreated;
@@ -268,7 +267,7 @@ class CourseController extends Controller
                         ->orderBy('id');
                 },
                 'checkpoints' => function ($q) {
-                    $q->with('linkedCourse')
+                    $q->with(['linkedCourse', 'downloads'])
                         ->orderByRaw('position IS NULL, position ASC')
                         ->orderBy('id');
                 },
@@ -285,11 +284,8 @@ class CourseController extends Controller
                 });
 
                 $checkpointItems = $cat->checkpoints->map(function ($checkpoint) {
-                    $template = CheckpointCatalog::get($checkpoint->checkpoint_key) ?? [];
                     $checkpoint->item_type = 'checkpoint';
-                    $checkpoint->title = $checkpoint->title ?? ($template['title'] ?? $checkpoint->checkpoint_key);
-                    $checkpoint->description = $checkpoint->description ?? ($template['description'] ?? '');
-                    $checkpoint->label = $template['label'] ?? 'Practice Checkpoint';
+                    $checkpoint->label = 'Practice Checkpoint';
                     return $checkpoint;
                 });
 
@@ -363,7 +359,7 @@ class CourseController extends Controller
                     ->orderBy('id');
             },
             'checkpoints' => function ($query) {
-                $query->with('linkedCourse')
+                $query->with(['linkedCourse', 'downloads'])
                     ->orderByRaw('position IS NULL, position ASC')
                     ->orderBy('id');
             }
@@ -380,24 +376,32 @@ class CourseController extends Controller
         $categories->each(function ($category) use ($userId) {
             $category->hasNewLessons = \App\Models\LessonView::anyNewUnviewed($userId, $category->courses);
 
-            $category->courses->transform(function ($course) {
+            $category->courses->transform(function ($course) use ($category) {
                 $course->isBookmarked = $course->bookmarks->isNotEmpty();
                 unset($course->bookmarks); // optional, remove bookmarks relation to clean response
 
-                if ($course->related_courses && count($course->related_courses)) {
+                if ($course->related_lessons && count($course->related_lessons)) {
+                    $course->related = collect($course->related_lessons)->values();
+                } elseif ($course->related_courses && count($course->related_courses)) {
                     $course->related = Course::whereIn('id', $course->related_courses)->get();
                 } else {
-                    $course->related = [];
+                    // Fall back to other lessons in the same category so the
+                    // Related Lessons section isn't empty for uncurated courses.
+                    // Queried fresh (not reused from $category->courses) to avoid
+                    // circular references once those siblings get their own
+                    // `related` attribute set.
+                    $siblingIds = $category->courses
+                        ->where('id', '!=', $course->id)
+                        ->take(3)
+                        ->pluck('id');
+                    $course->related = Course::whereIn('id', $siblingIds)->get();
                 }
 
                 return $course;
             });
 
             $category->checkpoints->transform(function ($checkpoint) {
-                $template = CheckpointCatalog::get($checkpoint->checkpoint_key) ?? [];
-                $checkpoint->title = $checkpoint->title ?? ($template['title'] ?? $checkpoint->checkpoint_key);
-                $checkpoint->description = $checkpoint->description ?? ($template['description'] ?? '');
-                $checkpoint->label = $template['label'] ?? 'Practice Checkpoint';
+                $checkpoint->label = 'Practice Checkpoint';
 
                 return $checkpoint;
             });

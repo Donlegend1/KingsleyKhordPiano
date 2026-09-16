@@ -23,12 +23,14 @@ class Course extends Model
         'course_category_id',
         'requirements',
         'related_courses',
+        'related_lessons',
         'images',
         'pdf_resource',
     ];
 
     protected $casts = [
         'related_courses' => 'array',
+        'related_lessons' => 'array',
         'images' => 'array',
     ];
 

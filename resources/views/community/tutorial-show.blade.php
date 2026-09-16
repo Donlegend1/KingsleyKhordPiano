@@ -1,12 +1,17 @@
-@extends('layouts.community')
+@extends('layouts.hub')
 
-@section('breadcrumb-parent', 'Overview')
-@section('breadcrumb-parent-url', '/member/my-library')
-@section('breadcrumb', 'Tutorial')
+@section('title', $tutorial->title)
+
+@section('breadcrumbs')
+    @include('community.partials.breadcrumbs', ['items' => [
+        ['label' => 'Tutorials', 'url' => route('community.subcategory', 'lessons')],
+        ['label' => $tutorial->title],
+    ]])
+@endsection
 
 @section('content')
 
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
 
     {{-- Video --}}
     <div class="aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-sm">

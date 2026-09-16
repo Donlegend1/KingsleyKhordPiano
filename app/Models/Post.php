@@ -15,12 +15,27 @@ class Post extends Model
     'category',
     'subcategory',
     'user_id',
-    'is_pinned'
+    'parent_post_id',
+    'is_pinned',
+    'video_url'
    ];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // The topic (e.g. a challenge post like "December challenge") this post
+    // was submitted under, if any.
+    public function parent()
+    {
+        return $this->belongsTo(Post::class, 'parent_post_id');
+    }
+
+    // Submissions made directly on this post's own topic page.
+    public function submissions()
+    {
+        return $this->hasMany(Post::class, 'parent_post_id');
     }
 
     public function comments()

@@ -3,7 +3,7 @@
 @section('title', 'Shop')
 
 @section('content')
-<div x-data="{ tab: 'shop', search: '' }" class="bg-gray-50 min-h-screen pt-32 pb-24 px-4">
+<div x-data="{ tab: ['shop', 'midi', 'plugin'].includes(new URLSearchParams(window.location.search).get('tab')) ? new URLSearchParams(window.location.search).get('tab') : 'shop', search: '' }" class="bg-gray-50 min-h-screen pt-32 pb-24 px-4">
     <div class="max-w-6xl mx-auto">
 
         <!-- Header -->
@@ -16,17 +16,17 @@
         <!-- Tabs + Search -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
             <div class="inline-flex bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
-                <button @click="tab = 'shop'"
+                <button @click="tab = 'shop'; history.replaceState(null, '', '?tab=shop')"
                     :class="tab === 'shop' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'"
                     class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200">
                     Shop
                 </button>
-                <button @click="tab = 'midi'"
+                <button @click="tab = 'midi'; history.replaceState(null, '', '?tab=midi')"
                     :class="tab === 'midi' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'"
                     class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200">
                     Midi Files
                 </button>
-                <button @click="tab = 'plugin'"
+                <button @click="tab = 'plugin'; history.replaceState(null, '', '?tab=plugin')"
                     :class="tab === 'plugin' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'"
                     class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200">
                     Plugins

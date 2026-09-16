@@ -32,7 +32,7 @@
   </a> --}}
 
   <!-- Card 3 -->
-  <a href="https://discord.gg/gFXnRnaf5N" target="_blank" rel="noopener noreferrer" class="block transition-shadow hover:shadow-md">
+  <a href="/member/community/activity-feed" class="block transition-shadow hover:shadow-md">
     <div class="min-h-[120px] h-full flex justify-between items-center gap-3 p-6 bg-[#F3F5F6] rounded-lg shadow-sm border">
       <div class="flex items-center space-x-4 min-w-0">
         <img src="/images/community.svg" class="w-12 h-12 object-contain flex-shrink-0" />

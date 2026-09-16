@@ -9,6 +9,12 @@
       </p>
     </div>
 
+    @if (session('success'))
+      <div class="mb-6 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3">
+        {{ session('success') }}
+      </div>
+    @endif
+
     <form class="space-y-4" method="POST" action="/contact/send">
       @csrf
 

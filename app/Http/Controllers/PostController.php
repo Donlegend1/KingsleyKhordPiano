@@ -23,7 +23,9 @@ class PostController extends Controller
     {
         $query = Post::where('subcategory', '!=', 'exclusive_feed')->with([
             'comments.user',
+            'comments.likes',
             'comments.replies.user',
+            'comments.replies.likes',
             'likes.user',
             'user',
             'media',
@@ -38,7 +40,13 @@ class PostController extends Controller
 
          if ($request->filled('post_id')) {
             $query->where('id', $request->post_id);
+        } elseif ($request->filled('parent_post_id')) {
+            // Submissions made on a specific topic's own page (e.g. the
+            // "December challenge" page) — scoped to that topic only.
+            $query->where('parent_post_id', $request->parent_post_id);
         }
+        // No exclusion otherwise: the Activity Feed shows every post,
+        // including submissions made on an individual challenge page.
 
         $query->orderByDesc('is_pinned');
 
@@ -55,10 +63,10 @@ class PostController extends Controller
                 break;
             case 'latest':
             default:
-                $query->orderByDesc('updated_at');
+                $query->orderByDesc('created_at');
         }
 
-        return response()->json($query->paginate(10));
+        return response()->json($query->paginate(20));
     }
     /**
      * Show the form for creating a new resource.
@@ -76,10 +84,11 @@ class PostController extends Controller
     {
         $result = DB::transaction(function () use ($request) {
             $post = Post::create([
-                'title'       => $request->title,
-                'user_id'     => auth()->id(),
-                'category'    => $request->category,
-                'subcategory' => $request->subcategory,
+                'title'          => $request->title,
+                'user_id'        => auth()->id(),
+                'category'       => $request->category,
+                'subcategory'    => $request->subcategory,
+                'parent_post_id' => $request->parent_post_id,
             ]);
 
             foreach ($request->blocks as $index => $block) {
@@ -99,11 +108,12 @@ class PostController extends Controller
                     $data['link_type'] = VideoHelper::getLinkType($block['content']); // 'embed' | 'video' | 'audio' | 'iframe'
                 }
 
-                if (in_array($block['type'], ['image', 'video', 'audio'])) {
+                if (in_array($block['type'], ['image', 'file'])) {
                     if ($request->hasFile($block['content'])) {
                         $file = $request->file($block['content']);
                         $path = $file->store('posts', 'public');
                         $data['content'] = $path;
+                        $data['original_name'] = $file->getClientOriginalName();
                     }
                 }
 
@@ -197,7 +207,9 @@ class PostController extends Controller
     {
          $query = Post::where('user_id', $community->user_id)->with([
             'comments.user',
+            'comments.likes',
             'comments.replies.user',
+            'comments.replies.likes',
             'likes.user',
             'user' ,
             'media',
@@ -219,7 +231,7 @@ class PostController extends Controller
                 break;
             case 'latest':
             default:
-                $query->orderByDesc('updated_at');
+                $query->orderByDesc('created_at');
         }
 
         return response()->json($query->paginate(5));
@@ -229,7 +241,9 @@ class PostController extends Controller
     {
         $query = Post::where('subcategory', 'exclusive_feed')->with([
             'comments.user',
+            'comments.likes',
             'comments.replies.user',
+            'comments.replies.likes',
             'likes.user',
             'user',
             'media',
@@ -252,7 +266,7 @@ class PostController extends Controller
                 break;
             case 'latest':
             default:
-                $query->orderByDesc('updated_at');
+                $query->orderByDesc('created_at');
         }
 
         return response()->json($query->paginate(10));

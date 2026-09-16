@@ -1,27 +1,9 @@
-@extends('layouts.community')
+@extends('layouts.hub')
 
-@section('breadcrumb-parent', 'Overview')
-@section('breadcrumb-parent-url', '/member/my-library')
-@section('breadcrumb', 'Audio Files')
+@section('title', 'Audio Files')
 
-@section('page-search')
-    <div class="relative group">
-        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
-        </svg>
-        <input
-            type="text"
-            x-model="search"
-            placeholder="Search audio files..."
-            class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#FF6B35]/40 transition-all"
-        >
-        <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
-            </svg>
-        </button>
-    </div>
+@section('breadcrumbs')
+    @include('community.partials.breadcrumbs', ['items' => [['label' => 'Audio Files']]])
 @endsection
 
 @section('content')
@@ -59,10 +41,35 @@
         pianoPlays: {{ \Illuminate\Support\Js::from($pianoPlays->map($mapTrack)->values()) }},
         tracksAndLoops: {{ \Illuminate\Support\Js::from($tracksAndLoops->map($mapTrack)->values()) }},
     })"
-    class="px-4 sm:px-6 pt-1 bg-gray-50 dark:bg-black min-h-screen"
+    class="px-4 sm:px-6 pt-6 min-h-screen"
     :class="currentTrack ? 'pb-32' : 'pb-6'"
 >
     <div class="max-w-7xl mx-auto">
+
+        <!-- Page header -->
+        <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm p-6 mb-6 flex items-center justify-between gap-4 flex-wrap">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Audio Files</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Listen to and download piano plays, tracks, and loops.</p>
+            </div>
+            <div class="relative group w-full sm:w-72">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+                </svg>
+                <input
+                    type="text"
+                    x-model="search"
+                    placeholder="Search audio files..."
+                    class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#FF6B35]/40 transition-all"
+                >
+                <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 6 6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
         <!-- Tabs -->
         @php
@@ -108,8 +115,42 @@
             </div>
         </div>
 
-        <!-- Table -->
-        <div class="bg-white dark:bg-[#161617] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm overflow-x-auto"
+        <!-- Mobile: compact row list -->
+        <div class="sm:hidden bg-white dark:bg-[#161617] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm divide-y divide-gray-50 dark:divide-white/5"
+            x-show="activeTabTracks.length > 0">
+            <template x-for="(track, index) in activeTabTracks" :key="track.id">
+                <div x-show="search === '' || track.title.toLowerCase().includes(search.toLowerCase())"
+                    @click="playTrack(track, index)"
+                    class="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors"
+                    :class="currentTrack && currentTrack.id === track.id ? 'bg-orange-50 dark:bg-orange-500/10' : 'active:bg-gray-50 dark:active:bg-white/5'"
+                >
+                    <div class="w-10 h-10 rounded-md bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V6l12-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate" x-text="track.title"></p>
+                        <p class="text-xs text-gray-400 truncate" x-text="track.artist || ''"></p>
+                    </div>
+                    <span class="text-xs text-gray-400 flex-shrink-0" x-text="track.duration || '—'"></span>
+                    <div class="relative flex-shrink-0" @click.stop x-data="{ open: false }" @click.outside="open = false">
+                        <button type="button" @click="open = !open" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-2 -m-2" aria-label="More options">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+                        </button>
+                        <div x-show="open" x-cloak x-transition
+                            class="absolute right-0 top-10 w-40 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50">
+                            <a :href="track.downloadUrl" @click="open = false"
+                                class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 13v8l-4-4m4 4 4-4M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284"/></svg>
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Desktop: Table -->
+        <div class="hidden sm:block bg-white dark:bg-[#161617] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm overflow-x-auto"
             x-show="activeTabTracks.length > 0">
             <table class="w-full text-left border-collapse sm:min-w-[560px]">
                 <thead>
@@ -263,6 +304,7 @@
             pianoPlays: data.pianoPlays,
             tracksAndLoops: data.tracksAndLoops,
             activeTab: 'piano_plays',
+            search: '',
             currentTrack: null,
             currentIndex: -1,
             isPlaying: false,

@@ -24,6 +24,11 @@
                             <p class="text-gray-400 text-[11px]">MP3 &middot; Streamable</p>
                         </div>
                         <span class="lesson-audio-time text-gray-400 font-semibold text-[11px] tabular-nums flex-shrink-0">0:00 / 0:00</span>
+                        <a href="{{ $lesson->audio_resource_url }}" download
+                           class="flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-400 hover:text-gray-900 hover:border-gray-300 flex-shrink-0 transition-colors"
+                           aria-label="Download audio" onclick="event.stopPropagation();">
+                            <i class="fa-solid fa-arrow-down text-xs"></i>
+                        </a>
                     </div>
 
                     <div class="lesson-audio-seek relative w-full h-1.5 rounded-full bg-gray-100 mt-3 cursor-pointer">

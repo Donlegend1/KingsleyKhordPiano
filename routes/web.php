@@ -7,6 +7,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\GetstartedController;
+use App\Http\Controllers\PersonalizedGuidanceController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\LessonController;
@@ -195,6 +196,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
+    Route::post('personalized-guidance/submit', [PersonalizedGuidanceController::class, 'store'])->name('member.personalized-guidance.submit');
     Route::get('quiz', [QuizController::class, 'index'])->name('member.quiz');
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
     Route::redirect('dashboard', '/home');
@@ -230,6 +232,18 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('/feedback', [CommunityIndexController::class, 'storeFeedback'])->name('community.feedback.store');
     Route::get('/community/members', [CommunityIndexController::class, 'members'])->name('community.members');
     Route::get('/community/leaderboard', [CommunityIndexController::class, 'leaderboard'])->name('community.leaderboard');
+    Route::get('/community/activity-feed', [CommunityIndexController::class, 'activityFeed'])->name('community.activity-feed');
+    Route::get('/community/announcement', [CommunityIndexController::class, 'announcement'])->name('community.announcement');
+    Route::get('/community/say-hello', [CommunityIndexController::class, 'sayHello'])->name('community.say-hello');
+    Route::get('/community/forum', [CommunityIndexController::class, 'forum'])->name('community.forum');
+    Route::get('/community/forum/{subcategory}', [CommunityIndexController::class, 'forumCategory'])->name('community.forum.category');
+    Route::post('/community/forum/{subcategory}/follow', [CommunityIndexController::class, 'toggleFollowTopic'])->name('community.forum.follow');
+    Route::post('/community/forum/{subcategory}/mark-all-read', [CommunityIndexController::class, 'markAllTopicsRead'])->name('community.forum.mark-all-read');
+    Route::get('/community/profile', [CommunityIndexController::class, 'profile'])->name('community.profile');
+    Route::get('/community/notifications', [CommunityIndexController::class, 'notifications'])->name('community.notifications');
+    Route::get('/community/account-settings', [CommunityIndexController::class, 'accountSettings'])->name('community.account-settings');
+    Route::get('/community/display-name', [CommunityIndexController::class, 'displayNameForm'])->name('community.display-name');
+    Route::post('/community/display-name', [CommunityIndexController::class, 'updateDisplayName'])->name('community.display-name.update');
     Route::get('/post/{post}', [CommunityIndexController::class, 'singlePost'])->name('singlePost');
     Route::get('/community/space/pdf-downloads', [CommunityIndexController::class, 'pdfDownloads'])->name('community.pdf-downloads');
     Route::get('/community/space/audio-downloads', [CommunityIndexController::class, 'audioDownloads'])->name('community.audio-downloads');
@@ -321,6 +335,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Community Tutorials Admin
     Route::resource('tutorials', \App\Http\Controllers\Admin\AdminTutorialController::class, ['as' => 'admin'])->except(['show']);
 
+    // Student Challenges Admin
+    Route::resource('student-challenges', \App\Http\Controllers\Admin\AdminStudentChallengeController::class, [
+        'as' => 'admin',
+        'parameters' => ['student-challenges' => 'studentChallenge'],
+    ])->except(['show']);
+
     // Shop Products Admin (MIDI files & Plugins)
     Route::resource('shop', \App\Http\Controllers\Admin\ShopProductController::class, ['as' => 'admin', 'parameters' => ['shop' => 'shopProduct']])->except(['show']);
 
@@ -340,6 +360,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'availability'])->name('availability');
         Route::post('/availability', [\App\Http\Controllers\Admin\GuestBookingController::class, 'storeAvailability'])->name('store-availability');
         Route::delete('/availability/{availability}', [\App\Http\Controllers\Admin\GuestBookingController::class, 'destroyAvailability'])->name('destroy-availability');
+    });
+
+    // Personalized Guidance Requests
+    Route::prefix('personalized-guidance')->name('admin.personalized-guidance.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'index'])->name('index');
+        Route::patch('/{guidanceRequest}/reviewed', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'markReviewed'])->name('reviewed');
     });
 
     // Piano coaching members (legacy premium + granted subscribers)
