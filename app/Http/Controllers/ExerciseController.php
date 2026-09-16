@@ -226,6 +226,7 @@ class ExerciseController extends Controller
     {
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
+        $page = $request->query('page', 1);
         $search = $request->query('name');
 
         $categoryPage = \App\Models\MusicalApplicationCategory::query()
