@@ -205,19 +205,6 @@
           </div>
         </div>
 
-        {{-- Tip Box --}}
-        <div class="mt-6 p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl flex gap-3 items-start" x-show="currentQuestion.tip">
-          <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0 mt-0.5">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-            </svg>
-          </div>
-          <div>
-            <p class="text-xs font-bold text-indigo-900">Pro Tip</p>
-            <p class="text-xs text-indigo-700/80 mt-1 leading-relaxed" x-text="currentQuestion.tip"></p>
-          </div>
-        </div>
-
       </div>
 
       {{-- Navigation Buttons --}}

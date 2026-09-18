@@ -196,6 +196,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('premium-chat', [PremiumChatController::class, 'index']);
     Route::post('getstarted/updated', [GetstartedController::class, 'updateGetStarted']);
     Route::get('getstarted', [GetstartedController::class, 'index']);
+    Route::get('personalized-guidance', [PersonalizedGuidanceController::class, 'create'])->name('member.personalized-guidance.create');
     Route::post('personalized-guidance/submit', [PersonalizedGuidanceController::class, 'store'])->name('member.personalized-guidance.submit');
     Route::get('quiz', [QuizController::class, 'index'])->name('member.quiz');
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
@@ -365,6 +366,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Personalized Guidance Requests
     Route::prefix('personalized-guidance')->name('admin.personalized-guidance.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'index'])->name('index');
+        Route::get('/user/{user}', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'show'])->name('show');
         Route::patch('/{guidanceRequest}/reviewed', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'markReviewed'])->name('reviewed');
     });
 

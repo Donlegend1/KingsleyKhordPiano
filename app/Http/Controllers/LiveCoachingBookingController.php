@@ -19,11 +19,11 @@ class LiveCoachingBookingController extends Controller
      * in West Africa Time (UTC+1, no DST). Wednesday and Sunday are closed.
      */
     private const SCHEDULE = [
-        Carbon::MONDAY => [[9, 0, 9, 45], [15, 30, 16, 15], [19, 20, 20, 5]],
-        Carbon::TUESDAY => [[14, 0, 14, 45]],
-        Carbon::WEDNESDAY => [[11, 30, 12, 15], [17, 0, 17, 45]],
-        Carbon::FRIDAY => [[18, 10, 19, 5]],
-        Carbon::SATURDAY => [[11, 30, 12, 15], [17, 0, 17, 45]],
+        Carbon::MONDAY => [[14, 0, 14, 15], [15, 0, 15, 15], [17, 0, 17, 15]],
+        Carbon::TUESDAY => [[12, 30, 12, 45], [20, 0, 20, 15]],
+        Carbon::WEDNESDAY => [[13, 0, 13, 15], [15, 30, 15, 45]],
+        Carbon::FRIDAY => [[18, 30, 18, 45], [19, 15, 19, 30]],
+        Carbon::SATURDAY => [[11, 30, 11, 45], [15, 30, 15, 45], [19, 45, 20, 0]],
     ];
 
     private const WINDOW_DAYS = 14;
@@ -39,15 +39,8 @@ class LiveCoachingBookingController extends Controller
             );
         }
 
-        [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
-
         $sessionsIncluded = 1;
-        $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
-            ->where('date', '>=', $cycleStart->toDateString())
-            ->where('date', '<', $cycleEnd->toDateString())
-            ->count();
-
-        $nextResetLabel = $cycleEnd->format('F j, Y');
+        $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)->count();
 
         $windowStart = now()->toDateString();
         $windowEnd = now()->addDays(self::WINDOW_DAYS - 1)->toDateString();
@@ -60,15 +53,11 @@ class LiveCoachingBookingController extends Controller
             ->map(fn ($rows) => $rows->map(fn ($b) => substr($b->time, 0, 8))->values())
             ->toArray();
 
-        $activeBooking = LiveCoachingBooking::where('user_id', $user->id)
-            ->where('date', '>=', $cycleStart->toDateString())
-            ->where('date', '<', $cycleEnd->toDateString())
-            ->first();
+        $activeBooking = LiveCoachingBooking::where('user_id', $user->id)->first();
 
         return view('memberpages.my-library', [
             'sessionsUsed' => $sessionsUsed,
             'sessionsIncluded' => $sessionsIncluded,
-            'nextResetLabel' => $nextResetLabel,
             'bookedSlots' => $bookedSlots,
             'activeBooking' => $activeBooking,
         ]);
@@ -114,14 +103,10 @@ class LiveCoachingBookingController extends Controller
             return response()->json(['error' => 'Bookings must be made at least 24 hours in advance.'], 422);
         }
 
-        // 4) User must still have their free session available this cycle.
-        [$cycleStart, $cycleEnd] = $user->currentCoachingCycleBounds();
-        $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)
-            ->where('date', '>=', $cycleStart->toDateString())
-            ->where('date', '<', $cycleEnd->toDateString())
-            ->count();
+        // 4) User must still have their one-time free session available.
+        $sessionsUsed = LiveCoachingBooking::where('user_id', $user->id)->count();
         if ($sessionsUsed >= 1) {
-            return response()->json(['error' => 'You have already used your free session this cycle.'], 422);
+            return response()->json(['error' => 'You have already used your free live coaching session.'], 422);
         }
 
         // 5) Slot must not already be booked by anyone else.
@@ -142,13 +127,13 @@ class LiveCoachingBookingController extends Controller
 
         // Slot times are validated above against SCHEDULE, which is defined in WAT.
         $startWat = Carbon::parse($request->date . ' ' . $time, 'Africa/Lagos');
-        $endWat = $startWat->copy()->addMinutes(45);
+        $endWat = $startWat->copy()->addMinutes(15);
 
         try {
             $meeting = (new ZoomService())->createMeeting([
                 'topic' => 'Live session with ' . $user->first_name,
                 'start_time' => $startWat->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s\Z'),
-                'duration' => 45,
+                'duration' => 15,
                 'timezone' => 'Africa/Lagos',
             ]);
 

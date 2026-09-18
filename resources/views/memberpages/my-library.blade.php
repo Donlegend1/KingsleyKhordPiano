@@ -1,8 +1,39 @@
+@php
+    $isEmbed = request()->boolean('embed');
+    $noHeader = true;
+    $noFooter = $isEmbed;
+@endphp
 @extends('layouts.member')
 
 @section('content')
 
-<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-jakarta"
+@unless($isEmbed)
+<header class="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+        <a href="{{ route('home') }}" class="flex items-center">
+            <img src="/logo/logoblack.png" alt="Kingsley Khord" class="h-9 w-auto">
+        </a>
+    </div>
+
+    <div class="flex items-center gap-4">
+        <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl text-xs font-bold transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Exit
+        </a>
+        @if(Auth::user()->passport)
+            <img src="{{ Auth::user()->passport }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100">
+        @else
+            <div class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+                {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'U', 0, 1)) }}
+            </div>
+        @endif
+    </div>
+</header>
+@endunless
+
+<div class="{{ $isEmbed ? 'bg-gray-50 py-5 px-4 sm:px-6' : 'min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8' }} font-jakarta"
     x-data="{
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear(),
@@ -20,15 +51,14 @@
 
         sessionsUsed: {{ $sessionsUsed }},
         sessionsIncluded: {{ $sessionsIncluded }},
-        nextResetLabel: {{ json_encode($nextResetLabel) }},
         bookedSlotsByDate: {{ json_encode($bookedSlots) }},
 
         slotsByDow: {
-            0: [{start:[9,0],end:[9,45]},  {start:[15,30],end:[16,15]}, {start:[19,20],end:[20,5]}],
-            1: [{start:[14,0],end:[14,45]}],
-            2: [{start:[11,30],end:[12,15]},{start:[17,0],end:[17,45]}],
-            4: [{start:[18,10],end:[19,5]}],
-            5: [{start:[11,30],end:[12,15]},{start:[17,0],end:[17,45]}]
+            0: [{start:[14,0],end:[14,15]}, {start:[15,0],end:[15,15]}, {start:[17,0],end:[17,15]}],
+            1: [{start:[12,30],end:[12,45]},{start:[20,0],end:[20,15]}],
+            2: [{start:[13,0],end:[13,15]},{start:[15,30],end:[15,45]}],
+            4: [{start:[18,30],end:[18,45]},{start:[19,15],end:[19,30]}],
+            5: [{start:[11,30],end:[11,45]},{start:[15,30],end:[15,45]},{start:[19,45],end:[20,0]}]
         },
 
         get todayMidnight() {
@@ -72,12 +102,11 @@
             return slots
                 .map(slot => {
                     let startUtc = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.start[0] - 1, slot.start[1]));
-                    let endUtc   = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.end[0]   - 1, slot.end[1]));
-                    let fmt = t => t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: this.userTz });
+                    let fmt = t => t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: this.userTz });
                     let time = this.pad(slot.start[0]) + ':' + this.pad(slot.start[1]) + ':00';
                     return {
                         time,
-                        label: fmt(startUtc) + ' – ' + fmt(endUtc),
+                        label: fmt(startUtc),
                         startUtc,
                         booked: this.isSlotBooked(dateKey, time),
                     };
@@ -140,7 +169,7 @@
                 let mn = parseInt(timeParts[1]);
 
                 let startUtc = new Date(Date.UTC(yr, mo, dy, hr - 1, mn));
-                let endUtc   = new Date(Date.UTC(yr, mo, dy, hr - 1, mn + 45));
+                let endUtc   = new Date(Date.UTC(yr, mo, dy, hr - 1, mn + 15));
                 return { startUtc, endUtc };
             }
             if (this.selectedDay === null || !this.selectedTime) return null;
@@ -149,8 +178,8 @@
             for (let slot of slots) {
                 let startUtc = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.start[0] - 1, slot.start[1]));
                 let endUtc   = new Date(Date.UTC(this.currentYear, this.currentMonth, this.selectedDay, slot.end[0]   - 1, slot.end[1]));
-                let fmt = t => t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: this.userTz });
-                if ((fmt(startUtc) + ' – ' + fmt(endUtc)) === this.selectedTime) {
+                let fmt = t => t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: this.userTz });
+                if (fmt(startUtc) === this.selectedTime) {
                     return { startUtc, endUtc };
                 }
             }
@@ -280,9 +309,8 @@
             let mn = parseInt(timeParts[1]);
 
             let startUtc = new Date(Date.UTC(yr, mo, dy, hr - 1, mn));
-            let endUtc   = new Date(Date.UTC(yr, mo, dy, hr - 1, mn + 45));
-            let fmt = t => t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: this.userTz });
-            return fmt(startUtc) + ' – ' + fmt(endUtc);
+            let fmt = t => t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: this.userTz });
+            return fmt(startUtc);
         },
 
         init() {
@@ -302,37 +330,25 @@
         <!-- ─── BOOKING FORM ─── -->
         <div x-show="!confirmed" x-transition>
 
+            @unless($isEmbed)
             <a href="/home" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-6 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 Back to Dashboard
             </a>
+            @endunless
 
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">Book Your Live Coaching Session</h1>
-            <p class="text-sm text-gray-500 mb-7">You get 1 free live coaching session every month as part of your membership.</p>
+            <h1 class="text-2xl font-bold text-gray-900 mb-7">Book Discovery Call with Kingsley</h1>
 
             <div x-show="sessionsUsed >= sessionsIncluded" x-cloak
                 class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-5 py-4 mb-6 text-sm">
-                You've used your free session for this month. Your next session becomes available on
-                <span class="font-bold" x-text="nextResetLabel"></span>.
+                You've already used your free live coaching session.
             </div>
 
             <!-- Stats Row -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">
-                <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100">
-                    <div class="flex items-center gap-4 px-6 py-5">
-                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 font-medium">Monthly Session</p>
-                            <p class="text-xl font-bold text-blue-500 leading-tight"><span x-text="sessionsUsed"></span> <span class="text-gray-300 font-light">/</span> <span x-text="sessionsIncluded"></span></p>
-                            <p class="text-[11px] text-gray-400">Sessions used</p>
-                        </div>
-                    </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 divide-x divide-y sm:divide-y-0 divide-gray-100">
                     <div class="flex items-center gap-4 px-6 py-5">
                         <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,7 +357,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-400 font-medium">Duration</p>
-                            <p class="text-base font-bold text-gray-800">45 Minutes</p>
+                            <p class="text-base font-bold text-gray-800">15 Minutes</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4 px-6 py-5">
@@ -353,17 +369,6 @@
                         <div>
                             <p class="text-xs text-gray-400 font-medium">Platform</p>
                             <p class="text-base font-bold text-gray-800">Zoom</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 px-6 py-5">
-                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 font-medium">Next Reset</p>
-                            <p class="text-base font-bold text-gray-800" x-text="nextResetLabel"></p>
                         </div>
                     </div>
                 </div>
@@ -485,127 +490,99 @@
         <!-- ─── CONFIRMATION VIEW ─── -->
         <div x-show="confirmed" x-transition>
 
+            @unless($isEmbed)
             <nav class="flex items-center gap-1.5 text-xs text-gray-400 mb-3">
                 <a href="/home" class="hover:text-gray-600">Dashboard</a>
                 <span>/</span>
                 <span class="text-gray-600 font-semibold">Live Session</span>
             </nav>
+            @endunless
 
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">Your Live Coaching Session</h1>
-            <p class="text-sm text-gray-500 mb-6">You get 1 free live coaching session every month as part of your membership.</p>
+            <!-- Confirmation Card -->
+            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">
 
-            <!-- Success Banner -->
-            <div class="bg-white rounded-2xl border border-gray-100 mb-6 px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="pt-10 pb-6 px-8 text-center">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-green-50 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                         </svg>
                     </div>
-                    <div>
-                        <p class="text-base font-bold text-gray-900">Your session is booked</p>
-                        <p class="text-sm text-gray-400">The Zoom link will be sent to your registered email.</p>
+                    <h2 class="text-xl font-bold text-gray-900 mb-1">You're scheduled!</h2>
+                    <p class="text-sm text-gray-500 mb-6">A confirmation has been sent to your registered email.</p>
+
+                    <!-- Add to Calendar -->
+                    <div class="relative inline-block" @click.away="calendarMenuOpen = false">
+                        <button @click="calendarMenuOpen = !calendarMenuOpen"
+                            class="flex items-center gap-2 text-sm font-semibold text-gray-700 border border-gray-200 px-5 py-2.5 rounded-full hover:bg-gray-50 transition">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Add to Calendar
+                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="calendarMenuOpen" x-transition x-cloak
+                            class="absolute left-1/2 -translate-x-1/2 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-lg py-2 z-20 text-left">
+                            <a :href="googleCalendarUrl" target="_blank" rel="noopener noreferrer"
+                                @click="calendarMenuOpen = false"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                Google Calendar
+                            </a>
+                            <a :href="outlookCalendarUrl" target="_blank" rel="noopener noreferrer"
+                                @click="calendarMenuOpen = false"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                Outlook Calendar
+                            </a>
+                            <button @click="downloadIcs()"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left">
+                                Apple / Other (.ics)
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Add to Calendar -->
-                <div class="relative flex-shrink-0" @click.away="calendarMenuOpen = false">
-                    <button @click="calendarMenuOpen = !calendarMenuOpen"
-                        class="flex items-center gap-2 text-sm font-semibold text-gray-700 border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="border-t border-gray-100 px-8 py-6 text-left">
+                    <p class="text-base font-bold text-gray-900 mb-4">Live Coaching Session</p>
+
+                    <div class="flex items-center gap-3 mb-3">
+                        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-700">Kingsley Khord</span>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-3">
+                        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Add to Calendar
-                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
+                        <span class="text-sm font-semibold text-gray-700" x-text="(activeBooking ? getFormattedBookingTime() : selectedTime) + ', ' + (activeBooking ? getFormattedBookingDate() : selectedDateLabel)"></span>
+                    </div>
 
-                    <div x-show="calendarMenuOpen" x-transition x-cloak
-                        class="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-lg py-2 z-20">
-                        <a :href="googleCalendarUrl" target="_blank" rel="noopener noreferrer"
-                            @click="calendarMenuOpen = false"
-                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
-                            Google Calendar
-                        </a>
-                        <a :href="outlookCalendarUrl" target="_blank" rel="noopener noreferrer"
-                            @click="calendarMenuOpen = false"
-                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
-                            Outlook Calendar
-                        </a>
-                        <button @click="downloadIcs()"
-                            class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left">
-                            Apple / Other (.ics)
-                        </button>
+                    <div class="flex items-center gap-3 mb-3">
+                        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 100-18 9 9 0 000 18zM3.6 9h16.8M3.6 15h16.8M11.5 3a17 17 0 000 18M12.5 3a17 17 0 010 18"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-700" x-text="userTzLabel"></span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                        </svg>
+                        <template x-if="activeBooking && activeBooking.zoom_join_url">
+                            <a :href="activeBooking.zoom_join_url" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-indigo-600 hover:underline">Join via Zoom</a>
+                        </template>
+                        <template x-if="!activeBooking || !activeBooking.zoom_join_url">
+                            <span class="text-sm font-semibold text-gray-700">Zoom link to follow via email</span>
+                        </template>
                     </div>
                 </div>
             </div>
 
-            <!-- Detail Grid: 2 cols x 2 rows so paired cards align to equal height -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-6">
-
-                <!-- Booked Session Card -->
-                <div class="bg-white rounded-2xl border border-gray-100 p-5">
-                    <p class="text-sm font-bold text-gray-900 mb-3">Your Booked Session</p>
-                    <div class="flex items-start gap-4 mb-4">
-                        <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-xl font-bold text-gray-900 leading-tight" x-text="activeBooking ? getFormattedBookingDate() : selectedDateLabel"></p>
-                            <p class="text-sm text-gray-500 mt-0.5" x-text="(activeBooking ? getFormattedBookingTime() : selectedTime) + ' (45 Minutes)'"></p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
-                            </svg>
-                            <div>
-                                <p class="text-[11px] text-gray-400">Platform</p>
-                                <p class="text-sm font-bold text-gray-800">Zoom</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
-                            </svg>
-                            <div>
-                                <p class="text-[11px] text-gray-400">Time zone</p>
-                                <p class="text-sm font-bold text-gray-800" x-text="userTzLabel"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Monthly Session Status -->
-                <div class="bg-white rounded-2xl border border-gray-100 p-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-sm font-bold text-gray-900">Monthly Session Status</p>
-                        <span class="text-xs font-bold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full" x-text="sessionsUsed + ' / ' + sessionsIncluded + ' Used'"></span>
-                    </div>
-                    <div class="flex flex-col gap-0 divide-y divide-gray-100">
-                        <div class="flex items-center justify-between py-2.5">
-                            <span class="text-sm text-gray-500">Sessions Included</span>
-                            <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded"></span>
-                        </div>
-                        <div class="flex items-center justify-between py-2.5">
-                            <span class="text-sm text-gray-500">Sessions Used</span>
-                            <span class="text-sm font-bold text-gray-900" x-text="sessionsUsed"></span>
-                        </div>
-                        <div class="flex items-center justify-between py-2.5">
-                            <span class="text-sm text-gray-500">Remaining Sessions</span>
-                            <span class="text-sm font-bold text-gray-900" x-text="sessionsIncluded - sessionsUsed"></span>
-                        </div>
-                        <div class="flex items-center justify-between py-2.5">
-                            <span class="text-sm text-gray-500">Next Available</span>
-                            <span class="text-sm font-bold text-gray-900" x-text="nextResetLabel"></span>
-                        </div>
-                    </div>
-                </div>
+            <!-- Detail Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 <!-- Important Notes Card -->
                 <div class="bg-white rounded-2xl border border-gray-100 p-5">
@@ -640,7 +617,7 @@
 
                 <!-- Watch Tutorial Card -->
                 <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Before Your Session</p>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Before Your Call</p>
                     <div class="flex items-start gap-4 mb-4">
                         <div class="w-11 h-11 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
                             <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -648,8 +625,8 @@
                             </svg>
                         </div>
                         <div>
-                            <p class="text-base font-bold text-gray-900 leading-tight">Watch the Set-Up Tutorial</p>
-                            <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">Make sure you have the best experience. This short tutorial walks you through how to prepare for your live coaching session.</p>
+                            <p class="text-base font-bold text-gray-900 leading-tight">Set Up for Zoom Call</p>
+                            <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">Get your piano's video and audio connected right so nothing cuts out on the call.</p>
                         </div>
                     </div>
                     <button class="mt-auto w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold px-5 py-3 rounded-xl transition">

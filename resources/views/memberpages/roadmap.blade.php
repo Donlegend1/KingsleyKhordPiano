@@ -13,39 +13,46 @@
 <div class="max-w-6xl mx-auto px-6 py-10">
 
   {{-- Title --}}
-  <div class="mb-10">
+  <div class="mb-8">
     <h1 class="text-3xl font-extrabold text-gray-900 mb-1">Your Learning Roadmap</h1>
     <div class="w-10 h-1 bg-[#6366F1] rounded mb-3"></div>
     <p class="text-gray-500 text-sm">Choose your path and start building the skills that will take your musicianship to the next level.</p>
+  </div>
+
+  {{-- Not Sure Banner --}}
+  <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-8 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-gray-800">Not sure which level to choose?</p>
+        <p class="text-xs text-gray-500 mt-0.5">You can take our quick assessment to find the best level for you.</p>
+      </div>
+    </div>
+    <a href="/member/quiz" class="inline-flex items-center flex-shrink-0 text-indigo-600 text-sm font-semibold hover:underline">
+      Take Assessment
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
   </div>
 
   {{-- Cards --}}
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
     {{-- Card 1: Beginner --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
-      <div class="flex items-center justify-center pt-8 pb-4 bg-[#F5F3FF] min-h-[180px]">
-        <img src="/images/featured1.jpeg" alt="Beginner" class="h-36 w-auto object-contain drop-shadow-md">
-      </div>
-      <div class="p-6 flex flex-col flex-1">
-        <h2 class="text-xl font-extrabold text-gray-900 mb-2">Build Your Foundation</h2>
-        <p class="text-gray-500 text-sm mb-5">Start your journey by mastering the basics and building a strong foundation.</p>
-        <ul class="space-y-2 mb-6">
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#6366F1] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Music theory
-          </li>
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#6366F1] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Scales and Chords
-          </li>
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#6366F1] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Harmonic Tension
-          </li>
-        </ul>
+    @php $b = $progress['Beginner']; @endphp
+    <div class="bg-white rounded-2xl border-2 {{ $b['completed'] > 0 ? 'border-[#6366F1]' : 'border-gray-100' }} shadow-sm flex flex-col overflow-hidden">
+      <div class="p-4 flex flex-col flex-1">
+        <div class="rounded-xl overflow-hidden bg-gray-100 mb-4">
+          <img src="/images/featured1.jpeg" alt="Beginner" class="w-full h-40 object-cover">
+        </div>
+        <h2 class="text-base font-bold text-gray-900 mb-1">Beginner Course</h2>
+        <p class="text-gray-500 text-sm mb-4">Start your piano journey with a clear, step-by-step method designed to make learning both easy and practical.</p>
         <div class="mt-auto">
-          @php $b = $progress['Beginner']; @endphp
           <div class="mb-4">
             <div class="flex justify-between text-xs text-gray-500 mb-1">
               <span>{{ $b['completed'] }}/{{ $b['total'] }} courses completed</span>
@@ -65,29 +72,15 @@
     </div>
 
     {{-- Card 2: Intermediate --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
-      <div class="flex items-center justify-center pt-8 pb-4 bg-[#F0FDF4] min-h-[180px]">
-        <img src="/images/featured2.jpeg" alt="Intermediate" class="h-36 w-auto object-contain drop-shadow-md">
-      </div>
-      <div class="p-6 flex flex-col flex-1">
-        <h2 class="text-xl font-extrabold text-gray-900 mb-2">Elevate Your Playing</h2>
-        <p class="text-gray-500 text-sm mb-5">Improve the quality of your chords and learn how to harmonize with confidence.</p>
-        <ul class="space-y-2 mb-6">
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#22C55E] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Chord Extensions
-          </li>
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#22C55E] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Passing Tones
-          </li>
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#22C55E] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Embellishments
-          </li>
-        </ul>
+    @php $i = $progress['Intermediate']; @endphp
+    <div class="bg-white rounded-2xl border-2 {{ $i['completed'] > 0 ? 'border-[#22C55E]' : 'border-gray-100' }} shadow-sm flex flex-col overflow-hidden">
+      <div class="p-4 flex flex-col flex-1">
+        <div class="rounded-xl overflow-hidden bg-gray-100 mb-4">
+          <img src="/images/featured2.jpeg" alt="Intermediate" class="w-full h-40 object-cover">
+        </div>
+        <h2 class="text-base font-bold text-gray-900 mb-1">Intermediate Course</h2>
+        <p class="text-gray-500 text-sm mb-4">Once you've mastered the basics, take your skills to the next level with this intermediate course.</p>
         <div class="mt-auto">
-          @php $i = $progress['Intermediate']; @endphp
           <div class="mb-4">
             <div class="flex justify-between text-xs text-gray-500 mb-1">
               <span>{{ $i['completed'] }}/{{ $i['total'] }} courses completed</span>
@@ -107,29 +100,15 @@
     </div>
 
     {{-- Card 3: Advanced --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
-      <div class="flex items-center justify-center pt-8 pb-4 bg-[#FFF5F5] min-h-[180px]">
-        <img src="/images/featured3.jpeg" alt="Advanced" class="h-36 w-auto object-contain drop-shadow-md">
-      </div>
-      <div class="p-6 flex flex-col flex-1">
-        <h2 class="text-xl font-extrabold text-gray-900 mb-2">Master & Create</h2>
-        <p class="text-gray-500 text-sm mb-5">Think like a musician, create freely and lead with excellence.</p>
-        <ul class="space-y-2 mb-6">
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#EF4444] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Substitutions
-          </li>
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#EF4444] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Advanced Voicings
-          </li>
-          <li class="flex items-center gap-2 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-[#EF4444] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Improvisation
-          </li>
-        </ul>
+    @php $a = $progress['Advanced']; @endphp
+    <div class="bg-white rounded-2xl border-2 {{ $a['completed'] > 0 ? 'border-[#EF4444]' : 'border-gray-100' }} shadow-sm flex flex-col overflow-hidden">
+      <div class="p-4 flex flex-col flex-1">
+        <div class="rounded-xl overflow-hidden bg-gray-100 mb-4">
+          <img src="/images/featured3.jpeg" alt="Advanced" class="w-full h-40 object-cover">
+        </div>
+        <h2 class="text-base font-bold text-gray-900 mb-1">Advanced Course</h2>
+        <p class="text-gray-500 text-sm mb-4">After refining your intermediate skills, take the leap into advanced playing with this course.</p>
         <div class="mt-auto">
-          @php $a = $progress['Advanced']; @endphp
           <div class="mb-4">
             <div class="flex justify-between text-xs text-gray-500 mb-1">
               <span>{{ $a['completed'] }}/{{ $a['total'] }} courses completed</span>
