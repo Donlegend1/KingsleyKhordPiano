@@ -40,6 +40,8 @@
                         allow="autoplay; encrypted-media; fullscreen"
                         allowfullscreen
                     ></iframe>
+                    {{-- Blocks Google Drive's built-in "open in new window" icon, which can't be removed from the cross-origin preview UI --}}
+                    <div class="absolute top-0 right-0 w-16 h-16"></div>
                 @else
                     <video
                         src="{{ $liveshow->recording_url }}"

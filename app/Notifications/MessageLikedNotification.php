@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class MessageLikedNotification extends Notification implements ShouldQueue
 {
@@ -23,7 +25,21 @@ class MessageLikedNotification extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return match ($notifiable->notification_preference) {
+            'disabled' => ['database'],
+            'push' => ['database', WebPushChannel::class],
+            default => ['database', 'mail'],
+        };
+    }
+
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        $liker = $this->user->first_name ?? 'Someone';
+
+        return (new WebPushMessage)
+            ->title("{$liker} liked your message")
+            ->body($this->message->body)
+            ->data(['url' => url('/member/premium-chat')]);
     }
 
     public function toMail($notifiable)

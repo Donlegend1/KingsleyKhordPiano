@@ -30,12 +30,16 @@
 
         @elseif ($MidiFile->video_type === 'google')
             {{-- GOOGLE DRIVE VIDEO --}}
-            <iframe 
-                src="https://drive.google.com/file/d/{{ $MidiFile->video_path }}/preview"
-                width="100%" 
-                height="400" 
-                allow="autoplay"
-            ></iframe>
+            <div class="relative w-full" style="height: 400px;">
+                <iframe
+                    src="https://drive.google.com/file/d/{{ $MidiFile->video_path }}/preview"
+                    width="100%"
+                    height="400"
+                    allow="autoplay"
+                ></iframe>
+                {{-- Blocks Google Drive's built-in "open in new window" icon, which can't be removed from the cross-origin preview UI --}}
+                <div class="absolute top-0 right-0 w-16 h-16"></div>
+            </div>
 
         @elseif ($MidiFile->video_type === 'local')
             {{-- LOCAL MP4 VIDEO --}}
@@ -104,18 +108,22 @@
 
         <!-- Close Button -->
         <button id="closeLearnModal"
-            class="absolute top-3 right-3 text-white bg-red-600 rounded-full px-3 py-1">
+            class="absolute top-3 right-3 z-10 text-white bg-red-600 rounded-full px-3 py-1">
             ✕
         </button>
 
-       <iframe 
-          id="learnVideo"
-          src="https://drive.google.com/file/d/19kLzKfc3HB0v2dYJHcUzBrnFqOE4YPm4/preview"
-          width="100%" 
-          height="450"
-          allow="autoplay"
-          allowfullscreen
-      ></iframe>
+        <div class="relative w-full" style="height: 450px;">
+            <iframe
+                id="learnVideo"
+                src="https://drive.google.com/file/d/19kLzKfc3HB0v2dYJHcUzBrnFqOE4YPm4/preview"
+                width="100%"
+                height="450"
+                allow="autoplay"
+                allowfullscreen
+            ></iframe>
+            {{-- Blocks Google Drive's built-in "open in new window" icon, which can't be removed from the cross-origin preview UI --}}
+            <div class="absolute top-0 right-0 w-16 h-16"></div>
+        </div>
 
     </div>
 </div>

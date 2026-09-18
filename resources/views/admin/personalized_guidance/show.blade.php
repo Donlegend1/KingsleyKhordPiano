@@ -59,14 +59,18 @@
                         allowfullscreen
                     ></iframe>
                 @elseif($driveFileId)
-                    <iframe
-                        class="w-full h-full"
-                        src="https://drive.google.com/file/d/{{ $driveFileId }}/preview"
-                        title="Submission from {{ $user->full_name ?? 'Student' }}"
-                        frameborder="0"
-                        allow="autoplay"
-                        allowfullscreen
-                    ></iframe>
+                    <div class="relative w-full h-full">
+                        <iframe
+                            class="w-full h-full"
+                            src="https://drive.google.com/file/d/{{ $driveFileId }}/preview"
+                            title="Submission from {{ $user->full_name ?? 'Student' }}"
+                            frameborder="0"
+                            allow="autoplay"
+                            allowfullscreen
+                        ></iframe>
+                        {{-- Covers Google Drive's built-in "open in new window" icon, which can't be removed from the cross-origin preview UI --}}
+                        <div class="absolute top-0 right-0 w-16 h-16"></div>
+                    </div>
                 @else
                     <a href="{{ $request->youtube_link }}" target="_blank" rel="noopener noreferrer" class="w-full h-full flex items-center justify-center text-gray-300 text-sm hover:text-white">
                         Couldn't preview this link — open it directly

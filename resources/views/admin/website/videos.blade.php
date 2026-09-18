@@ -28,14 +28,16 @@
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($websiteVideos as $video)
                     <div class="bg-white rounded-lg shadow border p-4 flex flex-col">
-                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 mb-3">
-                            <iframe 
+                        <div class="relative aspect-w-16 aspect-h-9 bg-gray-200 mb-3">
+                            <iframe
                                 src="https://drive.google.com/file/d/{{ $video->video_url }}/preview"
                                 class="w-full h-full rounded"
                                 frameborder="0"
                                 allow="autoplay; encrypted-media"
                                 allowfullscreen>
                             </iframe>
+                            {{-- Blocks Google Drive's built-in "open in new window" icon, which can't be removed from the cross-origin preview UI --}}
+                            <div class="absolute top-0 right-0 w-16 h-16"></div>
                         </div>
                         <p class="font-semibold text-gray-800">{{ $video->title }}</p>
                         <div class="mt-4 flex justify-between">

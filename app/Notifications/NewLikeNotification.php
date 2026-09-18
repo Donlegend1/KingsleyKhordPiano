@@ -7,6 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Enums\Notification\NotificationSectionEnum;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class NewLikeNotification extends Notification implements ShouldQueue
 {
@@ -27,7 +29,22 @@ class NewLikeNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return match ($notifiable->notification_preference) {
+            'disabled' => ['database'],
+            'push' => ['database', WebPushChannel::class],
+            default => ['database', 'mail'],
+        };
+    }
+
+    /**
+     * Send notification via web push.
+     */
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        return (new WebPushMessage)
+            ->title('New Like on Your Post')
+            ->body($this->like->user->full_name . ' liked your post')
+            ->data(['url' => route('singlePost', $this->like->post_id)]);
     }
 
     /**

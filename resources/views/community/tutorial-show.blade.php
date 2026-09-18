@@ -14,7 +14,7 @@
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
 
     {{-- Video --}}
-    <div class="aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-sm">
+    <div class="relative aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-sm">
         @if($tutorial->video_type === 'vimeo')
             <iframe
                 src="https://player.vimeo.com/video/{{ $tutorial->video_url }}?autoplay=0"
@@ -36,6 +36,8 @@
                 allow="autoplay"
                 allowfullscreen
             ></iframe>
+            {{-- Blocks Google Drive's built-in "open in new window" icon, which can't be removed from the cross-origin preview UI --}}
+            <div class="absolute top-0 right-0 w-16 h-16"></div>
         @else
             <video src="{{ $tutorial->video_url }}" class="w-full h-full" controls></video>
         @endif

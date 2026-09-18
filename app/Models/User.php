@@ -10,10 +10,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Cashier\Billable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, Billable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, Billable, SoftDeletes, HasPushSubscriptions;
 
     /**
      * The attributes that are mass assignable.
@@ -43,6 +44,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'country',
         'passport',
         'metadata',
+        'notification_preference',
         'last_login_at',
         'timezone',
         'phone_number',

@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class MessageRepliedNotification extends Notification implements ShouldQueue
 {
@@ -21,7 +23,21 @@ class MessageRepliedNotification extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return match ($notifiable->notification_preference) {
+            'disabled' => ['database'],
+            'push' => ['database', WebPushChannel::class],
+            default => ['database', 'mail'],
+        };
+    }
+
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        $sender = $this->reply->user->first_name ?? 'Someone';
+
+        return (new WebPushMessage)
+            ->title("New Reply from {$sender}")
+            ->body($this->reply->body)
+            ->data(['url' => url('/member/premium-chat')]);
     }
 
     public function toMail($notifiable)

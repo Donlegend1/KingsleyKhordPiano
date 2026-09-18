@@ -270,6 +270,12 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');
     Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
     ->name('notifications.markAllAsRead');
+    Route::post('/notifications/preference', [App\Http\Controllers\NotificationController::class, 'updatePreference'])
+    ->name('notifications.updatePreference');
+    Route::post('/webpush/subscribe', [App\Http\Controllers\PushSubscriptionController::class, 'store'])
+    ->name('webpush.subscribe');
+    Route::post('/webpush/unsubscribe', [App\Http\Controllers\PushSubscriptionController::class, 'destroy'])
+    ->name('webpush.unsubscribe');
     Route::get('/community/user/{community}', [CommunityController::class, 'show']);
     Route::get('/community/u/{community}/update', [CommunityController::class, 'edit']);
     Route::get('bookmark', [BookMarkController::class, 'bookmark']);

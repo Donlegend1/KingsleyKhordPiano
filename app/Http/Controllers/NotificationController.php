@@ -45,4 +45,17 @@ class NotificationController extends Controller
 
         return back();
     }
+
+    public function updatePreference(Request $request)
+    {
+        $request->validate([
+            'notification_preference' => ['required', 'in:push,email,disabled'],
+        ]);
+
+        auth()->user()->update([
+            'notification_preference' => $request->notification_preference,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
 }
