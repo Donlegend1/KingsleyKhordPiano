@@ -593,19 +593,6 @@
                                 </select>
                             </div>
 
-                            @if ($showReferenceNote)
-                                <div>
-                                    <label class="block text-[12px] font-semibold text-gray-600 mb-1.5">Highlighted key (reference note)</label>
-                                    <select name="reference_note" required
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[14px] text-gray-800 focus:bg-white focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none">
-                                        <option value="" disabled selected>Select the key to highlight</option>
-                                        @foreach ($referenceNoteOptions as $option)
-                                            <option value="{{ $option }}">{{ $option }}</option>
-                                        @endforeach
-                                    </select>
-                                    <p class="text-[11px] text-gray-400 mt-1">This is the key highlighted on the piano keyboard as the student's reference note for this question.</p>
-                                </div>
-                            @endif
 
                             <button type="submit"
                                 class="flex items-center gap-2 bg-gray-900 text-white text-[13px] font-semibold px-5 py-3 rounded-full hover:bg-black transition-colors">
@@ -1059,54 +1046,24 @@
                                     <span class="px-2.5 py-1 rounded-full bg-gray-900 text-white text-[11px] font-semibold whitespace-nowrap">
                                         {{ $fixedOptions[$question->correct_option] ?? $question->correct_option }}
                                     </span>
-                                    @if ($showReferenceNote)
-                                        <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-semibold whitespace-nowrap">
-                                            Key: {{ $question->reference_note ?? 'Not set' }}
-                                        </span>
-                                    @endif
                                     <button type="button" @click="editing = true" class="text-gray-300 hover:text-gray-600 transition-colors" title="Change correct answer">
                                         <i class="fa-solid fa-pen text-[11px]"></i>
                                     </button>
                                 </div>
 
-                                @if ($showReferenceNote)
-                                    <form x-show="editing" x-cloak action="{{ route('admin.audio-quiz.questions.update', ['question' => $question->id]) }}" method="POST"
-                                        class="flex items-center gap-2 flex-shrink-0">
-                                        @csrf
-                                        <select name="correct_option"
-                                            class="bg-gray-50 border border-gray-200 rounded-full pl-3 pr-7 py-1.5 text-[11px] font-semibold text-gray-700 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none">
-                                            @foreach ($fixedOptions as $index => $option)
-                                                <option value="{{ $index }}" {{ $index === (int) $question->correct_option ? 'selected' : '' }}>{{ $option }}</option>
-                                            @endforeach
-                                        </select>
-                                        <select name="reference_note"
-                                            class="bg-amber-50 border border-amber-200 rounded-full pl-3 pr-7 py-1.5 text-[11px] font-semibold text-amber-800 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 outline-none">
-                                            @foreach ($referenceNoteOptions as $option)
-                                                <option value="{{ $option }}" {{ $option === $question->reference_note ? 'selected' : '' }}>{{ $option }}</option>
-                                            @endforeach
-                                        </select>
-                                        <button type="submit" class="text-green-600 hover:text-green-800 transition-colors" title="Save">
-                                            <i class="fa-solid fa-check text-[12px]"></i>
-                                        </button>
-                                        <button type="button" @click="editing = false" class="text-gray-300 hover:text-gray-600 transition-colors" title="Cancel">
-                                            <i class="fa-solid fa-xmark text-[12px]"></i>
-                                        </button>
-                                    </form>
-                                @else
-                                    <form x-show="editing" x-cloak action="{{ route('admin.audio-quiz.questions.update', ['question' => $question->id]) }}" method="POST"
-                                        class="flex items-center gap-2 flex-shrink-0">
-                                        @csrf
-                                        <select name="correct_option" onchange="this.form.submit()"
-                                            class="bg-gray-50 border border-gray-200 rounded-full pl-3 pr-7 py-1.5 text-[11px] font-semibold text-gray-700 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none">
-                                            @foreach ($fixedOptions as $index => $option)
-                                                <option value="{{ $index }}" {{ $index === (int) $question->correct_option ? 'selected' : '' }}>{{ $option }}</option>
-                                            @endforeach
-                                        </select>
-                                        <button type="button" @click="editing = false" class="text-gray-300 hover:text-gray-600 transition-colors" title="Cancel">
-                                            <i class="fa-solid fa-xmark text-[12px]"></i>
-                                        </button>
-                                    </form>
-                                @endif
+                                <form x-show="editing" x-cloak action="{{ route('admin.audio-quiz.questions.update', ['question' => $question->id]) }}" method="POST"
+                                    class="flex items-center gap-2 flex-shrink-0">
+                                    @csrf
+                                    <select name="correct_option" onchange="this.form.submit()"
+                                        class="bg-gray-50 border border-gray-200 rounded-full pl-3 pr-7 py-1.5 text-[11px] font-semibold text-gray-700 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none">
+                                        @foreach ($fixedOptions as $index => $option)
+                                            <option value="{{ $index }}" {{ $index === (int) $question->correct_option ? 'selected' : '' }}>{{ $option }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" @click="editing = false" class="text-gray-300 hover:text-gray-600 transition-colors" title="Cancel">
+                                        <i class="fa-solid fa-xmark text-[12px]"></i>
+                                    </button>
+                                </form>
 
                                 <form action="{{ route('admin.audio-quiz.questions.destroy', ['question' => $question->id]) }}"
                                     method="POST" onsubmit="return confirm('Delete this question?');">

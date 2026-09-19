@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LessonCompletion;
 use App\Models\Quiz;
 
 class AudioQuizController extends Controller
@@ -30,6 +31,40 @@ class AudioQuizController extends Controller
         $modalVoicings = Quiz::where('category', 'Modal Voicings')->orderBy('id')->first();
         $scales = Quiz::where('category', 'Scales')->orderBy('id')->first();
 
-        return view('memberpages.audio-quiz', compact('relativePitch', 'melodicDictation', 'intervals', 'basicTriads', 'add9', 'seventhDegree', 'secondarySeventh', 'ninthDegree', 'secondaryNinth', 'eleventhDegree', 'secondaryEleventh', 'thirteenthDegree', 'extensionsRecognition', 'chordProgressions', 'modalVoicings', 'scales'));
+        // Percentage of lessons completed per category, for the progress bar
+        // on each card — a category can have more than one lesson (Quiz row)
+        // even though the card only links to the first one.
+        $categories = [
+            'Relative Pitch', 'Melodic Dictation', 'Diatonic Intervals', 'Basic Triad',
+            'Add 9 & b9', '7th Degree Chords', 'Secondary 7th Chords', '9th Degree Chords',
+            'Secondary 9th Chords', '11th Degree Chords', 'Secondary 11th Chords',
+            '13th Degree Chords', 'Extentions recognition', 'Chord Progressions',
+            'Modal Voicings', 'Scales',
+        ];
+
+        $quizIdsByCategory = Quiz::whereIn('category', $categories)
+            ->get(['id', 'category'])
+            ->groupBy('category')
+            ->map(fn ($quizzes) => $quizzes->pluck('id'));
+
+        $completedIds = LessonCompletion::where('user_id', auth()->id())
+            ->where('completable_type', Quiz::class)
+            ->whereIn('completable_id', $quizIdsByCategory->flatten())
+            ->pluck('completable_id')
+            ->all();
+
+        $categoryProgress = collect($categories)->mapWithKeys(function ($category) use ($quizIdsByCategory, $completedIds) {
+            $ids = $quizIdsByCategory->get($category, collect());
+            $total = $ids->count();
+            $completed = $ids->filter(fn ($id) => in_array($id, $completedIds, true))->count();
+
+            return [$category => [
+                'total' => $total,
+                'completed' => $completed,
+                'pct' => $total > 0 ? (int) round(($completed / $total) * 100) : 0,
+            ]];
+        });
+
+        return view('memberpages.audio-quiz', compact('relativePitch', 'melodicDictation', 'intervals', 'basicTriads', 'add9', 'seventhDegree', 'secondarySeventh', 'ninthDegree', 'secondaryNinth', 'eleventhDegree', 'secondaryEleventh', 'thirteenthDegree', 'extensionsRecognition', 'chordProgressions', 'modalVoicings', 'scales', 'categoryProgress'));
     }
 }
