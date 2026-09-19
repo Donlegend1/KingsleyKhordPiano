@@ -35,6 +35,7 @@ const CategorizedLessonsAdmin = ({ config }) => {
         video_type: config.defaultVideoType || "iframe",
         video_url: "",
         status: "active",
+        related_lessons: [],
         ...extraFieldDefaults(config.extraFields),
     });
 
@@ -207,6 +208,12 @@ const CategorizedLessonsAdmin = ({ config }) => {
         formData.append("video_url", newLesson.video_url);
         formData.append("status", newLesson.status);
         appendExtraFields(formData, newLesson);
+        (newLesson.related_lessons || [])
+            .filter((rl) => rl.title || rl.url)
+            .forEach((rl, idx) => {
+                formData.append(`related_lessons[${idx}][title]`, rl.title);
+                formData.append(`related_lessons[${idx}][url]`, rl.url);
+            });
         if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
         descriptionImageFiles.forEach((file, idx) => formData.append(`images[${idx}]`, file));
         if (audioResourceFile) formData.append("audio_resource", audioResourceFile);
@@ -236,6 +243,12 @@ const CategorizedLessonsAdmin = ({ config }) => {
         formData.append("video_url", editingLesson.video_url);
         formData.append("status", editingLesson.status);
         appendExtraFields(formData, editingLesson);
+        (editingLesson.related_lessons || [])
+            .filter((rl) => rl.title || rl.url)
+            .forEach((rl, idx) => {
+                formData.append(`related_lessons[${idx}][title]`, rl.title);
+                formData.append(`related_lessons[${idx}][url]`, rl.url);
+            });
         if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
         descriptionImageFiles.forEach((file, idx) => formData.append(`images[${idx}]`, file));
         if (editAudioResourceFile) formData.append("audio_resource", editAudioResourceFile);
@@ -442,7 +455,7 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                                                                                                 <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
                                                                                                                     <button
                                                                                                                         onClick={() => {
-                                                                                                                            setEditingLesson({ ...blankLesson(), ...lesson });
+                                                                                                                            setEditingLesson({ ...blankLesson(), ...lesson, related_lessons: lesson.related_lessons || [] });
                                                                                                                             setPreviewUrl(lesson.thumbnail_url);
                                                                                                                             setThumbnailFile(null);
                                                                                                                             setDescriptionImageFiles([]);
@@ -563,6 +576,54 @@ const CategorizedLessonsAdmin = ({ config }) => {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                             <textarea value={newLesson.description} onChange={(e) => setNewLesson({ ...newLesson, description: e.target.value })} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none" rows="3" />
                         </div>
+                        <div className="sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                            <div className="space-y-2">
+                                {newLesson.related_lessons.map((rl, idx) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Lesson name"
+                                            value={rl.title}
+                                            onChange={(e) => {
+                                                const rows = [...newLesson.related_lessons];
+                                                rows[idx] = { ...rows[idx], title: e.target.value };
+                                                setNewLesson({ ...newLesson, related_lessons: rows });
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Link"
+                                            value={rl.url}
+                                            onChange={(e) => {
+                                                const rows = [...newLesson.related_lessons];
+                                                rows[idx] = { ...rows[idx], url: e.target.value };
+                                                setNewLesson({ ...newLesson, related_lessons: rows });
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const rows = newLesson.related_lessons.filter((_, i) => i !== idx);
+                                                setNewLesson({ ...newLesson, related_lessons: rows });
+                                            }}
+                                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                        >
+                                            <i className="fa fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setNewLesson({ ...newLesson, related_lessons: [...newLesson.related_lessons, { title: "", url: "" }] })}
+                                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                                >
+                                    <i className="fa fa-plus"></i> Add related lesson
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     {previewUrl && <img src={previewUrl} alt="Preview" className="w-32 h-20 object-cover rounded-lg border" />}
                     <div className="flex justify-end gap-3 pt-4 border-t">
@@ -629,6 +690,54 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                 <textarea value={editingLesson.description || ""} onChange={(e) => setEditingLesson({ ...editingLesson, description: e.target.value })} className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none" rows="3" />
                             </div>
+                            <div className="sm:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Related Lessons (Optional)</label>
+                                <div className="space-y-2">
+                                    {editingLesson.related_lessons.map((rl, idx) => (
+                                        <div key={idx} className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Lesson name"
+                                                value={rl.title}
+                                                onChange={(e) => {
+                                                    const rows = [...editingLesson.related_lessons];
+                                                    rows[idx] = { ...rows[idx], title: e.target.value };
+                                                    setEditingLesson({ ...editingLesson, related_lessons: rows });
+                                                }}
+                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Link"
+                                                value={rl.url}
+                                                onChange={(e) => {
+                                                    const rows = [...editingLesson.related_lessons];
+                                                    rows[idx] = { ...rows[idx], url: e.target.value };
+                                                    setEditingLesson({ ...editingLesson, related_lessons: rows });
+                                                }}
+                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const rows = editingLesson.related_lessons.filter((_, i) => i !== idx);
+                                                    setEditingLesson({ ...editingLesson, related_lessons: rows });
+                                                }}
+                                                className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                            >
+                                                <i className="fa fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingLesson({ ...editingLesson, related_lessons: [...editingLesson.related_lessons, { title: "", url: "" }] })}
+                                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+                                    >
+                                        <i className="fa fa-plus"></i> Add related lesson
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         {previewUrl && <img src={previewUrl} alt="Preview" className="w-32 h-20 object-cover rounded-lg border" />}
                         <div className="flex justify-end gap-3 pt-4 border-t">
@@ -692,7 +801,7 @@ const musicalConfig = {
     sectionSuffix: "Level",
     itemLabel: "Lesson",
     defaultVideoType: "vimeo",
-    showImages: false,
+    showImages: true,
     showMidi: true,
     extraFields: [],
     endpoints: {

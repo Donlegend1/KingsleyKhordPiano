@@ -162,16 +162,6 @@ class ExerciseController extends Controller
 
         $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
 
-            $related_courses = [];
-
-            if ($activeVideo && !empty($activeVideo->tags)) {
-                if ($activeVideo instanceof \App\Models\MusicalApplication) {
-                    $related_courses = \App\Models\MusicalApplication::whereIn('id', $activeVideo->tags)->get();
-                } else {
-                    $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
-                }
-            }
-
         $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($activeVideo);
         $midiPracticeFiles = collect([$midiPracticeFile])->filter();
 
@@ -186,7 +176,6 @@ class ExerciseController extends Controller
             'levels',
             'skillLevels',
             'comments',
-            'related_courses',
             'midiPracticeFile',
             'midiPracticeFiles'
         ));

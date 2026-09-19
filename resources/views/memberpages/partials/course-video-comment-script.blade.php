@@ -15,7 +15,7 @@
 
         function buildReplyNode(reply) {
             const wrapper = document.createElement('div');
-            wrapper.className = 'flex gap-3 py-3 first:pt-0';
+            wrapper.className = 'flex gap-3 py-2 first:pt-0';
             wrapper.dataset.replyId = reply.id;
 
             const name = userName(reply.user);
@@ -40,14 +40,14 @@
 
         function buildCommentNode(comment) {
             const wrapper = document.createElement('div');
-            wrapper.className = 'flex gap-3.5 py-5 first:pt-0';
+            wrapper.className = 'flex gap-3 py-4 first:pt-0';
             wrapper.dataset.commentId = comment.id;
 
             const name = userName(comment.user);
             const isOwner = window.authUser && comment.user_id === window.authUser.id;
 
             wrapper.innerHTML = `
-                <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                     <span class="text-gray-500 font-semibold text-xs">${name.charAt(0).toUpperCase()}</span>
                 </div>
                 <div class="flex-1 min-w-0">
@@ -61,7 +61,7 @@
                             <button type="button" class="comment-menu-toggle text-gray-300 hover:text-gray-500 px-1 transition-colors">
                                 <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
                             </button>
-                            <div class="comment-menu-dropdown hidden absolute right-0 mt-1 w-32 bg-white border border-gray-100 rounded-xl shadow-lg z-10 overflow-hidden">
+                            <div class="comment-menu-dropdown hidden absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-md z-10 overflow-hidden">
                                 <button type="button" class="comment-edit-btn block w-full px-4 py-2 text-left text-[13px] text-gray-600 hover:bg-gray-50">Edit</button>
                                 <button type="button" class="comment-delete-btn block w-full px-4 py-2 text-left text-[13px] text-red-500 hover:bg-gray-50">Delete</button>
                             </div>
@@ -71,27 +71,27 @@
                     <p class="text-[13.5px] text-gray-600 leading-relaxed mt-1 comment-text"></p>
 
                     ${isOwner ? `
-                    <div class="comment-edit-form hidden mt-3 space-y-2">
-                        <textarea class="comment-edit-input w-full bg-white border border-gray-200 rounded-2xl p-3 text-[13.5px] focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="2"></textarea>
+                    <div class="comment-edit-form hidden mt-2 space-y-2">
+                        <textarea class="comment-edit-input w-full border border-gray-300 rounded-md p-2 text-[13.5px] focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="2"></textarea>
                         <div class="flex justify-end gap-2">
-                            <button type="button" class="comment-edit-cancel text-[12px] font-semibold text-gray-500 px-3.5 py-1.5 rounded-full hover:bg-gray-100 transition-colors">Cancel</button>
-                            <button type="button" class="comment-edit-save text-[12px] font-semibold text-white bg-gray-900 px-3.5 py-1.5 rounded-full hover:bg-black transition-colors">Save</button>
+                            <button type="button" class="comment-edit-cancel text-[12px] font-semibold text-gray-500 px-3 py-1 hover:text-gray-900 transition-colors">Cancel</button>
+                            <button type="button" class="comment-edit-save text-[12px] font-semibold text-white bg-gray-900 px-3 py-1 rounded-md hover:bg-black transition-colors">Save</button>
                         </div>
                     </div>` : ''}
 
-                    <button type="button" class="comment-reply-toggle mt-2 text-[12px] font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+                    <button type="button" class="comment-reply-toggle mt-1.5 text-[12px] font-semibold text-gray-500 hover:text-gray-900 transition-colors">
                         Reply
                     </button>
 
-                    <div class="comment-reply-form hidden mt-3 space-y-2">
-                        <textarea class="comment-reply-input w-full bg-white border border-gray-200 rounded-2xl p-3 text-[13px] focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="2" placeholder="Write a reply..."></textarea>
+                    <div class="comment-reply-form hidden mt-2 space-y-2">
+                        <textarea class="comment-reply-input w-full border border-gray-300 rounded-md p-2 text-[13px] focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="2" placeholder="Write a reply..."></textarea>
                         <div class="flex justify-end gap-2">
-                            <button type="button" class="comment-reply-cancel text-[12px] font-semibold text-gray-500 px-3.5 py-1.5 rounded-full hover:bg-gray-100 transition-colors">Cancel</button>
-                            <button type="button" class="comment-reply-submit text-[12px] font-semibold text-white bg-gray-900 px-3.5 py-1.5 rounded-full hover:bg-black transition-colors">Reply</button>
+                            <button type="button" class="comment-reply-cancel text-[12px] font-semibold text-gray-500 px-3 py-1 hover:text-gray-900 transition-colors">Cancel</button>
+                            <button type="button" class="comment-reply-submit text-[12px] font-semibold text-white bg-gray-900 px-3 py-1 rounded-md hover:bg-black transition-colors">Reply</button>
                         </div>
                     </div>
 
-                    <div class="comment-replies-list mt-4 space-y-4"></div>
+                    <div class="comment-replies-list mt-3 space-y-3"></div>
                 </div>
             `;
 
@@ -107,7 +107,7 @@
 
         function addReplyToComment(wrapper, reply) {
             const repliesList = wrapper.querySelector('.comment-replies-list');
-            repliesList.classList.add('border-l-2', 'pl-4');
+            repliesList.classList.add('border-l', 'pl-3');
             repliesList.appendChild(buildReplyNode(reply));
         }
 

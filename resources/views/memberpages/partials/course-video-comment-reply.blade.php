@@ -1,4 +1,4 @@
-<div class="flex gap-3 py-3 first:pt-0" data-reply-id="{{ $reply->id }}">
+<div class="flex gap-3 py-2 first:pt-0" data-reply-id="{{ $reply->id }}">
     <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
         <span class="text-gray-500 font-semibold text-[11px]">
             {{ $reply->user ? substr($reply->user->first_name ?? $reply->user->name ?? 'U', 0, 1) : 'U' }}
