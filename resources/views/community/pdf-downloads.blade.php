@@ -22,14 +22,14 @@
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Browse and download sheet music, chord charts, and practice handouts.</p>
                 </div>
                 <div class="relative group w-full sm:w-72">
-                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#C85A5A] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
                     </svg>
                     <input
                         type="text"
                         x-model="search"
                         placeholder="Search PDF files..."
-                        class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#FF6B35]/40 transition-all"
+                        class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#C85A5A]/40 transition-all"
                     >
                     <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
@@ -53,7 +53,7 @@
             <!-- Mobile: Dropdown accordion -->
             <div class="sm:hidden relative mb-8" @click.outside="tabsOpen = false">
                 <button type="button" @click="tabsOpen = !tabsOpen"
-                    class="w-full flex items-center justify-between px-6 py-3 rounded-lg font-semibold text-sm bg-[#FF6B35] text-white shadow-sm transition-all duration-200">
+                    class="w-full flex items-center justify-between px-6 py-3 rounded-lg font-semibold text-sm bg-[#C85A5A] text-white shadow-sm transition-all duration-200">
                     <span x-text="({{ \Illuminate\Support\Js::from($typeTabs) }})[activeType]"></span>
                     <svg class="w-4 h-4 transition-transform duration-200" :class="tabsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -65,7 +65,7 @@
                     @foreach ($typeTabs as $key => $label)
                         <button type="button" @click="activeType = '{{ $key }}'; tabsOpen = false"
                             class="block w-full text-left px-6 py-3 font-semibold text-sm transition-colors duration-150"
-                            :class="activeType === '{{ $key }}' ? 'bg-[#FF6B35] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'">
+                            :class="activeType === '{{ $key }}' ? 'bg-[#C85A5A] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'">
                             {{ $label }}
                         </button>
                     @endforeach
@@ -78,7 +78,7 @@
                     <button
                         type="button"
                         @click="activeType = '{{ $key }}'"
-                        :class="activeType === '{{ $key }}' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-[#161617] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'"
+                        :class="activeType === '{{ $key }}' ? 'bg-[#C85A5A] text-white' : 'bg-white dark:bg-[#161617] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'"
                         class="flex-1 px-8 py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm"
                     >
                         {{ $label }}
@@ -126,7 +126,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         View
                                     </button>
-                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl bg-[#FF6B35] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E55A2B]">
+                                    <a href="{{ route('community.pdf-view', $pdf) }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl bg-[#C85A5A] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-red-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#B54B4B]">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path></svg>
                                         Download
                                     </a>

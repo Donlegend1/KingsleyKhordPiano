@@ -24,7 +24,6 @@ use App\Http\Controllers\LiveShowController;
 use App\Http\Controllers\LiveShowNotificationController;
 use App\Http\Controllers\DocumentMailController;
 use App\Http\Controllers\CommunityController;
-use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShopCheckoutController;
 use App\Support\ShopCatalog;
@@ -198,6 +197,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('getstarted', [GetstartedController::class, 'index']);
     Route::get('personalized-guidance', [PersonalizedGuidanceController::class, 'create'])->name('member.personalized-guidance.create');
     Route::post('personalized-guidance/submit', [PersonalizedGuidanceController::class, 'store'])->name('member.personalized-guidance.submit');
+    Route::get('personalized-plan', [PersonalizedGuidanceController::class, 'plan'])->name('member.personalized-plan');
+    Route::post('personalized-plan/lesson/toggle', [PersonalizedGuidanceController::class, 'toggleLesson'])->name('member.personalized-plan.lesson.toggle');
     Route::get('quiz', [QuizController::class, 'index'])->name('member.quiz');
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');
     Route::redirect('dashboard', '/home');
@@ -227,7 +228,9 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
 Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->group(function () {
     Route::post('whatsapp-preference', [HomeController::class, 'updateWhatsappPreference']);
     Route::post('timezone', [HomeController::class, 'updateTimezone'])->name('member.timezone');
-    Route::get('/shop', [ShopController::class, 'index']);
+    Route::get('/shop', function () {
+        return redirect('/shop?tab=plugin');
+    });
     Route::get('/premium-booking', [LiveShowController::class, 'show']);
     Route::get('/my-library', [CommunityIndexController::class, 'index'])->name('community.index');
     Route::post('/feedback', [CommunityIndexController::class, 'storeFeedback'])->name('community.feedback.store');
@@ -279,7 +282,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community/user/{community}', [CommunityController::class, 'show']);
     Route::get('/community/u/{community}/update', [CommunityController::class, 'edit']);
     Route::get('bookmark', [BookMarkController::class, 'bookmark']);
-    Route::post('/bookmark/toggle', [BookmarkController::class, 'toggle'])->name('bookmark.toggle');
+    Route::post('/bookmark/toggle', [BookMarkController::class, 'toggle'])->name('bookmark.toggle');
     Route::post('/lesson-completion', [LessonCompletionController::class, 'store'])->name('lesson.complete');
 });
 
@@ -373,6 +376,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::prefix('personalized-guidance')->name('admin.personalized-guidance.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'index'])->name('index');
         Route::get('/user/{user}', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'show'])->name('show');
+        Route::get('/user/{user}/plan', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'editPlan'])->name('plan.edit');
+        Route::post('/user/{user}/plan', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'updatePlan'])->name('plan.update');
         Route::patch('/{guidanceRequest}/reviewed', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'markReviewed'])->name('reviewed');
     });
 

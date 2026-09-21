@@ -20,7 +20,7 @@ export const CheckpointCta = ({ checkpoint, onSelectCourse }) => {
     );
 
     const className =
-        "w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 transition";
+        "w-full flex items-center justify-center gap-2 rounded-xl bg-[#1447A6] hover:bg-[#0F3A8A] text-white font-semibold py-3.5 transition";
 
     if (checkpoint.redirect_url) {
         return (
@@ -45,11 +45,11 @@ const CheckpointDetails = ({ checkpoint }) => {
     return (
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 w-full max-w-7xl mx-auto">
             <div className="flex items-start gap-4 mb-6">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/40 shadow-sm flex-shrink-0">
-                    <Target className="w-6 h-6 text-indigo-600 dark:text-indigo-300" strokeWidth={2} />
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#1447A6]/10 dark:bg-[#1447A6]/20 shadow-sm flex-shrink-0">
+                    <Target className="w-6 h-6 text-[#1447A6] dark:text-[#1447A6]" strokeWidth={2} />
                 </div>
                 <div>
-                    <span className="text-xs font-bold tracking-wide text-indigo-600 dark:text-indigo-300 uppercase">
+                    <span className="text-xs font-bold tracking-wide text-[#1447A6] dark:text-[#1447A6] uppercase">
                         {checkpoint.label || "Practice Checkpoint"}
                     </span>
                     <h2 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 mt-1">

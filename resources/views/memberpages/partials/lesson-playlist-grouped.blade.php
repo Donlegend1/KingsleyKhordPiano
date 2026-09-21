@@ -24,8 +24,8 @@
      }">
 
     {{-- Header --}}
-    <div class="px-5 py-4 border-b border-gray-100 bg-red-50">
-        <p class="text-[11px] font-bold text-red-500 tracking-[0.14em] uppercase">
+    <div class="px-5 py-4 border-b border-gray-100 bg-[#1447A6]/10">
+        <p class="text-[11px] font-bold text-[#1447A6] tracking-[0.14em] uppercase">
             Browse by Skill Level
         </p>
     </div>
@@ -36,7 +36,7 @@
             <div>
                 <button type="button"
                     @click="toggleGroup({{ \Illuminate\Support\Js::from($groupLevel) }})"
-                    class="w-full flex items-center justify-between px-5 py-3 bg-gray-700 hover:bg-gray-600 transition-colors">
+                    class="w-full flex items-center justify-between px-5 py-3 border-b border-white/20 bg-gray-700 hover:bg-gray-600 transition-colors">
                     <span class="text-[11px] font-semibold text-white tracking-[0.08em] uppercase">{{ $groupLevel }}</span>
                     <span class="text-white text-sm font-light leading-none flex-shrink-0 w-3.5 text-center"
                           x-text="openGroups.includes({{ \Illuminate\Support\Js::from($groupLevel) }}) ? '−' : '+'"></span>
@@ -52,7 +52,7 @@
                         @endphp
                         <a href="{{ request()->fullUrlWithQuery(['video_id' => $item->id]) }}"
                             class="flex items-center gap-3 px-5 py-3.5 transition-colors
-                    {{ $isActive ? 'bg-red-600' : 'bg-gray-50 hover:bg-gray-100' }}">
+                    {{ $isActive ? 'bg-[#1447A6]' : 'bg-gray-100 hover:bg-gray-200' }}">
 
                             <i class="fa-solid fa-play text-[9px] flex-shrink-0 {{ $isActive ? 'text-white' : 'text-gray-300' }}"></i>
 
@@ -74,25 +74,25 @@
                             $curatedRelated = $item->related_lessons ?? null;
                         @endphp
                         @if ($isActive && (!empty($curatedRelated) || ($relatedLessons ?? collect())->count() > 0))
-                            <div class="bg-white border-b border-gray-50 px-5 py-4">
+                            <div class="bg-gray-50/70 border-b border-gray-50 px-5 py-4">
                                 <div class="flex items-center gap-1.5 mb-3">
-                                    <i class="fa-solid fa-link text-indigo-500 text-[10px]"></i>
+                                    <i class="fa-solid fa-link text-[#1447A6] text-[10px]"></i>
                                     <p class="text-[10px] font-bold text-gray-400 tracking-[0.14em] uppercase">
                                         Related Lessons
                                     </p>
                                 </div>
-                                <div class="space-y-2">
+                                <div class="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100 overflow-hidden shadow-sm">
                                     @if (!empty($curatedRelated))
                                         @foreach ($curatedRelated as $related)
                                             <a href="{{ $related['url'] }}"
-                                                class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all group">
-                                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 text-indigo-500 flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                                                    <i class="fa-solid fa-play text-[8px] ml-0.5"></i>
+                                                class="flex items-center gap-3 px-3.5 py-3 hover:bg-gray-50 transition-colors group">
+                                                <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1447A6]/10 text-[#1447A6] flex-shrink-0 group-hover:bg-[#1447A6] group-hover:text-white transition-colors">
+                                                    <i class="fa-solid fa-play text-[10px] ml-0.5"></i>
                                                 </span>
-                                                <p class="text-[11px] font-semibold text-gray-700 group-hover:text-indigo-700 truncate flex-1 transition-colors">
+                                                <p class="text-[13px] font-semibold text-gray-800 truncate flex-1 transition-colors">
                                                     {{ $related['title'] }}
                                                 </p>
-                                                <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-indigo-400 text-[9px] flex-shrink-0 transition-colors"></i>
+                                                <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-[#1447A6] text-[10px] flex-shrink-0 transition-colors"></i>
                                             </a>
                                         @endforeach
                                     @else
@@ -108,14 +108,14 @@
                                                 $relatedHref = route('piano.exercise.player', $relatedUrlParams);
                                             @endphp
                                             <a href="{{ $relatedHref }}"
-                                                class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all group">
-                                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 text-indigo-500 flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                                                    <i class="fa-solid fa-play text-[8px] ml-0.5"></i>
+                                                class="flex items-center gap-3 px-3.5 py-3 hover:bg-gray-50 transition-colors group">
+                                                <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1447A6]/10 text-[#1447A6] flex-shrink-0 group-hover:bg-[#1447A6] group-hover:text-white transition-colors">
+                                                    <i class="fa-solid fa-play text-[10px] ml-0.5"></i>
                                                 </span>
-                                                <p class="text-[11px] font-semibold text-gray-700 group-hover:text-indigo-700 truncate flex-1 transition-colors">
+                                                <p class="text-[13px] font-semibold text-gray-800 truncate flex-1 transition-colors">
                                                     {{ $related->title }}
                                                 </p>
-                                                <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-indigo-400 text-[9px] flex-shrink-0 transition-colors"></i>
+                                                <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-[#1447A6] text-[10px] flex-shrink-0 transition-colors"></i>
                                             </a>
                                         @endforeach
                                     @endif

@@ -39,7 +39,7 @@
     </div>
     <h4 class="relative font-semibold text-white text-[18px] font-sf">Personalized Roadmap</h4>
     <p class="relative text-sm text-gray-400 mt-1 font-sf flex-1">Your custom path to mastering piano</p>
-    <a href="{{ route('member.personalized-guidance.create') }}"
+    <a href="{{ route('member.personalized-plan') }}"
        class="relative mt-4 inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-300 text-black text-sm font-bold font-sf shadow-md shadow-amber-500/30 hover:shadow-amber-500/50 hover:brightness-105 transition-all">
       View Personalized Plan
       <i class="fa fa-angle-right text-xs"></i>

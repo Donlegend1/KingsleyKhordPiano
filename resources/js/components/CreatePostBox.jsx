@@ -96,6 +96,12 @@ const CreatePostBox = ({
     const topicOptions = TOPIC_OPTIONS.filter(
         (opt) => opt.value !== "announcement" || isAdmin,
     );
+    const getDefaultTitle = (topicValue) =>
+        ({
+            say_hello: `New Member: ${fullName}`,
+            workspace_showcase: "My Workspace",
+            public_pledges: "My Pledge",
+        })[topicValue] || "";
 
     /* ---------------- CATEGORY LOGIC ---------------- */
     useEffect(() => {
@@ -106,19 +112,37 @@ const CreatePostBox = ({
         }));
     }, [topic, fixedSubcategory]);
 
-    // Pre-fill the title for a "Say Hello" introduction post, without
-    // clobbering anything the user has already typed.
-    useEffect(() => {
-        if (topic === "say_hello" && !title.trim()) {
-            setTitle(`New Member: ${fullName}`);
-        }
-    }, [topic]);
-
+    // Resolve `topic` from `initialTopic` AND pre-fill the title in the same
+    // effect, off the same freshly-resolved value — doing this as two
+    // separate effects (one updating `topic`, another reacting to the
+    // derived `effectiveTopic`) meant the title effect saw a stale
+    // `effectiveTopic` for one extra render, since `effectiveTopic` only
+    // updates a render after `topic` state actually changes.
+    const autoTitleRef = useRef("");
     useEffect(() => {
         if (fixedSubcategory) return;
         const allowed = topicOptions.some((opt) => opt.value === initialTopic);
-        setTopic(allowed ? initialTopic : "");
+        const resolvedTopic = allowed ? initialTopic : "";
+        setTopic(resolvedTopic);
+
+        const defaultTitle = getDefaultTitle(resolvedTopic);
+        setTitle((current) => {
+            if (current.trim() !== "" && current !== autoTitleRef.current) {
+                return current;
+            }
+            return defaultTitle;
+        });
+        autoTitleRef.current = defaultTitle;
     }, [initialTopic, fixedSubcategory, isAdmin]);
+
+    // fixedSubcategory pages (e.g. Workspace Showcase) never go through the
+    // effect above, so pre-fill their title once on mount here instead.
+    useEffect(() => {
+        if (!fixedSubcategory) return;
+        const defaultTitle = getDefaultTitle(fixedSubcategory);
+        setTitle((current) => (current.trim() === "" ? defaultTitle : current));
+        autoTitleRef.current = defaultTitle;
+    }, [fixedSubcategory]);
 
     /* ---------------- MEDIA HANDLING ---------------- */
     // `blockType` is fixed by which button the user clicked (image vs.
@@ -236,7 +260,9 @@ const CreatePostBox = ({
         await handlePost(formData);
 
         setBlocks([]);
-        setTitle("");
+        const resetTitle = getDefaultTitle(fixedSubcategory || "");
+        setTitle(resetTitle);
+        autoTitleRef.current = resetTitle;
         setTopic("");
         setShowLinkInput(false);
         setLinkUrl("");

@@ -140,6 +140,94 @@
         </div>
     </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+
+    {{-- Recent Activity --}}
+    <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm p-6">
+        <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+            </div>
+            <span class="text-sm font-bold text-gray-900 dark:text-white">Recent Activity</span>
+        </div>
+
+        <div class="space-y-4">
+            @forelse($recentActivity as $act)
+                @php
+                    $isBookmarked = isset($act->type) && $act->type === 'bookmarked';
+                @endphp
+                <div class="flex items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0
+                            {{ $isBookmarked ? 'bg-indigo-500 text-white' : 'bg-emerald-500 text-white' }}">
+                            @if($isBookmarked)
+                                <svg class="w-2.5 h-2.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            @else
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            @endif
+                        </div>
+                        <span class="font-medium text-gray-800 dark:text-gray-200 truncate">
+                            {{ $isBookmarked ? 'Started' : 'Completed' }}: {{ $act->title }}
+                        </span>
+                    </div>
+                    <span class="text-gray-400 flex-shrink-0 text-[10px]">
+                        {{ \Carbon\Carbon::parse($act->created_at)->diffForHumans(null, true) }}
+                    </span>
+                </div>
+            @empty
+                <p class="text-xs text-gray-400 py-6 text-center">No recent activity found.</p>
+            @endforelse
+        </div>
+    </div>
+
+    {{-- Next Milestone --}}
+    <div class="relative bg-[#FFFDF4] border border-[#FBEFBF] rounded-2xl p-6 overflow-hidden">
+        <div class="pr-16">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-[#FDF6D6] flex items-center justify-center text-2xl shadow-sm flex-shrink-0">
+                    🏆
+                </div>
+                <div class="flex-grow min-w-0 pt-1">
+                    <h4 class="text-sm font-bold text-gray-900">Next Milestone</h4>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                        @if($nextMilestone)
+                            Complete {{ $neededLessons }} more {{ Str::plural('lesson', $neededLessons) }} to reach <span class="font-bold text-amber-600">{{ $nextMilestone['name'] }}</span>!
+                        @else
+                            You achieved all milestones! You are a <span class="font-bold text-amber-600">Piano Legend</span>!
+                        @endif
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <span class="text-2xl font-extrabold text-amber-500">{{ $milestonePct }}%</span>
+                <div class="mt-3 bg-amber-100 rounded-full h-2.5">
+                    <div class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: {{ $milestonePct }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute right-6 top-1/2 -translate-y-1/2 flex items-center justify-center">
+            {{-- Purple and Gold Shield Icon --}}
+            <svg class="w-11 h-11 text-indigo-700 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center text-amber-400">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
     {{-- Skill Assessment --}}
     <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm p-6 mt-6">
         @if($assessment)

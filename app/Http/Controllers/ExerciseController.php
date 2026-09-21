@@ -233,6 +233,7 @@ class ExerciseController extends Controller
             ->whereIn('musical_application_category_id', $categoryPage->pluck('id'))
             ->when($skillLevel !== 'ALL', fn ($q) => $q->where('skill_level', $skillLevel))
             ->orderByRaw('position IS NULL, position ASC')
+            ->orderByDesc('id')
             ->get()
             ->groupBy('series')
             ->sortBy(fn ($items, $series) => $categoryPage->pluck('category')->search($series));

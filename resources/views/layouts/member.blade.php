@@ -105,7 +105,7 @@
                     <a href="/member/community/activity-feed" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-users"></i> Community
                     </a>
-                    <a href="https://kingsleykhordpiano.com/shop" target="_blank" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
+                    <a href="/member/shop?tab=plugin" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
                         <i class="fa fa-shopping-bag"></i> Shop
                     </a>
                     <a href="/member/support" class="text-white hover:text-[#FFD736] text-sm flex items-center gap-1.5 transition">
@@ -318,7 +318,7 @@
                     <a href="/member/profile" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-user-circle w-4"></i> My Account
                     </a>
-                    <a href="https://kingsleykhordpiano.com/shop" target="_blank" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
+                    <a href="/member/shop?tab=plugin" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">
                         <i class="fa fa-shopping-bag w-4"></i> Shop
                     </a>
                     <a href="/member/support" class="flex items-center gap-2 text-sm px-3 py-2 text-gray-300 hover:text-[#FFD736] transition">

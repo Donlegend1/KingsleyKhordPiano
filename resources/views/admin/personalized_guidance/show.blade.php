@@ -3,12 +3,23 @@
 @section('content')
 <div class="p-4 sm:p-6 max-w-3xl mx-auto">
 
-    <a href="{{ route('admin.personalized-guidance.index') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-700 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to all requests
-    </a>
+    <div class="flex items-center justify-between mb-4">
+        <a href="{{ route('admin.personalized-guidance.index') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to all requests
+        </a>
+
+        <a href="{{ route('admin.personalized-guidance.plan.edit', $user) }}"
+           class="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-gray-900 hover:bg-black px-3.5 py-2 rounded-lg transition-colors"
+           title="Set personalized roadmap &amp; plan">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Set Personalized Plan
+        </a>
+    </div>
 
     @if(session('success'))
         <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\LiveCoachingBooking;
 use App\Models\PersonalizedGuidanceRequest;
+use App\Models\PersonalizedPlan;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class PersonalizedGuidanceController extends Controller
@@ -64,5 +66,93 @@ class PersonalizedGuidanceController extends Controller
     {
         $guidanceRequest->update(['status' => 'reviewed']);
         return back()->with('success', 'Marked as reviewed.');
+    }
+
+    private function blankLessonCategories(): array
+    {
+        return [
+            'finger_exercise' => [],
+            'theory_and_application' => [],
+            'guided_practice' => [],
+            'repertoire' => [],
+        ];
+    }
+
+    public function editPlan(User $user)
+    {
+        $plan = PersonalizedPlan::where('user_id', $user->id)->first();
+
+        $months = $plan?->months ?? [];
+        while (count($months) < 3) {
+            $months[] = ['lessons' => $this->blankLessonCategories()];
+        }
+
+        $initialPlan = [
+            'skill_level' => $plan?->skill_level ?? '',
+            'goal' => $plan?->goal ?? '',
+            'start_date' => $plan?->start_date?->toDateString() ?? '',
+            'ninety_day_target' => $plan?->ninety_day_target ?: [''],
+            'months' => $months,
+        ];
+
+        return view('admin.personalized_guidance.plan', [
+            'user' => $user,
+            'initialPlan' => $initialPlan,
+        ]);
+    }
+
+    public function updatePlan(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'skill_level' => 'nullable|string|in:Early Beginner,Advanced Beginner,Intermediate,Upper Intermediate,Advanced',
+            'goal' => 'nullable|string|max:255',
+            'start_date' => 'nullable|date',
+            'ninety_day_target' => 'nullable|string',
+            'months' => 'nullable|string',
+        ]);
+
+        $ninetyDayTarget = collect(json_decode($validated['ninety_day_target'] ?? '[]', true))
+            ->map(fn ($item) => trim((string) $item))
+            ->filter(fn ($item) => $item !== '')
+            ->values()
+            ->all();
+
+        $categoryKeys = ['finger_exercise', 'theory_and_application', 'guided_practice', 'repertoire'];
+
+        $months = collect(json_decode($validated['months'] ?? '[]', true))
+            ->map(function ($month) use ($categoryKeys) {
+                $lessons = [];
+                foreach ($categoryKeys as $key) {
+                    $lessons[$key] = collect($month['lessons'][$key] ?? [])
+                        ->map(fn ($item) => [
+                            'id' => ($item['id'] ?? '') ?: (string) \Illuminate\Support\Str::uuid(),
+                            'name' => trim((string) ($item['name'] ?? '')),
+                            'url' => trim((string) ($item['url'] ?? '')),
+                            'week' => trim((string) ($item['week'] ?? '')),
+                            'duration' => trim((string) ($item['duration'] ?? '')),
+                        ])
+                        ->filter(fn ($item) => $item['name'] !== '' || $item['url'] !== '')
+                        ->values()
+                        ->all();
+                }
+
+                return [
+                    'lessons' => $lessons,
+                ];
+            })
+            ->all();
+
+        PersonalizedPlan::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'skill_level' => $validated['skill_level'] ?? null,
+                'goal' => $validated['goal'] ?? null,
+                'start_date' => $validated['start_date'] ?? null,
+                'ninety_day_target' => $ninetyDayTarget,
+                'months' => $months,
+            ]
+        );
+
+        return redirect()->route('admin.personalized-guidance.show', $user)->with('success', 'Personalized plan saved.');
     }
 }

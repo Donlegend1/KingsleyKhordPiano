@@ -20,7 +20,7 @@
                 <span>/</span>
                 <a href="/member/live-session" class="hover:text-gray-700">Live Shows</a>
                 <span>/</span>
-                <span class="text-blue-600 font-medium">{{ $liveshow->title }}</span>
+                <span class="text-[#C85A5A] font-medium">{{ $liveshow->title }}</span>
             </div>
         </section>
 

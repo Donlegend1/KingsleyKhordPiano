@@ -48,7 +48,13 @@ class PostController extends Controller
         // No exclusion otherwise: the Activity Feed shows every post,
         // including submissions made on an individual challenge page.
 
-        $query->orderByDesc('is_pinned');
+        // Pinning is scoped to whatever topic/subcategory page a post was
+        // pinned within — it should only float that post to the top of that
+        // same topic's own feed, not bleed into the unfiltered "All Posts"
+        // feed and bury genuinely newer posts from other topics.
+        if ($request->filled('subcategory') || $request->filled('parent_post_id')) {
+            $query->orderByDesc('is_pinned');
+        }
 
         // Sorting logic
         switch ($request->get('sort')) {

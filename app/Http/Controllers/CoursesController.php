@@ -35,7 +35,8 @@ class CoursesController extends Controller
                       $subQ->where('title', 'like', "%{$search}%")
                            ->orWhere('description', 'like', "%{$search}%");
                   })
-                  ->latest();
+                  ->orderByDesc('created_at')
+                  ->orderByDesc('id');
             }])
             ->whereHas('courses', function($q) use ($search) {
                 $q->where('status', 'active')

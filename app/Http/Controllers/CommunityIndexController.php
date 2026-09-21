@@ -669,16 +669,96 @@ class CommunityIndexController extends Controller
       $skillLevel = $assessment->skill_level ?? null;
 
       // Same "Academy Stats" figures used on the community dashboard, for consistency.
-      $totalCompleted = \DB::table('course_progress')
+      $courseProgressCount = \DB::table('course_progress')
          ->where('user_id', $user->id)
          ->distinct('course_id')
          ->count('course_id');
+      $lessonCompletionCount = \App\Models\LessonCompletion::where('user_id', $user->id)->count();
+      $totalCompleted = $courseProgressCount + $lessonCompletionCount;
 
-      $milestonesList = [1, 4, 9, 14, 21, 31, 43, 58, 76, 96, 121, 151];
-      $achievedCount = collect($milestonesList)->filter(fn ($lessons) => $totalCompleted >= $lessons)->count();
+      // Same milestone ladder used on components/memberarea/stats.blade.php,
+      // kept in sync here so both pages report the same numbers.
+      $milestonesList = [
+         ['name' => 'Starter', 'lessons' => 1],
+         ['name' => 'Player', 'lessons' => 4],
+         ['name' => 'Performer', 'lessons' => 9],
+         ['name' => 'Artist', 'lessons' => 14],
+         ['name' => 'Maestro', 'lessons' => 21],
+         ['name' => 'Master', 'lessons' => 31],
+         ['name' => 'Grand Master', 'lessons' => 43],
+         ['name' => 'Composer', 'lessons' => 58],
+         ['name' => 'Conductor', 'lessons' => 76],
+         ['name' => 'Virtuoso', 'lessons' => 96],
+         ['name' => 'Prodigy', 'lessons' => 121],
+         ['name' => 'Piano Legend', 'lessons' => 151],
+      ];
+
+      $achievedCount = 0;
+      $currentMilestoneName = 'None';
+      $nextMilestone = null;
+      $prevMilestoneLessons = 0;
+      foreach ($milestonesList as $milestone) {
+         if ($totalCompleted >= $milestone['lessons']) {
+            $achievedCount++;
+            $currentMilestoneName = $milestone['name'];
+            $prevMilestoneLessons = $milestone['lessons'];
+         } else {
+            $nextMilestone = $milestone;
+            break;
+         }
+      }
+
+      if ($nextMilestone) {
+         $neededLessons = $nextMilestone['lessons'] - $totalCompleted;
+         $range = $nextMilestone['lessons'] - $prevMilestoneLessons;
+         $currentInRange = $totalCompleted - $prevMilestoneLessons;
+         $milestonePct = $range > 0 ? round(($currentInRange / $range) * 100) : 0;
+      } else {
+         $neededLessons = 0;
+         $milestonePct = 100;
+      }
+
+      // Recent Activity — same combined roadmap + lesson-completion query used
+      // on the dashboard's stats widget.
+      $courseActivity = \DB::table('course_progress')
+         ->join('courses', 'course_progress.course_id', '=', 'courses.id')
+         ->where('course_progress.user_id', $user->id)
+         ->select('courses.title', 'course_progress.created_at')
+         ->get()
+         ->map(fn ($row) => (object) [
+            'title' => $row->title,
+            'created_at' => \Carbon\Carbon::parse($row->created_at),
+         ]);
+
+      $lessonActivity = \App\Models\LessonCompletion::where('user_id', $user->id)
+         ->with('completable')
+         ->get()
+         ->map(fn ($lc) => (object) [
+            'title' => $lc->completable?->title ?? 'Untitled Lesson',
+            'created_at' => $lc->created_at,
+         ]);
+
+      $recentActivity = $courseActivity->concat($lessonActivity)
+         ->sortByDesc('created_at')
+         ->take(3)
+         ->values();
+
+      if ($recentActivity->isEmpty()) {
+         $recentActivity = $user->bookmarks()
+            ->with('bookmarkable')
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(fn ($b) => (object) [
+               'title' => $b->bookmarkable?->title ?? 'Untitled Lesson',
+               'created_at' => $b->created_at,
+               'type' => 'bookmarked',
+            ]);
+      }
 
       return view('community.profile', compact(
-         'user', 'postsCount', 'skillLevel', 'assessment', 'totalCompleted', 'achievedCount'
+         'user', 'postsCount', 'skillLevel', 'assessment', 'totalCompleted', 'achievedCount',
+         'currentMilestoneName', 'nextMilestone', 'neededLessons', 'milestonePct', 'recentActivity'
       ));
    }
 

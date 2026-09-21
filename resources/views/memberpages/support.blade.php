@@ -7,16 +7,11 @@
  <h2 class="text-2xl font-bold text-gray-800 mb-6">Support Center</h2>
     </div>
 
-<div class="my-5">
- <p class="text-xl font-sf">If you have any questions not addressed above, please use the form below to contact me and I will respond as soon as possible. My goal is to respond to every email within a day.</p>
-</div>
-
-
     {{-- Contact Support Form --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
         <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                <i class="fa-regular fa-paper-plane text-indigo-600 text-sm"></i>
+            <div class="w-10 h-10 rounded-xl bg-[#1447A6]/10 flex items-center justify-center flex-shrink-0">
+                <i class="fa-regular fa-paper-plane text-[#1447A6] text-sm"></i>
             </div>
             <div>
                 <h3 class="text-lg font-bold text-gray-900 leading-tight">Send Us a Message</h3>
@@ -37,7 +32,7 @@
                 <label for="subject" class="block text-sm font-semibold text-gray-700 mb-1.5">Subject</label>
                 <input type="text" name="subject" id="subject" value="{{ old('subject') }}" required
                        placeholder="What's this about?"
-                       class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none">
+                       class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-[#1447A6] focus:ring-2 focus:ring-[#1447A6]/10 focus:outline-none">
                 @error('subject')
                     <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>
                 @enderror
@@ -47,7 +42,7 @@
                 <label for="message" class="block text-sm font-semibold text-gray-700 mb-1.5">Message</label>
                 <textarea name="message" id="message" rows="5" required
                           placeholder="Tell us how we can help..."
-                          class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none resize-none">{{ old('message') }}</textarea>
+                          class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-[#1447A6] focus:ring-2 focus:ring-[#1447A6]/10 focus:outline-none resize-none">{{ old('message') }}</textarea>
                 @error('message')
                     <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>
                 @enderror
@@ -56,7 +51,7 @@
             <div x-data="{ fileName: null }">
                 <label class="block text-sm font-semibold text-gray-700 mb-1.5">Attachment <span class="font-normal text-gray-400">(optional)</span></label>
                 <label for="attachment"
-                       class="flex items-center justify-center gap-2 w-full py-6 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 cursor-pointer hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/40 transition">
+                       class="flex items-center justify-center gap-2 w-full py-6 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 cursor-pointer hover:border-[#1447A6] hover:text-[#1447A6] hover:bg-[#1447A6]/5 transition">
                     <i class="fa-solid fa-paperclip"></i>
                     <span x-text="fileName ?? 'Click to attach a file'"></span>
                 </label>
@@ -70,7 +65,7 @@
 
             <div class="flex justify-end pt-2">
                 <button type="submit"
-                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold text-sm shadow-sm shadow-indigo-200 transition-all duration-150 hover:scale-[1.02] active:scale-95">
+                        class="inline-flex items-center gap-2 bg-[#1447A6] hover:bg-[#0F3A8A] text-white px-6 py-3 rounded-xl font-semibold text-sm shadow-sm shadow-[#1447A6]/20 transition-all duration-150 hover:scale-[1.02] active:scale-95">
                     <i class="fa-solid fa-paper-plane text-xs"></i>
                     Send Message
                 </button>

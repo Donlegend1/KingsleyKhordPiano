@@ -38,7 +38,7 @@
           <div
             class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all duration-300"
             :class="{
-              'bg-indigo-600 border-indigo-600 text-white': step >= {{ $i }},
+              'bg-[#1447A6] border-[#1447A6] text-white': step >= {{ $i }},
               'bg-white border-gray-300 text-gray-400': step < {{ $i }}
             }"
           >
@@ -51,13 +51,13 @@
           </div>
           <span
             class="hidden sm:block mt-2 text-xs font-medium whitespace-nowrap"
-            :class="step >= {{ $i }} ? 'text-indigo-600' : 'text-gray-400'"
+            :class="step >= {{ $i }} ? 'text-[#1447A6]' : 'text-gray-400'"
           >{{ $stepLabels[$i] }}</span>
         </div>
         {{-- Connector line (skip after last) --}}
         @if ($i < 4)
           <div class="flex-1 h-px mx-2 mt-[18px]"
-            :class="step > {{ $i }} ? 'bg-indigo-600' : 'bg-gray-200'"
+            :class="step > {{ $i }} ? 'bg-[#1447A6]' : 'bg-gray-200'"
           ></div>
         @endif
       @endfor
@@ -116,8 +116,8 @@
       <div class="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col">
 
         {{-- Icon --}}
-        <div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center mb-3">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
           </svg>
         </div>
@@ -129,24 +129,24 @@
         {{-- Features --}}
         <ul class="divide-y divide-gray-100 mb-5 w-full text-left flex-1">
           <li class="flex items-center gap-3 py-3">
-            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <span class="text-sm text-gray-700">Takes less than 2 minutes</span>
           </li>
           <li class="flex items-center gap-3 py-3">
-            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1447A6]" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
               </svg>
             </div>
             <span class="text-sm text-gray-700">Instant results</span>
           </li>
           <li class="flex items-center gap-3 py-3">
-            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
               </svg>
             </div>
@@ -154,7 +154,7 @@
           </li>
         </ul>
 
-        <a href="/member/quiz" class="w-full flex items-center justify-center border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2.5 rounded-lg transition text-sm">
+        <a href="/member/quiz" class="w-full flex items-center justify-center border border-[#1447A6] text-[#1447A6] hover:bg-blue-50 font-semibold py-2.5 rounded-lg transition text-sm">
           Start Assessment
         </a>
       </div>
@@ -179,13 +179,13 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
         {{-- Beginner --}}
-        <div class="border-2 border-indigo-600 rounded-2xl p-4 flex flex-col hover:shadow-md transition">
+        <div class="border border-gray-200 rounded-2xl p-4 flex flex-col hover:shadow-md transition">
           <div class="rounded-xl overflow-hidden bg-gray-100 mb-4">
             <img src="/images/featured1.jpeg" alt="Beginner" class="w-full h-32 object-cover">
           </div>
           <p class="text-base font-bold text-gray-900 mb-1">Beginner Course</p>
           <p class="text-xs text-gray-500 mb-4 leading-relaxed">New to the piano? Build a solid foundation in scales, chords, and theory at a pace that actually sticks.</p>
-          <a href="/member/course/beginner" class="mt-auto w-full flex items-center justify-center space-x-1 border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl py-2.5 text-sm font-semibold transition">
+          <a href="/member/course/beginner" class="mt-auto w-full flex items-center justify-center space-x-1 border border-[#1447A6] text-[#1447A6] rounded-xl py-2.5 text-sm font-semibold transition">
             <span>Start Course</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
           </a>
@@ -211,7 +211,7 @@
           </div>
           <p class="text-base font-bold text-gray-900 mb-1">Advanced Course</p>
           <p class="text-xs text-gray-500 mb-4 leading-relaxed">Ready to push further? Master advanced voicings, substitutions, and improvisation like a seasoned player.</p>
-          <a href="/member/course/advanced" class="mt-auto w-full flex items-center justify-center space-x-1 border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white rounded-xl py-2.5 text-sm font-semibold transition">
+          <a href="/member/course/advanced" class="mt-auto w-full flex items-center justify-center space-x-1 border border-[#C85A5A] text-[#C85A5A] hover:bg-[#C85A5A] hover:text-white rounded-xl py-2.5 text-sm font-semibold transition">
             <span>Start Course</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
           </a>
@@ -221,8 +221,8 @@
 
       <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mt-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
         <div class="flex items-start space-x-3">
-          <div class="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
             </svg>
           </div>
@@ -231,7 +231,7 @@
             <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">You can take our quick assessment to find the best level for you.</p>
           </div>
         </div>
-        <a href="/member/quiz" class="inline-flex items-center flex-shrink-0 text-indigo-600 text-sm font-semibold hover:underline">
+        <a href="/member/quiz" class="inline-flex items-center flex-shrink-0 text-[#1447A6] text-sm font-semibold hover:underline">
           Take Assessment
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -253,8 +253,8 @@
 
       <div class="flex flex-col items-center text-center py-4">
 
-        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-5">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
         </div>
@@ -268,9 +268,9 @@
             ['label'=>'Stay Inspired', 'desc'=>'See what others are learning and creating', 'icon'=>'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z'],
             ['label'=>'Build Connections', 'desc'=>'Network with like-minded musicians', 'icon'=>'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
           ] as $item)
-          <div class="flex items-start gap-3 bg-indigo-50/60 border border-indigo-100 rounded-xl p-4 text-left">
+          <div class="flex items-start gap-3 bg-blue-50/60 border border-blue-100 rounded-xl p-4 text-left">
             <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="{{ $item['icon'] }}"/>
               </svg>
             </div>
@@ -282,7 +282,7 @@
           @endforeach
         </div>
 
-        <a href="{{ route('community.activity-feed') }}" class="w-full max-w-sm flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-sm shadow-indigo-200">
+        <a href="{{ route('community.activity-feed') }}" class="w-full max-w-sm flex items-center justify-center space-x-2 bg-[#1447A6] hover:bg-[#0F3A8A] text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-sm shadow-blue-200">
           <span>Join Community</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -312,7 +312,7 @@
 
     <button
       @click="if (step < totalSteps) { step++ } else { window.location.href = '{{ route('home') }}' }"
-      class="flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition whitespace-nowrap"
+      class="flex items-center gap-1.5 px-4 py-2.5 bg-[#1447A6] text-white rounded-lg text-sm font-medium hover:bg-[#0F3A8A] transition whitespace-nowrap"
     >
       <span x-text="step === totalSteps ? 'Finish' : 'Next Step'"></span>
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

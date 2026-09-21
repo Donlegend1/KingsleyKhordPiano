@@ -107,7 +107,7 @@
       @if(Auth::user()->passport)
         <img src="{{ Auth::user()->passport }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100">
       @else
-        <div class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+        <div class="w-9 h-9 rounded-full bg-[#1447A6]/10 text-[#1447A6] flex items-center justify-center font-bold text-sm">
           {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'U', 0, 1)) }}
         </div>
       @endif
@@ -123,7 +123,7 @@
         <div class="flex items-center justify-between mb-3">
           <div>
             <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">Overall Progress</span>
-            <div class="text-xl font-extrabold text-indigo-600 mt-0.5" x-text="progressPercent + '% Complete'">0% Complete</div>
+            <div class="text-xl font-extrabold text-[#1447A6] mt-0.5" x-text="progressPercent + '% Complete'">0% Complete</div>
           </div>
           <div class="text-right">
             <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">Questions</span>
@@ -131,7 +131,7 @@
           </div>
         </div>
         <div class="w-full bg-gray-100 rounded-full h-2.5">
-          <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" :style="'width: ' + progressPercent + '%'"></div>
+          <div class="bg-[#1447A6] h-2.5 rounded-full transition-all duration-300" :style="'width: ' + progressPercent + '%'"></div>
         </div>
       </div>
 
@@ -141,10 +141,10 @@
         <div>
           {{-- Question Header Badge --}}
           <div class="flex items-center justify-between mb-6">
-            <span class="px-3.5 py-1.5 bg-indigo-50 text-indigo-600 text-xs font-extrabold rounded-full" x-text="'Question ' + (currentQuestionIndex + 1) + ' of ' + questions.length">
+            <span class="px-3.5 py-1.5 bg-[#1447A6]/10 text-[#1447A6] text-xs font-extrabold rounded-full" x-text="'Question ' + (currentQuestionIndex + 1) + ' of ' + questions.length">
               Question 1 of 15
             </span>
-            <span class="text-xs font-bold text-indigo-500" x-text="currentQuestion.category">
+            <span class="text-xs font-bold text-[#1447A6]" x-text="currentQuestion.category">
               Piano Fundamentals
             </span>
           </div>
@@ -165,11 +165,11 @@
               <template x-for="opt in currentQuestion.options" :key="opt.text">
                 <button
                   @click="selectSingle(currentQuestion.id, opt.text)"
-                  class="w-full text-left p-4 rounded-xl border-2 transition-all flex items-start gap-4 hover:border-indigo-300 hover:bg-indigo-50/10 group"
-                  :class="isOptionSelected(currentQuestion.id, opt.text) ? 'border-indigo-600 bg-indigo-50/20' : 'border-gray-100 bg-white'"
+                  class="w-full text-left p-4 rounded-xl border-2 transition-all flex items-start gap-4 hover:border-[#1447A6]/40 hover:bg-[#1447A6]/5 group"
+                  :class="isOptionSelected(currentQuestion.id, opt.text) ? 'border-[#1447A6] bg-[#1447A6]/10' : 'border-gray-100 bg-white'"
                 >
                   <div class="mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-                       :class="isOptionSelected(currentQuestion.id, opt.text) ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 bg-white'">
+                       :class="isOptionSelected(currentQuestion.id, opt.text) ? 'border-[#1447A6] bg-[#1447A6] text-white' : 'border-gray-300 bg-white'">
                     <div class="w-2 h-2 rounded-full bg-white" x-show="isOptionSelected(currentQuestion.id, opt.text)"></div>
                   </div>
                   <div class="flex-grow min-w-0">
@@ -185,11 +185,11 @@
               <template x-for="opt in currentQuestion.options" :key="opt.id || opt.text">
                 <button
                   @click="toggleMultiSelect(currentQuestion.id, opt.id || opt.text)"
-                  class="w-full text-left p-4 rounded-xl border-2 transition-all flex items-start gap-4 hover:border-indigo-300 hover:bg-indigo-50/10 group"
-                  :class="isOptionSelected(currentQuestion.id, opt.id || opt.text, true) ? 'border-indigo-600 bg-indigo-50/20' : 'border-gray-100 bg-white'"
+                  class="w-full text-left p-4 rounded-xl border-2 transition-all flex items-start gap-4 hover:border-[#1447A6]/40 hover:bg-[#1447A6]/5 group"
+                  :class="isOptionSelected(currentQuestion.id, opt.id || opt.text, true) ? 'border-[#1447A6] bg-[#1447A6]/10' : 'border-gray-100 bg-white'"
                 >
                   <div class="mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-                       :class="isOptionSelected(currentQuestion.id, opt.id || opt.text, true) ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 bg-white'">
+                       :class="isOptionSelected(currentQuestion.id, opt.id || opt.text, true) ? 'border-[#1447A6] bg-[#1447A6] text-white' : 'border-gray-300 bg-white'">
                     <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" x-show="isOptionSelected(currentQuestion.id, opt.id || opt.text, true)">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                     </svg>
@@ -223,7 +223,7 @@
         <button
           @click="nextQuestion()"
           :disabled="!canGoNext()"
-          class="flex items-center gap-1.5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow disabled:opacity-40 disabled:cursor-not-allowed"
+          class="flex items-center gap-1.5 px-6 py-3 bg-[#1447A6] hover:bg-[#0F3A8A] text-white rounded-xl text-xs font-bold transition shadow disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <span x-text="currentQuestionIndex === questions.length - 1 ? 'Submit Assessment' : 'Next Question'">Next Question</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" x-show="currentQuestionIndex < questions.length - 1">

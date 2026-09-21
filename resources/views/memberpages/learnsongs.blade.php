@@ -12,7 +12,7 @@
     <div class="flex items-center gap-2">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
-      <span class="text-blue-600 font-medium">Learn Songs</span>
+      <span class="text-[#C85A5A] font-medium">Learn Songs</span>
     </div>
 
     <!-- Search Bar -->

@@ -22,7 +22,7 @@
     <div class="flex items-center gap-2">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
-      <span class="text-blue-600 font-medium">Extra Courses</span>
+      <span class="text-[#C85A5A] font-medium">Extra Courses</span>
     </div>
 
     <!-- Search Bar -->
@@ -58,7 +58,7 @@
           <button
               type="button"
               @click="open = !open"
-              style="background-color: #C85A5A;"
+              style="background-color: #1447A6;"
               class="w-full flex items-center justify-between px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-white shadow-md transition-all duration-300"
           >
               <span x-text="tabs[activeTab]"></span>
@@ -76,7 +76,7 @@
               <template x-for="(label, key) in tabs" :key="key">
                   <a href="#"
                       @click.prevent="open = false; selectTab(key)"
-                      :style="activeTab === key ? 'background-color: #C85A5A;' : ''"
+                      :style="activeTab === key ? 'background-color: #1447A6;' : ''"
                       :class="activeTab === key ? 'text-white' : 'text-gray-600 hover:bg-gray-50'"
                       class="block px-6 py-3 text-xs font-bold uppercase tracking-wide transition-colors duration-150"
                       x-text="label"
@@ -90,7 +90,7 @@
           <template x-for="(label, key, index) in tabs" :key="key">
               <a href="#"
                   @click.prevent="selectTab(key)"
-                  :style="activeTab === key ? 'background-color: #C85A5A;' : ''"
+                  :style="activeTab === key ? 'background-color: #1447A6;' : ''"
                   :class="[activeTab === key ? 'text-white' : 'text-gray-700 hover:bg-gray-200', Object.keys(tabs).indexOf(key) !== 0 ? 'border-l border-gray-200' : '']"
                   class="flex-1 flex items-center justify-center text-center px-6 py-4 text-xs font-bold uppercase tracking-wide transition-colors duration-200"
                   x-text="label"

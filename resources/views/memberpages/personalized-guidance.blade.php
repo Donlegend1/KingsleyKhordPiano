@@ -92,7 +92,7 @@
             @if(Auth::user()->passport)
                 <img src="{{ Auth::user()->passport }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100">
             @else
-                <div class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+                <div class="w-9 h-9 rounded-full bg-[#1447A6]/10 text-[#1447A6] flex items-center justify-center font-bold text-sm">
                     {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'U', 0, 1)) }}
                 </div>
             @endif
@@ -102,8 +102,8 @@
     {{-- ── Content ── --}}
     <div class="flex-1 flex flex-col items-center px-4 py-10">
         <h1 class="flex items-center gap-2.5 text-2xl font-bold text-gray-900 mb-6 text-center">
-            <span class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+            <span class="w-9 h-9 bg-[#1447A6]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12l4 6-10 12L2 9l4-6z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2 9h20M9 3l3 6 3-6M12 9v12"/>
                 </svg>
@@ -113,33 +113,43 @@
         <div class="w-full max-w-4xl border border-gray-200 rounded-2xl shadow-sm bg-white p-6 sm:p-8">
 
             <template x-if="submitted">
-                <div class="flex flex-col items-center text-center py-4">
-                    <div class="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center mb-5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold text-gray-900 mb-1.5">Submitted Successfully!</h2>
-                    <p class="text-sm text-gray-500 max-w-sm mb-6">Your information has been submitted successfully. Kingsley will review it and email you your personalized roadmap shortly — please keep an eye on your inbox.</p>
+                <div class="relative flex flex-col items-center text-center py-8 px-2 overflow-hidden">
+                    {{-- Decorative background accents --}}
+                    <div class="absolute -top-20 -right-16 w-56 h-56 rounded-full bg-emerald-500/5"></div>
+                    <div class="absolute -bottom-24 -left-16 w-56 h-56 rounded-full bg-[#1447A6]/5"></div>
 
-                    <a href="{{ route('home') }}" class="inline-flex items-center justify-center gap-2 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold py-2.5 px-8 rounded-xl transition text-sm w-full sm:w-auto">
+                    <div class="relative w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
+                        <div class="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <h2 class="relative text-2xl font-extrabold text-gray-900 mb-2.5">Submitted Successfully!</h2>
+                    <p class="relative text-sm text-gray-500 max-w-md mb-8 leading-relaxed">Your information has been submitted successfully. Kingsley will review it and email you your personalized roadmap shortly — please keep an eye on your inbox.</p>
+
+                    <a href="{{ route('home') }}" class="relative inline-flex items-center justify-center gap-2 bg-[#1447A6] hover:bg-[#0F3A8A] text-white font-bold py-3.5 px-10 rounded-xl transition-all text-sm w-full sm:w-auto shadow-lg shadow-[#1447A6]/25 hover:shadow-xl hover:-translate-y-0.5">
                         Continue to Dashboard
                     </a>
 
-                    <div class="flex items-center gap-3 w-full max-w-sm mt-6">
+                    <div class="relative flex items-center gap-3 w-full max-w-xs mt-8">
                         <div class="flex-1 h-px bg-gray-100"></div>
-                        <span class="text-xs text-gray-400 font-medium">or</span>
+                        <span class="text-xs text-gray-400 font-semibold uppercase tracking-wide">or</span>
                         <div class="flex-1 h-px bg-gray-100"></div>
                     </div>
 
                     <button
                         type="button"
                         @click="showCalendly = true"
-                        class="mt-6 inline-flex items-center justify-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 px-6 rounded-xl transition text-sm"
+                        class="relative mt-8 inline-flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-7 rounded-xl transition text-sm"
                     >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
                         Book a Call Instead
                     </button>
-                    <p class="text-xs text-gray-400 mt-2 max-w-sm">Prefer to talk it through? Book a live session and Kingsley will assess you in real time.</p>
+                    <p class="relative text-xs text-gray-400 mt-3 max-w-sm">Prefer to talk it through? Book a live session and Kingsley will assess you in real time.</p>
                 </div>
             </template>
 
@@ -161,14 +171,17 @@
                         {{-- STEP 1: How it works --}}
                         <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
 
-                            <div class="flex items-start justify-between mb-1">
-                                <h2 class="text-base font-bold text-gray-900">How it works</h2>
-                                <span class="text-xs text-gray-400 mt-0.5">1/2</span>
+                            <div class="flex items-start justify-between mb-1.5">
+                                <h2 class="text-lg font-extrabold text-gray-900">How it works</h2>
+                                <span class="text-[11px] font-bold text-[#1447A6] bg-[#1447A6]/10 px-2.5 py-1 rounded-full mt-0.5">Step 1 of 2</span>
                             </div>
-                            <p class="text-sm text-gray-500 mb-4">Watch the video and follow the guide to upload your video and information.</p>
+                            <p class="text-sm text-gray-500 mb-3">Watch the video and follow the guide to upload your video and information.</p>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 mb-6">
+                                <div class="bg-[#1447A6] h-1.5 rounded-full w-1/2"></div>
+                            </div>
 
                             {{-- Video embed --}}
-                            <div class="relative w-full rounded-lg overflow-hidden ring-1 ring-black/5 shadow-sm mb-6" style="padding-top: 56.25%;">
+                            <div class="relative w-full rounded-2xl overflow-hidden ring-1 ring-black/5 shadow-sm mb-6" style="padding-top: 56.25%;">
                                 <iframe
                                     src="https://fast.wistia.net/embed/iframe/gd8m2mxi65?videoFoam=false"
                                     title="How it works"
@@ -183,7 +196,7 @@
                                 <button
                                     type="button"
                                     @click="step = 2"
-                                    class="inline-flex items-center justify-center gap-2 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold py-2.5 px-8 rounded-xl transition text-sm"
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1447A6] hover:bg-[#0F3A8A] text-white font-bold py-3 px-10 rounded-xl transition text-sm shadow-lg shadow-[#1447A6]/20 hover:shadow-xl hover:-translate-y-0.5"
                                 >
                                     Proceed
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -197,11 +210,14 @@
                         {{-- STEP 2: Submission form --}}
                         <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
 
-                            <div class="flex items-start justify-between mb-1">
-                                <h2 class="text-base font-bold text-gray-900">Submit information</h2>
-                                <span class="text-xs text-gray-400 mt-0.5">2/2</span>
+                            <div class="flex items-start justify-between mb-1.5">
+                                <h2 class="text-lg font-extrabold text-gray-900">Submit information</h2>
+                                <span class="text-[11px] font-bold text-[#1447A6] bg-[#1447A6]/10 px-2.5 py-1 rounded-full mt-0.5">Step 2 of 2</span>
                             </div>
-                            <p class="text-sm text-gray-500 mb-5">Provide your information then we will take it from there</p>
+                            <p class="text-sm text-gray-500 mb-3">Provide your information then we will take it from there</p>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 mb-6">
+                                <div class="bg-[#1447A6] h-1.5 rounded-full w-full"></div>
+                            </div>
 
                             <div
                                 x-show="flashMessage"
@@ -211,22 +227,29 @@
                                 x-text="flashMessage"
                             ></div>
 
-                            <form @submit.prevent="submit()" class="flex flex-col gap-6">
+                            <form @submit.prevent="submit()" class="flex flex-col gap-5">
 
-                                <div>
+                                <div class="bg-gray-50/70 border border-gray-100 rounded-2xl p-5">
                                     <label class="block text-xs font-semibold text-gray-700 mb-1.5">Paste Assessment Video Link</label>
                                     <input
                                         type="text"
                                         required
                                         x-model="youtubeLink"
-                                        class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                                        class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent"
                                     />
                                     <p class="text-xs text-red-500 mt-1" x-show="errors.youtube_link" x-text="errors.youtube_link && errors.youtube_link[0]"></p>
                                 </div>
 
                                 {{-- ── Section: Your Playing ── --}}
-                                <div class="pt-6 border-t border-gray-100">
-                                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Your Playing</p>
+                                <div class="bg-gray-50/70 border border-gray-100 rounded-2xl p-5">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <span class="w-6 h-6 rounded-lg bg-[#1447A6]/10 text-[#1447A6] flex items-center justify-center flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                                            </svg>
+                                        </span>
+                                        <p class="text-xs font-bold text-gray-700 uppercase tracking-wide">Your Playing</p>
+                                    </div>
 
                                     <div class="flex flex-col gap-5">
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -242,7 +265,7 @@
                                                         </span>
                                                     </span>
                                                 </label>
-                                                <select x-model="archetype" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                                <select x-model="archetype" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                     <option value="">Select archetype</option>
                                                     <option>Self-taught</option>
                                                     <option>Formally Trained</option>
@@ -261,7 +284,7 @@
                                                         </span>
                                                     </span>
                                                 </label>
-                                                <select x-model="experience" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                                <select x-model="experience" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                     <option value="">Select experience</option>
                                                     <option>Less than 6 months</option>
                                                     <option>6 months - 1 year</option>
@@ -284,7 +307,7 @@
                                                         </span>
                                                     </span>
                                                 </label>
-                                                <select x-model="chordVocabulary" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                                <select x-model="chordVocabulary" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                     <option value="">Select chord vocabulary</option>
                                                     <option>Just triads (major/minor)</option>
                                                     <option>7th chords</option>
@@ -295,7 +318,7 @@
 
                                             <div>
                                                 <label class="block text-xs font-semibold text-gray-700 mb-1.5">Playing by Ear</label>
-                                                <select x-model="playingByEar" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                                <select x-model="playingByEar" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                     <option value="">Select ability</option>
                                                     <option>I can't yet — I need it shown to me</option>
                                                     <option>I can figure out simple melodies</option>
@@ -307,7 +330,7 @@
 
                                         <div>
                                             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Can you play on all 12 keys?</label>
-                                            <select x-model="keyFluency" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                            <select x-model="keyFluency" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                 <option value="">Select ability</option>
                                                 <option value="Yes I Can">Yes I Can — I can comfortably play in any of the 12 keys</option>
                                                 <option value="I Know Some Keys">I Know Some Keys — I can play in a few but not all of them yet</option>
@@ -317,7 +340,7 @@
 
                                         <div>
                                             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Which pianist's style do you want to play like?</label>
-                                            <select x-model="inspirationPianist" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                            <select x-model="inspirationPianist" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                 <option value="">Select a pianist</option>
                                                 <option>Kelvin Bond</option>
                                                 <option>Cory Henry</option>
@@ -340,21 +363,28 @@
                                                 :required="inspirationPianist === 'Other'"
                                                 x-model="inspirationPianistOther"
                                                 placeholder="Enter their name"
-                                                class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm mt-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                                                class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-white mt-2 focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 {{-- ── Section: Practice & Goals ── --}}
-                                <div class="pt-6 border-t border-gray-100">
-                                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Practice &amp; Goals</p>
+                                <div class="bg-gray-50/70 border border-gray-100 rounded-2xl p-5">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <span class="w-6 h-6 rounded-lg bg-[#1447A6]/10 text-[#1447A6] flex items-center justify-center flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </span>
+                                        <p class="text-xs font-bold text-gray-700 uppercase tracking-wide">Practice &amp; Goals</p>
+                                    </div>
 
                                     <div class="flex flex-col gap-5">
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                             <div>
                                                 <label class="block text-xs font-semibold text-gray-700 mb-1.5">How many days in a week do you have for practice?</label>
-                                                <select x-model="daysPerWeek" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                                <select x-model="daysPerWeek" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                     <option value="">Select days</option>
                                                     @for ($i = 1; $i <= 7; $i++)
                                                         <option value="{{ $i }}">{{ $i }}</option>
@@ -364,7 +394,7 @@
 
                                             <div>
                                                 <label class="block text-xs font-semibold text-gray-700 mb-1.5">How much time do you have for practice each day?</label>
-                                                <select x-model="practiceTime" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                                <select x-model="practiceTime" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                     <option value="">Select time</option>
                                                     <option>15 minutes</option>
                                                     <option>30 minutes</option>
@@ -386,7 +416,7 @@
                                                     </span>
                                                 </span>
                                             </label>
-                                            <select x-model="styleFocus" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+                                            <select x-model="styleFocus" required class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent bg-white">
                                                 <option value="">Select style</option>
                                                 <option>Hymns &amp; Traditional</option>
                                                 <option>Contemporary Gospel</option>
@@ -402,18 +432,18 @@
                                                 required
                                                 x-model="primaryGoal"
                                                 placeholder="Type here..."
-                                                class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                                                class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#1447A6] focus:border-transparent"
                                             ></textarea>
                                             <p class="text-xs text-red-500 mt-1" x-show="errors.primary_goal" x-text="errors.primary_goal && errors.primary_goal[0]"></p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="flex justify-center pt-2">
+                                <div class="flex justify-center pt-1">
                                     <button
                                         type="submit"
                                         :disabled="submitting"
-                                        class="inline-flex items-center justify-center gap-2 bg-indigo-700 hover:bg-indigo-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-8 rounded-xl transition text-sm"
+                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1447A6] hover:bg-[#0F3A8A] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 px-10 rounded-xl transition text-sm shadow-lg shadow-[#1447A6]/20 hover:shadow-xl hover:-translate-y-0.5"
                                     >
                                         <span x-text="submitting ? 'Submitting...' : 'Submit Now'"></span>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -467,7 +497,7 @@
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
                 <p class="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1447A6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Schedule a Call
