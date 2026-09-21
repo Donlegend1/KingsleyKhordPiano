@@ -60,6 +60,9 @@ const CategorizedLessonsAdmin = ({ config }) => {
     const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const [editMidiResourceFile, setEditMidiResourceFile] = useState(null);
     const fileInputRef = useRef(null);
+    const categoryThumbnailInputRef = useRef(null);
+    const [categoryThumbnailTarget, setCategoryThumbnailTarget] = useState(null);
+    const [uploadingCategoryThumbnail, setUploadingCategoryThumbnail] = useState(false);
 
     const { showMessage } = useFlashMessage();
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
@@ -141,6 +144,38 @@ const CategorizedLessonsAdmin = ({ config }) => {
             showMessage(error.response?.data?.message || "Error deleting category", "error");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const openCategoryThumbnailPicker = (categoryName, level) => {
+        setCategoryThumbnailTarget({ categoryName, level });
+        categoryThumbnailInputRef.current?.click();
+    };
+
+    const handleCategoryThumbnailSelected = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file || !categoryThumbnailTarget) return;
+
+        const { categoryName, level } = categoryThumbnailTarget;
+        const formData = new FormData();
+        formData.append("thumbnail", file);
+        formData.append("level", level);
+
+        setUploadingCategoryThumbnail(true);
+        try {
+            await axios.post(
+                `${config.endpoints.updateCategoryThumbnail}/${encodeName(categoryName)}/thumbnail`,
+                formData,
+                { headers: { "X-CSRF-TOKEN": csrfToken, "Content-Type": "multipart/form-data" } }
+            );
+            showMessage("Category thumbnail updated. All lessons in this category will use it unless they have their own.", "success");
+            fetchLessons();
+        } catch (error) {
+            showMessage(error.response?.data?.message || "Error updating category thumbnail", "error");
+        } finally {
+            setUploadingCategoryThumbnail(false);
+            setCategoryThumbnailTarget(null);
         }
     };
 
@@ -315,6 +350,13 @@ const CategorizedLessonsAdmin = ({ config }) => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-lg">
+            <input
+                type="file"
+                accept="image/*"
+                ref={categoryThumbnailInputRef}
+                onChange={handleCategoryThumbnailSelected}
+                className="hidden"
+            />
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">{config.title}</h2>
             </div>
@@ -372,7 +414,20 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                                                                 onClick={() => toggleCategory(`${level}-${categoryName}`)}
                                                                                 className="flex justify-between items-center cursor-pointer select-none bg-white p-3 rounded-lg border border-gray-200/80 shadow-sm hover:bg-gray-100/50 transition"
                                                                             >
-                                                                                <span className="font-semibold text-gray-800">{categoryName}</span>
+                                                                                <span className="flex items-center gap-2.5 font-semibold text-gray-800">
+                                                                                    {lessonsData[level]?.categoryThumbnails?.[categoryName] ? (
+                                                                                        <img
+                                                                                            src={lessonsData[level].categoryThumbnails[categoryName]}
+                                                                                            alt=""
+                                                                                            className="w-8 h-8 rounded-md object-cover flex-shrink-0 border border-gray-200"
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <span className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0 text-gray-300">
+                                                                                            <i className="fa fa-image text-xs"></i>
+                                                                                        </span>
+                                                                                    )}
+                                                                                    {categoryName}
+                                                                                </span>
                                                                                 <div className="flex items-center gap-4">
                                                                                     <button
                                                                                         onClick={(e) => {
@@ -392,6 +447,14 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                                                                     >
                                                                                         Add {config.itemLabel}
                                                                                     </button>
+                                                                                    <i
+                                                                                        className={`fa ${uploadingCategoryThumbnail && categoryThumbnailTarget?.categoryName === categoryName ? "fa-spinner fa-spin text-gray-400" : "fa-camera text-gray-500 hover:text-gray-700 cursor-pointer"} text-sm`}
+                                                                                        title="Set category thumbnail (applies to all lessons in this category)"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            openCategoryThumbnailPicker(categoryName, level);
+                                                                                        }}
+                                                                                    ></i>
                                                                                     <i
                                                                                         className="fa fa-pencil text-blue-500 hover:text-blue-700 text-sm cursor-pointer"
                                                                                         onClick={(e) => {
@@ -790,6 +853,7 @@ const pianoConfig = {
         createCategory: "/api/admin/piano-exercises/category/create",
         updateCategory: "/api/admin/piano-exercises/category",
         deleteCategory: "/api/admin/piano-exercises/category",
+        updateCategoryThumbnail: "/api/admin/piano-exercises/category",
         reorderCategories: "/api/admin/reorder/piano-exercises",
         reorderItems: "/api/admin/reorder/piano-exercises/items",
     },
@@ -812,6 +876,7 @@ const musicalConfig = {
         createCategory: "/api/admin/musical-applications/category/create",
         updateCategory: "/api/admin/musical-applications/category",
         deleteCategory: "/api/admin/musical-applications/category",
+        updateCategoryThumbnail: "/api/admin/musical-applications/category",
         reorderCategories: "/api/admin/reorder/musical-applications",
         reorderItems: "/api/admin/reorder/musical-applications/items",
     },

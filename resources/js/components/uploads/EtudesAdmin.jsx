@@ -84,6 +84,9 @@ const EtudesAdmin = () => {
     const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const [editMidiResourceFile, setEditMidiResourceFile] = useState(null);
     const fileInputRef = useRef(null);
+    const categoryThumbnailInputRef = useRef(null);
+    const [categoryThumbnailTarget, setCategoryThumbnailTarget] = useState(null);
+    const [uploadingCategoryThumbnail, setUploadingCategoryThumbnail] = useState(false);
 
     const { showMessage } = useFlashMessage();
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
@@ -159,6 +162,36 @@ const EtudesAdmin = () => {
             showMessage(error.response?.data?.message || "Error deleting category", "error");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const openCategoryThumbnailPicker = (categoryName) => {
+        setCategoryThumbnailTarget(categoryName);
+        categoryThumbnailInputRef.current?.click();
+    };
+
+    const handleCategoryThumbnailSelected = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file || !categoryThumbnailTarget) return;
+
+        const formData = new FormData();
+        formData.append("thumbnail", file);
+
+        setUploadingCategoryThumbnail(true);
+        try {
+            await axios.post(
+                `/api/admin/etudes/category/${categoryThumbnailTarget}/thumbnail`,
+                formData,
+                { headers: { "X-CSRF-TOKEN": csrfToken, "Content-Type": "multipart/form-data" } }
+            );
+            showMessage("Category thumbnail updated. All lessons in this category will use it unless they have their own.", "success");
+            fetchEtudes();
+        } catch (error) {
+            showMessage(error.response?.data?.message || "Error updating category thumbnail", "error");
+        } finally {
+            setUploadingCategoryThumbnail(false);
+            setCategoryThumbnailTarget(null);
         }
     };
 
@@ -385,10 +418,18 @@ const EtudesAdmin = () => {
     };
 
     const dataObj = etudesData.data || {};
+    const categoryThumbnails = etudesData.categoryThumbnails || {};
     const categoryKeys = Object.keys(dataObj);
 
     return (
         <div className="bg-gray-50 min-h-screen pb-12">
+            <input
+                type="file"
+                accept="image/*"
+                ref={categoryThumbnailInputRef}
+                onChange={handleCategoryThumbnailSelected}
+                className="hidden"
+            />
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-8 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <div>
@@ -428,6 +469,17 @@ const EtudesAdmin = () => {
                                                             <div {...dragProvided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab p-1">
                                                                 <i className="fa-solid fa-bars-staggered"></i>
                                                             </div>
+                                                            {categoryThumbnails[catName] ? (
+                                                                <img
+                                                                    src={categoryThumbnails[catName]}
+                                                                    alt=""
+                                                                    className="w-8 h-8 rounded-md object-cover flex-shrink-0 border border-gray-200"
+                                                                />
+                                                            ) : (
+                                                                <span className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0 text-gray-300">
+                                                                    <i className="fa fa-image text-xs"></i>
+                                                                </span>
+                                                            )}
                                                             <button
                                                                 onClick={() => toggleCategory(collapsedKey)}
                                                                 className="text-left font-bold text-gray-800 hover:text-indigo-600 transition flex items-center gap-2"
@@ -451,6 +503,17 @@ const EtudesAdmin = () => {
                                                                 className="text-xs bg-black text-white hover:bg-gray-800 transition px-3 py-1.5 rounded-lg font-semibold"
                                                             >
                                                                 + Add Lesson
+                                                            </button>
+                                                            <button
+                                                                onClick={() => openCategoryThumbnailPicker(catName)}
+                                                                title="Set category thumbnail (applies to all lessons in this category)"
+                                                                className="text-xs bg-gray-200 text-gray-700 hover:bg-gray-300 transition px-3 py-1.5 rounded-lg font-semibold"
+                                                            >
+                                                                {uploadingCategoryThumbnail && categoryThumbnailTarget === catName ? (
+                                                                    <i className="fa fa-spinner fa-spin"></i>
+                                                                ) : (
+                                                                    <i className="fa fa-camera"></i>
+                                                                )}
                                                             </button>
                                                             <button
                                                                 onClick={() => openEditCategoryModal(catName)}

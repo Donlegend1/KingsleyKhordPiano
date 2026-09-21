@@ -378,6 +378,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/user/{user}', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'show'])->name('show');
         Route::get('/user/{user}/plan', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'editPlan'])->name('plan.edit');
         Route::post('/user/{user}/plan', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'updatePlan'])->name('plan.update');
+        Route::get('/user/{sourceUser}/plan/copy-data', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'planCopyData'])->name('plan.copy-data');
         Route::patch('/{guidanceRequest}/reviewed', [\App\Http\Controllers\Admin\PersonalizedGuidanceController::class, 'markReviewed'])->name('reviewed');
     });
 

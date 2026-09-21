@@ -23,7 +23,7 @@ class AdminMusicalApplicationLessonController extends Controller
         foreach ($this->levels as $level) {
             $categories = MusicalApplicationCategory::where('level', $level)
                 ->orderBy('position')
-                ->get(['id', 'category', 'position']);
+                ->get(['id', 'category', 'position', 'thumbnail']);
 
             $skillLevel = ucfirst($level);
             $categories->load(['lessons' => function ($q) use ($skillLevel) {
@@ -31,12 +31,15 @@ class AdminMusicalApplicationLessonController extends Controller
             }]);
 
             $data = [];
+            $categoryThumbnails = [];
             foreach ($categories as $cat) {
                 $data[$cat->category] = $cat->lessons->values();
+                $categoryThumbnails[$cat->category] = $cat->thumbnail_url;
             }
 
             $payload[$level] = [
                 'data' => $data,
+                'categoryThumbnails' => $categoryThumbnails,
                 'current_page' => 1,
                 'last_page' => 1,
             ];
@@ -218,6 +221,27 @@ class AdminMusicalApplicationLessonController extends Controller
 
         return response()->json([
             'message' => 'Category updated successfully',
+            'category' => $category,
+        ], 200);
+    }
+
+    public function updateCategoryThumbnail(Request $request, $name)
+    {
+        $request->validate([
+            'thumbnail' => 'required|image|max:5000',
+        ]);
+
+        $query = MusicalApplicationCategory::where('category', $name);
+        if ($request->filled('level')) {
+            $query->where('level', strtolower($request->input('level')));
+        }
+        $category = $query->firstOrFail();
+
+        $this->deletePublicFile($category->thumbnail);
+        $category->update(['thumbnail' => $this->storePublicFile($request->file('thumbnail'), 'thumbnails')]);
+
+        return response()->json([
+            'message' => 'Category thumbnail updated successfully',
             'category' => $category,
         ], 200);
     }

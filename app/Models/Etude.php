@@ -35,7 +35,11 @@ class Etude extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail ? asset($this->thumbnail) : null;
+        if ($this->thumbnail) {
+            return asset($this->thumbnail);
+        }
+
+        return $this->category?->thumbnail_url;
     }
 
     public function getAudioResourceUrlAttribute()

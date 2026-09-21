@@ -95,9 +95,38 @@ class PersonalizedGuidanceController extends Controller
             'months' => $months,
         ];
 
+        $copyOptions = PersonalizedPlan::with('user')
+            ->where('user_id', '!=', $user->id)
+            ->get()
+            ->filter(fn ($p) => $p->user)
+            ->map(fn ($p) => [
+                'id' => $p->user_id,
+                'name' => $p->user->full_name ?? $p->user->name ?? $p->user->email,
+                'email' => $p->user->email,
+            ])
+            ->values();
+
         return view('admin.personalized_guidance.plan', [
             'user' => $user,
             'initialPlan' => $initialPlan,
+            'copyOptions' => $copyOptions,
+        ]);
+    }
+
+    public function planCopyData(User $sourceUser)
+    {
+        $plan = PersonalizedPlan::where('user_id', $sourceUser->id)->firstOrFail();
+
+        $months = $plan->months ?? [];
+        while (count($months) < 3) {
+            $months[] = ['lessons' => $this->blankLessonCategories()];
+        }
+
+        return response()->json([
+            'skill_level' => $plan->skill_level ?? '',
+            'goal' => $plan->goal ?? '',
+            'ninety_day_target' => $plan->ninety_day_target ?: [''],
+            'months' => $months,
         ]);
     }
 

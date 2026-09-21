@@ -108,6 +108,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('extra-courses/category/create', [AdminExtraCourseController::class, 'createCategory']);
         Route::delete('extra-courses/category/{name}/delete', [AdminExtraCourseController::class, 'deleteCategory']);
         Route::put('extra-courses/category/{name}/update', [AdminExtraCourseController::class, 'updateCategory']);
+        Route::post('extra-courses/category/{name}/thumbnail', [AdminExtraCourseController::class, 'updateCategoryThumbnail']);
         Route::post('reorder/extra-courses', [AdminExtraCourseController::class, 'updatePositions']);
         Route::post('reorder/extra-courses/items', [AdminExtraCourseController::class, 'updateCoursePositions']);
 
@@ -120,6 +121,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('piano-exercises/category/create', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'createCategory']);
         Route::delete('piano-exercises/category/{name}/delete', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'deleteCategory']);
         Route::put('piano-exercises/category/{name}/update', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updateCategory']);
+        Route::post('piano-exercises/category/{name}/thumbnail', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updateCategoryThumbnail']);
         Route::post('reorder/piano-exercises', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updatePositions']);
         Route::post('reorder/piano-exercises/items', [\App\Http\Controllers\Admin\AdminPianoExerciseController::class, 'updateLessonPositions']);
 
@@ -132,6 +134,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('musical-applications/category/create', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'createCategory']);
         Route::delete('musical-applications/category/{name}/delete', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'deleteCategory']);
         Route::put('musical-applications/category/{name}/update', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updateCategory']);
+        Route::post('musical-applications/category/{name}/thumbnail', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updateCategoryThumbnail']);
         Route::post('reorder/musical-applications', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updatePositions']);
         Route::post('reorder/musical-applications/items', [\App\Http\Controllers\Admin\AdminMusicalApplicationLessonController::class, 'updateLessonPositions']);
 
@@ -144,6 +147,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('etudes/category/create', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'createCategory']);
         Route::delete('etudes/category/{name}/delete', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'deleteCategory']);
         Route::put('etudes/category/{name}/update', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateCategory']);
+        Route::post('etudes/category/{name}/thumbnail', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateCategoryThumbnail']);
         Route::post('reorder/etudes', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updatePositions']);
         Route::post('reorder/etudes/items', [\App\Http\Controllers\Admin\AdminEtudeController::class, 'updateEtudePositions']);
 

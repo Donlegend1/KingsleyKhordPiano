@@ -37,7 +37,11 @@ class MusicalApplication extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail ? asset($this->thumbnail) : null;
+        if ($this->thumbnail) {
+            return asset($this->thumbnail);
+        }
+
+        return $this->applicationCategory?->thumbnail_url;
     }
 
     public function getImageUrlsAttribute()

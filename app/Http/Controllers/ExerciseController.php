@@ -99,6 +99,7 @@ class ExerciseController extends Controller
 
         if ($series) {
             $playlist = \App\Models\MusicalApplication::where('series', $series)
+                ->with('applicationCategory')
                 ->orderByRaw('position IS NULL, position ASC')
                 ->orderBy('id', 'asc')
                 ->get();
@@ -230,6 +231,7 @@ class ExerciseController extends Controller
             ->appends(['skill_level' => $skillLevel, 'name' => $search]);
 
         $applications = \App\Models\MusicalApplication::where('status', 'active')
+            ->with('applicationCategory')
             ->whereIn('musical_application_category_id', $categoryPage->pluck('id'))
             ->when($skillLevel !== 'ALL', fn ($q) => $q->where('skill_level', $skillLevel))
             ->orderByRaw('position IS NULL, position ASC')

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="p-4 sm:p-6 max-w-4xl mx-auto" x-data="personalizedPlanForm({{ \Illuminate\Support\Js::from($initialPlan) }})">
+<div class="p-4 sm:p-6 max-w-4xl mx-auto" x-data="personalizedPlanForm({{ \Illuminate\Support\Js::from($initialPlan) }}, '{{ url('/admin/personalized-guidance/user') }}')">
 
     <a href="{{ route('admin.personalized-guidance.show', $user) }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-700 mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -18,6 +18,26 @@
     @if(session('success'))
         <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
             {{ session('success') }}
+        </div>
+    @endif
+
+    @if($copyOptions->isNotEmpty())
+        <div class="bg-white rounded-xl shadow p-5 mb-6">
+            <label class="block text-sm font-bold text-gray-900 mb-2">Copy Plan From Another Member</label>
+            <p class="text-xs text-gray-500 mb-3">Prefill the skill level, goal, 90-day target, and month-by-month lessons from an existing member's plan. Their start date is not copied &mdash; you'll set a new one below.</p>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <select x-model="copySourceId" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none">
+                    <option value="">Select a member to copy from</option>
+                    @foreach($copyOptions as $option)
+                        <option value="{{ $option['id'] }}">{{ $option['name'] }} ({{ $option['email'] }})</option>
+                    @endforeach
+                </select>
+                <button type="button" @click="copyPlanFrom()" :disabled="!copySourceId || copying"
+                    class="flex-shrink-0 bg-gray-900 hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-semibold transition">
+                    <span x-text="copying ? 'Copying...' : 'Copy Plan'"></span>
+                </button>
+            </div>
+            <p class="text-xs text-green-600 mt-2" x-show="copySuccess" x-cloak>Plan copied below &mdash; review and save when ready.</p>
         </div>
     @endif
 
@@ -146,7 +166,7 @@
 </div>
 
 <script>
-    function personalizedPlanForm(initial) {
+    function personalizedPlanForm(initial, baseUrl) {
         const categories = [
             { key: 'finger_exercise', label: 'Finger Exercise' },
             { key: 'theory_and_application', label: 'Theory and Application' },
@@ -161,8 +181,33 @@
             startDate: initial.start_date || '',
             ninetyDayTarget: (initial.ninety_day_target && initial.ninety_day_target.length) ? initial.ninety_day_target : [''],
             months: initial.months,
+            copySourceId: '',
+            copying: false,
+            copySuccess: false,
             genLessonId() {
                 return window.crypto?.randomUUID ? window.crypto.randomUUID() : 'l_' + Math.random().toString(36).slice(2);
+            },
+            async copyPlanFrom() {
+                if (!this.copySourceId) return;
+                this.copying = true;
+                this.copySuccess = false;
+                try {
+                    const response = await fetch(`${baseUrl}/${this.copySourceId}/plan/copy-data`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    });
+                    if (!response.ok) throw new Error('Failed to fetch plan');
+                    const data = await response.json();
+                    this.skillLevel = data.skill_level || '';
+                    this.goal = data.goal || '';
+                    this.ninetyDayTarget = (data.ninety_day_target && data.ninety_day_target.length) ? data.ninety_day_target : [''];
+                    this.months = data.months;
+                    this.copySuccess = true;
+                } catch (error) {
+                    console.error('Error copying plan:', error);
+                    alert('Failed to copy plan. Please try again.');
+                } finally {
+                    this.copying = false;
+                }
             },
         };
     }

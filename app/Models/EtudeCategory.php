@@ -12,7 +12,15 @@ class EtudeCategory extends Model
     protected $fillable = [
         'category',
         'position',
+        'thumbnail',
     ];
+
+    protected $appends = ['thumbnail_url'];
+
+    public function getThumbnailUrlAttribute()
+    {
+        return $this->thumbnail ? asset($this->thumbnail) : null;
+    }
 
     public function etudes()
     {
