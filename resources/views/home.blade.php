@@ -6,9 +6,8 @@
     @include("components.memberarea.getstarted")
 @endif
 @include("components.memberarea.details")
-@include("components.memberarea.guide")
+@include("components.memberarea.guide", ['resumeLesson' => $resumeLesson ?? null])
 @include("components.memberarea.stats")
-@include("components.memberarea.liveshow")
 @include("components.memberarea.latest-courses")
 
 {{-- <div id="zoomMeetingBooking"></div> --}}

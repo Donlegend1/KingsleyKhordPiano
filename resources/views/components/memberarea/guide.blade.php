@@ -1,47 +1,51 @@
-<section class="max-w-7xl mx-auto px-4 py-6
-    grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<section class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-  <!-- Card 1: Courses -->
-  <div class="min-h-[190px] h-full flex flex-col p-6 bg-[#F3F5F6] rounded-lg shadow-sm border border-gray-100">
-    <div class="w-11 h-11 flex items-center justify-center bg-[#E8EDF2] rounded-xl flex-shrink-0 mb-3">
-      <i class="fa fa-graduation-cap text-[#435065] text-lg"></i>
+  {{-- Card 1: Get Started / Resume Lesson --}}
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="flex items-start gap-4 flex-1 min-w-0">
+      <div class="flex items-center justify-center w-12 h-12 flex-shrink-0 rounded-xl bg-[#1447A6]/10">
+        <i class="fa {{ $resumeLesson ? 'fa-circle-play' : 'fa-graduation-cap' }} text-[#1447A6] text-lg"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="inline-block text-[10px] font-bold uppercase tracking-wide text-[#1447A6] bg-[#1447A6]/10 px-2 py-0.5 rounded-full font-sf">
+          {{ $resumeLesson ? 'Continue Learning' : 'Get Started' }}
+        </span>
+        <h3 class="font-bold text-gray-900 text-[15px] mt-1.5 font-sf">
+          {{ $resumeLesson ? 'Pick Up Where You Left Off' : 'Start Your Learning Journey' }}
+        </h3>
+        <p class="text-sm text-gray-500 mt-0.5 font-sf">
+          @if($resumeLesson)
+            Continue "{{ $resumeLesson['title'] }}" right where you paused.
+          @else
+            Explore our courses and take your first lesson.
+          @endif
+        </p>
+      </div>
     </div>
-    <h4 class="font-semibold text-[#435065] text-[18px] font-sf">Courses</h4>
-    <p class="text-sm text-[#5E6779] mt-1 font-sf flex-1">Pick a course that matches your skill level</p>
-    <a href="{{ route('member.roadmap') }}"
-       class="mt-4 inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-blue-200 bg-white text-blue-600 text-sm font-semibold font-sf hover:bg-blue-50 transition-colors">
-      View Courses
+    <a href="{{ $resumeLesson ? $resumeLesson['url'] : route('member.roadmap') }}"
+       class="flex-shrink-0 inline-flex items-center justify-center gap-1.5 w-full sm:w-auto bg-[#1447A6] hover:bg-[#0F3A8A] text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors font-sf">
+      {{ $resumeLesson ? 'Resume' : 'Start' }}
       <i class="fa fa-angle-right text-xs"></i>
     </a>
   </div>
 
-  <!-- Card 2: Community -->
-  <div class="min-h-[190px] h-full flex flex-col p-6 bg-[#F3F5F6] rounded-lg shadow-sm border border-gray-100">
-    <div class="w-11 h-11 flex items-center justify-center bg-indigo-50 rounded-xl flex-shrink-0 mb-3">
-      <img src="/images/community.svg" class="w-6 h-6 object-contain" />
+  {{-- Card 2: Personalised Path --}}
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div class="flex items-start gap-4 flex-1 min-w-0">
+      <div class="flex items-center justify-center w-12 h-12 flex-shrink-0 rounded-xl bg-[#C85A5A]/10">
+        <i class="fa fa-bullseye text-[#C85A5A] text-lg"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="inline-block text-[10px] font-bold uppercase tracking-wide text-[#C85A5A] bg-[#C85A5A]/10 px-2 py-0.5 rounded-full font-sf">
+          Custom Path
+        </span>
+        <h3 class="font-bold text-gray-900 text-[15px] mt-1.5 font-sf">Personalised Path</h3>
+        <p class="text-sm text-gray-500 mt-0.5 font-sf">See where your skills stand and get lessons picked just for you.</p>
+      </div>
     </div>
-    <h4 class="font-semibold text-[#435065] text-[18px] font-sf">Community</h4>
-    <p class="text-sm text-[#5E6779] mt-1 font-sf flex-1">View the latest community activities</p>
-    <a href="/member/community/activity-feed"
-       class="mt-4 inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-blue-200 bg-white text-blue-600 text-sm font-semibold font-sf hover:bg-blue-50 transition-colors">
-      View Community
-      <i class="fa fa-angle-right text-xs"></i>
-    </a>
-  </div>
-
-  <!-- Card 3: Personalized Roadmap -->
-  <div class="relative min-h-[190px] h-full flex flex-col p-6 rounded-2xl border border-amber-400/20 shadow-xl shadow-black/30 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black">
-    {{-- Subtle gold glow accent --}}
-    <div class="pointer-events-none absolute -top-10 -right-10 w-32 h-32 bg-amber-400/20 rounded-full blur-3xl"></div>
-
-    <div class="relative w-11 h-11 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl flex-shrink-0 mb-3">
-      <i class="fa fa-route text-amber-300 text-lg"></i>
-    </div>
-    <h4 class="relative font-semibold text-white text-[18px] font-sf">Personalized Roadmap</h4>
-    <p class="relative text-sm text-gray-400 mt-1 font-sf flex-1">Your custom path to mastering piano</p>
     <a href="{{ route('member.personalized-plan') }}"
-       class="relative mt-4 inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-300 text-black text-sm font-bold font-sf shadow-md shadow-amber-500/30 hover:shadow-amber-500/50 hover:brightness-105 transition-all">
-      View Personalized Plan
+       class="flex-shrink-0 inline-flex items-center justify-center gap-1.5 w-full sm:w-auto bg-[#C85A5A] hover:bg-[#B54B4B] text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors font-sf">
+      View Plan
       <i class="fa fa-angle-right text-xs"></i>
     </a>
   </div>

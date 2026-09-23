@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PersonalizedGuidanceReady;
 use App\Models\LiveCoachingBooking;
 use App\Models\PersonalizedGuidanceRequest;
 use App\Models\PersonalizedPlan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PersonalizedGuidanceController extends Controller
 {
@@ -181,6 +184,14 @@ class PersonalizedGuidanceController extends Controller
                 'months' => $months,
             ]
         );
+
+        if ($user->email) {
+            try {
+                Mail::to($user->email)->send(new PersonalizedGuidanceReady($user));
+            } catch (\Exception $e) {
+                Log::warning('Failed to email member that personalized guidance is ready: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->route('admin.personalized-guidance.show', $user)->with('success', 'Personalized plan saved.');
     }

@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PersonalizedGuidanceSubmitted;
 use App\Models\LiveCoachingBooking;
 use App\Models\Liveshow;
 use App\Models\PersonalizedGuidanceRequest;
 use App\Models\PersonalizedPlan;
 use App\Models\UserDailyLogin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PersonalizedGuidanceController extends Controller
 {
     public function create()
     {
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
+        }
+
         $existingRequest = PersonalizedGuidanceRequest::where('user_id', auth()->id())
             ->latest()
             ->first();
@@ -22,11 +29,16 @@ class PersonalizedGuidanceController extends Controller
 
     public function plan()
     {
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
+        }
+
         $plan = PersonalizedPlan::where('user_id', auth()->id())->first();
 
         if (! $plan) {
             $hasSubmittedRequest = PersonalizedGuidanceRequest::where('user_id', auth()->id())->exists();
             $hasBookedCall = LiveCoachingBooking::where('user_id', auth()->id())->exists();
+            // dd($hasBookedCall);
 
             if ($hasSubmittedRequest || $hasBookedCall) {
                 return view('memberpages.personalized-plan-pending');
@@ -105,6 +117,10 @@ class PersonalizedGuidanceController extends Controller
 
     public function toggleLesson(Request $request)
     {
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
+        }
+
         $validated = $request->validate([
             'lesson_key' => ['required', 'string'],
             'completed' => ['required', 'boolean'],
@@ -129,8 +145,8 @@ class PersonalizedGuidanceController extends Controller
 
     public function store(Request $request)
     {
-        if (! auth()->user()->premium) {
-            return response()->json(['message' => 'This feature is for Premium members only.'], 403);
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
         }
 
         $validated = $request->validate([
@@ -164,9 +180,33 @@ class PersonalizedGuidanceController extends Controller
             'details' => $validated['details'] ?? null,
         ]);
 
+        $guidanceRequest->setRelation('user', auth()->user());
+
+        try {
+            Mail::to(config('services.admin_notification_email'))
+                ->send(new PersonalizedGuidanceSubmitted($guidanceRequest));
+        } catch (\Exception $e) {
+            Log::warning('Failed to email admin about personalized guidance request: ' . $e->getMessage());
+        }
+
         return response()->json([
             'message' => 'Thanks! Your video and notes have been sent for review.',
             'request' => $guidanceRequest,
         ]);
+    }
+
+    private function denyUnlessPremium()
+    {
+        if (auth()->user()->premium) {
+            return null;
+        }
+
+        $message = 'This feature is for Premium members only.';
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => $message], 403);
+        }
+
+        return redirect('/home')->with('error', $message);
     }
 }

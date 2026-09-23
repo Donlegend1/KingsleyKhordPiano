@@ -106,14 +106,14 @@
     {{-- Heading --}}
     <div class="mb-6">
       <h2 class="text-xl font-bold text-gray-900 tracking-tight leading-tight mb-1">Find Your Best Path</h2>
-      <p class="text-gray-500 text-sm leading-relaxed">Take a quick assessment or get a personalized roadmap — whichever fits you best.</p>
+      <p class="text-gray-500 text-sm leading-relaxed">{{ auth()->user()->premium ? 'Take a quick assessment or get a personalized roadmap — whichever fits you best.' : 'Take a quick assessment to find the path that fits you best.' }}</p>
     </div>
 
     {{-- Two-card choice row --}}
     <div class="flex flex-col md:flex-row items-stretch gap-4">
 
       {{-- Card 1: Discover Your Level --}}
-      <div class="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col">
+      <div class="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col {{ auth()->user()->premium ? '' : 'md:max-w-[calc(50%-0.5rem)]' }}">
 
         {{-- Icon --}}
         <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
@@ -159,8 +159,10 @@
         </a>
       </div>
 
+      @if(auth()->user()->premium)
       {{-- Card 2: Personalized Guidance --}}
       <div id="personalized-guidance-card" class="flex-1 flex" data-guidance-url="{{ route('member.personalized-guidance.create') }}"></div>
+      @endif
 
     </div>
     </div>
