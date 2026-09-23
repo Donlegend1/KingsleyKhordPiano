@@ -26,9 +26,9 @@ class PersonalizedGuidanceController extends Controller
 
         if (! $plan) {
             $hasSubmittedRequest = PersonalizedGuidanceRequest::where('user_id', auth()->id())->exists();
-            $hasBookedCall = LiveCoachingBooking::where('user_id', auth()->id())->exists();
+            // $hasBookedCall = LiveCoachingBooking::where('user_id', auth()->id())->exists();
 
-            if ($hasSubmittedRequest || $hasBookedCall) {
+            if ($hasSubmittedRequest) {
                 return view('memberpages.personalized-plan-pending');
             }
 
