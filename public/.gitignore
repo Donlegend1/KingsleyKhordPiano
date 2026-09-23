@@ -1,9 +1,6 @@
-/.phpunit.cache
-/node_modules
-/node_modules/*
-/public/build
+/build
 /public/hot
-/public/uploads
+/uploads
 /public/midi-files
 /public/storage
 /storage/*.key
