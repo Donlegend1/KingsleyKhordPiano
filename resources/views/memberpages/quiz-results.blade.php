@@ -48,7 +48,7 @@
     </div>
 
     <div class="flex items-center gap-4">
-      <a href="{{ route('member.quiz', ['retake' => 1]) }}" class="inline-flex items-center gap-1.5 px-4 py-2 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 rounded-xl text-xs font-bold transition shadow-sm">
+      <a href="{{ route('member.quiz', ['retake' => 1]) }}" class="inline-flex items-center gap-1.5 px-4 py-2 border border-[#1447A6]/30 text-[#1447A6] bg-white hover:bg-[#1447A6]/10 rounded-xl text-xs font-bold transition shadow-sm">
         <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-width-2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
         </svg>
@@ -57,7 +57,7 @@
       @if(Auth::user()->passport)
         <img src="{{ Auth::user()->passport }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100">
       @else
-        <div class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+        <div class="w-9 h-9 rounded-full bg-[#1447A6]/10 text-[#1447A6] flex items-center justify-center font-bold text-sm">
           {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'U', 0, 1)) }}
         </div>
       @endif
@@ -68,7 +68,7 @@
   <div class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6">
 
     <div>
-      <span class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Gospel Musician Skills Assessment</span>
+      <span class="text-xs font-bold text-[#1447A6] uppercase tracking-widest">Gospel Musician Skills Assessment</span>
       <h1 class="text-3xl font-extrabold text-gray-900 mt-1 flex items-center gap-2">
         Assessment Complete! 🎉
       </h1>
@@ -105,17 +105,17 @@
       </div>
 
       {{-- Trophy Graphic --}}
-      <div class="md:col-span-1 flex items-center justify-center bg-indigo-50/30 rounded-2xl p-6 min-h-[160px] relative overflow-hidden">
+      <div class="md:col-span-1 flex items-center justify-center bg-[#1447A6]/10 rounded-2xl p-6 min-h-[160px] relative overflow-hidden">
         {{-- Background stars decoration --}}
         <div class="absolute top-4 left-4 text-sm opacity-50 animate-bounce">✨</div>
         <div class="absolute bottom-4 right-4 text-sm opacity-50">🎵</div>
         
         {{-- Trophy SVG --}}
         <div class="relative flex flex-col items-center">
-          <svg class="w-16 h-16 text-indigo-600 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 text-[#1447A6] drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
             <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.44 1.72 4.48 4 4.9V19H3v2h18v-2h-4v-4.1c2.28-.42 4-2.46 4-4.9V7c0-1.1-.9-2-2-2zM5 10V7h2v3H5zm14 0h-2V7h2v3z"/>
           </svg>
-          <div class="w-8 h-8 rounded-full bg-indigo-500 absolute -top-1.5 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
+          <div class="w-8 h-8 rounded-full bg-[#1447A6]/100 absolute -top-1.5 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
             ★
           </div>
         </div>
@@ -234,7 +234,7 @@
       {{-- Quote Card --}}
       <div class="bg-[#F8F9FD] border border-[#E9EEFC] rounded-2xl p-8 flex items-center justify-between relative overflow-hidden">
         <div class="flex-grow pr-4 z-10">
-          <div class="text-6xl font-serif text-indigo-200 select-none leading-none">“</div>
+          <div class="text-6xl font-serif text-[#1447A6]/20 select-none leading-none">“</div>
           <blockquote class="text-base font-extrabold text-gray-800 leading-relaxed -mt-3 italic">
             Skill is built daily. Keep showing up and your sound will grow!
           </blockquote>
@@ -255,8 +255,8 @@
               <div class="absolute top-0 left-16 w-1 h-5 bg-black"></div>
               <div class="absolute top-0 left-18 w-1 h-5 bg-black"></div>
             </div>
-            <div class="flex items-center gap-1.5 text-[8px] font-bold text-indigo-400">
-              <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping"></span>
+            <div class="flex items-center gap-1.5 text-[8px] font-bold text-[#1447A6]">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#1447A6] animate-ping"></span>
               <span>Practicing</span>
             </div>
           </div>

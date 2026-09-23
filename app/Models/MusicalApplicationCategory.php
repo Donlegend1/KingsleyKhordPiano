@@ -13,7 +13,15 @@ class MusicalApplicationCategory extends Model
         'category',
         'level',
         'position',
+        'thumbnail',
     ];
+
+    protected $appends = ['thumbnail_url'];
+
+    public function getThumbnailUrlAttribute()
+    {
+        return $this->thumbnail ? asset($this->thumbnail) : null;
+    }
 
     public function lessons()
     {

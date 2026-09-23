@@ -109,7 +109,7 @@
                         {{-- Button at bottom --}}
                         <div class="mt-auto">
                             <a href="{{ url('member/community/space/midi-download/' . $midiFile->id) }}"
-                               class="w-full bg-[#FF6B35] hover:bg-[#E55A2B] text-white py-3.5 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-sm hover:shadow-lg hover:shadow-orange-500/20 hover:-translate-y-0.5">
+                               class="w-full bg-[#C85A5A] hover:bg-[#B54B4B] text-white py-3.5 px-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-sm hover:shadow-lg hover:shadow-red-500/20 hover:-translate-y-0.5">
                                 <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>

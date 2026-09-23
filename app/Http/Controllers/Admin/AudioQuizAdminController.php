@@ -287,13 +287,6 @@ class AudioQuizAdminController extends Controller
         ],
     ];
 
-    // Lessons where the member-facing player shows a mini piano keyboard with
-    // one key highlighted as the question's reference note. The admin picks
-    // that key per-question from the same chromatic list as FIXED_OPTIONS.
-    protected const PIANO_HIGHLIGHT_LESSONS = [
-        'Relative Pitch' => ['Find the Key', 'Find the key #2'],
-    ];
-
     public function index(Request $request)
     {
         $category = $request->query('category');
@@ -396,10 +389,6 @@ class AudioQuizAdminController extends Controller
             }
         }
 
-        $showReferenceNote = $activeLesson
-            && in_array($activeLesson->title, self::PIANO_HIGHLIGHT_LESSONS[$category] ?? [], true);
-        $referenceNoteOptions = $showReferenceNote ? $fixedOptions : [];
-
         $allCategories = collect(self::CATEGORY_ORDER)->map(fn ($name) => [
             'db_category' => $name,
             'label' => self::CATEGORY_LABELS[$name] ?? $name,
@@ -410,8 +399,7 @@ class AudioQuizAdminController extends Controller
             'answerType', 'fixedOptions', 'compoundOptions',
             'isSequenceCategory', 'sequenceLabels', 'sequenceNoteCount', 'allowBlackKeys',
             'chordSequenceOptions', 'chordSequenceLength', 'chordNamingOptions',
-            'progressionQualityOptions', 'progressionDegreeOptions',
-            'showReferenceNote', 'referenceNoteOptions'
+            'progressionQualityOptions', 'progressionDegreeOptions'
         ));
     }
 
@@ -541,7 +529,6 @@ class AudioQuizAdminController extends Controller
     {
         $request->validate(['audio' => 'required|file|mimes:mp3,wav,ogg']);
         $correctOption = $this->validateCorrectOption($request, $quiz);
-        $referenceNote = $this->validateReferenceNote($request, $quiz);
 
         $audio = $request->file('audio');
         $audioName = time() . '_' . $audio->getClientOriginalName();
@@ -560,7 +547,6 @@ class AudioQuizAdminController extends Controller
             'quiz_id' => $quiz->id,
             'audio_path' => "/uploads/audio/$audioName",
             'correct_option' => $correctOption,
-            'reference_note' => $referenceNote,
         ]);
 
         return redirect()
@@ -582,11 +568,9 @@ class AudioQuizAdminController extends Controller
     {
         $quiz = $question->quiz;
         $correctOption = $this->validateCorrectOption($request, $quiz);
-        $referenceNote = $this->validateReferenceNote($request, $quiz);
 
         $question->update([
             'correct_option' => $correctOption,
-            'reference_note' => $referenceNote,
         ]);
 
         return redirect()
@@ -764,19 +748,4 @@ class AudioQuizAdminController extends Controller
      * player's mini keyboard for this question. Returns null for every other
      * lesson, so it's always safe to call regardless of quiz type.
      */
-    protected function validateReferenceNote(Request $request, Quiz $quiz): ?string
-    {
-        $lessons = self::PIANO_HIGHLIGHT_LESSONS[$quiz->category] ?? [];
-        if (! in_array($quiz->title, $lessons, true)) {
-            return null;
-        }
-
-        $options = self::FIXED_OPTIONS[$quiz->category][$quiz->title] ?? [];
-
-        $validated = $request->validate([
-            'reference_note' => ['required', Rule::in($options)],
-        ]);
-
-        return $validated['reference_note'];
-    }
 }

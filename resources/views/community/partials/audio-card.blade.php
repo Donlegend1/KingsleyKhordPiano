@@ -1,7 +1,7 @@
 @php
     $isPianoPlay = $audio->category === 'piano_plays';
-    $gradient = $isPianoPlay ? 'from-orange-400 to-orange-600' : 'from-blue-400 to-blue-600';
-    $overlay = $isPianoPlay ? 'bg-orange-500' : 'bg-blue-500';
+    $gradient = $isPianoPlay ? 'from-[#D97777] to-[#C85A5A]' : 'from-blue-400 to-blue-600';
+    $overlay = $isPianoPlay ? 'bg-[#C85A5A]' : 'bg-blue-500';
 @endphp
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
     <!-- Waveform Visual -->
@@ -32,7 +32,7 @@
 
             <button
                 onclick="toggleAudio('audio-{{ $audio->id }}', this)"
-                class="w-full bg-[#FF6B35] hover:bg-[#E55A2B] text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                class="w-full bg-[#C85A5A] hover:bg-[#B54B4B] text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
             >
                 <!-- Play Icon -->
                 <svg class="w-5 h-5 play-icon" fill="currentColor" viewBox="0 0 24 24">

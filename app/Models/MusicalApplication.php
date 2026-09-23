@@ -20,6 +20,7 @@ class MusicalApplication extends Model
         'duration',
         'status',
         'related_lessons',
+        'images',
         'audio_resource',
         'pdf_resource',
         'midi_resource',
@@ -29,13 +30,26 @@ class MusicalApplication extends Model
 
     protected $casts = [
         'related_lessons' => 'array',
+        'images' => 'array',
     ];
 
-    protected $appends = ['thumbnail_url', 'category', 'audio_resource_url', 'pdf_resource_url', 'midi_resource_url'];
+    protected $appends = ['thumbnail_url', 'category', 'image_urls', 'audio_resource_url', 'pdf_resource_url', 'midi_resource_url'];
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail ? asset($this->thumbnail) : null;
+        if ($this->thumbnail) {
+            return asset($this->thumbnail);
+        }
+
+        return $this->applicationCategory?->thumbnail_url;
+    }
+
+    public function getImageUrlsAttribute()
+    {
+        if (!$this->images) {
+            return [];
+        }
+        return array_map(fn($path) => asset($path), $this->images);
     }
 
     public function getAudioResourceUrlAttribute()

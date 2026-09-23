@@ -23,7 +23,7 @@ class AdminMusicalApplicationLessonController extends Controller
         foreach ($this->levels as $level) {
             $categories = MusicalApplicationCategory::where('level', $level)
                 ->orderBy('position')
-                ->get(['id', 'category', 'position']);
+                ->get(['id', 'category', 'position', 'thumbnail']);
 
             $skillLevel = ucfirst($level);
             $categories->load(['lessons' => function ($q) use ($skillLevel) {
@@ -31,12 +31,15 @@ class AdminMusicalApplicationLessonController extends Controller
             }]);
 
             $data = [];
+            $categoryThumbnails = [];
             foreach ($categories as $cat) {
                 $data[$cat->category] = $cat->lessons->values();
+                $categoryThumbnails[$cat->category] = $cat->thumbnail_url;
             }
 
             $payload[$level] = [
                 'data' => $data,
+                'categoryThumbnails' => $categoryThumbnails,
                 'current_page' => 1,
                 'last_page' => 1,
             ];
@@ -63,6 +66,8 @@ class AdminMusicalApplicationLessonController extends Controller
             'status' => 'required|string',
             'description' => 'nullable|string',
             'thumbnail' => 'nullable|image|max:5000',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
             'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
@@ -78,7 +83,7 @@ class AdminMusicalApplicationLessonController extends Controller
             return response()->json(['message' => 'Category not found'], 400);
         }
 
-        $media = $this->collectMediaFromRequest($request, null, false);
+        $media = $this->collectMediaFromRequest($request, null, true);
         $maxPos = MusicalApplication::where('musical_application_category_id', $category->id)->max('position') ?: 0;
 
         $lesson = MusicalApplication::create([
@@ -93,6 +98,7 @@ class AdminMusicalApplicationLessonController extends Controller
             'status' => $request->input('status'),
             'position' => $maxPos + 1,
             'related_lessons' => $request->input('related_lessons'),
+            'images' => $media['images'],
             'audio_resource' => $media['audio_resource'],
             'pdf_resource' => $media['pdf_resource'],
             'midi_resource' => $media['midi_resource'],
@@ -117,6 +123,8 @@ class AdminMusicalApplicationLessonController extends Controller
             'status' => 'nullable|string',
             'description' => 'nullable|string',
             'thumbnail' => 'nullable|image|max:5000',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
             'audio_resource' => 'nullable|file|mimes:mp3,wav,ogg,m4a|max:20480',
             'pdf_resource' => 'nullable|file|mimes:pdf|max:20480',
             'midi_resource' => 'nullable|file|mimes:mid,midi|max:20480',
@@ -129,7 +137,7 @@ class AdminMusicalApplicationLessonController extends Controller
             $videoUrl = $this->processVideoUrl($videoType, $request->input('video_url'), 'embed');
         }
 
-        $media = $this->collectMediaFromRequest($request, $lesson, false);
+        $media = $this->collectMediaFromRequest($request, $lesson, true);
 
         $lesson->update([
             'title' => $request->input('title') ?? $lesson->title,
@@ -139,6 +147,7 @@ class AdminMusicalApplicationLessonController extends Controller
             'thumbnail' => $media['thumbnail'],
             'status' => $request->input('status') ?? $lesson->status,
             'related_lessons' => $request->has('related_lessons') ? $request->input('related_lessons') : $lesson->related_lessons,
+            'images' => $media['images'],
             'audio_resource' => $media['audio_resource'],
             'pdf_resource' => $media['pdf_resource'],
             'midi_resource' => $media['midi_resource'],
@@ -212,6 +221,27 @@ class AdminMusicalApplicationLessonController extends Controller
 
         return response()->json([
             'message' => 'Category updated successfully',
+            'category' => $category,
+        ], 200);
+    }
+
+    public function updateCategoryThumbnail(Request $request, $name)
+    {
+        $request->validate([
+            'thumbnail' => 'required|image|max:5000',
+        ]);
+
+        $query = MusicalApplicationCategory::where('category', $name);
+        if ($request->filled('level')) {
+            $query->where('level', strtolower($request->input('level')));
+        }
+        $category = $query->firstOrFail();
+
+        $this->deletePublicFile($category->thumbnail);
+        $category->update(['thumbnail' => $this->storePublicFile($request->file('thumbnail'), 'thumbnails')]);
+
+        return response()->json([
+            'message' => 'Category thumbnail updated successfully',
             'category' => $category,
         ], 200);
     }

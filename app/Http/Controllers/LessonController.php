@@ -31,7 +31,8 @@ class LessonController extends Controller
                          ->orWhere('description', 'like', "%{$search}%");
                 });
             })
-            ->latest();
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
 
         $songs = $query->paginate(9, ['*'], 'page', $page)->appends([
             'tab' => $activeTab,

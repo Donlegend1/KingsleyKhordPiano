@@ -12,6 +12,19 @@ const shuffleArray = (array) => {
     return [...array].sort(() => Math.random() - 0.5);
 };
 
+// Reassigns each question's `reference_note` to a random pick from the pool
+// of keys admins have configured across the quiz's questions, instead of the
+// specific key that admin chose for that exact question. The draw is
+// independent per question (and per repeat of the same question), not a
+// fixed pairing or a single shuffled permutation.
+const shuffleReferenceNotes = (questions, pool) => {
+    if (!pool || pool.length === 0) return questions;
+    return questions.map((q) => ({
+        ...q,
+        reference_note: pool[Math.floor(Math.random() * pool.length)],
+    }));
+};
+
 const QUIZ_QUESTION_CAP = 25;
 
 // Builds the question set a student actually plays through: if the lesson has
@@ -934,6 +947,10 @@ const ShowEartraining = () => {
 
                 if (fetchedQuiz?.questions?.length) {
                     fetchedQuiz.questions = buildQuestionSet(fetchedQuiz.questions);
+                    // The admin only picks the correct answer per question — the
+                    // highlighted reference key is drawn independently at random
+                    // from all 12 keys for every question, every time.
+                    fetchedQuiz.questions = shuffleReferenceNotes(fetchedQuiz.questions, FIND_THE_KEY_OPTIONS);
                 }
 
                 setQuiz(fetchedQuiz);

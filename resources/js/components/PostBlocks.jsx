@@ -241,6 +241,22 @@ function FileCard({ block, onPreview }) {
     );
 }
 
+function EmbedPlayer({ src, isVertical }) {
+    return (
+        <div
+            className={`relative rounded-lg overflow-hidden ${isVertical ? "aspect-[9/16] max-w-sm mx-auto" : "aspect-video"}`}
+        >
+            <iframe
+                src={src}
+                className="w-full h-full"
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+            />
+        </div>
+    );
+}
+
 // Main component (replace your existing block renderer)
 export default function PostBlocks({ post }) {
     const [preview, setPreview] = useState(null);
@@ -292,20 +308,7 @@ export default function PostBlocks({ post }) {
                         if (rawUrl && isEmbeddableLink(rawUrl)) {
                             const embedSrc = block.embed_url || rawUrl;
                             const isVertical = /instagram\.com|tiktok\.com/.test(embedSrc);
-                            return (
-                                <div
-                                    key={idx}
-                                    className={`relative rounded-lg overflow-hidden ${isVertical ? "aspect-[9/16] max-w-sm mx-auto" : "aspect-video"}`}
-                                >
-                                    <iframe
-                                        src={block.embed_url}
-                                        className="w-full h-full"
-                                        frameBorder="0"
-                                        allow="autoplay; fullscreen; picture-in-picture"
-                                        allowFullScreen
-                                    />
-                                </div>
-                            );
+                            return <EmbedPlayer key={idx} src={embedSrc} isVertical={isVertical} />;
                         }
 
                         return rawUrl ? (

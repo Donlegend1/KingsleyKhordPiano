@@ -12,7 +12,7 @@
     <div class="flex items-center gap-2">
       <a href="/home" class="hover:text-gray-700">Dashboard</a>
       <span>/</span>
-      <span class="text-blue-600 font-medium">Learn Songs</span>
+      <span class="text-[#C85A5A] font-medium">Learn Songs</span>
     </div>
 
     <!-- Search Bar -->
@@ -156,6 +156,13 @@
                 this.$refs.resultsContainer.addEventListener('click', (e) => {
                     const link = e.target.closest('a');
                     if (!link) return;
+                    // Only intercept pagination links (same path, just a
+                    // different ?page=). Song card links go to a different
+                    // route entirely and must do a normal full navigation —
+                    // otherwise that page's full HTML (header, nav, etc.)
+                    // gets stuffed into this container instead of the browser
+                    // actually navigating there.
+                    if (link.pathname !== window.location.pathname) return;
                     e.preventDefault();
                     this.fetchResults(link.getAttribute('href'));
                 });

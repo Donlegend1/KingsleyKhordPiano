@@ -17,19 +17,22 @@ class AdminEtudeController extends Controller
     public function list(Request $request)
     {
         $categories = EtudeCategory::orderBy('position')
-            ->get(['id', 'category', 'position']);
+            ->get(['id', 'category', 'position', 'thumbnail']);
 
         $categories->load(['etudes' => function ($q) {
             $q->orderBy('position');
         }]);
 
         $data = [];
+        $categoryThumbnails = [];
         foreach ($categories as $cat) {
             $data[$cat->category] = $cat->etudes->values();
+            $categoryThumbnails[$cat->category] = $cat->thumbnail_url;
         }
 
         return response()->json([
             'data' => $data,
+            'categoryThumbnails' => $categoryThumbnails,
             'current_page' => 1,
             'last_page' => 1,
         ]);
@@ -408,6 +411,37 @@ class AdminEtudeController extends Controller
         return response()->json([
             'message' => 'Category updated successfully',
             'category' => $category
+        ], 200);
+    }
+
+    public function updateCategoryThumbnail(Request $request, $name)
+    {
+        $request->validate([
+            'thumbnail' => 'required|image|max:5000',
+        ]);
+
+        $category = EtudeCategory::where('category', $name)->firstOrFail();
+
+        $thumbnail = $request->file('thumbnail');
+        $filename = time() . '_' . uniqid() . '_' . $thumbnail->getClientOriginalName();
+        $destination = base_path('../public_html/uploads/thumbnails');
+        if (!file_exists($destination)) {
+            $destination = public_path('uploads/thumbnails');
+        }
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        if ($category->thumbnail && file_exists(public_path($category->thumbnail))) {
+            @unlink(public_path($category->thumbnail));
+        }
+
+        $thumbnail->move($destination, $filename);
+        $category->update(['thumbnail' => 'uploads/thumbnails/' . $filename]);
+
+        return response()->json([
+            'message' => 'Category thumbnail updated successfully',
+            'category' => $category,
         ], 200);
     }
 

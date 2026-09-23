@@ -32,7 +32,7 @@
                 </p>
 
                 <div x-show="showVideo" x-cloak class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" @click.self="showVideo = false">
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden">
                         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
                             <h2 class="text-base font-bold text-gray-900 dark:text-white">How to Submit a Video</h2>
                             <button type="button" @click="showVideo = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
@@ -45,7 +45,7 @@
                             <template x-if="showVideo">
                                 <iframe
                                     class="w-full h-full"
-                                    src="https://www.youtube.com/embed/ocg1B9uYuEs?start=468"
+                                    src="https://www.youtube.com/embed/hn4PL6T2d_E"
                                     title="How to upload your video to YouTube and share the link"
                                     frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

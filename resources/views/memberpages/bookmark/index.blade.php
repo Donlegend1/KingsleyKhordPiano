@@ -45,6 +45,12 @@
                     'App\Models\ExtraCourse' =>
                         '/member/lesson/' . $item?->id . '?type=extra_course',
 
+                    'App\Models\Etude' =>
+                        '/member/lesson/' . $item?->id . '?type=etudes',
+
+                    'App\Models\MusicalApplication' =>
+                        route('piano.exercise.player', ['series' => $item?->series, 'video_id' => $item?->id]),
+
                     'App\Models\Post' =>
                         '/member/post/' . $item?->id,
 
@@ -56,8 +62,24 @@
                     'App\Models\Upload' => $bookmark->bookmarkable?->category ? \Illuminate\Support\Str::title($bookmark->bookmarkable->category) : 'Lesson',
                     'App\Models\LearnSong' => 'Learn Song',
                     'App\Models\ExtraCourse' => 'Extra Course',
+                    'App\Models\Etude' => 'Etude',
+                    'App\Models\MusicalApplication' => 'Guided Practice',
                     'App\Models\Post' => 'Post',
                     default => 'Bookmark',
+                };
+
+                // Short alias BookMarkController::resolveModel() expects, so
+                // this card's remove button can hit the same toggle endpoint
+                // the bookmark buttons on lesson pages use.
+                $shortType = match ($bookmark->bookmarkable_type) {
+                    'App\Models\Upload' => 'uploads',
+                    'App\Models\Course' => 'courses',
+                    'App\Models\Post' => 'posts',
+                    'App\Models\LearnSong' => 'learn_songs',
+                    'App\Models\ExtraCourse' => 'extra_courses',
+                    'App\Models\Etude' => 'etudes',
+                    'App\Models\MusicalApplication' => 'musical_applications',
+                    default => null,
                 };
 
                 if ($isPost) {
@@ -69,7 +91,7 @@
                 }
             @endphp
 
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 flex flex-col hover:shadow-sm transition-shadow">
+                    <div class="bookmark-card bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 flex flex-col hover:shadow-sm transition-shadow">
 
                         <div class="flex items-center justify-between mb-4">
                             <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400 flex-shrink-0">
@@ -79,9 +101,22 @@
                                     <i class="fas fa-play text-sm"></i>
                                 @endif
                             </span>
-                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
-                                {{ $categoryLabel }}
-                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+                                    {{ $categoryLabel }}
+                                </span>
+                                @if($shortType)
+                                    <form action="{{ route('bookmark.toggle') }}" method="POST" class="unbookmark-form">
+                                        @csrf
+                                        <input type="hidden" name="bookmarkable_id" value="{{ $bookmark->bookmarkable_id }}">
+                                        <input type="hidden" name="bookmarkable_type" value="{{ $shortType }}">
+                                        <button type="submit" title="Remove bookmark"
+                                            class="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                                            <i class="fas fa-xmark text-xs"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
 
                         <h3 class="text-[15px] font-bold text-gray-900 dark:text-white mb-5 line-clamp-2 flex-1">{{ $title }}</h3>
@@ -98,4 +133,33 @@
         @endif
     </div>
 </section>
+
+<script>
+    document.querySelectorAll('.unbookmark-form').forEach(form => {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const card = this.closest('.bookmark-card');
+            try {
+                const res = await fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: {
+                        'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json',
+                    },
+                });
+                const json = await res.json();
+                if (json.status === 'removed') {
+                    const grid = card.parentElement;
+                    card.remove();
+                    if (grid && grid.children.length === 0) {
+                        window.location.reload();
+                    }
+                }
+            } catch (error) {
+                console.error('Could not remove bookmark:', error);
+            }
+        });
+    });
+</script>
 @endsection

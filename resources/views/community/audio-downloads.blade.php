@@ -53,14 +53,14 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Listen to and download piano plays, tracks, and loops.</p>
             </div>
             <div class="relative group w-full sm:w-72">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#C85A5A] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
                 </svg>
                 <input
                     type="text"
                     x-model="search"
                     placeholder="Search audio files..."
-                    class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#FF6B35]/40 transition-all"
+                    class="w-full pl-10 pr-9 py-2.5 rounded-xl border-0 bg-gray-100 dark:bg-white/5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none ring-1 ring-transparent focus:bg-white dark:focus:bg-[#161617] focus:ring-2 focus:ring-[#C85A5A]/40 transition-all"
                 >
                 <button type="button" x-show="search !== ''" x-cloak @click="search = ''"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
@@ -84,7 +84,7 @@
             <!-- Mobile: Dropdown accordion -->
             <div class="sm:hidden relative" @click.outside="tabsOpen = false">
                 <button type="button" @click="tabsOpen = !tabsOpen"
-                    class="w-full flex items-center justify-between px-6 py-3 rounded-lg font-semibold text-sm bg-[#FF6B35] text-white shadow-sm transition-all duration-200">
+                    class="w-full flex items-center justify-between px-6 py-3 rounded-lg font-semibold text-sm bg-[#C85A5A] text-white shadow-sm transition-all duration-200">
                     <span x-text="({ all: 'All Files', piano_plays: 'Piano Plays', tracks_loops: 'Track & Loops' })[activeTab]"></span>
                     <svg class="w-4 h-4 transition-transform duration-200" :class="tabsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -96,7 +96,7 @@
                     @foreach ($audioTabs as $key => $label)
                         <button type="button" @click="activeTab = '{{ $key }}'; tabsOpen = false"
                             class="block w-full text-left px-6 py-3 font-semibold text-sm transition-colors duration-150"
-                            :class="activeTab === '{{ $key }}' ? 'bg-[#FF6B35] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'">
+                            :class="activeTab === '{{ $key }}' ? 'bg-[#C85A5A] text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'">
                             {{ $label }}
                         </button>
                     @endforeach
@@ -107,7 +107,7 @@
             <div class="hidden sm:flex gap-4">
                 @foreach ($audioTabs as $key => $label)
                     <button type="button" @click="activeTab = '{{ $key }}'"
-                        :class="activeTab === '{{ $key }}' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-[#161617] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'"
+                        :class="activeTab === '{{ $key }}' ? 'bg-[#C85A5A] text-white' : 'bg-white dark:bg-[#161617] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'"
                         class="flex-1 px-8 py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm">
                         {{ $label }}
                     </button>
@@ -122,9 +122,9 @@
                 <div x-show="search === '' || track.title.toLowerCase().includes(search.toLowerCase())"
                     @click="playTrack(track, index)"
                     class="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors"
-                    :class="currentTrack && currentTrack.id === track.id ? 'bg-orange-50 dark:bg-orange-500/10' : 'active:bg-gray-50 dark:active:bg-white/5'"
+                    :class="currentTrack && currentTrack.id === track.id ? 'bg-[#C85A5A]/10 dark:bg-[#C85A5A]/10' : 'active:bg-gray-50 dark:active:bg-white/5'"
                 >
-                    <div class="w-10 h-10 rounded-md bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
+                    <div class="w-10 h-10 rounded-md bg-gradient-to-br from-[#D97777] to-[#C85A5A] flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V6l12-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                     </div>
                     <div class="min-w-0 flex-1">
@@ -169,15 +169,15 @@
                             x-show="search === '' || track.title.toLowerCase().includes(search.toLowerCase())"
                             @click="playTrack(track, index)"
                             class="border-b border-gray-50 dark:border-white/5 last:border-b-0 cursor-pointer transition-colors"
-                            :class="currentTrack && currentTrack.id === track.id ? 'bg-orange-50 dark:bg-orange-500/10' : 'hover:bg-gray-50 dark:hover:bg-white/5'"
+                            :class="currentTrack && currentTrack.id === track.id ? 'bg-[#C85A5A]/10 dark:bg-[#C85A5A]/10' : 'hover:bg-gray-50 dark:hover:bg-white/5'"
                         >
-                            <td class="px-3 sm:px-4 py-3.5 sm:py-3 text-sm" :class="currentTrack && currentTrack.id === track.id ? 'text-[#FF6B35]' : 'text-gray-400'">
+                            <td class="px-3 sm:px-4 py-3.5 sm:py-3 text-sm" :class="currentTrack && currentTrack.id === track.id ? 'text-[#C85A5A]' : 'text-gray-400'">
                                 <svg x-show="currentTrack && currentTrack.id === track.id && isPlaying" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                                 <span x-show="!(currentTrack && currentTrack.id === track.id && isPlaying)" x-text="index + 1"></span>
                             </td>
                             <td class="px-3 sm:px-4 py-3.5 sm:py-3">
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 sm:w-9 sm:h-9 rounded-md bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
+                                    <div class="w-10 h-10 sm:w-9 sm:h-9 rounded-md bg-gradient-to-br from-[#D97777] to-[#C85A5A] flex items-center justify-center flex-shrink-0">
                                         <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V6l12-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                                     </div>
                                     <div class="min-w-0">
@@ -222,7 +222,7 @@
 
             <!-- Track info -->
             <div class="flex items-center gap-2 sm:gap-3 w-24 sm:w-64 min-w-0 flex-shrink-0">
-                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0">
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-[#D97777] to-[#C85A5A] flex items-center justify-center flex-shrink-0">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V6l12-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                 </div>
                 <div class="min-w-0">
@@ -242,7 +242,7 @@
                     </div>
 
                     <div class="relative group">
-                        <button type="button" @click="togglePlay" class="w-9 h-9 rounded-full bg-[#FF6B35] hover:bg-[#E55A2B] text-white flex items-center justify-center transition-colors" aria-label="Play/Pause">
+                        <button type="button" @click="togglePlay" class="w-9 h-9 rounded-full bg-[#C85A5A] hover:bg-[#B54B4B] text-white flex items-center justify-center transition-colors" aria-label="Play/Pause">
                             <svg x-show="!isPlaying" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             <svg x-show="isPlaying" x-cloak class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                         </button>
@@ -258,7 +258,7 @@
 
                     <!-- Single button cycling: Order → Shuffle All → Repeat All → Repeat One -->
                     <div class="relative group">
-                        <button type="button" @click="cyclePlayMode" :class="playMode !== 'order' ? 'text-[#FF6B35]' : 'text-gray-400 hover:text-gray-500'" class="relative" aria-label="Playback mode">
+                        <button type="button" @click="cyclePlayMode" :class="playMode !== 'order' ? 'text-[#C85A5A]' : 'text-gray-400 hover:text-gray-500'" class="relative" aria-label="Playback mode">
                             <!-- Order (sequential) -->
                             <svg x-show="playMode === 'order'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h13M8 12h13M8 17h13M3 7h.01M3 12h.01M3 17h.01"/>
@@ -271,7 +271,7 @@
                             <svg x-show="playMode === 'repeat_all' || playMode === 'repeat_one'" x-cloak class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/>
                             </svg>
-                            <span x-show="playMode === 'repeat_one'" x-cloak class="absolute -top-1.5 -right-1.5 text-[8px] font-bold bg-[#FF6B35] text-white rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">1</span>
+                            <span x-show="playMode === 'repeat_one'" x-cloak class="absolute -top-1.5 -right-1.5 text-[8px] font-bold bg-[#C85A5A] text-white rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">1</span>
                         </button>
                         <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-md bg-gray-900 dark:bg-black px-2 py-1 text-[11px] font-medium text-white opacity-0 scale-95 transition-all duration-150 group-hover:opacity-100 group-hover:scale-100"
                             x-text="playMode === 'order' ? 'Order' : playMode === 'shuffle' ? 'Shuffle All' : playMode === 'repeat_all' ? 'Loop All' : 'Repeat One'"></span>
@@ -280,7 +280,7 @@
 
                 <div class="w-full flex items-center gap-2">
                     <span class="text-[11px] text-gray-400 w-9 text-right" x-text="formatTime(currentTime)"></span>
-                    <input type="range" min="0" :max="duration || 0" step="0.1" x-model.number="currentTime" @input="seek" class="flex-1 h-1 accent-[#FF6B35]">
+                    <input type="range" min="0" :max="duration || 0" step="0.1" x-model.number="currentTime" @input="seek" class="flex-1 h-1 accent-[#C85A5A]">
                     <span class="text-[11px] text-gray-400 w-9" x-text="formatTime(duration)"></span>
                 </div>
             </div>
@@ -288,7 +288,7 @@
             <!-- Volume -->
             <div class="hidden md:flex items-center gap-2 w-28 flex-shrink-0">
                 <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M3 10v4h4l5 5V5L7 10H3z"/></svg>
-                <input type="range" min="0" max="1" step="0.01" x-model.number="volume" @input="setVolume" class="flex-1 h-1 accent-[#FF6B35]">
+                <input type="range" min="0" max="1" step="0.01" x-model.number="volume" @input="setVolume" class="flex-1 h-1 accent-[#C85A5A]">
             </div>
 
             <audio x-ref="player" @timeupdate="onTimeUpdate" @loadedmetadata="onLoadedMetadata" @ended="onEnded" x-on:error="onPlaybackError"></audio>

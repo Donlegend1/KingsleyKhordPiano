@@ -9,7 +9,7 @@
             <div class="flex items-center gap-2">
                 <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
                 <span>/</span>
-                <span class="text-blue-600 font-medium">Guided Practice</span>
+                <span class="text-[#C85A5A] font-medium">Guided Practice</span>
             </div>
 
             <!-- Search Bar -->
@@ -45,7 +45,7 @@
                     <button
                         type="button"
                         @click="open = !open"
-                        style="background-color: #C85A5A;"
+                        style="background-color: #1447A6;"
                         class="w-full flex items-center justify-between px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wide text-white shadow-md transition-all duration-300"
                     >
                         <span x-text="skillLevel"></span>
@@ -63,7 +63,7 @@
                         <template x-for="level in skillLevels" :key="level">
                             <a href="#"
                                 @click.prevent="open = false; selectLevel(level)"
-                                :style="skillLevel === level ? 'background-color: #C85A5A;' : ''"
+                                :style="skillLevel === level ? 'background-color: #1447A6;' : ''"
                                 :class="skillLevel === level ? 'text-white' : 'text-gray-600 hover:bg-gray-50'"
                                 class="block px-6 py-3 text-xs font-bold uppercase tracking-wide transition-colors duration-150"
                                 x-text="level"
@@ -77,7 +77,7 @@
                     <template x-for="(level, index) in skillLevels" :key="level">
                         <a href="#"
                             @click.prevent="selectLevel(level)"
-                            :style="skillLevel === level ? 'background-color: #C85A5A;' : ''"
+                            :style="skillLevel === level ? 'background-color: #1447A6;' : ''"
                             :class="[skillLevel === level ? 'text-white' : 'text-gray-700 hover:bg-gray-200', index !== 0 ? 'border-l border-gray-200' : '']"
                             class="flex-1 flex items-center justify-center text-center px-6 py-4 text-xs font-bold uppercase tracking-wide transition-colors duration-200"
                             x-text="level"
@@ -88,7 +88,7 @@
 
             <!-- Loading indicator -->
             <div x-show="loading" x-cloak class="flex justify-center py-2">
-                <div class="w-5 h-5 border-2 border-gray-300 border-t-indigo-500 rounded-full animate-spin"></div>
+                <div class="w-5 h-5 border-2 border-gray-300 border-t-[#1447A6] rounded-full animate-spin"></div>
             </div>
 
             <!-- Courses Included -->
@@ -121,6 +121,13 @@
                     this.$refs.resultsContainer.addEventListener('click', (e) => {
                         const link = e.target.closest('a');
                         if (!link) return;
+                        // Only intercept pagination links (same path, just a
+                        // different ?page=). Drill/lesson links go to a
+                        // different route entirely and must do a normal full
+                        // navigation — otherwise that page's full HTML
+                        // (header, nav, etc.) gets stuffed into this
+                        // container instead of the browser navigating there.
+                        if (link.pathname !== window.location.pathname) return;
                         e.preventDefault();
                         this.fetchResults(link.getAttribute('href'));
                     });

@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class NewChatMessageNotification extends Notification implements ShouldQueue
 {
@@ -23,7 +25,19 @@ class NewChatMessageNotification extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return match ($notifiable->notification_preference) {
+            'disabled' => ['database'],
+            'push' => ['database', WebPushChannel::class],
+            default => ['database', 'mail'],
+        };
+    }
+
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        return (new WebPushMessage)
+            ->title("New Message from {$this->sender->first_name}")
+            ->body($this->message->body)
+            ->data(['url' => url('/member/premium-chat')]);
     }
 
     public function toMail($notifiable)

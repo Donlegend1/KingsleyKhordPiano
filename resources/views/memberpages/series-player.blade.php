@@ -55,7 +55,7 @@
                 @endif
                 @if ($courseLabel)
                     <span>/</span>
-                    <span class="text-blue-600 font-medium">{{ $courseLabel }}</span>
+                    <span class="text-[#C85A5A] font-medium">{{ $courseLabel }}</span>
                 @endif
             </div>
         </section>
@@ -66,7 +66,7 @@
             <div class="max-w-[1280px] mx-auto px-6 pt-6 pb-16 flex flex-col lg:flex-row gap-8 items-start">
 
                 {{-- ── LEFT COLUMN ── --}}
-                <div class="flex-1 min-w-0 w-full">
+                <div class="flex-1 min-w-0 w-full flex flex-col">
 
                     {{-- Video Player --}}
                     {{-- <div class="w-full bg-black rounded-xl overflow-hidden aspect-video mb-5 shadow"> --}}
@@ -84,31 +84,17 @@
                         'midiPracticeTitle' => Str::title($activeVideo->title),
                     ])
 
-                    @if (!empty($activeVideo->images) && is_array($activeVideo->images))
-                        <div class="mt-6 mb-8">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Course Walkthrough / Highlights</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                @foreach ($activeVideo->images as $imgPath)
-                                    <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50 aspect-video relative group">
-                                        <img src="{{ asset($imgPath) }}" alt="Walkthrough Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-
                     {{-- Action Buttons --}}
                     <div class="flex items-center flex-wrap gap-3 mb-10">
                         {{-- @if($previousVideo)
-                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $previousVideo->id]) }}" 
+                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $previousVideo->id]) }}"
                                class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 <i class="fa-solid fa-arrow-left text-[14px]"></i> Previous
                             </a>
                         @endif
 
                         @if($nextVideo)
-                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $nextVideo->id]) }}" 
+                            <a href="{{ request()->fullUrlWithQuery(['video_id' => $nextVideo->id]) }}"
                                class="flex items-center gap-2 bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 Next Lesson <i class="fa-solid fa-arrow-right text-[14px]"></i>
                             </a>
@@ -143,6 +129,19 @@
                         </form>
                     </div>
 
+                    @if (!empty($activeVideo->images) && is_array($activeVideo->images))
+                        <div class="mt-6 mb-8">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-[0.14em] mb-4">Lesson Highlight</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                @foreach ($activeVideo->images as $imgPath)
+                                    <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50 aspect-video relative group">
+                                        <img src="{{ asset($imgPath) }}" alt="Walkthrough Image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     @if ($activeVideo->audio_resource_url || $activeVideo->pdf_resource_url)
                         <div class="mb-10 rounded-xl overflow-hidden border-2 border-indigo-100 shadow-lg shadow-indigo-100/50">
                             @include('memberpages.partials.sidebar-downloads', ['lesson' => $activeVideo])
@@ -150,33 +149,31 @@
                     @endif
 
                     {{-- Lessons in this course (mobile & tablet only) --}}
-                    <div class="lg:hidden mb-10">
+                    <div class="order-2 lg:order-none lg:hidden mb-10">
                         @include($level ? 'memberpages.partials.lesson-playlist-grouped' : 'memberpages.partials.lesson-playlist')
                     </div>
 
-                    <div class="mt-10 pt-8 border-t border-gray-100" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
-                        <h2 class="text-[17px] font-semibold text-gray-900 tracking-tight mb-5">Discussion</h2>
-                        <form id="comment-form" class="mb-8">
+                    <div class="order-1 lg:order-none mt-10 pt-6 border-t border-gray-200" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
+                        <h2 class="text-[15px] font-semibold text-gray-900 mb-4">Discussion</h2>
+                        <form id="comment-form" class="mb-6">
                             <textarea name="comment" placeholder="What did you learn from this lesson?"
-                                class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
-                            <div class="flex justify-end mt-3">
-                                <button type="submit" class="flex items-center gap-2 bg-gray-900 text-white text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-black transition-colors">
-                                    <i class="fa-solid fa-paper-plane text-[11px]"></i>
+                                class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-[14px] text-gray-800 placeholder-gray-400 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors outline-none resize-none" rows="3"></textarea>
+                            <div class="flex justify-end mt-2">
+                                <button type="submit" class="bg-gray-900 text-white text-[13px] font-semibold px-4 py-2 rounded-md hover:bg-black transition-colors">
                                     Comment
                                 </button>
                             </div>
                         </form>
 
-                        <div class="divide-y divide-gray-100" id="comment-list">
+                        <div class="divide-y divide-gray-200" id="comment-list">
                             @foreach($comments as $comment)
                                 @include('memberpages.partials.course-video-comment', ['comment' => $comment])
                             @endforeach
                         </div>
 
                         @if ($comments->isEmpty())
-                            <div id="comment-empty-state" class="border border-dashed border-gray-200 rounded-2xl px-6 py-10 text-center">
-                                <i class="fa-regular fa-comment-dots text-2xl text-gray-300 mb-3"></i>
-                                <p class="text-[13px] font-medium text-gray-500">No comments yet. Be the first to share your thoughts.</p>
+                            <div id="comment-empty-state" class="py-6 text-center">
+                                <p class="text-[13px] text-gray-500">No comments yet. Be the first to share your thoughts.</p>
                             </div>
                         @endif
                     </div>

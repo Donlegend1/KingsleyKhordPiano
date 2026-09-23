@@ -380,7 +380,7 @@ const CourseDetails = ({
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 mt-6">
                 <button
                     onClick={toggleBookmark}
-                    className={`px-5 py-2.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 border transition duration-200 whitespace-nowrap ${
+                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 border transition duration-200 whitespace-nowrap ${
                         isBookmarked
                             ? "border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
                             : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
@@ -397,7 +397,7 @@ const CourseDetails = ({
                 <button
                     onClick={handleMarkAsCompleted}
                     disabled={loading || course.progress?.course_id}
-                    className={`px-5 py-2.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 whitespace-nowrap ${
+                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 whitespace-nowrap ${
                         course.progress?.course_id
                             ? "bg-green-500 text-white cursor-not-allowed"
                             : "bg-gray-900 text-white hover:bg-gray-800"
@@ -448,27 +448,27 @@ const CourseDetails = ({
 
             {/* Related Lessons Section */}
             {course.related && course.related.length > 0 && (
-                <div className="mt-8 border-t pt-6 dark:border-gray-700">
+                <div className="mt-8 border-t pt-6 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/40 rounded-2xl p-4">
                     <div className="flex items-center gap-1.5 mb-3">
-                        <i className="fa-solid fa-link text-indigo-500 text-[10px]"></i>
+                        <i className="fa-solid fa-link text-[#1447A6] text-[10px]"></i>
                         <p className="text-[10px] font-bold text-gray-400 tracking-[0.14em] uppercase">
                             Related Lessons
                         </p>
                     </div>
-                    <div className="space-y-2">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700 overflow-hidden shadow-sm">
                         {course.related.map((related, idx) => {
                             const content = (
                                 <>
-                                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                                        <i className="fa-solid fa-play text-[8px] ml-0.5"></i>
+                                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1447A6]/10 dark:bg-[#1447A6]/20 text-[#1447A6] flex-shrink-0 group-hover:bg-[#1447A6] group-hover:text-white transition-colors">
+                                        <i className="fa-solid fa-play text-[10px] ml-0.5"></i>
                                     </span>
-                                    <p className="text-[11px] font-semibold text-gray-700 dark:text-gray-200 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 truncate flex-1 transition-colors">
+                                    <p className="text-[13px] font-semibold text-gray-800 dark:text-gray-100 truncate flex-1 transition-colors">
                                         {related.title}
                                     </p>
-                                    <i className="fa-solid fa-chevron-right text-gray-300 group-hover:text-indigo-400 text-[9px] flex-shrink-0 transition-colors"></i>
+                                    <i className="fa-solid fa-chevron-right text-gray-300 group-hover:text-[#1447A6] text-[10px] flex-shrink-0 transition-colors"></i>
                                 </>
                             );
-                            const className = "flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-indigo-200 hover:shadow-sm transition-all cursor-pointer group";
+                            const className = "flex items-center gap-3 px-3.5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer group";
 
                             // Admin-curated related lessons carry a plain `url`
                             // (any link, not necessarily another course) and no
@@ -893,7 +893,7 @@ const CoursesPage = () => {
                                                         key={`checkpoint-${item.id}`}
                                                         className={`relative flex items-center gap-3.5 pl-8 pr-4 py-4 cursor-pointer transition-colors ${
                                                             isSelected
-                                                                ? "bg-indigo-50 dark:bg-indigo-900/20"
+                                                                ? "bg-[#1447A6]/10 dark:bg-[#1447A6]/20"
                                                                 : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                         }`}
                                                         onClick={() => {
@@ -913,27 +913,27 @@ const CoursesPage = () => {
                                                             aria-hidden="true"
                                                         />
                                                         <span
-                                                            className="absolute left-[13px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-400 ring-4 ring-white dark:ring-gray-900"
+                                                            className="absolute left-[13px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#1447A6] ring-4 ring-white dark:ring-gray-900"
                                                             aria-hidden="true"
                                                         />
                                                         <span
                                                             className={`relative flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 shadow-sm transition-colors ${
                                                                 isSelected
-                                                                    ? "bg-indigo-600"
-                                                                    : "bg-indigo-50 dark:bg-indigo-900/40"
+                                                                    ? "bg-[#1447A6]"
+                                                                    : "bg-[#1447A6]/10 dark:bg-[#1447A6]/20"
                                                             }`}
                                                         >
                                                             <Target
                                                                 className={`w-[18px] h-[18px] ${
                                                                     isSelected
                                                                         ? "text-white"
-                                                                        : "text-indigo-600 dark:text-indigo-300"
+                                                                        : "text-[#1447A6] dark:text-[#1447A6]"
                                                                 }`}
                                                                 strokeWidth={2}
                                                             />
                                                         </span>
                                                         <div className="min-w-0">
-                                                            <span className="block text-sm font-semibold text-indigo-600 dark:text-indigo-300 truncate">
+                                                            <span className="block text-sm font-semibold text-[#1447A6] dark:text-[#1447A6] truncate">
                                                                 {item.label || "Practice Checkpoint"}
                                                             </span>
                                                             <span className="block text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
@@ -954,7 +954,7 @@ const CoursesPage = () => {
                                                     key={course.id}
                                                     className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition ${
                                                         isSelected
-                                                            ? "bg-gray-800"
+                                                            ? "bg-[#1447A6]"
                                                             : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                     }`}
                                                     onClick={() => {
@@ -1113,7 +1113,7 @@ const CoursesPage = () => {
                     } transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800`}
                     style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
                 >
-                    <div className={`relative ${sidebarCollapsed ? "px-4 py-5" : "px-4 py-5 bg-blue-600"}`}>
+                    <div className={`relative ${sidebarCollapsed ? "px-4 py-5" : "px-4 py-5 bg-[#1447A6]"}`}>
                         <button
                             onClick={handleSidebarToggle}
                             className={
@@ -1158,7 +1158,7 @@ const CoursesPage = () => {
 
                 {/* Mobile Course List */}
                 <div className="md:hidden w-full mb-4">
-                    <div className="relative px-4 py-5 bg-blue-600">
+                    <div className="relative px-4 py-5 bg-[#1447A6]">
                         <button
                             onClick={() =>
                                 setExpandedCategories((prev) => ({

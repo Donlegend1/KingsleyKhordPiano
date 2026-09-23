@@ -259,6 +259,7 @@ class QuizController extends Controller
                     ['id' => 'extended', 'text' => 'Extended chords (9ths, 11ths, 13ths)', 'points' => 4, 'subtext' => 'Chords with rich, lush extensions.'],
                     ['id' => 'dim_aug', 'text' => 'Diminished/Augmented', 'points' => 2, 'subtext' => 'Tension chords used for passing harmony.'],
                     ['id' => 'slash', 'text' => 'Slash chords', 'points' => 2, 'subtext' => 'Chords with a specified bass note (e.g. C/E).'],
+                    ['id' => 'none', 'text' => 'None', 'points' => 0, 'subtext' => "I can't play any of these confidently yet."],
                 ],
                 'tip' => 'Expanding your chord vocabulary allows you to add color and sophistication to your playing.'
             ],

@@ -122,7 +122,92 @@
                     $unreadCount = $notifications->whereNull('read_at')->count();
                 @endphp
 
-                <div class="relative group" x-data="{ open: false }" @click.outside="open = false">
+                <div class="relative group" x-data="{
+                        open: false,
+                        openSettings: false,
+                        notifPref: '{{ auth()->user()->notification_preference ?? 'email' }}',
+                        saving: false,
+                        pushError: '',
+                        async savePreference(value) {
+                            const previous = this.notifPref;
+                            this.notifPref = value;
+                            try {
+                                const res = await fetch('{{ route('notifications.updatePreference') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                    },
+                                    body: JSON.stringify({ notification_preference: value }),
+                                });
+                                if (!res.ok) { this.notifPref = previous; }
+                            } catch (e) {
+                                this.notifPref = previous;
+                            }
+                        },
+                        async setPref(value) {
+                            if (this.saving) return;
+                            this.pushError = '';
+                            if (value !== 'push') {
+                                this.saving = true;
+                                await this.savePreference(value);
+                                this.saving = false;
+                                return;
+                            }
+
+                            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                                this.pushError = 'Push notifications are not supported in this browser.';
+                                this.notifPref = '{{ auth()->user()->notification_preference ?? 'email' }}';
+                                return;
+                            }
+
+                            this.saving = true;
+                            try {
+                                const permission = await Notification.requestPermission();
+                                if (permission !== 'granted') {
+                                    this.pushError = 'Notification permission was denied.';
+                                    this.notifPref = '{{ auth()->user()->notification_preference ?? 'email' }}';
+                                    return;
+                                }
+
+                                const registration = await navigator.serviceWorker.register('/serviceworker.js');
+                                await navigator.serviceWorker.ready;
+
+                                const urlBase64ToUint8Array = (base64String) => {
+                                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                                    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+                                    const rawData = atob(base64);
+                                    return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
+                                };
+
+                                let subscription = await registration.pushManager.getSubscription();
+                                if (!subscription) {
+                                    subscription = await registration.pushManager.subscribe({
+                                        userVisibleOnly: true,
+                                        applicationServerKey: urlBase64ToUint8Array('{{ config('webpush.vapid.public_key') }}'),
+                                    });
+                                }
+
+                                await fetch('{{ route('webpush.subscribe') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                    },
+                                    body: JSON.stringify(subscription.toJSON()),
+                                });
+
+                                await this.savePreference('push');
+                            } catch (e) {
+                                this.pushError = 'Could not enable push notifications.';
+                                this.notifPref = '{{ auth()->user()->notification_preference ?? 'email' }}';
+                            } finally {
+                                this.saving = false;
+                            }
+                        }
+                     }" @click.outside="open = false">
                     <button type="button" @click="open = !open"
                         class="relative flex items-center justify-center w-6 h-6 text-white hover:text-white/80 transition-colors" aria-label="Notifications">
                         <svg class="w-6 h-6 block" fill="currentColor" viewBox="0 0 24 24">
@@ -163,14 +248,43 @@
                                     </span>
                                 @endif
                             </div>
-                            @if($unreadCount > 0)
-                                <form method="POST" action="{{ route('notifications.markAllAsRead') }}">
-                                    @csrf
-                                    <button type="submit" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
-                                        Mark all read
+                            <div class="flex items-center gap-3">
+                                @if($unreadCount > 0)
+                                    <form method="POST" action="{{ route('notifications.markAllAsRead') }}">
+                                        @csrf
+                                        <button type="submit" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                                            Mark all read
+                                        </button>
+                                    </form>
+                                @endif
+                                <div class="relative" @click.outside="openSettings = false">
+                                    <button type="button" @click="openSettings = !openSettings" aria-label="Notification settings"
+                                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
                                     </button>
-                                </form>
-                            @endif
+
+                                    <div x-show="openSettings" x-cloak x-transition
+                                        class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-lg p-3 z-50 text-left">
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">Notify me via</p>
+                                        <label class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/60 cursor-pointer">
+                                            <input type="radio" name="notifPref" value="push" x-model="notifPref" :disabled="saving" @change="setPref('push')" class="text-indigo-600 focus:ring-indigo-400">
+                                            <span class="text-sm text-gray-700 dark:text-gray-200">Push notifications</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/60 cursor-pointer">
+                                            <input type="radio" name="notifPref" value="email" x-model="notifPref" :disabled="saving" @change="setPref('email')" class="text-indigo-600 focus:ring-indigo-400">
+                                            <span class="text-sm text-gray-700 dark:text-gray-200">Email notifications</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/60 cursor-pointer">
+                                            <input type="radio" name="notifPref" value="disabled" x-model="notifPref" :disabled="saving" @change="setPref('disabled')" class="text-indigo-600 focus:ring-indigo-400">
+                                            <span class="text-sm text-gray-700 dark:text-gray-200">Disabled</span>
+                                        </label>
+                                        <p x-show="pushError" x-cloak x-text="pushError" class="text-xs text-red-500 mt-1.5 px-1"></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Notification Items -->

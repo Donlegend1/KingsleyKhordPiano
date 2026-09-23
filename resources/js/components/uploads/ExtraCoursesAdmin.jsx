@@ -93,6 +93,9 @@ const ExtraCoursesAdmin = () => {
     const [editAudioResourceFile, setEditAudioResourceFile] = useState(null);
     const [editPdfResourceFile, setEditPdfResourceFile] = useState(null);
     const fileInputRef = useRef(null);
+    const categoryThumbnailInputRef = useRef(null);
+    const [categoryThumbnailTarget, setCategoryThumbnailTarget] = useState(null);
+    const [uploadingCategoryThumbnail, setUploadingCategoryThumbnail] = useState(false);
 
     const { showMessage } = useFlashMessage();
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
@@ -180,6 +183,36 @@ const ExtraCoursesAdmin = () => {
             showMessage(msg, "error");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const openCategoryThumbnailPicker = (categoryName) => {
+        setCategoryThumbnailTarget(categoryName);
+        categoryThumbnailInputRef.current?.click();
+    };
+
+    const handleCategoryThumbnailSelected = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file || !categoryThumbnailTarget) return;
+
+        const formData = new FormData();
+        formData.append("thumbnail", file);
+
+        setUploadingCategoryThumbnail(true);
+        try {
+            await axios.post(
+                `/api/admin/extra-courses/category/${categoryThumbnailTarget}/thumbnail`,
+                formData,
+                { headers: { "X-CSRF-TOKEN": csrfToken, "Content-Type": "multipart/form-data" } }
+            );
+            showMessage("Category thumbnail updated. All courses in this category will use it unless they have their own.", "success");
+            fetchCourses();
+        } catch (error) {
+            showMessage(error.response?.data?.message || "Error updating category thumbnail", "error");
+        } finally {
+            setUploadingCategoryThumbnail(false);
+            setCategoryThumbnailTarget(null);
         }
     };
 
@@ -424,6 +457,13 @@ const ExtraCoursesAdmin = () => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-lg">
+            <input
+                type="file"
+                accept="image/*"
+                ref={categoryThumbnailInputRef}
+                onChange={handleCategoryThumbnailSelected}
+                className="hidden"
+            />
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Extra Courses Manager</h2>
             </div>
@@ -489,7 +529,20 @@ const ExtraCoursesAdmin = () => {
                                                                                 onClick={() => toggleCategory(`${level}-${categoryName}`)}
                                                                                 className="flex justify-between items-center cursor-pointer select-none bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200/80 shadow-sm hover:bg-gray-100/50 transition"
                                                                             >
-                                                                                <span className="font-semibold text-gray-800">{categoryName}</span>
+                                                                                <span className="flex items-center gap-2.5 font-semibold text-gray-800">
+                                                                                    {coursesData[level]?.categoryThumbnails?.[categoryName] ? (
+                                                                                        <img
+                                                                                            src={coursesData[level].categoryThumbnails[categoryName]}
+                                                                                            alt=""
+                                                                                            className="w-8 h-8 rounded-md object-cover flex-shrink-0 border border-gray-200"
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <span className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0 text-gray-300">
+                                                                                            <i className="fa fa-image text-xs"></i>
+                                                                                        </span>
+                                                                                    )}
+                                                                                    {categoryName}
+                                                                                </span>
                                                                                 <div className="flex items-center gap-4">
                                                                                     <button
                                                                                         onClick={(e) => {
@@ -500,6 +553,14 @@ const ExtraCoursesAdmin = () => {
                                                                                     >
                                                                                         Add Course
                                                                                     </button>
+                                                                                    <i
+                                                                                        className={`fa ${uploadingCategoryThumbnail && categoryThumbnailTarget === categoryName ? "fa-spinner fa-spin text-gray-400" : "fa-camera text-gray-500 hover:text-gray-700 cursor-pointer"} text-sm`}
+                                                                                        title="Set category thumbnail (applies to all courses in this category)"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            openCategoryThumbnailPicker(categoryName);
+                                                                                        }}
+                                                                                    ></i>
                                                                                     <i
                                                                                         className="fa fa-pencil text-blue-500 hover:text-blue-700 text-sm cursor-pointer"
                                                                                         onClick={(e) => {

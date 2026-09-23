@@ -42,7 +42,11 @@ class Upload extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail ? asset($this->thumbnail) : null;
+        if ($this->thumbnail) {
+            return asset($this->thumbnail);
+        }
+
+        return $this->pianoExerciseCategory?->thumbnail_url;
     }
 
     public function getAudioResourceUrlAttribute()

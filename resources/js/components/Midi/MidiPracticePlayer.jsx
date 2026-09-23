@@ -46,7 +46,7 @@ const BLACK_KEY_SPAN = 6;
 // (C=0 ... B=6). Combined with the octave number this gives an absolute
 // "white key ordinal" for any pitch, measured from a fixed C reference —
 // unlike an octave-relative index, this stays correct even when the visible
-// range starts on a non-C pitch (e.g. the full 88-key view starts on A0).
+// range starts on a non-C pitch.
 const WHITE_KEY_INDEX_IN_OCTAVE = { 0: 0, 2: 1, 4: 2, 5: 3, 7: 4, 9: 5, 11: 6 };
 const whiteKeyUnits = (pitch) => Math.floor(pitch / 12) * 7 + WHITE_KEY_INDEX_IN_OCTAVE[((pitch % 12) + 12) % 12];
 const blackKeyBoundaryUnits = (pitch) => Math.floor(pitch / 12) * 7 + BLACK_KEY_OFFSETS[((pitch % 12) + 12) % 12];
@@ -54,22 +54,27 @@ const blackKeyBoundaryUnits = (pitch) => Math.floor(pitch / 12) * 7 + BLACK_KEY_
 // instead of html-midi-player's default bare oscillator synth.
 const PIANO_SOUNDFONT_URL = "https://storage.googleapis.com/magentadata/js/soundfonts/salamander";
 // Fixed C0-C7 range shown in the fullscreen "full view".
-const FULL_VIEW_MIN_PITCH = 12; // C0
-const FULL_VIEW_MAX_PITCH = 96; // C7
+const FULL_VIEW_MIN_PITCH = 24; // C0
+const FULL_VIEW_MAX_PITCH = 108; // C7
 // Mobile full view (landscape) uses a narrower 5-octave range instead of
 // the full 88 keys — the full range doesn't fit comfortably on a phone
 // screen even rotated, so this trades range for a more usable key size.
-const MOBILE_FULL_VIEW_MIN_PITCH = 24; // C1
-const MOBILE_FULL_VIEW_MAX_PITCH = 84; // C6
-// Active-key highlight color split: C0-C3 highlights blue, C3 and above
-// highlights green.
-const KEY_RANGE_SPLIT_PITCH = 48; // C3
+const MOBILE_FULL_VIEW_MIN_PITCH = 24; // C0
+const MOBILE_FULL_VIEW_MAX_PITCH = 84; // C5
+// Default embedded player (desktop, not full view) shows a fixed C1-C6
+// range instead of the note-driven dynamic window, matching the fixed
+// ranges used by the other two view modes.
+const DEFAULT_VIEW_MIN_PITCH = 36; // C1
+const DEFAULT_VIEW_MAX_PITCH = 96; // C6
+// Active-key highlight color split: below this pitch highlights blue, this
+// pitch and above highlights green.
+const KEY_RANGE_SPLIT_PITCH = 48; // C2
 
 const isBlackPitch = (pitch) => BLACK_KEY_CLASSES.has(((pitch % 12) + 12) % 12);
 
 const pitchLabel = (pitch) => {
     const name = PITCH_NAMES[((pitch % 12) + 12) % 12];
-    const octave = Math.floor(pitch / 12) - 1;
+    const octave = Math.floor(pitch / 12) - 2;
 
     return `${name}${octave}`;
 };
@@ -127,20 +132,6 @@ const getActivePitches = (sequence, time, tempoRatio = 1) => {
             .map((note) => note.pitch),
     );
 };
-
-const getSequencePitchRange = (sequence) => {
-    const pitches = (sequence?.notes || []).map((note) => note.pitch).filter(Number.isFinite);
-
-    return {
-        minNote: pitches.length ? Math.min(...pitches) : 48,
-        maxNote: pitches.length ? Math.max(...pitches) : 72,
-    };
-};
-
-const KEYBOARD_OCTAVE_COUNT = 6;
-const KEYBOARD_PITCH_COUNT = KEYBOARD_OCTAVE_COUNT * 12;
-const KEYBOARD_LOWEST_START_PITCH = 12;
-const KEYBOARD_HIGHEST_START_PITCH = 24;
 
 const cloneSequence = (sequence) => {
     if (mm.sequences?.clone) {
@@ -291,38 +282,18 @@ const MidiPracticePlayer = ({ data }) => {
             minPitch = FULL_VIEW_MIN_PITCH;
             maxPitch = FULL_VIEW_MAX_PITCH;
         } else if (isNarrowPortrait) {
-            // Mobile default embedded player (not full view): fixed C1-C6,
+            // Mobile default embedded player (not full view): fixed C0-C5,
             // 5 octaves, instead of the note-driven dynamic window — keeps
             // key size consistent and predictable on a phone screen rather
             // than depending on whatever range the loaded sequence uses.
             minPitch = MOBILE_FULL_VIEW_MIN_PITCH;
             maxPitch = MOBILE_FULL_VIEW_MAX_PITCH;
         } else {
-            const { minNote, maxNote } = getSequencePitchRange(sequence);
-            minPitch = clamp(
-                Math.floor((minNote - 12) / 12) * 12,
-                KEYBOARD_LOWEST_START_PITCH,
-                KEYBOARD_HIGHEST_START_PITCH,
-            );
-            maxPitch = minPitch + KEYBOARD_PITCH_COUNT - 1;
-
-            if (maxNote > maxPitch) {
-                minPitch = clamp(
-                    Math.ceil((maxNote - KEYBOARD_PITCH_COUNT + 1) / 12) * 12,
-                    KEYBOARD_LOWEST_START_PITCH,
-                    KEYBOARD_HIGHEST_START_PITCH,
-                );
-                maxPitch = minPitch + KEYBOARD_PITCH_COUNT - 1;
-            }
-
-            if (minNote < minPitch) {
-                minPitch = clamp(
-                    Math.floor(minNote / 12) * 12,
-                    KEYBOARD_LOWEST_START_PITCH,
-                    KEYBOARD_HIGHEST_START_PITCH,
-                );
-                maxPitch = minPitch + KEYBOARD_PITCH_COUNT - 1;
-            }
+            // Default embedded player (desktop, not full view): fixed C1-C6
+            // instead of the note-driven dynamic window, regardless of what
+            // the loaded sequence actually uses.
+            minPitch = DEFAULT_VIEW_MIN_PITCH;
+            maxPitch = DEFAULT_VIEW_MAX_PITCH;
         }
 
         const pitches = Array.from(
@@ -345,7 +316,7 @@ const MidiPracticePlayer = ({ data }) => {
         // Positions are measured in "white key units" from a fixed C
         // reference (whiteKeyUnits / blackKeyBoundaryUnits), not relative to
         // minPitch's own octave — this keeps the grouping correct even when
-        // the visible range starts on a non-C pitch, like A0 in full view.
+        // the visible range starts on a non-C pitch.
         const origin = whiteKeyUnits(minPitch);
         const totalColumns = whitePitches.length * WHITE_KEY_SUBDIVISIONS;
         const blackPitches = pitches

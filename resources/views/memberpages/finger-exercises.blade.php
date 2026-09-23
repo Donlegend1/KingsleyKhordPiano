@@ -38,7 +38,7 @@
     <div class="max-w-7xl mx-auto flex items-center h-8 gap-2 text-sm text-gray-500">
         <a href="{{ route('home') }}" class="hover:text-gray-700">Dashboard</a>
         <span>/</span>
-        <span class="text-blue-600 font-medium">Piano Exercise</span>
+        <span class="text-[#C85A5A] font-medium">Piano Exercise</span>
     </div>
 </section>
 
@@ -50,13 +50,13 @@
             <div class="inline-flex items-stretch bg-gray-100 rounded-lg overflow-hidden">
                 <button type="button" @click="activeTab = 'finger'"
                     class="px-8 py-3 text-xs font-bold uppercase tracking-wide transition-colors duration-200"
-                    :style="activeTab === 'finger' ? 'background-color: #C85A5A;' : ''"
+                    :style="activeTab === 'finger' ? 'background-color: #1447A6;' : ''"
                     :class="activeTab === 'finger' ? 'text-white' : 'text-gray-500 hover:bg-gray-200'">
                     Finger Exercise
                 </button>
                 <button type="button" @click="activeTab = 'etudes'"
                     class="px-8 py-3 text-xs font-bold uppercase tracking-wide border-l border-gray-200 transition-colors duration-200"
-                    :style="activeTab === 'etudes' ? 'background-color: #C85A5A;' : ''"
+                    :style="activeTab === 'etudes' ? 'background-color: #1447A6;' : ''"
                     :class="activeTab === 'etudes' ? 'text-white' : 'text-gray-500 hover:bg-gray-200'">
                     Etudes &amp; Pieces
                 </button>
@@ -86,7 +86,7 @@
             <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col group">
 
                 <!-- Thumbnail -->
-                <a href="{{ $watchUrl }}" class="block relative overflow-hidden" style="aspect-ratio:16/9;">
+                <a href="{{ $lessonCount > 0 ? $watchUrl : '#' }}" @if($lessonCount === 0) onclick="return false;" @endif class="block relative overflow-hidden {{ $lessonCount === 0 ? 'cursor-default' : '' }}" style="aspect-ratio:16/9;">
                     @if($firstLesson && $firstLesson->thumbnail_url)
                         <img src="{{ $firstLesson->thumbnail_url }}" alt="{{ $card['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     @else
@@ -131,10 +131,17 @@
                     </div>
 
                     <!-- Watch Now Button -->
-                    <a href="{{ $watchUrl }}"
-                       class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
-                        Watch Now
-                    </a>
+                    @if ($lessonCount > 0)
+                        <a href="{{ $watchUrl }}"
+                           class="mt-auto flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all duration-200">
+                            Watch Now
+                        </a>
+                    @else
+                        <div class="mt-auto flex items-center justify-center gap-2 w-full py-3 bg-gray-50 text-gray-400 text-sm font-semibold rounded-xl border border-gray-100">
+                            <i class="fa-regular fa-circle-question text-xs"></i>
+                            No lessons in this course yet
+                        </div>
+                    @endif
                 </div>
             </div>
             @endforeach

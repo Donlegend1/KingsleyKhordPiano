@@ -99,6 +99,7 @@ class ExerciseController extends Controller
 
         if ($series) {
             $playlist = \App\Models\MusicalApplication::where('series', $series)
+                ->with('applicationCategory')
                 ->orderByRaw('position IS NULL, position ASC')
                 ->orderBy('id', 'asc')
                 ->get();
@@ -162,16 +163,6 @@ class ExerciseController extends Controller
 
         $levels = ['independence', 'technique', 'flexibility', 'strength', 'dexterity'];
 
-            $related_courses = [];
-
-            if ($activeVideo && !empty($activeVideo->tags)) {
-                if ($activeVideo instanceof \App\Models\MusicalApplication) {
-                    $related_courses = \App\Models\MusicalApplication::whereIn('id', $activeVideo->tags)->get();
-                } else {
-                    $related_courses = Upload::whereIn('id', $activeVideo->tags)->get();
-                }
-            }
-
         $midiPracticeFile = app(MidiPracticeFileResolver::class)->forLesson($activeVideo);
         $midiPracticeFiles = collect([$midiPracticeFile])->filter();
 
@@ -186,7 +177,6 @@ class ExerciseController extends Controller
             'levels',
             'skillLevels',
             'comments',
-            'related_courses',
             'midiPracticeFile',
             'midiPracticeFiles'
         ));
@@ -226,6 +216,7 @@ class ExerciseController extends Controller
     {
         $skillLevel = $request->query('skill_level', 'ALL');
         $skillLevels = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
+        $page = $request->query('page', 1);
         $search = $request->query('name');
 
         $categoryPage = \App\Models\MusicalApplicationCategory::query()
@@ -240,9 +231,11 @@ class ExerciseController extends Controller
             ->appends(['skill_level' => $skillLevel, 'name' => $search]);
 
         $applications = \App\Models\MusicalApplication::where('status', 'active')
+            ->with('applicationCategory')
             ->whereIn('musical_application_category_id', $categoryPage->pluck('id'))
             ->when($skillLevel !== 'ALL', fn ($q) => $q->where('skill_level', $skillLevel))
             ->orderByRaw('position IS NULL, position ASC')
+            ->orderByDesc('id')
             ->get()
             ->groupBy('series')
             ->sortBy(fn ($items, $series) => $categoryPage->pluck('category')->search($series));
