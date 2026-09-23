@@ -1,8 +1,10 @@
-@extends('layouts.community')
+@extends('layouts.hub')
 
-@section('breadcrumb-parent', 'Overview')
-@section('breadcrumb-parent-url', '/member/my-library')
-@section('breadcrumb', 'Application')
+@section('title', 'Application')
+
+@section('breadcrumbs')
+    @include('community.partials.breadcrumbs', ['items' => [['label' => 'Application']]])
+@endsection
 
 @section('content')
 
