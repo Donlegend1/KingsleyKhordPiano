@@ -183,9 +183,9 @@
                             {{-- Video embed --}}
                             <div class="relative w-full rounded-2xl overflow-hidden ring-1 ring-black/5 shadow-sm mb-6" style="padding-top: 56.25%;">
                                 <iframe
-                                    src="https://fast.wistia.net/embed/iframe/gd8m2mxi65?videoFoam=false"
+                                    src="https://www.youtube.com/embed/WQ2U6zV-S1M"
                                     title="How it works"
-                                    allow="autoplay; fullscreen"
+                                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
                                     allowfullscreen
                                     frameborder="0"
                                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"

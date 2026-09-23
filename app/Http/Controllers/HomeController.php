@@ -98,10 +98,59 @@ class HomeController extends Controller
                 $latestCourses['extra courses'] = $latestExtraCourse;
             }
 
-            return view('home', compact('progress', 'levels', 'latestCourses', 'assessment'));
+            $resumeLesson = $this->buildResumeLesson($userId);
+
+            return view('home', compact('progress', 'levels', 'latestCourses', 'assessment', 'resumeLesson'));
         }
     }
 
+
+    /**
+     * Finds the most recently viewed lesson (across all lesson types) so the
+     * dashboard can offer a "Resume Lesson" shortcut instead of "Get Started"
+     * once the member has actually started learning.
+     */
+    private function buildResumeLesson($userId): ?array
+    {
+        $lastView = \App\Models\LessonView::where('user_id', $userId)
+            ->latest('updated_at')
+            ->with('viewable')
+            ->first();
+
+        if (!$lastView || !$lastView->viewable) {
+            return null;
+        }
+
+        $lesson = $lastView->viewable;
+
+        return match (get_class($lesson)) {
+            Upload::class => [
+                'title' => $lesson->title,
+                'url' => route('piano.exercise.player', ['level' => $lesson->level, 'video_id' => $lesson->id]),
+            ],
+            \App\Models\MusicalApplication::class => [
+                'title' => $lesson->title,
+                'url' => route('piano.exercise.player', [
+                    'series' => $lesson->series,
+                    'skill_level' => strtolower($lesson->skill_level),
+                    'video_id' => $lesson->id,
+                ]),
+            ],
+            \App\Models\ExtraCourse::class => [
+                'title' => $lesson->title,
+                'url' => url("/member/lesson/{$lesson->id}?type=extra_course"),
+            ],
+            \App\Models\LearnSong::class => [
+                'title' => $lesson->title,
+                'url' => url("/member/lesson/{$lesson->id}?type=learn_song"),
+            ],
+            \App\Models\Etude::class => [
+                'title' => $lesson->title,
+                'url' => url("/member/lesson/{$lesson->id}?type=etudes"),
+            ],
+            default => null,
+        };
+    }
 
     public function admin()
     {
