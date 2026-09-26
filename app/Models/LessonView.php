@@ -27,19 +27,20 @@ class LessonView extends Model
 
     /**
      * Record (or refresh the timestamp of) a view for the given user/model.
+     *
+     * Uses firstOrCreate + touch() rather than updateOrCreate(), because
+     * 'updated_at' isn't mass-assignable — passing it as an updateOrCreate
+     * value gets silently dropped, and re-viewing an already-recorded lesson
+     * leaves zero dirty attributes, so Eloquent skips the UPDATE query and
+     * the timestamp never actually bumps. touch() forces it regardless.
      */
     public static function record($userId, $viewable): void
     {
-        static::query()->updateOrCreate(
-            [
-                'user_id' => $userId,
-                'viewable_id' => $viewable->getKey(),
-                'viewable_type' => get_class($viewable),
-            ],
-            [
-                'updated_at' => now(),
-            ]
-        );
+        static::query()->firstOrCreate([
+            'user_id' => $userId,
+            'viewable_id' => $viewable->getKey(),
+            'viewable_type' => get_class($viewable),
+        ])->touch();
     }
 
     /**

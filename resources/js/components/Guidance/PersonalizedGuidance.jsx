@@ -1,18 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {
-    useFlashMessage,
-    FlashMessageProvider,
-} from "../Alert/FlashMessageContext";
+import { FlashMessageProvider } from "../Alert/FlashMessageContext";
 
-const PersonalizedGuidance = ({ guidanceUrl }) => {
-    const { showMessage } = useFlashMessage();
+const PersonalizedGuidance = ({ guidanceUrl, paywallUrl }) => {
     const authUser = window.authUser || {};
     const isPremium = authUser?.premium;
 
     const handleGetStarted = () => {
         if (!isPremium) {
-            showMessage("This feature is for Premium members only.", "error");
+            window.location.href = paywallUrl;
             return;
         }
         window.location.href = guidanceUrl;
@@ -77,7 +73,10 @@ if (mountEl) {
     const root = ReactDOM.createRoot(mountEl);
     root.render(
         <FlashMessageProvider>
-            <PersonalizedGuidance guidanceUrl={mountEl.dataset.guidanceUrl} />
+            <PersonalizedGuidance
+                guidanceUrl={mountEl.dataset.guidanceUrl}
+                paywallUrl={mountEl.dataset.paywallUrl}
+            />
         </FlashMessageProvider>
     );
 }

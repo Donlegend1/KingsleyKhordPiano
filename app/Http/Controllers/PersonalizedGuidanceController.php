@@ -22,6 +22,10 @@ class PersonalizedGuidanceController extends Controller
 
     public function plan()
     {
+        if (! auth()->user()->premium) {
+            return view('memberpages.personalized-plan-paywall');
+        }
+
         $plan = PersonalizedPlan::where('user_id', auth()->id())->first();
 
         if (! $plan) {

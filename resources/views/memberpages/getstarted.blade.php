@@ -160,7 +160,7 @@
       </div>
 
       {{-- Card 2: Personalized Guidance --}}
-      <div id="personalized-guidance-card" class="flex-1 flex" data-guidance-url="{{ route('member.personalized-guidance.create') }}"></div>
+      <div id="personalized-guidance-card" class="flex-1 flex" data-guidance-url="{{ route('member.personalized-guidance.create') }}" data-paywall-url="{{ route('member.personalized-plan') }}"></div>
 
     </div>
     </div>

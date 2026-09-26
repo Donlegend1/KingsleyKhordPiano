@@ -99,7 +99,8 @@ class LiveShowController extends Controller
             'start_time',
             'access_type',
             'category',
-            'max_slots'
+            'max_slots',
+            'status'
         ]));
 
         return response()->json([

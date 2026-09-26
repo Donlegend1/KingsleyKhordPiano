@@ -104,6 +104,19 @@ const CourseDetails = ({
         fetchComments();
     }, [course.id]);
 
+    // Records this course as the member's most recently viewed lesson so the
+    // dashboard's "Resume Lesson" card points at whatever was opened last,
+    // not whatever happened to be recorded before.
+    useEffect(() => {
+        axios
+            .post(
+                `/member/course/${course.id}/view`,
+                {},
+                { headers: { "X-CSRF-TOKEN": csrfToken }, withCredentials: true }
+            )
+            .catch((err) => console.error("Failed to record course view:", err));
+    }, [course.id]);
+
     useEffect(() => {
         setIsBookmarked(course.isBookmarked || false);
     }, [course]);
@@ -509,208 +522,168 @@ const CourseDetails = ({
             </div>
 
             {/* Comment Section */}
-            <div className="mt-10">
-                <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
-                    Comments
-                </h3>
+            <div className="mt-10 pt-6 border-t border-gray-100 dark:border-white/10 bg-white dark:bg-gray-800 rounded-2xl p-6">
+                <div className="flex items-center gap-2.5 mb-5">
+                    <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400">
+                        <i className="fa-regular fa-comments text-sm"></i>
+                    </span>
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                        Comments{" "}
+                        <span className="text-gray-400 font-medium">
+                            ({comments.length})
+                        </span>
+                    </h3>
+                </div>
 
-                <form onSubmit={handleSubmitComment} className="mb-4">
+                <form onSubmit={handleSubmitComment} className="mb-8">
                     <textarea
-                        className="w-full p-2 border rounded shadow-sm focus:outline-none focus:ring 
-                       bg-white text-gray-900 dark:bg-gray-900 dark:text-white 
-                       dark:border-gray-700"
+                        className="w-full border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-[#1447A6] focus:border-[#1447A6] outline-none transition resize-none"
                         rows="3"
                         placeholder="Write a comment..."
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
+                        required
                     ></textarea>
-                    <button
-                        type="submit"
-                        disabled={commentSubmitting}
-                        className="mt-2 px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        <span className="fa fa-paper-plane mr-2"></span>
-                        Post Comment
-                    </button>
+                    <div className="flex justify-end mt-3">
+                        <button
+                            type="submit"
+                            disabled={commentSubmitting}
+                            className="flex items-center gap-2 bg-[#1447A6] hover:bg-[#0F3A8A] disabled:opacity-60 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
+                        >
+                            <i className="fa-solid fa-paper-plane text-[11px]"></i>
+                            {commentSubmitting ? "Posting..." : "Post"}
+                        </button>
+                    </div>
                 </form>
 
-                <div className="space-y-4">
-                    {comments.length === 0 ? (
-                        <div className="text-center text-gray-500 dark:text-gray-400">
-                            <i className="fa fa-comments fa-2x mb-2"></i>
-                            <p>No comments yet.</p>
-                        </div>
-                    ) : (
-                        comments.map((c) => (
-                            <div
-                                key={c.id}
-                                className="border p-3 rounded shadow-sm relative 
-                               bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-100 
-                               dark:border-gray-700"
-                            >
-                                {/* Header */}
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
+                {comments.length === 0 ? (
+                    <div className="py-8 text-center">
+                        <p className="text-sm text-gray-400">
+                            No comments yet. Be the first to share your thoughts.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="divide-y divide-gray-100 dark:divide-white/10">
+                        {comments.map((c) => (
+                            <div key={c.id} className="flex gap-3 py-4 first:pt-0">
+                                <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-300 font-semibold text-xs flex-shrink-0 overflow-hidden">
+                                    {c.user?.passport ? (
                                         <img
-                                            src={
-                                                c.user?.passport ||
-                                                "/avatar1.jpg"
-                                            }
+                                            src={c.user.passport}
                                             alt="Avatar"
-                                            className="w-10 h-10 rounded-full object-cover"
+                                            className="w-full h-full object-cover"
                                         />
-                                        <div>
-                                            <div className="font-semibold">
-                                                {c.user?.first_name}{" "}
-                                                {c.user?.last_name}
-                                            </div>
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                {new Date(
-                                                    c.created_at
-                                                ).toLocaleString()}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Menu */}
-                                    {c.user_id === window.authUser?.id && (
-                                        <div className="relative">
-                                            <button
-                                                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
-                                                onClick={() =>
-                                                    handleMenuToggle(c.id)
-                                                }
-                                            >
-                                                <i className="fa fa-ellipsis-v"></i>
-                                            </button>
-
-                                            {activeMenuId === c.id && (
-                                                <div
-                                                    className="absolute right-0 mt-2 bg-white dark:bg-gray-900
-                                                border dark:border-gray-700 rounded shadow-md z-10 w-32"
-                                                >
-                                                    <button
-                                                        onClick={() =>
-                                                            handleEdit(c)
-                                                        }
-                                                        className="block w-full px-4 py-2 text-left text-sm
-                                                   hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(c.id)
-                                                        }
-                                                        className="block w-full px-4 py-2 text-left text-sm
-                                                   text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
+                                    ) : (
+                                        (c.user?.first_name || "U").charAt(0)
                                     )}
                                 </div>
-
-                                {/* Comment Text or Edit */}
-                                {editingCommentId === c.id ? (
-                                    <div className="mt-2 space-y-2">
-                                        <textarea
-                                            className="w-full border px-2 py-1 text-sm rounded 
-                                           bg-white dark:bg-gray-900 
-                                           text-gray-900 dark:text-white 
-                                           dark:border-gray-700"
-                                            value={editedComment}
-                                            onChange={(e) =>
-                                                setEditedComment(e.target.value)
-                                            }
-                                        />
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() =>
-                                                    handleUpdateComment(c.id)
-                                                }
-                                                className="text-blue-600 text-sm"
-                                            >
-                                                Save
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    setEditingCommentId(null)
-                                                }
-                                                className="text-gray-500 dark:text-gray-300 text-sm"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="mt-2 text-sm text-gray-700 dark:text-gray-200">
-                                        {c.comment}
-                                    </div>
-                                )}
-
-                                {/* Replies */}
-                                {c.replies && c.replies.length > 0 && (
-                                    <div className="mt-4 border-t pt-2 space-y-2 pl-5 dark:border-gray-700">
-                                        {c.replies.map((reply) => (
-                                            <div
-                                                key={reply.id}
-                                                className="text-sm text-gray-600 dark:text-gray-300"
-                                            >
-                                                <strong>
-                                                    {reply.user?.first_name}:
-                                                </strong>{" "}
-                                                {reply.reply}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                            {c.user?.first_name} {c.user?.last_name}
+                                        </p>
+                                        <span className="text-xs text-gray-400">
+                                            {new Date(c.created_at).toLocaleString()}
+                                        </span>
+                                        {c.user_id === window.authUser?.id && (
+                                            <div className="flex items-center gap-3 ml-auto">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleEdit(c)}
+                                                    className="text-xs font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDelete(c.id)}
+                                                    className="text-xs font-medium text-red-500 hover:underline"
+                                                >
+                                                    Delete
+                                                </button>
                                             </div>
-                                        ))}
+                                        )}
                                     </div>
-                                )}
 
-                                {/* Reply input */}
-                                <div className="pl-5 mt-2">
-                                    <button
-                                        className="text-xs text-blue-600"
-                                        onClick={() => toggleReplyInput(c.id)}
-                                    >
-                                        {activeReplyId === c.id
-                                            ? "Cancel"
-                                            : "Reply"}
-                                    </button>
-
-                                    {activeReplyId === c.id && (
-                                        <div className="mt-2 space-y-2">
-                                            <input
-                                                type="text"
-                                                value={replyText[c.id] || ""}
-                                                onChange={(e) =>
-                                                    handleReplyChange(
-                                                        c.id,
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Write a reply..."
-                                                className="w-full border rounded px-2 py-1 text-sm 
-                                               bg-white dark:bg-gray-900 
-                                               text-gray-900 dark:text-white 
-                                               dark:border-gray-700"
+                                    {editingCommentId === c.id ? (
+                                        <div className="mt-2">
+                                            <textarea
+                                                className="w-full border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg p-2 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#1447A6] focus:border-[#1447A6] outline-none transition resize-none"
+                                                rows="2"
+                                                value={editedComment}
+                                                onChange={(e) => setEditedComment(e.target.value)}
                                             />
-                                            <button
-                                                onClick={() =>
-                                                    submitReply(c.id)
-                                                }
-                                                className="text-sm text-white bg-blue-500 px-3 py-1 rounded"
-                                            >
-                                                Submit
-                                            </button>
+                                            <div className="flex items-center gap-3 mt-1.5">
+                                                <button
+                                                    onClick={() => handleUpdateComment(c.id)}
+                                                    className="bg-[#1447A6] hover:bg-[#0F3A8A] text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors"
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingCommentId(null)}
+                                                    className="text-xs font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                                            {c.comment}
+                                        </p>
+                                    )}
+
+                                    {c.replies && c.replies.length > 0 && (
+                                        <div className="mt-3 space-y-2 pl-4 border-l-2 border-gray-100 dark:border-white/10">
+                                            {c.replies.map((reply) => (
+                                                <p
+                                                    key={reply.id}
+                                                    className="text-sm text-gray-600 dark:text-gray-300"
+                                                >
+                                                    <span className="font-semibold text-gray-800 dark:text-white">
+                                                        {reply.user?.first_name}:
+                                                    </span>{" "}
+                                                    {reply.reply}
+                                                </p>
+                                            ))}
                                         </div>
                                     )}
+
+                                    <div className="mt-2">
+                                        <button
+                                            type="button"
+                                            className="text-xs font-semibold text-[#1447A6] hover:underline"
+                                            onClick={() => toggleReplyInput(c.id)}
+                                        >
+                                            {activeReplyId === c.id ? "Cancel" : "Reply"}
+                                        </button>
+
+                                        {activeReplyId === c.id && (
+                                            <div className="mt-2 flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={replyText[c.id] || ""}
+                                                    onChange={(e) =>
+                                                        handleReplyChange(c.id, e.target.value)
+                                                    }
+                                                    placeholder="Write a reply..."
+                                                    className="flex-1 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-full px-3.5 py-1.5 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#1447A6] focus:border-[#1447A6] outline-none transition"
+                                                />
+                                                <button
+                                                    onClick={() => submitReply(c.id)}
+                                                    className="bg-[#1447A6] hover:bg-[#0F3A8A] text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors flex-shrink-0"
+                                                >
+                                                    Send
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        ))
-                    )}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

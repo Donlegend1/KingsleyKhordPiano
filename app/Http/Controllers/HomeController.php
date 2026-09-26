@@ -112,18 +112,33 @@ class HomeController extends Controller
      */
     private function buildResumeLesson($userId): ?array
     {
-        $lastView = \App\Models\LessonView::where('user_id', $userId)
+        $recentViews = \App\Models\LessonView::where('user_id', $userId)
             ->latest('updated_at')
+            ->limit(10)
             ->with('viewable')
-            ->first();
+            ->get();
 
-        if (!$lastView || !$lastView->viewable) {
-            return null;
+        foreach ($recentViews as $view) {
+            if (!$view->viewable) {
+                continue;
+            }
+
+            $resolved = $this->resolveResumeLesson($view->viewable);
+            if ($resolved) {
+                return $resolved;
+            }
         }
 
-        $lesson = $lastView->viewable;
+        return null;
+    }
 
+    private function resolveResumeLesson($lesson): ?array
+    {
         return match (get_class($lesson)) {
+            \App\Models\Course::class => [
+                'title' => $lesson->title,
+                'url' => url("/member/course/{$lesson->level}?selected_course={$lesson->id}"),
+            ],
             Upload::class => [
                 'title' => $lesson->title,
                 'url' => route('piano.exercise.player', ['level' => $lesson->level, 'video_id' => $lesson->id]),
@@ -403,6 +418,7 @@ class HomeController extends Controller
         'new_password_input' => 'nullable|string|min:8|confirmed',
         'passport' => 'nullable|image|mimes:jpeg,png,jpg',
         'country' => 'nullable|string|max:500',
+        'biography' => 'nullable|string|max:1000',
     ], [
         'new_password_input.confirmed' => 'The new password and confirm password fields do not match.',
         'new_password_input.min' => 'The new password must be at least 8 characters.',
@@ -412,6 +428,7 @@ class HomeController extends Controller
     $user->last_name = $request->last_name;
     $user->email = $request->email;
     $user->country = $request->country;
+    $user->biography = $request->biography;
 
     if ($request->filled('new_password_input')) {
         $user->password = Hash::make($request->new_password_input);
