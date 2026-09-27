@@ -221,6 +221,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::post('notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
     Route::get('audio-quiz', [AudioQuizController::class, 'index'])->name('member.audio-quiz');
     Route::get('course/{level}', [CourseController::class, 'membershow']);
+    Route::get('course/{level}/{course}', [CourseController::class, 'membershow'])
+        ->where(['level' => 'beginner|intermediate|advanced', 'course' => '[0-9]+']);
     Route::post('/course/{course}/complete', [CourseProgressController::class, 'store']);
     Route::post('/course/{course}/view', [CourseController::class, 'recordView']);
 });

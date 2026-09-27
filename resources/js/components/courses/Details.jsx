@@ -716,9 +716,21 @@ const CourseDetails = ({
     );
 };
 
+const parseCoursePath = () => {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const courseIndex = parts.indexOf("course");
+    const level = parts[courseIndex + 1] || "";
+    const pathId = parts[courseIndex + 2];
+    const queryId = new URLSearchParams(window.location.search).get("selected_course");
+    const courseId = pathId && /^\d+$/.test(pathId) ? pathId : queryId;
+
+    return { level, courseId: courseId || null };
+};
+
 const CoursesPage = () => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const selectedCourseId = searchParams.get("selected_course");
+    const initialPath = parseCoursePath();
+    const level = initialPath.level;
+    const [courseId, setCourseId] = useState(initialPath.courseId);
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [selectedCheckpoint, setSelectedCheckpoint] = useState(null);
@@ -739,16 +751,24 @@ const CoursesPage = () => {
     const handleSidebarToggle = () => {
         setSidebarCollapsed((prev) => !prev);
     };
-    const lastSegment = window.location.pathname
-        .split("/")
-        .filter(Boolean)
-        .pop();
+    useEffect(() => {
+        const onPopState = () => {
+            const next = parseCoursePath();
+            setCourseId(next.courseId);
+            if (!next.courseId) {
+                setSelectedCourse(null);
+            }
+        };
+
+        window.addEventListener("popstate", onPopState);
+        return () => window.removeEventListener("popstate", onPopState);
+    }, []);
 
     useEffect(() => {
         const fetchCourses = async () => {
             try {
                 const response = await axios.get(
-                    `/api/member/courses/${lastSegment}`,
+                    `/api/member/courses/${level}`,
                     {
                         headers: {
                             "X-CSRF-TOKEN": csrfToken,
@@ -773,7 +793,26 @@ const CoursesPage = () => {
             }
         };
         fetchCourses();
-    }, [lastSegment]);
+    }, [level]);
+
+    const openCourse = (course) => {
+        if (!course) return;
+
+        setSelectedCourse(course);
+        setSelectedCheckpoint(null);
+        setShowCourseModal(false);
+        setCourseId(String(course.id));
+        setExpandedCategories((prev) => ({
+            ...prev,
+            [course.category]: true,
+            __mobile: false,
+        }));
+
+        const url = `/member/course/${level}/${course.id}`;
+        if (window.location.pathname !== url) {
+            window.history.pushState({ courseId: course.id }, "", url);
+        }
+    };
 
     const toggleCategory = (category) => {
         setExpandedCategories((prev) => ({
@@ -899,6 +938,7 @@ const CoursesPage = () => {
                                                         onClick={() => {
                                                             setSelectedCheckpoint(item);
                                                             setSelectedCourse(null);
+                                                            setCourseId(null);
                                                             setShowCourseModal(false);
                                                             setExpandedCategories(
                                                                 (prev) => ({
@@ -906,6 +946,10 @@ const CoursesPage = () => {
                                                                     __mobile: false,
                                                                 }),
                                                             );
+                                                            const url = `/member/course/${level}`;
+                                                            if (window.location.pathname !== url) {
+                                                                window.history.pushState({}, "", url);
+                                                            }
                                                         }}
                                                     >
                                                         <span
@@ -957,17 +1001,7 @@ const CoursesPage = () => {
                                                             ? "bg-[#1447A6]"
                                                             : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                     }`}
-                                                    onClick={() => {
-                                                        setSelectedCourse(course);
-                                                        setSelectedCheckpoint(null);
-                                                        setShowCourseModal(false);
-                                                        setExpandedCategories(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                __mobile: false,
-                                                            }),
-                                                        );
-                                                    }}
+                                                    onClick={() => openCourse(course)}
                                                 >
                                                     <div className="flex items-center gap-3 min-w-0">
                                                         <span
@@ -1058,12 +1092,7 @@ const CoursesPage = () => {
     }, [selectedCourse]);
 
     const goToLesson = (lesson) => {
-        if (!lesson) return;
-        setSelectedCourse(lesson);
-        setExpandedCategories((prev) => ({
-            ...prev,
-            [lesson.category]: true,
-        }));
+        openCourse(lesson);
     };
 
     const handleNextCourse = () => {
@@ -1078,31 +1107,33 @@ const CoursesPage = () => {
     };
 
     useEffect(() => {
-        if (!selectedCourseId || courses.length === 0) return;
+        if (!courseId || courses.length === 0) return;
 
-        // Find the course across all categories
         for (const categoryObj of courses) {
             const found = categoryObj.courses?.find(
-                (course) => String(course.id) === String(selectedCourseId)
+                (course) => String(course.id) === String(courseId)
             );
 
             if (found) {
-                setSelectedCourse(found);
-
-                // auto-expand the category
+                setSelectedCourse((prev) =>
+                    prev && String(prev.id) === String(found.id) ? prev : found
+                );
+                setSelectedCheckpoint(null);
                 setExpandedCategories((prev) => ({
                     ...prev,
                     [categoryObj.category]: true,
+                    __mobile: false,
                 }));
+
+                const canonical = `/member/course/${level}/${found.id}`;
+                if (window.location.pathname !== canonical) {
+                    window.history.replaceState({ courseId: found.id }, "", canonical);
+                }
 
                 break;
             }
         }
-    }, [courses, selectedCourseId]);
-
-    useEffect(() => {
-   
-    }, [])
+    }, [courses, courseId, level]);
 
     return (
         <>
@@ -1137,8 +1168,8 @@ const CoursesPage = () => {
                         {!sidebarCollapsed && (
                             <>
                                 <span className="block font-bold text-lg text-white truncate pr-8">
-                                    {lastSegment.charAt(0).toUpperCase() +
-                                        lastSegment.slice(1)}{" "}
+                                    {level.charAt(0).toUpperCase() +
+                                        level.slice(1)}{" "}
                                     Piano Roadmap
                                 </span>
                                 <a
@@ -1181,8 +1212,8 @@ const CoursesPage = () => {
                         </button>
 
                         <span className="block font-bold text-lg text-white truncate pr-8">
-                            {lastSegment.charAt(0).toUpperCase() +
-                                lastSegment.slice(1)}{" "}
+                            {level.charAt(0).toUpperCase() +
+                                level.slice(1)}{" "}
                             Piano Roadmap
                         </span>
                         <a
@@ -1225,7 +1256,7 @@ const CoursesPage = () => {
                             <CourseDetails
                                 course={selectedCourse}
                                 onComplete={handleCourseCompletion}
-                                onSelectCourse={setSelectedCourse}
+                                onSelectCourse={openCourse}
                                 onPrevLesson={handlePrevCourse}
                                 onNextLesson={handleNextCourse}
                                 hasPrevLesson={currentIndex > 0}
@@ -1256,10 +1287,7 @@ const CoursesPage = () => {
                             <div className="max-w-7xl mx-auto">
                                 <CheckpointCta
                                     checkpoint={selectedCheckpoint}
-                                    onSelectCourse={(course) => {
-                                        setSelectedCourse(course);
-                                        setSelectedCheckpoint(null);
-                                    }}
+                                    onSelectCourse={openCourse}
                                 />
                             </div>
                         </div>

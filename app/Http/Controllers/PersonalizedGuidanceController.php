@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PersonalizedGuidanceSubmitted;
 use App\Models\LiveCoachingBooking;
 use App\Models\Liveshow;
 use App\Models\PersonalizedGuidanceRequest;
 use App\Models\PersonalizedPlan;
 use App\Models\UserDailyLogin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PersonalizedGuidanceController extends Controller
 {
@@ -163,6 +166,15 @@ class PersonalizedGuidanceController extends Controller
             'primary_goal' => $validated['primary_goal'] ?? null,
             'details' => $validated['details'] ?? null,
         ]);
+
+        $guidanceRequest->setRelation('user', auth()->user());
+
+        try {
+            Mail::to(config('services.admin_notification_email'))
+                ->send(new PersonalizedGuidanceSubmitted($guidanceRequest));
+        } catch (\Exception $e) {
+            Log::warning('Failed to email admin about personalized guidance request: ' . $e->getMessage());
+        }
 
         return response()->json([
             'message' => 'Thanks! Your video and notes have been sent for review.',
