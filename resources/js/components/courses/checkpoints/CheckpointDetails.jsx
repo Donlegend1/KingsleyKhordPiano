@@ -95,12 +95,24 @@ const CheckpointDetails = ({ checkpoint }) => {
                     <div className="bg-gray-50 dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {checkpoint.downloads.map((download) => (
                             <div key={download.id} className="px-4 py-3 sm:px-5 sm:py-4 flex items-center gap-3 sm:gap-4">
-                                <div className="w-12 h-9 sm:w-16 sm:h-10 rounded bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">
+                                <a
+                                    href={download.file_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Open PDF"
+                                    className="w-12 h-9 sm:w-16 sm:h-10 rounded bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0 hover:bg-gray-500 transition"
+                                >
                                     PDF
-                                </div>
-                                <span className="flex-1 min-w-0 text-sm sm:text-base text-gray-800 dark:text-gray-100 font-semibold truncate">
+                                </a>
+                                <a
+                                    href={download.file_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Open PDF"
+                                    className="flex-1 min-w-0 text-sm sm:text-base text-gray-800 dark:text-gray-100 font-semibold truncate hover:underline"
+                                >
                                     {download.title}
-                                </span>
+                                </a>
                                 <a
                                     href={download.file_url}
                                     download={download.title}
