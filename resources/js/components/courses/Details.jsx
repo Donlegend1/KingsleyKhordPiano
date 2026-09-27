@@ -967,14 +967,18 @@ const CoursesPage = () => {
                                                 selectedCourse &&
                                                 selectedCourse.id === course.id;
                                             return (
-                                                <div
+                                                <a
                                                     key={course.id}
-                                                    className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition ${
+                                                    href={`/member/course/${level}/${course.id}`}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        openCourse(course);
+                                                    }}
+                                                    className={`flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer transition no-underline ${
                                                         isSelected
                                                             ? "bg-[#1447A6]"
                                                             : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                     }`}
-                                                    onClick={() => openCourse(course)}
                                                 >
                                                     <div className="flex items-center gap-3 min-w-0">
                                                         <span
@@ -1013,7 +1017,7 @@ const CoursesPage = () => {
                                                             ></i>
                                                         </span>
                                                     )}
-                                                </div>
+                                                </a>
                                             );
                                         })
                                     ) : (
