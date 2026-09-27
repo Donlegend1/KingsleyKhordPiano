@@ -16,6 +16,10 @@ class PersonalizedGuidanceController extends Controller
 {
     public function create()
     {
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
+        }
+
         $existingRequest = PersonalizedGuidanceRequest::where('user_id', auth()->id())
             ->latest()
             ->first();
@@ -25,11 +29,16 @@ class PersonalizedGuidanceController extends Controller
 
     public function plan()
     {
+        if (! auth()->user()->premium) {
+            return view('memberpages.personalized-plan-paywall');
+        }
+
         $plan = PersonalizedPlan::where('user_id', auth()->id())->first();
 
         if (! $plan) {
             $hasSubmittedRequest = PersonalizedGuidanceRequest::where('user_id', auth()->id())->exists();
             $hasBookedCall = LiveCoachingBooking::where('user_id', auth()->id())->exists();
+            // dd($hasBookedCall);
 
             if ($hasSubmittedRequest || $hasBookedCall) {
                 return view('memberpages.personalized-plan-pending');
@@ -108,6 +117,10 @@ class PersonalizedGuidanceController extends Controller
 
     public function toggleLesson(Request $request)
     {
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
+        }
+
         $validated = $request->validate([
             'lesson_key' => ['required', 'string'],
             'completed' => ['required', 'boolean'],
@@ -132,8 +145,8 @@ class PersonalizedGuidanceController extends Controller
 
     public function store(Request $request)
     {
-        if (! auth()->user()->premium) {
-            return response()->json(['message' => 'This feature is for Premium members only.'], 403);
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
         }
 
         $validated = $request->validate([
@@ -180,5 +193,20 @@ class PersonalizedGuidanceController extends Controller
             'message' => 'Thanks! Your video and notes have been sent for review.',
             'request' => $guidanceRequest,
         ]);
+    }
+
+    private function denyUnlessPremium()
+    {
+        if (auth()->user()->premium) {
+            return null;
+        }
+
+        $message = 'This feature is for Premium members only.';
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => $message], 403);
+        }
+
+        return redirect('/home')->with('error', $message);
     }
 }

@@ -53,7 +53,7 @@
       </div>
 
       <div class="px-6 py-4">
-        <p class="text-3xl md:text-4xl font-extrabold text-white">700+</p>
+        <p class="text-3xl md:text-4xl font-extrabold text-white">800+</p>
         <p class="text-gray-400 text-sm mt-1">Students Enrolled</p>
       </div>
 

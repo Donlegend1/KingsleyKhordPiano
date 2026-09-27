@@ -70,8 +70,11 @@ class CourseCheckpointController extends Controller
     public function destroy(CourseCheckpoint $checkpoint)
     {
         foreach ($checkpoint->downloads as $download) {
-            if ($download->file_path && file_exists(public_path($download->file_path))) {
-                @unlink(public_path($download->file_path));
+            if ($download->file_path) {
+                $fullPath = $this->resolveDownloadFullPath($download->file_path);
+                if (file_exists($fullPath)) {
+                    @unlink($fullPath);
+                }
             }
         }
 
@@ -92,9 +95,36 @@ class CourseCheckpointController extends Controller
         return response()->json($download, 201);
     }
 
+    /**
+     * Resolve a stored checkpoint-download's full server path, checking
+     * both possible upload destinations (see storeDownloadFile()) so
+     * deletes work regardless of which one the file actually landed in.
+     */
+    private function resolveDownloadFullPath(string $relativePath): string
+    {
+        $normalizedPath = ltrim($relativePath, '/');
+        $localPublicPath = public_path($normalizedPath);
+
+        if (file_exists($localPublicPath)) {
+            return $localPublicPath;
+        }
+
+        return base_path('../public_html/' . $normalizedPath);
+    }
+
     private function storeDownloadFile(CourseCheckpoint $checkpoint, string $title, $file): CourseCheckpointDownload
     {
-        $filename = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+        // Sanitize to a safe ASCII filename so the URL built from it (see
+        // CourseCheckpointDownload::getFileUrlAttribute) always resolves —
+        // spaces/unicode/special characters in the original file name (e.g.
+        // an em dash or ampersand) can otherwise 404 on some servers even
+        // after URL-encoding.
+        $extension = $file->getClientOriginalExtension();
+        $baseName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeBaseName = preg_replace('/[^A-Za-z0-9_-]+/', '-', $baseName);
+        $safeBaseName = trim($safeBaseName, '-') ?: 'file';
+        $filename = time() . '_' . uniqid() . '_' . $safeBaseName . '.' . $extension;
+
         $destination = base_path('../public_html/uploads/checkpoint-downloads');
         if (!file_exists($destination)) {
             $destination = public_path('uploads/checkpoint-downloads');
@@ -116,8 +146,11 @@ class CourseCheckpointController extends Controller
 
     public function destroyDownload(CourseCheckpointDownload $download)
     {
-        if ($download->file_path && file_exists(public_path($download->file_path))) {
-            @unlink(public_path($download->file_path));
+        if ($download->file_path) {
+            $fullPath = $this->resolveDownloadFullPath($download->file_path);
+            if (file_exists($fullPath)) {
+                @unlink($fullPath);
+            }
         }
 
         $download->delete();

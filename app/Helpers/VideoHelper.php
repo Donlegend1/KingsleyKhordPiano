@@ -38,6 +38,12 @@ class VideoHelper
             return "https://player.vimeo.com/video/{$m[1]}";
         }
 
+        // Wistia — matches fast.wistia.net/embed/iframe/{id}, wistia.com/medias/{id},
+        // home.wistia.com/medias/{id}, and *.wistia.com/embed/iframe/{id}
+        if (preg_match('/wistia\.(?:com|net)\/(?:embed\/iframe|medias)\/([a-zA-Z0-9]+)/', $url, $m)) {
+            return "https://fast.wistia.net/embed/iframe/{$m[1]}";
+        }
+
         // Dailymotion
         if (preg_match('/dailymotion\.com\/video\/([^\?&]+)/', $url, $m)) {
             return "https://www.dailymotion.com/embed/video/{$m[1]}";
@@ -105,7 +111,7 @@ class VideoHelper
     {
         if (
             self::extractGoogleDriveFileId($url) ||
-            preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|tiktok\.com|vm\.tiktok\.com|vt\.tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos|instagram\.com\/(p|reel|tv)\//', $url)
+            preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|wistia\.(com|net)|dailymotion\.com|tiktok\.com|vm\.tiktok\.com|vt\.tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos|instagram\.com\/(p|reel|tv)\//', $url)
         ) {
             return 'embed'; // use <iframe>
         }

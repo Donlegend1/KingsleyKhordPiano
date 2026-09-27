@@ -30,7 +30,7 @@
             @csrf
             <div>
                 <label for="subject" class="block text-sm font-semibold text-gray-700 mb-1.5">Subject</label>
-                <input type="text" name="subject" id="subject" value="{{ old('subject') }}" required
+                <input type="text" name="subject" id="subject" value="{{ old('subject', request('subject')) }}" required
                        placeholder="What's this about?"
                        class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-[#1447A6] focus:ring-2 focus:ring-[#1447A6]/10 focus:outline-none">
                 @error('subject')
@@ -42,7 +42,7 @@
                 <label for="message" class="block text-sm font-semibold text-gray-700 mb-1.5">Message</label>
                 <textarea name="message" id="message" rows="5" required
                           placeholder="Tell us how we can help..."
-                          class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-[#1447A6] focus:ring-2 focus:ring-[#1447A6]/10 focus:outline-none resize-none">{{ old('message') }}</textarea>
+                          class="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-[#1447A6] focus:ring-2 focus:ring-[#1447A6]/10 focus:outline-none resize-none">{{ old('message', request('message')) }}</textarea>
                 @error('message')
                     <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p>
                 @enderror

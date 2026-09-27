@@ -7,17 +7,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     <div class="text-center mb-10 px-4" style="position: relative; z-index: 1;">
-<h2 class="font-black" style="
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #ffffff 0%, #FFD736 50%, #ffffff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        ">
+        <span class="inline-block text-[#FFD736] text-xs font-bold uppercase tracking-widest mb-3">
+            Real Lessons, Real Skills
+        </span>
+        <h2 class="text-white font-black" style="font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.03em;">
             Learn To Apply
         </h2>
-        <div class="mx-auto mt-4" style="width: 60px; height: 1px; background: linear-gradient(90deg, transparent, #FFD736, transparent);"></div>
     </div>
 
     <div class="swiper coaches-swiper">
@@ -26,24 +21,25 @@
             @php
                 $base = 'https://www.youtube.com/embed/';
                 $params = '?rel=0&modestbranding=1&playsinline=1&controls=1&enablejsapi=1';
+                // TODO: replace these placeholder topic labels with the real
+                // lesson topic demonstrated in each video.
                 $coaches = [
-                    ['src' => $base.'XNypgaUtlRY'.$params, 'name' => 'Coach 1'],
-                    ['src' => $base.'UOBAL7mmkHY'.$params, 'name' => 'Coach 2'],
-                    ['src' => $base.'hwvpOGtSk6A'.$params, 'name' => 'Coach 3'],
-                    ['src' => $base.'gVtATcXUaM0'.$params, 'name' => 'Coach 4'],
-                    ['src' => $base.'JqeVxcsKu4A'.$params, 'name' => 'Coach 5'],
-                    ['src' => $base.'XonpAmgCHtY'.$params, 'name' => 'Coach 6'],
-                    ['src' => $base.'ckNI-O_TuRc'.$params, 'name' => 'Coach 7'],
-                    ['src' => $base.'_kEHErnLoTk'.$params, 'name' => 'Coach 8'],
-                    ['src' => $base.'yPCoUFZ6csY'.$params, 'name' => 'Coach 9'],
+                    ['src' => $base.'XNypgaUtlRY'.$params, 'name' => 'Chord Voicings'],
+                    ['src' => $base.'UOBAL7mmkHY'.$params, 'name' => 'Gospel Runs & Fills'],
+                    ['src' => $base.'hwvpOGtSk6A'.$params, 'name' => 'Left Hand Grooves'],
+                    ['src' => $base.'gVtATcXUaM0'.$params, 'name' => 'Praise Break Layering'],
+                    ['src' => $base.'JqeVxcsKu4A'.$params, 'name' => 'Chord Substitutions'],
+                    ['src' => $base.'XonpAmgCHtY'.$params, 'name' => 'Worship Intros'],
+                    ['src' => $base.'ckNI-O_TuRc'.$params, 'name' => 'Modulation Techniques'],
+                    ['src' => $base.'_kEHErnLoTk'.$params, 'name' => 'Reharmonization'],
+                    ['src' => $base.'yPCoUFZ6csY'.$params, 'name' => 'Choir Backup Progressions'],
                 ];
             @endphp
 
             @foreach ($coaches as $coach)
             <div class="swiper-slide">
-                <div style="aspect-ratio:9/16; background:#000; border-radius:1.5rem;
-                            overflow:hidden;
-                            box-shadow:0 12px 40px rgba(0,0,0,0.4);">
+                <div style="aspect-ratio:9/16; background:#000; border-radius:1.25rem;
+                            overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.4);">
                     <iframe
                         src="{{ $coach['src'] }}"
                         data-src="{{ $coach['src'] }}"
@@ -55,6 +51,9 @@
                         loading="lazy">
                     </iframe>
                 </div>
+                <p style="color:rgba(255,255,255,0.8); font-size:13px; font-weight:600; text-align:center; margin-top:12px;">
+                    {{ $coach['name'] }}
+                </p>
             </div>
             @endforeach
 
@@ -62,6 +61,14 @@
 
         <div class="swiper-button-prev coaches-prev"></div>
         <div class="swiper-button-next coaches-next"></div>
+    </div>
+
+    <div class="text-center mt-4" style="position: relative; z-index: 1;">
+        <a href="/plans#pricing"
+           class="inline-flex items-center gap-2 bg-[#FFD736] hover:bg-[#FFC700] text-black font-bold text-sm sm:text-base px-7 py-3 rounded-full shadow-lg shadow-[#FFD736]/25 transition-all duration-300 hover:-translate-y-0.5">
+            Learn These Skills Yourself
+            <i class="fa fa-angle-right"></i>
+        </a>
     </div>
 
 </section>

@@ -9,7 +9,7 @@ class Liveshow extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['title', 'start_time', 'access_type', 'zoom_link', 'recording_url', 'category', 'max_slots'];
+    protected $fillable = ['title', 'start_time', 'access_type', 'zoom_link', 'recording_url', 'category', 'max_slots', 'status'];
 
     protected $casts = [
         'start_time' => 'datetime',

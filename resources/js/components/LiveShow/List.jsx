@@ -158,6 +158,9 @@ const LiveShow = () => {
                                     Category
                                 </th>
                                 <th className="py-2 px-4 text-left">
+                                    Status
+                                </th>
+                                <th className="py-2 px-4 text-left">
                                     Video Url
                                 </th>
 
@@ -182,6 +185,13 @@ const LiveShow = () => {
                                         </td>
                                         <td className="py-2 px-4 text-xs uppercase font-bold text-blue-600">
                                             {user.category || 'event'}
+                                        </td>
+                                        <td className="py-2 px-4 text-xs uppercase font-bold">
+                                            {user.status === 'coming_soon' ? (
+                                                <span className="text-amber-600">Coming Soon</span>
+                                            ) : (
+                                                <span className="text-emerald-600">Open</span>
+                                            )}
                                         </td>
                                         <td className="py-2 px-4">
                                             {user.recording_url}
@@ -209,7 +219,7 @@ const LiveShow = () => {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan="6"
+                                        colSpan="7"
                                         className="py-2 px-4 text-center"
                                     >
                                         No Live Show found.
@@ -299,6 +309,15 @@ const LiveShow = () => {
                                 required
                             />
                         )}
+                        <select
+                            name="status"
+                            value={liveShow?.status || "open"}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg"
+                        >
+                            <option value="open">Open</option>
+                            <option value="coming_soon">Coming Soon</option>
+                        </select>
                     </div>
 
                     <button
