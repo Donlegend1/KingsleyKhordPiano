@@ -137,7 +137,7 @@
                                                 class="w-full ml-1.5 outline-none">
                                         </div>
                                         <div class="flex items-center w-32 border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                                            <input type="number" min="1" x-model="lesson.duration"
+                                            <input type="text" inputmode="numeric" pattern="[0-9]*\+?" x-model="lesson.duration"
                                                 class="w-full outline-none">
                                             <span class="text-gray-500 flex-shrink-0 ml-1.5">min</span>
                                         </div>

@@ -385,16 +385,10 @@ class CourseController extends Controller
                 } elseif ($course->related_courses && count($course->related_courses)) {
                     $course->related = Course::whereIn('id', $course->related_courses)->get();
                 } else {
-                    // Fall back to other lessons in the same category so the
-                    // Related Lessons section isn't empty for uncurated courses.
-                    // Queried fresh (not reused from $category->courses) to avoid
-                    // circular references once those siblings get their own
-                    // `related` attribute set.
-                    $siblingIds = $category->courses
-                        ->where('id', '!=', $course->id)
-                        ->take(3)
-                        ->pluck('id');
-                    $course->related = Course::whereIn('id', $siblingIds)->get();
+                    // No admin-curated related lessons for this course — leave
+                    // it empty rather than guessing with sibling lessons from
+                    // the same category.
+                    $course->related = collect();
                 }
 
                 return $course;

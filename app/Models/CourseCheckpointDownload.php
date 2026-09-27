@@ -22,6 +22,17 @@ class CourseCheckpointDownload extends Model
 
     public function getFileUrlAttribute()
     {
-        return $this->file_path ? asset($this->file_path) : null;
+        if (! $this->file_path) {
+            return null;
+        }
+
+        // asset() doesn't URL-encode the path, so a stored filename with
+        // spaces/special characters (from the original uploaded file name)
+        // produces a URL the browser/server can't resolve, which shows up
+        // as a 404 that Chrome mislabels as "File wasn't available on site"
+        // and saves as .html. Encode each path segment while keeping slashes.
+        $encodedPath = implode('/', array_map('rawurlencode', explode('/', $this->file_path)));
+
+        return asset($encodedPath);
     }
 }

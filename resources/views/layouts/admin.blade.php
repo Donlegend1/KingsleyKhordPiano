@@ -42,9 +42,11 @@
             <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-leanpub"></i> <span>Ear Training</span>
             </a>
+            @if(app()->environment('local'))
             <a href="/admin/audio-quiz" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-headphones"></i> <span>Audio Quiz</span>
             </a>
+            @endif
             <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
               <i class="fa fa-television"></i> <span>Live Show</span>
             </a>
@@ -163,9 +165,11 @@
         <a href="/admin/ear-training" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-leanpub"></i> <span>Ear Training</span>
         </a>
+        @if(app()->environment('local'))
         <a href="/admin/audio-quiz" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-headphones"></i> <span>Audio Quiz</span>
         </a>
+        @endif
         <a href="/admin/live-shows" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-200 hover:text-black">
           <i class="fa fa-television"></i> <span>Live Show</span>
         </a>

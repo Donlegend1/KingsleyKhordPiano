@@ -264,9 +264,11 @@
                         ['url' => 'member/ear-training',    'label' => 'Ear Training',  'icon' => 'eartraning.svg'],
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
                         ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'music-note.svg', 'new' => $hasNewLearnSongs],
-                        ['url' => 'member/live-session',    'label' => 'Live Shows',  'icon' => 'livesession.svg'],
-                        ['url' => 'member/audio-quiz',       'label' => 'Audio Quiz',  'icon' => 'sound.png'],
+                        ['url' => 'member/live-session',    'label' => 'Events',  'icon' => 'livesession.svg'],
                     ];
+                    if (app()->environment('local')) {
+                        $subNav[] = ['url' => 'member/audio-quiz', 'label' => 'Audio Quiz', 'icon' => 'sound.png'];
+                    }
                 @endphp
                 @foreach($subNav as $item)
                     <a href="/{{ $item['url'] }}"

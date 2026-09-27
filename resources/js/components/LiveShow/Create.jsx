@@ -17,6 +17,7 @@ const LiveShowForm = () => {
         start_time: "",
         category: "event",
         max_slots: 5,
+        status: "open",
     });
 
     const { showMessage } = useFlashMessage();
@@ -42,6 +43,7 @@ const LiveShowForm = () => {
                 start_time: "", 
                 category: "event",
                 max_slots: 5,
+                status: "open",
             })
             // window.location ="/admin/live-shows"
            
@@ -151,6 +153,21 @@ const LiveShowForm = () => {
                                 />
                             </div>
                         )}
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Status
+                            </label>
+                            <select
+                                name="status"
+                                defaultValue={liveShow.status}
+                                onChange={handleChange}
+                                className="w-full p-3 border rounded-md"
+                            >
+                                <option value="open">Open</option>
+                                <option value="coming_soon">Coming Soon</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className="text-center">

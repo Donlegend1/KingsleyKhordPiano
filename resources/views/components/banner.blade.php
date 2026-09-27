@@ -19,13 +19,13 @@
     <div class="relative px-6 pb-14 bg-transparent" style="padding-top: 54vh; z-index: 10;">
 
       <p class="inline-block relative text-white text-[11px] font-semibold tracking-[0.22em] uppercase mb-6">
-        Master The Piano
+        The #1 Online Piano School
         <svg class="absolute left-0 -bottom-1.5 w-full" height="5" viewBox="0 0 120 5" preserveAspectRatio="none" fill="none" aria-hidden="true">
           <path d="M1 3.5C22 1.2 68 0.8 119 3.2" stroke="#FFD736" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </p>
 
-      <h1 class="font-playfair italic font-medium leading-[1.08] mb-0 text-white">
+      <h1 class="font-playfair italic font-black leading-[1.08] mb-0 text-white">
         <span class="block whitespace-nowrap" style="font-size: 9.5vw;">Play Piano.</span>
         <span class="block text-[#FFD736] whitespace-nowrap" style="font-size: 9.5vw;">Play With Purpose.</span>
       </h1>
@@ -55,7 +55,7 @@
       src="/images/first-p.png"
       alt="Kingsley Khord at the piano"
       class="absolute w-full object-cover"
-      style="top: 72px; left: 0; right: 0; bottom: 0; height: calc(100% - 72px); object-position: 62% 0%;"
+      style="top: 112px; left: 0; right: 0; bottom: 0; height: calc(100% - 112px); object-position: 62% 0%;"
       aria-hidden="true"
     >
 
@@ -79,13 +79,13 @@
       <div class="px-16 lg:px-20 xl:px-28" style="max-width: 58%;">
 
         <p class="inline-block relative text-white text-[13px] font-semibold tracking-[0.24em] uppercase mb-7">
-          Master The Piano
+          The #1 Online Piano School
           <svg class="absolute left-0 -bottom-2 w-full" height="6" viewBox="0 0 160 6" preserveAspectRatio="none" fill="none" aria-hidden="true">
             <path d="M1 4.5C30 1.5 90 1 159 4" stroke="#FFD736" stroke-width="2.4" stroke-linecap="round"/>
           </svg>
         </p>
 
-        <h1 class="font-playfair italic font-medium leading-[1.08] mb-0 text-white">
+        <h1 class="font-playfair italic font-black leading-[1.08] mb-0 text-white">
           <span class="block text-5xl lg:text-[4.25rem] xl:text-[5rem]">Play Piano.</span>
           <span class="block text-5xl lg:text-[4.25rem] xl:text-[5rem] text-[#FFD736]">Play With Purpose.</span>
         </h1>
