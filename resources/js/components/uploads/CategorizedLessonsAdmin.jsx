@@ -475,7 +475,7 @@ const CategorizedLessonsAdmin = ({ config }) => {
                                                                                     <i className={`fa ${isCollapsed ? "fa-chevron-down" : "fa-chevron-up"} text-sm text-gray-500`}></i>
                                                                                 </div>
                                                                             </div>
-                                                                            <div className={`mt-4 overflow-hidden transition-all duration-300 ${isCollapsed ? "max-h-0 opacity-0" : "max-h-[3000px] opacity-100"}`}>
+                                                                            <div className={`mt-4 transition-all duration-300 ${isCollapsed ? "max-h-0 opacity-0 overflow-hidden" : "overflow-visible opacity-100"}`}>
                                                                                 {lessons.length === 0 ? (
                                                                                     <p className="text-gray-500 text-xs text-center py-4">No {config.itemLabel.toLowerCase()}s in this category yet.</p>
                                                                                 ) : (
