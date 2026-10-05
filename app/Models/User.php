@@ -87,7 +87,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $appends = [
         'can_access_piano_coaching',
+        'has_premium_access',
     ];
+
+    public function getHasPremiumAccessAttribute(): bool
+    {
+        return (bool) $this->premium || $this->hasActiveSubscription();
+    }
 
 
     public function plan()

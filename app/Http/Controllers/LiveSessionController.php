@@ -50,6 +50,9 @@ class LiveSessionController extends Controller
     public function bookSlot(Liveshow $liveshow)
     {
         if ($liveshow->category !== 'session') {
+            if (request()->wantsJson()) {
+                return response()->json(['status' => 'error', 'message' => 'This liveshow is not a live session.'], 422);
+            }
             return redirect('/member/live-session')->with('error', 'This liveshow is not a live session.');
         }
 
@@ -57,10 +60,16 @@ class LiveSessionController extends Controller
         $bookingsCount = $liveshow->bookedUsers()->count();
 
         if ($liveshow->bookedUsers()->where('users.id', $userId)->exists()) {
+            if (request()->wantsJson()) {
+                return response()->json(['status' => 'already_booked', 'message' => 'You have already booked a slot for this session.'], 409);
+            }
             return redirect('/member/live-session')->with('info', 'You have already booked a slot for this session.');
         }
 
         if ($bookingsCount >= $liveshow->max_slots) {
+            if (request()->wantsJson()) {
+                return response()->json(['status' => 'full', 'message' => 'This live session is already full.'], 409);
+            }
             return redirect('/member/live-session')->with('error', 'This live session is already full.');
         }
 
@@ -71,6 +80,14 @@ class LiveSessionController extends Controller
             auth()->user()->notify(new \App\Notifications\LiveshowSlothNotification($liveshow));
         } catch (\Exception $e) {
             logger()->warning('Failed to send live session booking confirmation email: ' . $e->getMessage());
+        }
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'title' => $liveshow->title,
+                'start_time_utc' => \Carbon\Carbon::parse($liveshow->start_time, 'Africa/Lagos')->setTimezone('UTC')->toIso8601String(),
+            ]);
         }
 
         return redirect('/member/live-session')->with('success', 'Your live session slot has been booked successfully!');

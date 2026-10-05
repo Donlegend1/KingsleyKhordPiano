@@ -7,9 +7,8 @@
         The Pros Don't Just Play
       </h2>
       <div class="w-14 h-1 bg-orange-500 mx-auto mb-6 rounded-full"></div>
-      <p class="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed">
-        They understand the fundamentals of music well enough<br>
-        to teach others to follow in their footsteps.
+      <p class="text-gray-500 text-base sm:text-lg max-w-xl mx-auto leading-relaxed px-2">
+        They understand the fundamentals of music well enough to teach others to follow in their footsteps.
       </p>
     </div>
 

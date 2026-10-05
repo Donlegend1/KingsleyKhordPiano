@@ -3,7 +3,7 @@
 @section('title', 'Privacy Policy')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 py-12 text-gray-800 dark:text-gray-200">
+<div class="max-w-4xl mx-auto px-4 pt-28 pb-12 text-gray-800 dark:text-gray-200">
     <h1 class="text-3xl font-bold mb-4">Privacy Policy</h1>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">Effective Date: 2021</p>
 

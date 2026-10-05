@@ -85,19 +85,16 @@
                     @mouseenter="open = true"
                     @mouseleave="open = false"
                     x-cloak
-                    class="absolute top-10 left-full ml-3 w-60 bg-white text-black rounded-lg shadow-lg p-3 z-50"
+                    class="fixed left-4 right-4 top-[70px] sm:absolute sm:left-full sm:right-auto sm:top-10 sm:mt-0 sm:ml-3 sm:w-60 bg-white text-black rounded-lg shadow-lg p-3 z-50"
                 >
-                    <!-- Arrow -->
-                    <div class="absolute -left-1 top-3 w-3 h-3 bg-white rotate-45 shadow-sm"></div>
+                    <!-- Arrow (only makes sense once the card is anchored to the button, on sm+) -->
+                    <div class="hidden sm:block absolute top-3 -left-1 w-3 h-3 bg-white rotate-45 shadow-sm"></div>
 
                     <h3 class="text-sm font-semibold text-gray-800">{{ $liveshow->title }}</h3>
-                   
-                    <p class="text-xs text-gray-600" id="liveshow-time" data-utc="{{ \Carbon\Carbon::parse($liveshow->start_time)->utc()->toISOString() }}">
+
+                    <p class="text-xs text-gray-600 mt-1" id="liveshow-time" data-utc="{{ \Carbon\Carbon::parse($liveshow->start_time)->utc()->toISOString() }}">
                         {{ \Carbon\Carbon::parse($liveshow->start_time)->format('M d, Y h:i A') }}
                     </p>
-                    @if($liveshow->title)
-                    <p class="text-xs text-gray-500 mt-1">{{ Str::limit($liveshow->title, 80) }}</p>
-                    @endif
                 </div>
             </div>
             @endif

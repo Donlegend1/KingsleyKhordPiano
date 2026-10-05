@@ -11,7 +11,11 @@
 
 <section class="bg-gray-100">
 
-<div id="live-show-page">
+<div id="live-show-page"
+     @if(session('success')) data-flash-success="{{ session('success') }}" @endif
+     @if(session('info')) data-flash-info="{{ session('info') }}" @endif
+     @if(session('error')) data-flash-error="{{ session('error') }}" @endif
+>
 
 </div>
 </section>
