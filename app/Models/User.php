@@ -214,6 +214,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasActiveSubscription(): bool
     {
+        if ($this->subscriptionAccessBlocked()) {
+            return false;
+        }
+
         if ($this->hasActiveLocalSubscription()) {
             return true;
         }
@@ -227,6 +231,24 @@ class User extends Authenticatable implements MustVerifyEmail
             ->whereNotNull('ends_at')
             ->where('ends_at', '>', now())
             ->exists();
+    }
+
+    /**
+     * Admin pause, or a start date that has not arrived yet, blocks access
+     * even when a payment or gateway row is still marked successful.
+     */
+    protected function subscriptionAccessBlocked(): bool
+    {
+        $status = strtolower((string) ($this->subscription_status ?? ''));
+        if ($status === 'paused') {
+            return true;
+        }
+
+        if ($this->subscription_started_at && $this->subscription_started_at->isFuture()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -264,7 +286,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $status = strtolower((string) ($this->subscription_status ?? ''));
 
-        if (in_array($status, ['past_due', 'expired', 'failed', 'incomplete', 'pending'], true)) {
+        if (in_array($status, ['paused', 'past_due', 'expired', 'failed', 'incomplete', 'pending'], true)) {
             return false;
         }
 

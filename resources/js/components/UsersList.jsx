@@ -27,12 +27,12 @@ const UsersList = () => {
         verified: 0,
     });
     const [paymentDetails, setPaymentDetails] = useState({
-        user_id: selectedUser?.id,
+        user_id: null,
         starts_at: "",
         ends_at: "",
-        amount: "",
-        premium: 0,
+        paused: false,
     });
+    const [subscriptionSaving, setSubscriptionSaving] = useState(false);
     const [error, setError] = useState(null);
 
     const perPage = 10;
@@ -159,44 +159,111 @@ const UsersList = () => {
         }
     };
 
+    const toDateInput = (value) => {
+        if (!value) return "";
+        const match = String(value).match(/^(\d{4}-\d{2}-\d{2})/);
+        if (match) return match[1];
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        const pad = (part) => String(part).padStart(2, "0");
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    };
+
+    const subscriptionPayload = (user, overrides = {}) => {
+        const details = getSubscriptionDetails(user);
+        const paused =
+            String(details.status || "").toLowerCase() === "paused";
+
+        return {
+            starts_at: toDateInput(details.startedAt) || null,
+            ends_at: toDateInput(details.endsAt) || null,
+            paused,
+            ...overrides,
+        };
+    };
+
     const handleOpenPaymentModal = (user) => {
         setSelectedUser(user);
         setPaymentModalOpen(true);
         setPaymentDetails({
             user_id: user?.id,
+            ...subscriptionPayload(user),
         });
-        // window.location.href = `/admin/subscriptions/${userId}`;
     };
 
     const handleClosePaymentModal = () => {
         setPaymentModalOpen(false);
         setPaymentDetails({
-            duration: "",
-            tier: "",
+            user_id: null,
             starts_at: "",
             ends_at: "",
+            paused: false,
         });
     };
 
     const handleChangeSubscription = (e) => {
-        const { name, value } = e.target;
-        setPaymentDetails({ ...paymentDetails, [name]: value });
+        const { name, value, type, checked } = e.target;
+        setPaymentDetails({
+            ...paymentDetails,
+            [name]: type === "checkbox" ? checked : value,
+        });
+    };
+
+    const saveSubscription = async (user, payload, successMessage) => {
+        setSubscriptionSaving(true);
+        try {
+            await axios.put(
+                `/api/admin/users/${user.id}/subscription`,
+                payload,
+                { headers: { "X-CSRF-TOKEN": csrfToken } }
+            );
+            showMessage(successMessage, "success");
+            fetchUsers(currentPage);
+            return true;
+        } catch (error) {
+            console.error("Error updating subscription:", error);
+            const message =
+                error.response?.data?.message ||
+                "Could not update the subscription";
+            showMessage(message, "error");
+            return false;
+        } finally {
+            setSubscriptionSaving(false);
+        }
     };
 
     const handleUpdateSubscription = async () => {
-        try {
-            await axios.post(`/api/admin/payment/update`, paymentDetails, {
-                headers: { "X-CSRF-TOKEN": csrfToken },
-            });
-            handleClosePaymentModal();
-            showMessage("payment updated", "success");
-            fetchUsers();
-        } catch (error) {
-            console.error("Error updating payment:", error);
-            showMessage("Error updating payment", "error");
-        } finally {
-            setLoading(false);
+        if (!selectedUser) return;
+        if (!paymentDetails.starts_at || !paymentDetails.ends_at) {
+            showMessage("Choose a start date and an expiry date", "error");
+            return;
         }
+
+        const saved = await saveSubscription(
+            selectedUser,
+            {
+                starts_at: paymentDetails.starts_at,
+                ends_at: paymentDetails.ends_at,
+                paused: !!paymentDetails.paused,
+            },
+            paymentDetails.paused
+                ? "Subscription paused"
+                : "Subscription dates saved"
+        );
+
+        if (saved) {
+            handleClosePaymentModal();
+        }
+    };
+
+    const handleTogglePause = async (user) => {
+        const details = getSubscriptionDetails(user);
+        const paused = String(details.status || "").toLowerCase() === "paused";
+        await saveSubscription(
+            user,
+            subscriptionPayload(user, { paused: !paused }),
+            paused ? "Subscription resumed" : "Subscription paused"
+        );
     };
 
     const handleSearchUsers = async (e) => {
@@ -222,7 +289,10 @@ const UsersList = () => {
 
     const formatDate = (value) => {
         if (!value) return null;
-        const date = new Date(value);
+        const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        const date = match
+            ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+            : new Date(value);
         if (Number.isNaN(date.getTime())) return null;
         return date.toLocaleDateString(undefined, {
             year: "numeric",
@@ -260,11 +330,46 @@ const UsersList = () => {
                 user.subscription_status ||
                 latestSub?.stripe_status ||
                 null,
+            startedAt:
+                details.started_at ||
+                user.subscription_started_at ||
+                latestSub?.created_at ||
+                null,
             endsAt:
                 details.ends_at ||
                 user.subscription_expires_at ||
                 latestSub?.ends_at ||
                 null,
+        };
+    };
+
+    const describeSubscription = (user) => {
+        const subscription = getSubscriptionDetails(user);
+        const typeLabel = formatLabel(subscription.type);
+        const tierLabel = formatLabel(subscription.tier);
+        const startsAtLabel = formatDate(subscription.startedAt);
+        const endsAtLabel = formatDate(subscription.endsAt);
+        const isPaused =
+            String(subscription.status || "").toLowerCase() === "paused";
+
+        let rangeLabel = "No expiry date";
+        if (startsAtLabel && endsAtLabel) {
+            rangeLabel = `${startsAtLabel} – ${endsAtLabel}`;
+        } else if (endsAtLabel) {
+            rangeLabel = `Expires ${endsAtLabel}`;
+        } else if (startsAtLabel) {
+            rangeLabel = `Starts ${startsAtLabel}`;
+        }
+
+        return {
+            subscription,
+            title:
+                typeLabel || tierLabel
+                    ? [tierLabel, typeLabel].filter(Boolean).join(" · ")
+                    : "No subscription",
+            providerLabel: formatLabel(subscription.paymentMethod),
+            rangeLabel,
+            isPaused,
         };
     };
 
@@ -316,175 +421,250 @@ const UsersList = () => {
                 </div>
             </div>
 
-            {/* Table section with contained scroll */}
-            <div className="flex-1 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <div className="inline-block min-w-full align-middle">
-                        {/* Existing table */}
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        S/N
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        User Details
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Email
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Subscription
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {userList.length > 0 ? (
-                                    userList.map((user, index) => {
-                                        const subscription =
-                                            getSubscriptionDetails(user);
-                                        const endsAtLabel = formatDate(
-                                            subscription.endsAt
-                                        );
-                                        const typeLabel = formatLabel(
-                                            subscription.type
-                                        );
-                                        const tierLabel = formatLabel(
-                                            subscription.tier
-                                        );
-                                        const providerLabel = formatLabel(
-                                            subscription.paymentMethod
-                                        );
-
-                                        return (
-                                        <tr
-                                            key={user.id}
-                                            className="hover:bg-gray-50 transition-colors"
-                                        >
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {(currentPage - 1) * perPage +
-                                                    index +
-                                                    1}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-200 to-blue-300 flex items-center justify-center text-blue-600 font-semibold">
-                                                        {user.first_name[0]}
-                                                        {user.last_name[0]}
-                                                    </div>
-                                                    <div className="ml-4">
-                                                        <AuthorNameWithVerification author={user}/>
-                                                    </div>
+            <div className="flex-1">
+                {userList.length === 0 ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+                            <i className="fas fa-users text-2xl text-gray-400"></i>
+                        </div>
+                        <p className="text-sm text-gray-500">No users found</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="space-y-3 md:hidden">
+                            {userList.map((user, index) => {
+                                const summary = describeSubscription(user);
+                                return (
+                                    <article
+                                        key={user.id}
+                                        className="rounded-xl border border-gray-200 bg-white p-4"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-blue-200 to-blue-300 font-semibold text-blue-600">
+                                                {user.first_name?.[0]}
+                                                {user.last_name?.[0]}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <AuthorNameWithVerification
+                                                        author={user}
+                                                    />
+                                                    <span className="text-xs text-gray-400">
+                                                        #
+                                                        {(currentPage - 1) *
+                                                            perPage +
+                                                            index +
+                                                            1}
+                                                    </span>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {user.email}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                                                        user.payment_status ===
-                                                        "successful"
-                                                            ? "bg-green-100 text-green-800"
-                                                            : "bg-yellow-100 text-yellow-800"
-                                                    }`}
-                                                >
-                                                    {user.payment_status ||
-                                                        "Pending"}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="space-y-1.5 min-w-[180px]">
-                                                    <div className="text-sm font-medium text-gray-900">
-                                                        {typeLabel || tierLabel
-                                                            ? [
-                                                                  tierLabel,
-                                                                  typeLabel,
-                                                              ]
-                                                                  .filter(
-                                                                      Boolean
-                                                                  )
-                                                                  .join(" · ")
-                                                            : "No subscription"}
-                                                    </div>
-                                                    {providerLabel ? (
-                                                        <span
-                                                            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${providerBadgeClass(
-                                                                subscription.paymentMethod
-                                                            )}`}
-                                                        >
-                                                            {providerLabel}
-                                                        </span>
-                                                    ) : null}
-                                                    <div className="text-xs text-gray-500">
-                                                        {endsAtLabel
-                                                            ? `Ends ${endsAtLabel}`
-                                                            : "No end date"}
-                                                    </div>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleOpenPaymentModal(
-                                                                user
-                                                            )
-                                                        }
-                                                        className="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-lg text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
-                                                    >
-                                                        Update
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex items-center gap-2">
-                                                    <button
-                                                        onClick={() =>
-                                                            openEditModal(user)
-                                                        }
-                                                        className="inline-flex items-center p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all"
-                                                    >
-                                                        <i className="fas fa-edit"></i>
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            openDeleteModal(
-                                                                user
-                                                            )
-                                                        }
-                                                        className="inline-flex items-center p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all"
-                                                    >
-                                                        <i className="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        );
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td
-                                            colSpan="6"
-                                            className="px-6 py-12 text-center"
-                                        >
-                                            <div className="flex flex-col items-center">
-                                                <div className="h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <i className="fas fa-users text-gray-400 text-2xl"></i>
-                                                </div>
-                                                <p className="text-gray-500 text-sm">
-                                                    No users found
+                                                <p className="mt-1 break-all text-sm text-gray-500">
+                                                    {user.email}
                                                 </p>
                                             </div>
-                                        </td>
+                                        </div>
+                                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                                            <PaymentBadge user={user} />
+                                            <SubscriptionBadge
+                                                summary={summary}
+                                                providerBadgeClass={
+                                                    providerBadgeClass
+                                                }
+                                            />
+                                        </div>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            {summary.rangeLabel}
+                                        </p>
+                                        <div className="mt-3 flex flex-wrap gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleOpenPaymentModal(user)
+                                                }
+                                                className="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700"
+                                            >
+                                                Set dates
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={subscriptionSaving}
+                                                onClick={() =>
+                                                    handleTogglePause(user)
+                                                }
+                                                className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
+                                                    summary.isPaused
+                                                        ? "bg-emerald-100 text-emerald-800"
+                                                        : "bg-amber-100 text-amber-800"
+                                                }`}
+                                            >
+                                                {summary.isPaused
+                                                    ? "Resume"
+                                                    : "Pause"}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    openEditModal(user)
+                                                }
+                                                className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    openDeleteModal(user)
+                                                }
+                                                className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </article>
+                                );
+                            })}
+                        </div>
+
+                        <div className="hidden overflow-x-auto md:block">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr className="bg-gradient-to-r from-blue-500 to-blue-600">
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white lg:px-6">
+                                            S/N
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white lg:px-6">
+                                            User
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white lg:px-6">
+                                            Email
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white lg:px-6">
+                                            Status
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white lg:px-6">
+                                            Subscription
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white lg:px-6">
+                                            Actions
+                                        </th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                    {userList.map((user, index) => {
+                                        const summary =
+                                            describeSubscription(user);
+                                        return (
+                                            <tr
+                                                key={user.id}
+                                                className="align-top transition-colors hover:bg-gray-50"
+                                            >
+                                                <td className="px-4 py-4 text-sm text-gray-500 lg:px-6">
+                                                    {(currentPage - 1) *
+                                                        perPage +
+                                                        index +
+                                                        1}
+                                                </td>
+                                                <td className="px-4 py-4 lg:px-6">
+                                                    <div className="flex items-center">
+                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-blue-200 to-blue-300 font-semibold text-blue-600">
+                                                            {user.first_name?.[0]}
+                                                            {user.last_name?.[0]}
+                                                        </div>
+                                                        <div className="ml-3 min-w-0">
+                                                            <AuthorNameWithVerification
+                                                                author={user}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="max-w-[220px] px-4 py-4 text-sm text-gray-500 lg:px-6">
+                                                    <span className="break-all">
+                                                        {user.email}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-4 lg:px-6">
+                                                    <PaymentBadge user={user} />
+                                                </td>
+                                                <td className="px-4 py-4 lg:px-6">
+                                                    <div className="max-w-xs space-y-1.5">
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {summary.title}
+                                                        </div>
+                                                        <SubscriptionBadge
+                                                            summary={summary}
+                                                            providerBadgeClass={
+                                                                providerBadgeClass
+                                                            }
+                                                        />
+                                                        <div className="text-xs text-gray-500">
+                                                            {summary.rangeLabel}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 text-sm font-medium lg:px-6">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleOpenPaymentModal(
+                                                                    user
+                                                                )
+                                                            }
+                                                            className="rounded-lg bg-blue-100 px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-200"
+                                                        >
+                                                            Dates
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            disabled={
+                                                                subscriptionSaving
+                                                            }
+                                                            onClick={() =>
+                                                                handleTogglePause(
+                                                                    user
+                                                                )
+                                                            }
+                                                            className={`rounded-lg px-2.5 py-1.5 text-xs font-medium ${
+                                                                summary.isPaused
+                                                                    ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                                                                    : "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                                                            }`}
+                                                        >
+                                                            {summary.isPaused
+                                                                ? "Resume"
+                                                                : "Pause"}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                openEditModal(
+                                                                    user
+                                                                )
+                                                            }
+                                                            className="inline-flex items-center rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100"
+                                                        >
+                                                            <i className="fas fa-edit"></i>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                openDeleteModal(
+                                                                    user
+                                                                )
+                                                            }
+                                                            className="inline-flex items-center rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100"
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Pagination section */}
@@ -646,96 +826,63 @@ const UsersList = () => {
                 </div>
             </Modal>
 
-            {/* Payment Modal */}
+            {/* Subscription dates and pause */}
             <Modal isOpen={paymentModalOpen} onClose={handleClosePaymentModal}>
-                <div className="max-h-[80vh] overflow-y-auto">
-                    <h2 className="text-lg font-bold mb-4">
-                        Update Subscription for {selectedUser?.first_name}{" "}
+                <div className="w-full max-w-lg p-6">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                        Subscription for {selectedUser?.first_name}{" "}
                         {selectedUser?.last_name}
                     </h2>
-                    <label className="block mb-2">
-                        Start Date
+                    <p className="mt-1 text-sm text-gray-500">
+                        Access stays on from the start date through the expiry
+                        date. Pausing blocks access until you resume it.
+                    </p>
+
+                    <label className="mt-5 block text-sm text-gray-700">
+                        Start date
                         <input
                             type="date"
                             name="starts_at"
-                            defaultValue={paymentDetails.starts_at}
+                            value={paymentDetails.starts_at}
                             onChange={handleChangeSubscription}
-                            className="w-full border rounded px-3 py-2 mt-1"
+                            className="mt-1 w-full rounded border px-3 py-2"
                         />
                     </label>
-                    <label className="block mb-2">
-                        End Date
+                    <label className="mt-3 block text-sm text-gray-700">
+                        Expires on
                         <input
                             type="date"
                             name="ends_at"
-                            defaultValue={paymentDetails.ends_at}
+                            value={paymentDetails.ends_at}
                             onChange={handleChangeSubscription}
-                            className="w-full border rounded px-3 py-2 mt-1"
+                            className="mt-1 w-full rounded border px-3 py-2"
                         />
                     </label>
-                    <label className="block mb-2">
-                        Amount
+                    <label className="mt-4 flex items-center gap-2 text-sm text-gray-700">
                         <input
-                            type="text"
-                            name="amount"
-                            defaultValue={paymentDetails.amount}
+                            type="checkbox"
+                            name="paused"
+                            checked={!!paymentDetails.paused}
                             onChange={handleChangeSubscription}
-                            className="w-full border rounded px-3 py-2 mt-1"
                         />
-                    </label>
-                    <label className="block mb-2">
-                        Premium:
-                        <select
-                            name="premium"
-                            defaultValue={paymentDetails.premium}
-                            onChange={handleChangeSubscription}
-                            className="w-full border rounded px-3 py-2 mt-1"
-                        >
-                            <option value="">--select--</option>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
+                        Pause subscription
                     </label>
 
-                    <div className="mt-4 flex justify-between space-x-3">
+                    <div className="mt-6 flex justify-end gap-3">
                         <button
-                            onClick={() => handleClosePaymentModal()}
-                            className="px-4 py-2 bg-gray-400 text-white rounded"
+                            type="button"
+                            onClick={handleClosePaymentModal}
+                            className="rounded border px-4 py-2 text-sm text-gray-600"
                         >
                             Cancel
                         </button>
                         <button
-                            disabled={loading}
+                            type="button"
+                            disabled={subscriptionSaving}
                             onClick={handleUpdateSubscription}
-                            className="px-4 py-2 bg-red-600 text-white rounded"
+                            className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
                         >
-                            {loading ? (
-                                <>
-                                    <svg
-                                        className="animate-spin h-5 w-5 text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
-                                        ></path>
-                                    </svg>
-                                    <span>Updating...</span>
-                                </>
-                            ) : (
-                                <span>Update</span>
-                            )}
+                            {subscriptionSaving ? "Saving..." : "Save"}
                         </button>
                     </div>
                 </div>
@@ -773,6 +920,37 @@ const UsersList = () => {
 };
 
 export default UsersList;
+
+const PaymentBadge = ({ user }) => (
+    <span
+        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+            user.payment_status === "successful"
+                ? "bg-green-100 text-green-800"
+                : "bg-yellow-100 text-yellow-800"
+        }`}
+    >
+        {user.payment_status || "Pending"}
+    </span>
+);
+
+const SubscriptionBadge = ({ summary, providerBadgeClass }) => (
+    <span className="inline-flex flex-wrap items-center gap-1.5">
+        {summary.isPaused ? (
+            <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                Paused
+            </span>
+        ) : null}
+        {summary.providerLabel ? (
+            <span
+                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${providerBadgeClass(
+                    summary.subscription.paymentMethod
+                )}`}
+            >
+                {summary.providerLabel}
+            </span>
+        ) : null}
+    </span>
+);
 
 const Toggle = ({ label, checked, onChange }) => (
     <div className="flex items-center justify-between">

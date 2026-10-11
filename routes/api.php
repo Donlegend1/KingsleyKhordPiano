@@ -65,6 +65,7 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::get('users', [AdminController::class, 'usersList']);
         Route::get('all-courses', [CourseController::class, 'allCourses']);
         Route::put('users/{user}', [AdminController::class, 'editUser']);
+        Route::put('users/{user}/subscription', [AdminController::class, 'updateSubscriptionAccess']);
         Route::delete('user/{user}', [AdminController::class, 'destroy']);
         Route::get('courses', [CourseController::class, 'coursesList']);
         Route::patch('courses/{course}', [CourseController::class, 'update']);

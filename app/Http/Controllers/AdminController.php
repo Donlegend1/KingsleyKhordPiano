@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Community;
+use App\Models\Subscription;
 use App\Enums\Roles\UserRoles;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -111,6 +114,68 @@ class AdminController extends Controller
         $user->delete();
 
         return response()->json(['message' => "Record deleted"]);
+    }
+
+    public function updateSubscriptionAccess(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'starts_at' => ['nullable', 'date'],
+            'ends_at' => ['nullable', 'date'],
+            'paused' => ['required', 'boolean'],
+        ]);
+
+        if ($request->filled('starts_at') && $request->filled('ends_at')) {
+            $start = Carbon::parse($validated['starts_at'])->startOfDay();
+            $end = Carbon::parse($validated['ends_at'])->endOfDay();
+            if ($end->lt($start)) {
+                return response()->json([
+                    'message' => 'The expiry date must be on or after the start date.',
+                ], 422);
+            }
+        }
+
+        $paused = $request->boolean('paused');
+        $startsAt = $request->filled('starts_at')
+            ? Carbon::parse($validated['starts_at'])->startOfDay()
+            : $user->subscription_started_at;
+        $endsAt = $request->filled('ends_at')
+            ? Carbon::parse($validated['ends_at'])->endOfDay()
+            : $user->subscription_expires_at;
+
+        $expired = $endsAt && $endsAt->isPast();
+        $status = $paused ? 'paused' : ($expired ? 'expired' : 'active');
+
+        DB::transaction(function () use ($user, $startsAt, $endsAt, $status) {
+            $user->forceFill([
+                'subscription_started_at' => $startsAt,
+                'subscription_expires_at' => $endsAt,
+                'subscription_status' => $status,
+            ])->save();
+
+            if ($endsAt) {
+                Subscription::query()
+                    ->where('user_id', $user->id)
+                    ->update(['ends_at' => $endsAt]);
+
+                $user->payments()
+                    ->where('status', 'successful')
+                    ->update([
+                        'starts_at' => $startsAt,
+                        'ends_at' => $endsAt,
+                    ]);
+            }
+        });
+
+        $message = $paused
+            ? 'Subscription paused.'
+            : 'Subscription dates updated.';
+
+        return response()->json([
+            'message' => $message,
+            'subscription_status' => $status,
+            'subscription_started_at' => $startsAt,
+            'subscription_expires_at' => $endsAt,
+        ]);
     }
 
     public function updateUserStatus(Request $request, User $user)
