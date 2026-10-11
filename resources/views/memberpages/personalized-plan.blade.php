@@ -30,7 +30,7 @@
           {{ $initials }}
         </div>
         <div class="min-w-0">
-          <p class="text-[15px] font-bold text-gray-900 truncate">{{ trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: $authUser->name }}</p>
+          <p class="text-[15px] font-bold text-gray-900 break-words">{{ trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: $authUser->name }}</p>
           @if($plan->skill_level)
             <p class="text-[13px] text-gray-500">{{ $plan->skill_level }}</p>
           @endif
@@ -44,7 +44,7 @@
         </div>
         <div class="min-w-0">
           <p class="text-xs text-gray-400">Goal</p>
-          <p class="text-[15px] font-bold text-gray-900 truncate">{{ $plan->goal ?: 'Not set yet' }}</p>
+          <p class="text-[15px] font-bold text-gray-900 break-words">{{ $plan->goal ?: 'Not set yet' }}</p>
         </div>
       </div>
 
@@ -144,12 +144,12 @@
                       <div class="space-y-2">
                         @foreach ($lessons as $lesson)
                           @php $lessonKey = "{$index}.{$key}.{$lesson['id']}"; @endphp
-                          <div class="flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors"
+                          <div class="flex items-start gap-3 px-3 sm:px-4 py-3 rounded-lg border transition-colors"
                                :class="isCompleted('{{ $lessonKey }}') ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-transparent'">
                             <a href="{{ $lesson['url'] ?: '#' }}"
                                target="{{ $lesson['url'] ? '_blank' : '_self' }}" rel="noopener noreferrer"
                                class="flex-1 min-w-0 hover:text-[#1447A6] transition-colors">
-                              <p class="text-sm font-medium text-gray-800 truncate"
+                              <p class="text-sm font-medium text-gray-800 whitespace-normal break-words"
                                  :class="isCompleted('{{ $lessonKey }}') ? 'line-through text-gray-400' : ''">{{ $lesson['name'] ?: 'Untitled lesson' }}</p>
                               @if(!empty($lesson['week']) || !empty($lesson['duration']))
                                 <p class="text-xs text-gray-400 mt-0.5">
@@ -160,7 +160,7 @@
                               @endif
                             </a>
                             <input type="checkbox"
-                                   class="w-5 h-5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
+                                   class="w-5 h-5 mt-0.5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
                                    :checked="isCompleted('{{ $lessonKey }}')"
                                    @change="toggleLesson('{{ $lessonKey }}', $event.target.checked)">
                           </div>
@@ -181,12 +181,12 @@
                     <div class="space-y-2">
                       @foreach ($lessons as $lesson)
                         @php $lessonKey = "{$index}.{$lesson['category_key']}.{$lesson['id']}"; @endphp
-                        <div class="flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors"
+                        <div class="flex items-start gap-3 px-3 sm:px-4 py-3 rounded-lg border transition-colors"
                              :class="isCompleted('{{ $lessonKey }}') ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-transparent'">
                           <a href="{{ $lesson['url'] ?: '#' }}"
                              target="{{ $lesson['url'] ? '_blank' : '_self' }}" rel="noopener noreferrer"
                              class="flex-1 min-w-0 hover:text-[#1447A6] transition-colors">
-                            <p class="text-sm font-medium text-gray-800 truncate"
+                            <p class="text-sm font-medium text-gray-800 whitespace-normal break-words"
                                :class="isCompleted('{{ $lessonKey }}') ? 'line-through text-gray-400' : ''">{{ $lesson['name'] ?: 'Untitled lesson' }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">
                               <i class="fa-solid {{ $lesson['category_icon'] }} text-gray-300"></i>
@@ -195,7 +195,7 @@
                             </p>
                           </a>
                           <input type="checkbox"
-                                 class="w-5 h-5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
+                                 class="w-5 h-5 mt-0.5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
                                  :checked="isCompleted('{{ $lessonKey }}')"
                                  @change="toggleLesson('{{ $lessonKey }}', $event.target.checked)">
                         </div>
@@ -220,7 +220,7 @@
           @if(!empty($plan->ninety_day_target))
             <ul class="space-y-2">
               @foreach ($plan->ninety_day_target as $item)
-                <li class="flex items-start gap-2 text-sm text-gray-600">
+                <li class="flex items-start gap-2 text-sm text-gray-600 break-words">
                   <i class="fa-solid fa-check text-green-500 mt-0.5"></i>
                   {{ $item }}
                 </li>
@@ -242,8 +242,8 @@
               <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
               Upcoming Live Session
             </div>
-            <p class="text-sm font-bold text-gray-900 mb-1">{{ $liveshow->title }}</p>
-            <p class="text-xs text-gray-400 mb-4 live-session-datetime">{{ $liveshow->start_time->format('l, M j \a\t g:i A') }} &middot; Zoom</p>
+            <p class="text-sm font-bold text-gray-900 mb-1 break-words">{{ $liveshow->title }}</p>
+            <p class="text-xs text-gray-400 mb-4 break-words live-session-datetime">{{ $liveshow->start_time->format('l, M j \a\t g:i A') }} &middot; Zoom</p>
 
             <div class="grid grid-cols-4 gap-1.5 mb-4">
               <div class="flex flex-col items-center justify-center bg-gray-50 rounded-lg py-2 border border-gray-100">
@@ -364,21 +364,21 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <p class="text-sm font-bold text-gray-900 mb-3">Your Stats</p>
           <div class="space-y-2.5">
-            <div class="flex items-center justify-between text-sm">
+            <div class="flex items-start justify-between gap-3 text-sm">
               <span class="text-gray-500">Lessons Completed</span>
-              <span class="font-bold text-gray-900">{{ $stats['lessons_completed'] }}/{{ $stats['lessons_total'] }}</span>
+              <span class="font-bold text-gray-900 text-right">{{ $stats['lessons_completed'] }}/{{ $stats['lessons_total'] }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm">
+            <div class="flex items-start justify-between gap-3 text-sm">
               <span class="text-gray-500">Current Streak</span>
-              <span class="font-bold text-gray-900">{{ $stats['current_streak'] }} days</span>
+              <span class="font-bold text-gray-900 text-right">{{ $stats['current_streak'] }} days</span>
             </div>
-            <div class="flex items-center justify-between text-sm pt-2.5 border-t border-gray-100">
+            <div class="flex items-start justify-between gap-3 text-sm pt-2.5 border-t border-gray-100">
               <span class="text-gray-500">Milestone Achieved</span>
-              <span class="font-bold text-gray-900">{{ $stats['milestone_name'] }} ({{ $stats['milestone_count'] }})</span>
+              <span class="font-bold text-gray-900 text-right break-words">{{ $stats['milestone_name'] }} ({{ $stats['milestone_count'] }})</span>
             </div>
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-gray-500">Current Level</span>
-              <span class="font-bold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-md text-[10px]">{{ $stats['current_level'] }}</span>
+            <div class="flex items-start justify-between gap-3 text-sm">
+              <span class="text-gray-500 shrink-0">Current Level</span>
+              <span class="font-bold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-md text-[10px] text-right break-words">{{ $stats['current_level'] }}</span>
             </div>
           </div>
         </div>
