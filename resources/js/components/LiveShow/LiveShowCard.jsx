@@ -19,7 +19,9 @@ const LiveShowCard = () => {
     const { showMessage } = useFlashMessage();
 
     const authUser = window.authUser || {};
-    const isPremium = authUser?.premium;
+    // `premium` is only the raw flag column — it misses active paid
+    // subscriptions, which is what actually grants access server-side.
+    const isPremium = authUser?.has_premium_access;
     dayjs.extend(duration);
     dayjs.extend(relativeTime);
     dayjs.extend(isoWeek);

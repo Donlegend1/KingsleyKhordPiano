@@ -4,8 +4,7 @@
 {{-- @include("components.pricebanner") --}}
 @include("components.youtube")
 
-
-@include("components.features")
+@include("components.platform-highlights")
 
 @include("components.approach")
 @include("components.framework")

@@ -20,10 +20,28 @@ const PremiumVideoSection = () => {
     const { showMessage } = useFlashMessage();
 
     const authUser = window.authUser || {};
-    const isPremium = authUser?.premium;
+    // `premium` is only the raw flag column — it misses active paid
+    // subscriptions, which is what actually grants access server-side.
+    const isPremium = authUser?.has_premium_access;
     dayjs.extend(duration);
     dayjs.extend(relativeTime);
     dayjs.extend(isoWeek);
+
+    // Surface any Laravel session-flash message (e.g. a server redirect from
+    // the confirm/book flow) as a toast — otherwise a redirect back to this
+    // same page is completely silent and looks like the click did nothing.
+    useEffect(() => {
+        const root = document.getElementById("live-show-page");
+        if (!root) return;
+
+        const success = root.dataset.flashSuccess;
+        const info = root.dataset.flashInfo;
+        const error = root.dataset.flashError;
+
+        if (success) showMessage(success, "success");
+        if (info) showMessage(info, "success");
+        if (error) showMessage(error, "error");
+    }, []);
 
     useEffect(() => {
         const fetchVideos = async () => {
@@ -449,14 +467,26 @@ const PremiumVideoSection = () => {
                                     const comingSoon = isComingSoon(show);
                                     const isSession = show.category === "session";
                                     const isRestricted = show.access_type === "premium" && !isPremium;
-                                    const Wrapper = comingSoon ? "div" : "a";
-                                    const wrapperProps = comingSoon
+                                    const isFull = isSession && show.bookings_count >= show.max_slots && !show.booked_by_user;
+                                    // Already-booked sessions must NOT go through the confirm page —
+                                    // the server redirects that straight back here with nothing
+                                    // shown, so clicking looks like it does nothing. Send them to
+                                    // the Zoom link instead, same as the featured card does.
+                                    const Wrapper = comingSoon || isFull ? "div" : "a";
+                                    const wrapperProps = comingSoon || isFull
                                         ? {}
                                         : isSession
-                                        ? {
-                                              href: isRestricted ? "#" : `/member/live-session/${show.id}/confirm`,
-                                              onClick: isRestricted ? (e) => { e.preventDefault(); handleVideoClick(show); } : undefined,
-                                          }
+                                        ? (show.booked_by_user
+                                              ? {
+                                                    href: isRestricted ? "#" : show.zoom_link,
+                                                    target: isRestricted ? undefined : "_blank",
+                                                    rel: isRestricted ? undefined : "noopener noreferrer",
+                                                    onClick: isRestricted ? handleVideoClick : undefined,
+                                                }
+                                              : {
+                                                    href: isRestricted ? "#" : `/member/live-session/${show.id}/confirm`,
+                                                    onClick: isRestricted ? (e) => { e.preventDefault(); handleVideoClick(show); } : undefined,
+                                                })
                                         : {
                                               href: isRestricted ? "#" : show.zoom_link,
                                               target: isRestricted ? undefined : "_blank",
@@ -486,11 +516,13 @@ const PremiumVideoSection = () => {
                                                 <p className="text-xs text-gray-400">{d.format("ddd, MMM D YYYY")} &middot; {d.format("h:mm A")}</p>
                                             </div>
                                             <span className={`text-xs font-semibold px-3 py-1 rounded-full border flex-shrink-0 ${
-                                                comingSoon
+                                                comingSoon || isFull
                                                     ? "text-gray-500 bg-white border-gray-200"
+                                                    : show.booked_by_user
+                                                    ? "text-indigo-700 bg-indigo-50 border-indigo-200"
                                                     : "text-emerald-700 bg-emerald-50 border-emerald-200"
                                             }`}>
-                                                {comingSoon ? "Coming Soon" : "Open"}
+                                                {comingSoon ? "Coming Soon" : isFull ? "Full" : show.booked_by_user ? "Booked" : "Open"}
                                             </span>
                                         </Wrapper>
                                     );

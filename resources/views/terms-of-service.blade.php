@@ -3,7 +3,7 @@
 @section('title', 'Terms of Service')
 
 @section('content')
-<section class="bg-white text-gray-800 dark:bg-gray-900 dark:text-white py-12 px-4">
+<section class="bg-white text-gray-800 dark:bg-gray-900 dark:text-white pt-28 pb-12 px-4">
     <div class="max-w-5xl mx-auto space-y-8">
         <h1 class="text-3xl font-bold border-b pb-4">Terms of Service</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400">Effective Date: </p>

@@ -20,7 +20,7 @@
 
             @php
                 $base = 'https://www.youtube.com/embed/';
-                $params = '?rel=0&modestbranding=1&playsinline=1&controls=1&enablejsapi=1';
+                $params = '?rel=0&modestbranding=1&playsinline=1&controls=1&enablejsapi=1&origin=' . urlencode(url('/'));
                 // TODO: replace these placeholder topic labels with the real
                 // lesson topic demonstrated in each video.
                 $coaches = [
@@ -29,7 +29,6 @@
                     ['src' => $base.'hwvpOGtSk6A'.$params, 'name' => 'Left Hand Grooves'],
                     ['src' => $base.'gVtATcXUaM0'.$params, 'name' => 'Praise Break Layering'],
                     ['src' => $base.'JqeVxcsKu4A'.$params, 'name' => 'Chord Substitutions'],
-                    ['src' => $base.'XonpAmgCHtY'.$params, 'name' => 'Worship Intros'],
                     ['src' => $base.'ckNI-O_TuRc'.$params, 'name' => 'Modulation Techniques'],
                     ['src' => $base.'_kEHErnLoTk'.$params, 'name' => 'Reharmonization'],
                     ['src' => $base.'yPCoUFZ6csY'.$params, 'name' => 'Choir Backup Progressions'],
@@ -38,7 +37,7 @@
 
             @foreach ($coaches as $coach)
             <div class="swiper-slide">
-                <div style="aspect-ratio:9/16; background:#000; border-radius:1.25rem;
+                <div style="position:relative; aspect-ratio:9/16; background:#000; border-radius:1.25rem;
                             overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.4);">
                     <iframe
                         src="{{ $coach['src'] }}"
@@ -50,6 +49,12 @@
                         allowfullscreen
                         loading="lazy">
                     </iframe>
+                    {{-- Transparent shield: a plain div (unlike the iframe) never
+                         swallows touch/drag, so it's what actually lets a swipe
+                         that starts over a side video still move the carousel.
+                         It's only removed from the centered slide, which is the
+                         one allowed to be played/clicked. --}}
+                    <div class="coaches-touch-shield"></div>
                 </div>
                 <p style="color:rgba(255,255,255,0.8); font-size:13px; font-weight:600; text-align:center; margin-top:12px;">
                     {{ $coach['name'] }}
@@ -97,6 +102,20 @@
         opacity: 0.85;
     }
 
+    /* Covers the iframe on every slide except the centered one. A div (unlike
+       an iframe) always lets the browser's native drag/swipe pass through to
+       Swiper, and only the centered slide's video is left clickable. */
+    .coaches-touch-shield {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: transparent;
+        cursor: grab;
+    }
+    .coaches-swiper .swiper-slide-active .coaches-touch-shield {
+        display: none;
+    }
+
     /* Circular arrow buttons */
     .coaches-prev,
     .coaches-next {
@@ -139,11 +158,26 @@
         });
     }
 
+    // Swiping away from a slide doesn't stop its YouTube embed on its own —
+    // tell every iframe to pause via the postMessage API so whatever was
+    // playing stops the moment the user moves to another slide.
+    function pauseAllVideos(swiper) {
+        swiper.slides.forEach(function (slide) {
+            var iframe = slide.querySelector('iframe[data-src]');
+            if (!iframe || !iframe.contentWindow) return;
+            iframe.contentWindow.postMessage(
+                JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }),
+                'https://www.youtube.com'
+            );
+        });
+    }
+
     function initCoaches() {
         var swiper = new Swiper('.coaches-swiper', {
             loop: true,
             centeredSlides: true,
             grabCursor: true,
+            slideToClickedSlide: true,
             spaceBetween: 16,
             slidesPerView: 2,
             navigation: {
@@ -157,6 +191,7 @@
             },
             on: {
                 init: function (s) { applyLoop(s); },
+                slideChange: function (s) { pauseAllVideos(s); },
             },
         });
     }

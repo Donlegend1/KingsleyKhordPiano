@@ -15,6 +15,31 @@ class IndexController extends Controller
         $liveshow = Liveshow::where('start_time', '>=', Carbon::now())
         ->orderBy('start_time', 'asc')
         ->first();
-        return view('welcome', compact('extracourses', 'liveshow'));
+
+        $latestLessons = [];
+
+        $latestPianoExercise = Upload::where('category', 'piano exercise')
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if ($latestPianoExercise) {
+            $latestLessons['piano exercise'] = $latestPianoExercise;
+        }
+
+        $latestGuidedPractice = \App\Models\MusicalApplication::orderBy('created_at', 'desc')->first();
+        if ($latestGuidedPractice) {
+            $latestLessons['guided practice'] = $latestGuidedPractice;
+        }
+
+        $latestLearnSong = \App\Models\LearnSong::orderBy('created_at', 'desc')->first();
+        if ($latestLearnSong) {
+            $latestLessons['learn songs'] = $latestLearnSong;
+        }
+
+        $latestExtraCourse = \App\Models\ExtraCourse::orderBy('created_at', 'desc')->first();
+        if ($latestExtraCourse) {
+            $latestLessons['extra courses'] = $latestExtraCourse;
+        }
+
+        return view('welcome', compact('extracourses', 'liveshow', 'latestLessons'));
     }
 }
