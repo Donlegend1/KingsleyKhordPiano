@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Community;
+use App\Models\Payment;
 use App\Models\Subscription;
 use App\Enums\Roles\UserRoles;
 use Carbon\Carbon;
@@ -157,12 +158,19 @@ class AdminController extends Controller
                     ->where('user_id', $user->id)
                     ->update(['ends_at' => $endsAt]);
 
-                $user->payments()
+                $paymentUpdates = [
+                    'ends_at' => $endsAt->toDateString(),
+                ];
+                if ($startsAt) {
+                    $paymentUpdates['starts_at'] = $startsAt->toDateString();
+                }
+
+                // user_id is a string and includes guest checkout rows.
+                // Comparing it to an integer makes MySQL coerce 'guest' and abort.
+                Payment::query()
+                    ->where('user_id', (string) $user->id)
                     ->where('status', 'successful')
-                    ->update([
-                        'starts_at' => $startsAt,
-                        'ends_at' => $endsAt,
-                    ]);
+                    ->update($paymentUpdates);
             }
         });
 

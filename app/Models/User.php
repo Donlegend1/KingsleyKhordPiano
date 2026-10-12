@@ -226,7 +226,8 @@ class User extends Authenticatable implements MustVerifyEmail
             return true;
         }
 
-        return $this->payments()
+        return Payment::query()
+            ->where('user_id', (string) $this->id)
             ->where('status', 'successful')
             ->whereNotNull('ends_at')
             ->where('ends_at', '>', now())
