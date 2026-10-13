@@ -127,6 +127,8 @@
                                 {{ $isCompleted ? 'Completed' : 'Mark as Complete' }}
                             </button>
                         </form>
+
+                        @include('memberpages.partials.submit-video-button', ['lesson' => $activeVideo])
                     </div>
 
                     @if (!empty($activeVideo->images) && is_array($activeVideo->images))

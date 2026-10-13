@@ -1,0 +1,4 @@
+Audio in this folder was rendered with the MuseScore General SoundFont (MIT license).
+FluidR3 Copyright (c) 2000-2002, 2008 Frank Wen; FluidR3Mono (c) 2014-17 Michael Cowgill;
+MuseScore_General adaptation (c) 2018-19 S. Christian Collins.
+Permission is granted under the MIT license; these notices must be kept with derivative works.

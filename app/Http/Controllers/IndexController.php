@@ -21,6 +21,13 @@ class IndexController extends Controller
         $latestPianoExercise = Upload::where('category', 'piano exercise')
             ->orderBy('created_at', 'desc')
             ->first();
+        // Etudes & Pieces share the Piano Exercise slot: show whichever is newest.
+        $latestEtude = \App\Models\Etude::where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if ($latestEtude && (! $latestPianoExercise || $latestEtude->created_at > $latestPianoExercise->created_at)) {
+            $latestPianoExercise = $latestEtude;
+        }
         if ($latestPianoExercise) {
             $latestLessons['piano exercise'] = $latestPianoExercise;
         }

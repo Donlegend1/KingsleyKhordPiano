@@ -154,6 +154,10 @@
                                 {{ $isCompleted ? 'Completed' : 'Mark as Complete' }}
                             </button>
                         </form>
+
+                        @if (in_array($lessonType, ['uploads', 'learn_songs'], true))
+                            @include('memberpages.partials.submit-video-button', ['lesson' => $lesson])
+                        @endif
                     </div>
 
                     @if (!empty($lesson->images) && is_array($lesson->images))
