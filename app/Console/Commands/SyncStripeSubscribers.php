@@ -80,12 +80,19 @@ class SyncStripeSubscribers extends Command
                 ]
             );
 
-            $user->update([
-                'payment_status' => $status === 'active' ? 'successful' : 'failed',
-                'amount' => $amount,
-                'premium' => (isset($plan->tier) && stripos($plan->tier, 'premium') !== false) ? 1 : 0,
-                'plan' => $plan?->id,
-            ]);
+          $data = [
+                    'payment_status' => $status === 'active' ? 'successful' : 'failed',
+                    'amount'         => $amount,
+                    'plan'           => $plan?->id,
+                ];
+
+                $tier = strtolower(trim($plan?->tier ?? ''));
+
+                if (in_array($tier, ['premium', 'standard'], true)) {
+                    $data['premium'] = $tier;   // saves 'premium' or 'standard'
+                }
+
+                $user->update($data);
 
             if ($status === 'active' && $plan) {
                 app(\App\Services\SubscriptionLifecycleService::class)
