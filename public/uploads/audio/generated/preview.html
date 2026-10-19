@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generated quiz audio - preview</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 32px auto; padding: 0 16px; color: #151515; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  p { color: #666; margin-top: 0; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+  button { font: inherit; padding: 12px 16px; min-width: 72px; border: 1px solid #ddd; border-radius: 10px; background: #fff; cursor: pointer; }
+  button:hover { border-color: #151515; }
+  button.playing { background: #151515; color: #fff; }
+  button.sharp { background: #f4f4f4; }
+  select { font: inherit; padding: 6px 10px; }
+  #meta { font-size: 13px; color: #888; }
+</style>
+</head>
+<body>
+<h1>Generated quiz audio</h1>
+<p>Click a note to hear it. Same loudness ceiling and length for every note.</p>
+<label>Set <select id="instrument"></select></label>
+<div class="row" id="notes"></div>
+<div id="meta"></div>
+<script>
+  const params = new URLSearchParams(location.search);
+  const instrument = params.get('instrument') || 'piano';
+  const select = document.getElementById('instrument');
+  fetch('sets.json').then(r => r.json()).then(sets => {
+    select.innerHTML = sets.map(s => '<option>' + s + '</option>').join('');
+    select.value = instrument;
+  });
+  document.getElementById('instrument').onchange = (e) => { location.search = '?instrument=' + e.target.value; };
+  let current = null;
+  fetch(instrument + '/manifest.json').then(r => r.json()).then(data => {
+    document.getElementById('meta').textContent = data.notes.length + ' notes - soundfont: ' + data.soundfont;
+    const box = document.getElementById('notes');
+    data.notes.forEach(note => {
+      const b = document.createElement('button');
+      b.textContent = note.note;
+      if (note.note.includes('#')) b.className = 'sharp';
+      b.onclick = () => {
+        if (current) { current.audio.pause(); current.button.classList.remove('playing'); }
+        const audio = new Audio(note.path);
+        current = { audio, button: b };
+        b.classList.add('playing');
+        audio.onended = () => b.classList.remove('playing');
+        audio.play();
+      };
+      box.appendChild(b);
+    });
+  }).catch(() => { document.getElementById('meta').textContent = 'No audio generated for ' + instrument + ' yet.'; });
+</script>
+</body>
+</html>

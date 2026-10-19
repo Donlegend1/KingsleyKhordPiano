@@ -1,0 +1,102 @@
+{
+  "instrument": "piano",
+  "set": "piano",
+  "strikes_per_clip": 1,
+  "strike_times": [
+    0.0
+  ],
+  "soundfont": "MS Basic.sf3",
+  "notes": [
+    {
+      "note": "C3",
+      "midi": 48,
+      "hz": 130.81,
+      "path": "/uploads/audio/generated/piano/c3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "C#3",
+      "midi": 49,
+      "hz": 138.59,
+      "path": "/uploads/audio/generated/piano/csharp3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "D3",
+      "midi": 50,
+      "hz": 146.83,
+      "path": "/uploads/audio/generated/piano/d3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "D#3",
+      "midi": 51,
+      "hz": 155.56,
+      "path": "/uploads/audio/generated/piano/dsharp3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "E3",
+      "midi": 52,
+      "hz": 164.81,
+      "path": "/uploads/audio/generated/piano/e3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "F3",
+      "midi": 53,
+      "hz": 174.61,
+      "path": "/uploads/audio/generated/piano/f3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "F#3",
+      "midi": 54,
+      "hz": 185.0,
+      "path": "/uploads/audio/generated/piano/fsharp3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "G3",
+      "midi": 55,
+      "hz": 196.0,
+      "path": "/uploads/audio/generated/piano/g3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "G#3",
+      "midi": 56,
+      "hz": 207.65,
+      "path": "/uploads/audio/generated/piano/gsharp3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "A3",
+      "midi": 57,
+      "hz": 220.0,
+      "path": "/uploads/audio/generated/piano/a3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "A#3",
+      "midi": 58,
+      "hz": 233.08,
+      "path": "/uploads/audio/generated/piano/asharp3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "B3",
+      "midi": 59,
+      "hz": 246.94,
+      "path": "/uploads/audio/generated/piano/b3.mp3",
+      "seconds": 3.5
+    },
+    {
+      "note": "C4",
+      "midi": 60,
+      "hz": 261.63,
+      "path": "/uploads/audio/generated/piano/c4.mp3",
+      "seconds": 3.5
+    }
+  ]
+}

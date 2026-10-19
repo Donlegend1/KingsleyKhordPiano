@@ -1476,7 +1476,7 @@ const DraggableCategoryList = ({
                         className="w-full px-3 py-2 border rounded-lg"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                        Shown at the top of the checkpoint page. Supports YouTube, Vimeo, Wistia, Google Drive, and other embeddable/iframe links.
+                        Shown at the top of the checkpoint page. Paste a link or the embed/iframe code from YouTube, Vimeo, Wistia or Google Drive. Google Drive files must be shared as "Anyone with the link" to play.
                     </p>
                 </div>
 
@@ -1640,7 +1640,7 @@ const DraggableCategoryList = ({
                                     className="w-full px-3 py-2 border rounded-lg"
                                 />
                                 <p className="text-xs text-gray-500 mt-1">
-                                    Shown as an embedded video above the checkpoint content. Supports YouTube, Vimeo, Wistia, Google Drive, and other embeddable/iframe links.
+                                    Shown as an embedded video above the checkpoint content. Paste a link or the embed/iframe code from YouTube, Vimeo, Wistia or Google Drive. Google Drive files must be shared as "Anyone with the link" to play.
                                 </p>
                             </div>
 

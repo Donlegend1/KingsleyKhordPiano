@@ -6,7 +6,7 @@
         @foreach ($latestCourses as $category => $latestCourse)
             @php
                 $lessonType = match ($category) {
-                    'piano exercise' => 'upload',
+                    'piano exercise' => $latestCourse instanceof \App\Models\Etude ? 'etudes' : 'upload',
                     'learn songs' => 'learn_song',
                     'extra courses' => 'extra_course',
                     default => null,

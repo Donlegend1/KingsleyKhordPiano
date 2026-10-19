@@ -106,7 +106,7 @@ const PlanSwitchAndCurrencySelect = () => {
         "Personalized practice plan",
         "Feedback on your playing",
         "Accountability framework",
-        "Weekly live workshop",
+        "Monthly live workshop",
         "In-depth master classes",
     ];
 
