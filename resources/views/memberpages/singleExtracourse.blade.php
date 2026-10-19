@@ -181,7 +181,7 @@
 
                     {{-- Lessons in this course (Mobile Only) --}}
                     @if ($playlist->count() > 1 && $lessonType !== 'learn_songs')
-                        <div class="order-2 lg:order-none block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div class="order-1 lg:order-none block lg:hidden mb-10 border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
                             {{-- Header --}}
                             <div class="px-5 py-4 border-b border-gray-100 bg-[#1447A6]/10">
                                 <p class="text-[11px] font-bold text-[#1447A6] tracking-[0.14em] uppercase">
@@ -267,7 +267,7 @@
 
 
                     {{-- Discussion / Comments --}}
-                    <div class="order-1 lg:order-none mt-10 pt-6 border-t border-gray-200" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
+                    <div class="order-2 lg:order-none mt-10 pt-6 border-t border-gray-200" id="discussion-section" data-course-id="{{ $lesson->id }}" data-comment-category="others">
                         <h2 class="text-[15px] font-semibold text-gray-900 mb-1">Discussion</h2>
                         <p class="text-[12px] text-gray-400 mb-4">Share your thoughts, questions, and follow-up replies.</p>
 

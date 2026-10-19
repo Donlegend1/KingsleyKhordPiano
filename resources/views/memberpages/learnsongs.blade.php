@@ -3,7 +3,7 @@
 @section('content')
 
 <div
-  x-data="learnSongsPage({{ \Illuminate\Support\Js::from($search ?? '') }}, {{ \Illuminate\Support\Js::from($activeTab) }}, {{ \Illuminate\Support\Js::from($tonalCenter) }})"
+  x-data="learnSongsPage({{ \Illuminate\Support\Js::from($search ?? '') }}, {{ \Illuminate\Support\Js::from($activeTab) }}, {{ \Illuminate\Support\Js::from($tonalCenter) }}, {{ \Illuminate\Support\Js::from($author) }})"
   x-init="init()"
 >
 
@@ -47,7 +47,7 @@
   <div class="w-full max-w-6xl mx-auto">
 
     <!-- Filters -->
-    <div class="mb-10 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-6 relative z-30">
+    <div class="mb-10 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm px-6 py-5 grid grid-cols-1 sm:grid-cols-2 {{ $authors->isNotEmpty() ? 'lg:grid-cols-3' : '' }} gap-6 relative z-30">
 
       <!-- Skill Level dropdown -->
       <div class="flex-1" x-data="{ open: false }" @click.outside="open = false">
@@ -117,6 +117,46 @@
           </div>
         </div>
       </div>
+
+      <!-- Author dropdown (only when at least one song has an author) -->
+      @if ($authors->isNotEmpty())
+      <div class="flex-1" x-data="{ open: false }" @click.outside="open = false">
+        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Author</label>
+        <div class="relative">
+          <button type="button" @click="open = !open"
+            class="w-full flex items-center justify-between gap-2 px-4 py-2.5 border-2 border-blue-200 dark:border-blue-900 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 hover:border-blue-300 focus:outline-none transition-colors">
+            <span class="truncate" x-text="author === 'all' ? 'All Authors' : author"></span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <div x-show="open" x-transition x-cloak
+            class="absolute left-0 right-0 mt-2 max-h-64 overflow-y-auto rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xl z-40">
+            <a href="#"
+              @click.prevent="open = false; selectAuthor('all')"
+              class="flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors duration-150"
+              :class="author === 'all'
+                  ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-semibold'
+                  : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'">
+              All Authors
+              <i class="fa fa-check text-blue-600 dark:text-blue-300 text-xs" x-show="author === 'all'"></i>
+            </a>
+            <template x-for="name in authorOptions" :key="name">
+              <a href="#"
+                @click.prevent="open = false; selectAuthor(name)"
+                class="flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-medium transition-colors duration-150"
+                :class="author === name
+                    ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-semibold'
+                    : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'">
+                <span class="truncate" x-text="name"></span>
+                <i class="fa fa-check text-blue-600 dark:text-blue-300 text-xs flex-shrink-0" x-show="author === name"></i>
+              </a>
+            </template>
+          </div>
+        </div>
+      </div>
+      @endif
     </div>
 
     <!-- Loading indicator -->
@@ -143,14 +183,16 @@
 </style>
 
 <script>
-    function learnSongsPage(initialSearch, initialTab, initialKey) {
+    function learnSongsPage(initialSearch, initialTab, initialKey, initialAuthor) {
         return {
             search: initialSearch,
             activeTab: initialTab,
             tonalCenter: initialKey,
+            author: initialAuthor,
             loading: false,
             skillOptions: { all: 'All', beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
             keyOptions: @json($keyOptions),
+            authorOptions: @json($authors->values()),
 
             init() {
                 this.$refs.resultsContainer.addEventListener('click', (e) => {
@@ -184,6 +226,12 @@
                 this.pushSearch();
             },
 
+            selectAuthor(value) {
+                if (this.author === value) return;
+                this.author = value;
+                this.pushSearch();
+            },
+
             onSearchInput() {
                 this.pushSearch();
             },
@@ -197,6 +245,7 @@
                 const params = new URLSearchParams();
                 params.set('tab', this.activeTab);
                 params.set('key', this.tonalCenter);
+                params.set('author', this.author);
                 if (this.search) params.set('search', this.search);
                 this.fetchResults(window.location.pathname + '?' + params.toString());
             },

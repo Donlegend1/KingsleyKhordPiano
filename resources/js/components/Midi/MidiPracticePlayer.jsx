@@ -53,28 +53,32 @@ const blackKeyBoundaryUnits = (pitch) => Math.floor(pitch / 12) * 7 + BLACK_KEY_
 // Sampled Salamander Grand Piano tone (publicly hosted by Magenta), used
 // instead of html-midi-player's default bare oscillator synth.
 const PIANO_SOUNDFONT_URL = "https://storage.googleapis.com/magentadata/js/soundfonts/salamander";
-// Fixed C0-C7 range shown in the fullscreen "full view".
-const FULL_VIEW_MIN_PITCH = 24; // C0
-const FULL_VIEW_MAX_PITCH = 108; // C7
-// Mobile full view (landscape) uses a narrower 5-octave range instead of
-// the full 88 keys — the full range doesn't fit comfortably on a phone
-// screen even rotated, so this trades range for a more usable key size.
-const MOBILE_FULL_VIEW_MIN_PITCH = 24; // C0
-const MOBILE_FULL_VIEW_MAX_PITCH = 84; // C5
-// Default embedded player (desktop, not full view) shows a fixed C1-C6
+// Fixed C1-C8 range shown in the fullscreen "full view".
+const FULL_VIEW_MIN_PITCH = 24; // C1
+const FULL_VIEW_MAX_PITCH = 108; // C8
+// Phone embedded player (not full view) shows a narrower C2-C6 range —
+// the desktop range doesn't leave the keys a usable size on a phone screen.
+// Notes outside it are flagged by a hint (see outOfRangeCount) that points
+// to full view, which shows the whole C1-C8 range.
+const MOBILE_VIEW_MIN_PITCH = 36; // C2
+const MOBILE_VIEW_MAX_PITCH = 84; // C6
+// Default embedded player (desktop, not full view) shows a fixed C2-C7
 // range instead of the note-driven dynamic window, matching the fixed
 // ranges used by the other two view modes.
-const DEFAULT_VIEW_MIN_PITCH = 36; // C1
-const DEFAULT_VIEW_MAX_PITCH = 96; // C6
-// Active-key highlight color split: below this pitch highlights blue, this
-// pitch and above highlights green.
-const KEY_RANGE_SPLIT_PITCH = 48; // C2
+const DEFAULT_VIEW_MIN_PITCH = 36; // C2
+const DEFAULT_VIEW_MAX_PITCH = 96; // C7
+// Active-key highlight color split at middle C (MIDI 60): keys below it
+// light up blue, middle C and above light up green. The legend under the
+// keyboard says the same. Middle C is labelled C4 on the keys (see
+// pitchLabel).
+const KEY_RANGE_SPLIT_PITCH = 60; // middle C
 
 const isBlackPitch = (pitch) => BLACK_KEY_CLASSES.has(((pitch % 12) + 12) % 12);
 
 const pitchLabel = (pitch) => {
     const name = PITCH_NAMES[((pitch % 12) + 12) % 12];
-    const octave = Math.floor(pitch / 12) - 2;
+    // MIDI 60 is middle C, labelled C4 (the usual convention in lessons).
+    const octave = Math.floor(pitch / 12) - 1;
 
     return `${name}${octave}`;
 };
@@ -173,6 +177,37 @@ const transformSequence = (sequence, transpose, targetTempo) => {
 
 const TEMPO_PERCENT_OPTIONS = [25, 50, 75, 90, 100];
 
+// How often playback is sampled, and how often the clock/slider is allowed to
+// re-render while playing. Sampling stays frequent so keys release on time;
+// the clock only shows whole seconds, so it doesn't need to redraw as often.
+const PLAYBACK_POLL_MS = 30;
+const CLOCK_UPDATE_MS = 100;
+// Within this many seconds of the end the clock updates on every sample, so
+// it still lands exactly on the final time when the piece finishes.
+const CLOCK_PRECISE_NEAR_END = 0.5;
+
+const samePitchSet = (a, b) => {
+    if (a.size !== b.size) return false;
+
+    for (const pitch of a) {
+        if (!b.has(pitch)) return false;
+    }
+
+    return true;
+};
+
+// What the audio status icon in the toolbar shows for each piano-sample state.
+const SOUND_STATUS = {
+    idle: { icon: "fa-plug", title: "Piano sounds not loaded yet" },
+    loading: { icon: "fa-spinner fa-spin", title: "Loading piano sounds…" },
+    ready: { icon: "fa-plug-circle-check", title: "Piano sounds ready" },
+    error: { icon: "fa-plug-circle-xmark", title: "Piano sounds failed to load" },
+};
+
+// Within this many seconds of the end, pressing Play restarts the piece
+// from the beginning instead of "resuming" at the end.
+const PLAY_FROM_START_TOLERANCE = 0.3;
+
 const MidiPracticePlayer = ({ data }) => {
     const files = data.files || [];
     // A single mm.SoundFontPlayer, created once per loaded file and reused
@@ -199,6 +234,12 @@ const MidiPracticePlayer = ({ data }) => {
     // dependency arrays) and must not close over stale render values.
     const sequenceRef = useRef(null);
     const tempoRatioRef = useRef(1);
+    // Set by the tempo/transpose handlers right before they change state,
+    // and consumed by the effect that reacts to the new sequence, so the
+    // student's position (and whether it was playing) survives the change
+    // instead of resetting to 0:00. null for any other reason the
+    // sequence changes (e.g. a new file loading).
+    const resumeRef = useRef(null);
 
     const [selectedFileId, setSelectedFileId] = useState(data.selectedFileId ? String(data.selectedFileId) : "");
     const [sourceSequence, setSourceSequence] = useState(null);
@@ -211,6 +252,16 @@ const MidiPracticePlayer = ({ data }) => {
     const [timeInfo, setTimeInfo] = useState({ current: 0, duration: 0 });
     const [activePitches, setActivePitches] = useState(new Set());
     const [isMuted, setIsMuted] = useState(false);
+    // The piano samples are downloaded from a remote server (see
+    // PIANO_SOUNDFONT_URL), separately from the MIDI file itself, so they
+    // have their own state: "idle" (no file yet), "loading", "ready", or
+    // "error". soundRetry is bumped by the "Try again" button to re-run the
+    // download. soundStateRef lets effects read the current state without
+    // re-running when it changes.
+    const [soundState, setSoundState] = useState("idle");
+    const [soundRetry, setSoundRetry] = useState(0);
+    const soundStateRef = useRef("idle");
+    soundStateRef.current = soundState;
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isNarrowPortrait, setIsNarrowPortrait] = useState(
         () => typeof window !== "undefined" && window.innerWidth <= 900 && window.innerHeight > window.innerWidth,
@@ -276,20 +327,20 @@ const MidiPracticePlayer = ({ data }) => {
         let maxPitch;
 
         if (isFullscreen) {
-            // Full view (desktop or mobile landscape) shows a fixed C0-C7
+            // Full view (desktop or mobile landscape) shows a fixed C1-C8
             // range instead of the note-driven window, regardless of what
             // the loaded sequence actually uses.
             minPitch = FULL_VIEW_MIN_PITCH;
             maxPitch = FULL_VIEW_MAX_PITCH;
         } else if (isNarrowPortrait) {
-            // Mobile default embedded player (not full view): fixed C0-C5,
-            // 5 octaves, instead of the note-driven dynamic window — keeps
+            // Mobile default embedded player (not full view): fixed C2-C6,
+            // 4 octaves, instead of the note-driven dynamic window — keeps
             // key size consistent and predictable on a phone screen rather
             // than depending on whatever range the loaded sequence uses.
-            minPitch = MOBILE_FULL_VIEW_MIN_PITCH;
-            maxPitch = MOBILE_FULL_VIEW_MAX_PITCH;
+            minPitch = MOBILE_VIEW_MIN_PITCH;
+            maxPitch = MOBILE_VIEW_MAX_PITCH;
         } else {
-            // Default embedded player (desktop, not full view): fixed C1-C6
+            // Default embedded player (desktop, not full view): fixed C2-C7
             // instead of the note-driven dynamic window, regardless of what
             // the loaded sequence actually uses.
             minPitch = DEFAULT_VIEW_MIN_PITCH;
@@ -333,6 +384,18 @@ const MidiPracticePlayer = ({ data }) => {
 
         return { pitches, whitePitches, blackPitches, octaveCount, totalColumns };
     }, [sequence, isFullscreen, isNarrowPortrait]);
+
+    // Notes the loaded piece plays that have no key in the current view
+    // (they're still heard). Only meaningful outside full view, where the
+    // hint tells the student to open full view to see them.
+    const outOfRangeCount = useMemo(() => {
+        if (isFullscreen || !sequence?.notes?.length) return 0;
+
+        const lowest = keyboard.pitches[0];
+        const highest = keyboard.pitches[keyboard.pitches.length - 1];
+
+        return sequence.notes.filter((note) => note.pitch < lowest || note.pitch > highest).length;
+    }, [sequence, keyboard, isFullscreen]);
 
     useEffect(() => {
         if (!selectedFile?.midiUrl) {
@@ -388,12 +451,34 @@ const MidiPracticePlayer = ({ data }) => {
         };
     }, [selectedFile?.midiUrl, files.length]);
 
+    // Starts the sound engine on `seq` at `startTime` seconds. Player.start
+    // takes an offset but never moves Tone.js's own Transport clock to it,
+    // so the Transport is set to the same position first — see handlePlay
+    // for the longer explanation of why both have to agree.
+    const beginPlayback = (seq, startTime) => {
+        const player = soundPlayerRef.current;
+
+        if (!player) return;
+
+        Tone.Transport.stop();
+        Tone.Transport.seconds = startTime;
+
+        player.start(seq, undefined, startTime).catch((error) => {
+            console.error("MIDI playback failed:", error);
+            setIsPlaying(false);
+        });
+        setIsPlaying(true);
+    };
+
     useEffect(() => {
-        // A tempo/transpose change rescales or reshapes the timeline, so
-        // just reset our own displayed position — the sound engine itself
-        // (soundPlayerRef) is untouched here; see the effect below for why
-        // it's never recreated on this kind of change.
+        // The sequence was rebuilt (new file, or a tempo/transpose change),
+        // so whatever the engine was playing no longer matches it and has
+        // to be stopped. The engine itself (soundPlayerRef) is never
+        // recreated here; see the effect below for why.
         if (!sequence) return;
+
+        const resume = resumeRef.current;
+        resumeRef.current = null;
 
         try {
             soundPlayerRef.current?.stop?.();
@@ -401,10 +486,41 @@ const MidiPracticePlayer = ({ data }) => {
             // Wasn't playing — nothing to stop.
         }
 
-        setIsPlaying(false);
-        setTimeInfo({ current: 0, duration: sequence.totalTime || 0 });
-        setActivePitches(new Set());
-        desiredSeekRef.current = null;
+        const duration = sequence.totalTime || 0;
+
+        if (!resume) {
+            // New file: start from the top.
+            setIsPlaying(false);
+            setTimeInfo({ current: 0, duration });
+            setActivePitches(new Set());
+            desiredSeekRef.current = null;
+            return;
+        }
+
+        // Tempo change: the whole timeline is stretched by the ratio of
+        // the new tempo to the old one, so the student's place in the
+        // piece (e.g. "40% through") is kept by scaling the position the
+        // same way. Transpose leaves the ratio at 1, so the position is
+        // unchanged.
+        const position = clamp(
+            resume.position * (tempoRatioRef.current / resume.ratio),
+            0,
+            duration,
+        );
+
+        setTimeInfo({ current: position, duration });
+        setActivePitches(getActivePitches(sequence, position, tempoRatioRef.current));
+
+        if (resume.wasPlaying && position < duration - PLAY_FROM_START_TOLERANCE) {
+            // Was playing: carry straight on from the same spot.
+            desiredSeekRef.current = null;
+            beginPlayback(sequence, position);
+        } else {
+            // Was paused or stopped: stay there; Play will start from
+            // desiredSeekRef.
+            setIsPlaying(false);
+            desiredSeekRef.current = position;
+        }
     }, [sequence]);
 
     useEffect(() => {
@@ -418,7 +534,8 @@ const MidiPracticePlayer = ({ data }) => {
         const callbackObject = {
             run: (note) => {
                 if (cancelled) return;
-                setActivePitches(getActivePitches(sequenceRef.current, note.startTime, tempoRatioRef.current));
+                const nextPitches = getActivePitches(sequenceRef.current, note.startTime, tempoRatioRef.current);
+                setActivePitches((prev) => (samePitchSet(prev, nextPitches) ? prev : nextPitches));
             },
             stop: () => {
                 if (cancelled) return;
@@ -435,7 +552,6 @@ const MidiPracticePlayer = ({ data }) => {
         );
 
         soundPlayerRef.current = player;
-        player.loadSamples(sourceSequence).catch(() => {});
 
         return () => {
             cancelled = true;
@@ -448,9 +564,63 @@ const MidiPracticePlayer = ({ data }) => {
                 soundPlayerRef.current = null;
             }
         };
-    }, [sourceSequence]);
+    }, [sourceSequence, soundRetry]);
+
+    // Download the piano samples this sequence needs (it runs again when
+    // transpose changes which notes are used, and when "Try again" is
+    // pressed). Declared after the player-creation effect above so the
+    // player already exists when this runs. Failures are shown to the
+    // student instead of being swallowed.
+    useEffect(() => {
+        const player = soundPlayerRef.current;
+
+        if (!player || !sequence) {
+            setSoundState("idle");
+            return undefined;
+        }
+
+        let cancelled = false;
+        let slowTimer = null;
+
+        if (soundStateRef.current === "ready") {
+            // Samples were already loaded, and a tempo or small transpose
+            // change usually needs few or none — only switch to "loading"
+            // (which disables Play) if it actually takes a moment, so the
+            // message doesn't flash on every tempo change.
+            slowTimer = window.setTimeout(() => {
+                if (!cancelled) setSoundState("loading");
+            }, 300);
+        } else {
+            setSoundState("loading");
+        }
+
+        player
+            .loadSamples(sequence)
+            .then(() => {
+                if (cancelled) return;
+                window.clearTimeout(slowTimer);
+                setSoundState("ready");
+            })
+            .catch((error) => {
+                if (cancelled) return;
+                window.clearTimeout(slowTimer);
+                console.error("Could not load the piano sounds:", error);
+                setSoundState("error");
+            });
+
+        return () => {
+            cancelled = true;
+            window.clearTimeout(slowTimer);
+        };
+    }, [sequence, soundRetry]);
 
     useEffect(() => {
+        let lastClockUpdate = 0;
+
+        // Every setState below hands React a value that is only "new" when
+        // something actually changed — a fresh object/Set each sample would
+        // re-render the whole player (all the keys) ~33 times a second even
+        // while paused. Returning the previous value makes React skip it.
         const interval = window.setInterval(() => {
             const player = soundPlayerRef.current;
 
@@ -468,10 +638,22 @@ const MidiPracticePlayer = ({ data }) => {
             // resets it (see handleStop). isPlaying() stays true while
             // paused (only Stop clears it), so this still runs then.
             const current = Tone.Transport.seconds;
+            const nextPitches = getActivePitches(sequenceRef.current, current, tempoRatioRef.current);
 
-            setTimeInfo((prev) => ({ ...prev, current }));
-            setActivePitches(getActivePitches(sequenceRef.current, current, tempoRatioRef.current));
-        }, 30);
+            setActivePitches((prev) => (samePitchSet(prev, nextPitches) ? prev : nextPitches));
+
+            // Paused: the position doesn't move, so this updates once (to the
+            // exact paused position) and then not at all. Playing: throttle
+            // the clock, except near the end so it finishes on the last second.
+            const now = performance.now();
+            const duration = sequenceRef.current?.totalTime || 0;
+            const nearEnd = duration > 0 && current >= duration - CLOCK_PRECISE_NEAR_END;
+
+            if (isStarted && !nearEnd && now - lastClockUpdate < CLOCK_UPDATE_MS) return;
+
+            lastClockUpdate = now;
+            setTimeInfo((prev) => (prev.current === current ? prev : { ...prev, current }));
+        }, PLAYBACK_POLL_MS);
 
         return () => window.clearInterval(interval);
     }, []);
@@ -505,7 +687,7 @@ const MidiPracticePlayer = ({ data }) => {
     const progressPercent = timeInfo.duration ? (timeInfo.current / timeInfo.duration) * 100 : 0;
     const tempoPercentValue = clamp(Math.round((tempo / baseTempo) * 100), 25, 200);
     const handlePlay = () => {
-        if (!canPlay) return;
+        if (!canPlay || soundState !== "ready") return;
 
         const player = soundPlayerRef.current;
 
@@ -525,7 +707,20 @@ const MidiPracticePlayer = ({ data }) => {
         // Use the user's actual last explicit seek (desiredSeekRef), not
         // timeInfo.current — see the comment where desiredSeekRef is
         // declared for why timeInfo.current can't be trusted here.
-        const targetTime = desiredSeekRef.current ?? timeInfo.current;
+        let targetTime = desiredSeekRef.current ?? timeInfo.current;
+
+        // After the piece finishes (or the slider is dragged to the very
+        // end) the stored position is the end of the piece. Starting from
+        // there would schedule no notes and just run the clock past the
+        // duration in silence, so Play restarts from the beginning instead.
+        // The last poll before the end can land a few ms short of
+        // totalTime, hence the small tolerance.
+        const duration = sequence.totalTime || 0;
+
+        if (duration > 0 && targetTime >= duration - PLAY_FROM_START_TOLERANCE) {
+            targetTime = 0;
+            setTimeInfo((current) => ({ ...current, current: 0 }));
+        }
 
         // Player.start(seq, qpm, offset) tells the audio Part "treat
         // yourself as `offset` seconds in already" (so it skips scheduling
@@ -538,13 +733,11 @@ const MidiPracticePlayer = ({ data }) => {
         // diverge. Setting Transport to the same offset the Part is asked
         // to use keeps both in lockstep, so a note fires at transport time
         // = X, matching its real position.
-        Tone.Transport.stop();
-        Tone.Transport.seconds = targetTime;
-
-        player.start(sequence, undefined, targetTime).catch(() => {});
-        setIsPlaying(true);
+        beginPlayback(sequence, targetTime);
         desiredSeekRef.current = null;
     };
+
+    const handleSoundRetry = () => setSoundRetry((current) => current + 1);
 
     const handlePause = () => {
         const player = soundPlayerRef.current;
@@ -622,13 +815,37 @@ const MidiPracticePlayer = ({ data }) => {
         setActivePitches(getActivePitches(sequence, nextTime, baseTempo / tempo));
     };
 
+    // Remember where the student is (and whether it was playing) so the
+    // effect that reacts to the rebuilt sequence can put them back there.
+    const rememberPosition = () => {
+        const player = soundPlayerRef.current;
+
+        // isPlaying() stays true while paused, and the Transport clock
+        // holds the paused position, so it's the right source in both
+        // cases; when fully stopped, fall back to the last seek/position.
+        const position = player?.isPlaying?.()
+            ? Tone.Transport.seconds
+            : (desiredSeekRef.current ?? timeInfo.current);
+
+        resumeRef.current = { position, ratio: tempoRatioRef.current, wasPlaying: isPlaying };
+    };
+
     const handleTempoPercentChange = (percent) => {
         const nextTempo = clamp(Math.round(baseTempo * (Number(percent) / 100)), 20, 220);
+
+        if (nextTempo === tempo) return;
+
+        rememberPosition();
         setTempo(nextTempo);
     };
 
     const handleTransposeStep = (delta) => {
-        setTranspose((current) => clamp(current + delta, -12, 12));
+        const nextTranspose = clamp(transpose + delta, -12, 12);
+
+        if (nextTranspose === transpose) return;
+
+        rememberPosition();
+        setTranspose(nextTranspose);
     };
 
     const handleMuteToggle = () => setIsMuted((current) => !current);
@@ -844,7 +1061,7 @@ const MidiPracticePlayer = ({ data }) => {
                     pointer-events: none;
                 }
 
-                /* Mobile only: the C1/C2/.../C5 octave labels clutter the
+                /* Mobile only: the C2/C3/.../C6 octave labels clutter the
                    already-small keys, so hide them there — desktop keeps
                    them. */
                 @media (max-width: 900px) {
@@ -876,6 +1093,64 @@ const MidiPracticePlayer = ({ data }) => {
 
                 .kk-midi-control-section {
                     position: relative;
+                }
+
+                .kk-midi-legend {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px 16px;
+                    margin: 10px 2px 0;
+                    color: #94a3b8;
+                    font-size: 11px;
+                    font-weight: 700;
+                }
+
+                .kk-midi-legend span {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                .kk-midi-legend-dot {
+                    display: inline-block;
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 3px;
+                }
+
+                .kk-midi-legend-dot--blue {
+                    background: linear-gradient(180deg, #6ba4ff 0%, #2563eb 100%);
+                }
+
+                .kk-midi-legend-dot--green {
+                    background: linear-gradient(180deg, #6ee7a8 0%, #16a34a 100%);
+                }
+
+                .kk-midi-range-hint {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    margin: 10px 2px 0;
+                    color: #fcd34d;
+                    font-size: 12px;
+                    font-weight: 600;
+                    line-height: 1.4;
+                }
+
+                .kk-midi-range-hint i {
+                    flex: 0 0 auto;
+                    margin-top: 2px;
+                }
+
+                .kk-midi-range-hint button {
+                    padding: 0;
+                    border: 0;
+                    background: none;
+                    color: #fef3c7;
+                    font: inherit;
+                    font-weight: 800;
+                    text-decoration: underline;
+                    cursor: pointer;
                 }
 
                 .kk-midi-display-title {
@@ -1132,6 +1407,49 @@ const MidiPracticePlayer = ({ data }) => {
                     cursor: default;
                 }
 
+                .kk-midi-icon-static--idle {
+                    color: #64748b;
+                }
+
+                .kk-midi-icon-static--loading {
+                    color: #fbbf24;
+                }
+
+                .kk-midi-icon-static--error {
+                    color: #f87171;
+                }
+
+                .kk-midi-sound-status {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    margin: 0 2px 10px;
+                    color: #cbd5e1;
+                    font-size: 12px;
+                    font-weight: 600;
+                    line-height: 1.4;
+                }
+
+                .kk-midi-sound-status i {
+                    flex: 0 0 auto;
+                    margin-top: 2px;
+                }
+
+                .kk-midi-sound-status--error {
+                    color: #fca5a5;
+                }
+
+                .kk-midi-sound-status button {
+                    padding: 0;
+                    border: 0;
+                    background: none;
+                    color: #fee2e2;
+                    font: inherit;
+                    font-weight: 800;
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+
                 .kk-midi-progress {
                     display: grid;
                     grid-template-columns: 44px minmax(0, 1fr) 44px;
@@ -1173,7 +1491,10 @@ const MidiPracticePlayer = ({ data }) => {
                         border-left: 1px solid rgba(148, 163, 184, 0.18);
                     }
 
-                    .kk-midi-file-title {
+                    /* Hide the whole title section, not just the text inside
+                       it — the empty wrapper would otherwise still take a
+                       slot in the toolbar's layout. */
+                    .kk-midi-title-section {
                         display: none;
                     }
 
@@ -1192,6 +1513,72 @@ const MidiPracticePlayer = ({ data }) => {
                     .kk-midi-transport .kk-midi-button {
                         min-width: 34px;
                         padding: 0;
+                    }
+
+                    /* The file-title section before it is hidden here, so
+                       the transport is the first thing on the row — without
+                       this it still gets the divider meant to separate it
+                       from the title. */
+                    .kk-midi-control-section.kk-midi-transport {
+                        padding-left: 0;
+                        border-left: 0;
+                    }
+                }
+
+                /* Phones: instead of one long row that scrolls sideways
+                   (hiding Tempo, Fullscreen and Mute off-screen with no
+                   hint), lay the controls out in two rows —
+                     row 1: Play / Pause / Stop            Fullscreen / Mute
+                     row 2: Transpose                      Tempo
+                   Not applied in the rotated full view, which is wide
+                   enough for the single row. */
+                @media (max-width: 700px) {
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-toolbar {
+                        display: grid;
+                        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                        gap: 12px 10px;
+                        align-items: center;
+                        overflow: visible;
+                        padding-bottom: 14px;
+                    }
+
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-toolbar .kk-midi-control-section {
+                        padding-left: 0;
+                        border-left: 0;
+                        min-width: 0;
+                    }
+
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-transport {
+                        order: 1;
+                    }
+
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-icon-group {
+                        order: 2;
+                        justify-content: flex-end;
+                    }
+
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-transpose {
+                        order: 3;
+                    }
+
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-tempo {
+                        order: 4;
+                        justify-self: end;
+                    }
+
+                    /* Label above its control, so the two controls on row 2
+                       each fit in half the width. */
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-field {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 5px;
+                    }
+
+                    .kk-midi-display-panel:not(.kk-midi-display-panel--rotated) .kk-midi-field-label {
+                        color: #94a3b8;
+                        font-size: 10px;
+                        letter-spacing: 0.06em;
+                        text-transform: uppercase;
                     }
                 }
 
@@ -1254,7 +1641,7 @@ const MidiPracticePlayer = ({ data }) => {
 
             <div className={`kk-midi-display-panel${isRotated ? " kk-midi-display-panel--rotated" : ""}`}>
                 <div className="kk-midi-toolbar">
-                    <div className="kk-midi-control-section">
+                    <div className="kk-midi-control-section kk-midi-title-section">
                         <div className="kk-midi-file-title">
                             <i className="fa fa-music"></i>
                             <span className="truncate">{selectedFile?.name || data.title}</span>
@@ -1265,7 +1652,7 @@ const MidiPracticePlayer = ({ data }) => {
                         <button
                             type="button"
                             onClick={handlePlay}
-                            disabled={!canPlay || isPlaying}
+                            disabled={!canPlay || isPlaying || soundState !== "ready"}
                             className="kk-midi-button kk-midi-button-primary"
                             aria-label="Play"
                         >
@@ -1294,7 +1681,7 @@ const MidiPracticePlayer = ({ data }) => {
                         </button>
                     </div>
 
-                    <div className="kk-midi-control-section kk-midi-field">
+                    <div className="kk-midi-control-section kk-midi-field kk-midi-transpose">
                         <span className="kk-midi-field-label">
                             Transpose
                         </span>
@@ -1321,7 +1708,7 @@ const MidiPracticePlayer = ({ data }) => {
                         </div>
                     </div>
 
-                    <label className="kk-midi-control-section kk-midi-field">
+                    <label className="kk-midi-control-section kk-midi-field kk-midi-tempo">
                         <span className="kk-midi-field-label">
                             Tempo
                         </span>
@@ -1363,11 +1750,12 @@ const MidiPracticePlayer = ({ data }) => {
                             <i className={`fa-solid ${isMuted ? "fa-volume-xmark" : "fa-volume-high"}`}></i>
                         </button>
                         <span
-                            className="kk-midi-icon-btn kk-midi-icon-static"
-                            title="Audio engine ready"
-                            aria-hidden="true"
+                            className={`kk-midi-icon-btn kk-midi-icon-static kk-midi-icon-static--${soundState}`}
+                            title={SOUND_STATUS[soundState].title}
+                            role="img"
+                            aria-label={SOUND_STATUS[soundState].title}
                         >
-                            <i className="fa-solid fa-plug-circle-check"></i>
+                            <i className={`fa-solid ${SOUND_STATUS[soundState].icon}`}></i>
                         </span>
                     </div>
                 </div>
@@ -1411,6 +1799,27 @@ const MidiPracticePlayer = ({ data }) => {
                     {loadState === "error" && (
                         <div className="flex h-40 items-center justify-center px-6 text-center text-sm font-semibold text-red-300">
                             {loadError}
+                        </div>
+                    )}
+
+                    {canPlay && (soundState === "loading" || soundState === "error") && (
+                        <div className={`kk-midi-sound-status kk-midi-sound-status--${soundState}`} role="status">
+                            {soundState === "loading" ? (
+                                <>
+                                    <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                                    <span>Loading piano sounds…</span>
+                                </>
+                            ) : (
+                                <>
+                                    <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                                    <span>
+                                        Couldn&apos;t load the piano sounds. Check your internet connection and try again.{" "}
+                                        <button type="button" onClick={handleSoundRetry}>
+                                            Try again
+                                        </button>
+                                    </span>
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -1480,6 +1889,28 @@ const MidiPracticePlayer = ({ data }) => {
                                     })}
                                 </div>
                             </div>
+                            <div className="kk-midi-legend" aria-label="Key colours">
+                                <span>
+                                    <i className="kk-midi-legend-dot kk-midi-legend-dot--blue" aria-hidden="true"></i>
+                                    Below middle C
+                                </span>
+                                <span>
+                                    <i className="kk-midi-legend-dot kk-midi-legend-dot--green" aria-hidden="true"></i>
+                                    Middle C and above
+                                </span>
+                            </div>
+                            {outOfRangeCount > 0 && (
+                                <p className="kk-midi-range-hint">
+                                    <i className="fa-solid fa-circle-info" aria-hidden="true"></i>
+                                    <span>
+                                        Some notes in this piece are outside this keyboard view.{" "}
+                                        <button type="button" onClick={handleFullscreenToggle}>
+                                            Open full view
+                                        </button>{" "}
+                                        to see them all.
+                                    </span>
+                                </p>
+                            )}
                         </div>
                     )}
                 </div>

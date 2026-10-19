@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseCheckpoint;
 use App\Models\CourseCheckpointDownload;
+use App\Helpers\VideoHelper;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CourseCheckpointController extends Controller
 {
@@ -34,7 +36,7 @@ class CourseCheckpointController extends Controller
             'course_category_id' => $validated['course_category_id'],
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
-            'video_url' => $validated['video_url'] ?? null,
+            'video_url' => $this->cleanVideoInput($validated['video_url'] ?? null),
             'overview' => $validated['overview'] ?? null,
             'linked_course_id' => $validated['linked_course_id'] ?? null,
             'redirect_url' => $validated['redirect_url'] ?? null,
@@ -62,9 +64,54 @@ class CourseCheckpointController extends Controller
             'redirect_url' => 'nullable|string|max:2048',
         ]);
 
+        if (array_key_exists('video_url', $validated)) {
+            $validated['video_url'] = $this->cleanVideoInput($validated['video_url']);
+        }
+
         $checkpoint->update($validated);
 
         return response()->json($checkpoint->fresh(['linkedCourse', 'downloads']));
+    }
+
+    /**
+     * The video field takes a link or a pasted embed code. The database column
+     * holds 255 characters, and a pasted code (Wistia's is ~700) is far longer,
+     * so embed code is reduced to the video's embed link before saving — and
+     * anything that still can't be saved gets a clear message instead of a
+     * server error.
+     */
+    private function cleanVideoInput(?string $input): ?string
+    {
+        $input = trim((string) $input);
+
+        if ($input === '') {
+            return null;
+        }
+
+        if (str_contains($input, '<')) {
+            $embed = VideoHelper::linkToEmbed($input);
+
+            // A provider the site doesn't know: fall back to the iframe's own src.
+            if (str_contains($embed, '<') && preg_match('/<iframe[^>]*\ssrc=["\']([^"\']+)["\']/i', $input, $m)) {
+                $embed = html_entity_decode($m[1]);
+            }
+
+            if (str_contains($embed, '<')) {
+                throw ValidationException::withMessages([
+                    'video_url' => "We couldn't find a video in that embed code. Paste the video's link, or the embed code from YouTube, Vimeo, Wistia or Google Drive.",
+                ]);
+            }
+
+            $input = $embed;
+        }
+
+        if (mb_strlen($input) > 255) {
+            throw ValidationException::withMessages([
+                'video_url' => 'That video link is too long (255 characters at most). Paste the video\'s share link instead.',
+            ]);
+        }
+
+        return $input;
     }
 
     public function destroy(CourseCheckpoint $checkpoint)

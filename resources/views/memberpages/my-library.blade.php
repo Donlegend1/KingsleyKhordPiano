@@ -582,7 +582,7 @@
             </div>
 
             <!-- Detail Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6">
 
                 <!-- Important Notes Card -->
                 <div class="bg-white rounded-2xl border border-gray-100 p-5">
@@ -613,28 +613,6 @@
                             <span class="text-sm text-gray-600">Come prepared with any questions or topics you'd like help with.</span>
                         </li>
                     </ul>
-                </div>
-
-                <!-- Watch Tutorial Card -->
-                <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Before Your Call</p>
-                    <div class="flex items-start gap-4 mb-4">
-                        <div class="w-11 h-11 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-base font-bold text-gray-900 leading-tight">Set Up for Zoom Call</p>
-                            <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">Get your piano's video and audio connected right so nothing cuts out on the call.</p>
-                        </div>
-                    </div>
-                    <button class="mt-auto w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold px-5 py-3 rounded-xl transition">
-                        Watch Tutorial
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                        </svg>
-                    </button>
                 </div>
 
             </div>

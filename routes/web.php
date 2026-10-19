@@ -198,6 +198,7 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('personalized-guidance', [PersonalizedGuidanceController::class, 'create'])->name('member.personalized-guidance.create');
     Route::post('personalized-guidance/submit', [PersonalizedGuidanceController::class, 'store'])->name('member.personalized-guidance.submit');
     Route::get('personalized-plan', [PersonalizedGuidanceController::class, 'plan'])->name('member.personalized-plan');
+    Route::get('personalized-plan/download', [PersonalizedGuidanceController::class, 'downloadPlan'])->name('member.personalized-plan.download');
     Route::post('personalized-plan/lesson/toggle', [PersonalizedGuidanceController::class, 'toggleLesson'])->name('member.personalized-plan.lesson.toggle');
     Route::get('quiz', [QuizController::class, 'index'])->name('member.quiz');
     Route::post('quiz/submit', [QuizController::class, 'submit'])->name('member.quiz.submit');

@@ -6,6 +6,7 @@
     $authUser = auth()->user();
     $initials = strtoupper(substr($authUser->first_name ?? $authUser->name ?? 'U', 0, 1) . substr($authUser->last_name ?? '', 0, 1));
     $progress = $plan->progressPercent();
+    $progressForumUrl = route('community.forum.category', 'progress_report');
 @endphp
 
 <section class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 px-4 border-b border-gray-150 dark:border-gray-800">
@@ -19,7 +20,38 @@
 <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6"
      x-data="personalizedPlanPage({{ \Illuminate\Support\Js::from(['progress' => $progress, 'completed' => $plan->completed_lessons ?? []]) }})">
 
+  {{-- Shown right after a lesson is ticked: invites the student to post their progress --}}
+  <div x-show="shareNudge" x-cloak x-transition.opacity
+       class="fixed z-50 bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-96 bg-white border border-[#1447A6]/20 rounded-2xl shadow-xl p-4">
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-full bg-[#1447A6]/10 text-[#1447A6] flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-comments"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-bold text-gray-900">Nice work finishing <span x-text="shareNudge"></span>!</p>
+        <p class="text-[13px] text-gray-600 mt-0.5">Share your progress with the community and let them cheer you on.</p>
+        <a href="{{ $progressForumUrl }}"
+           class="mt-3 flex w-full items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#1447A6] hover:bg-[#0F3A8A] text-white text-sm font-bold transition-colors">
+          Post my progress
+          <i class="fa fa-angle-right text-xs"></i>
+        </a>
+      </div>
+      <button type="button" @click="shareNudge = null" class="text-gray-400 hover:text-gray-600 flex-shrink-0" aria-label="Dismiss">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
   <div class="max-w-7xl mx-auto" x-data="{ activeMonth: 0 }">
+
+    {{-- Download the plan as a PDF --}}
+    <div class="flex justify-end mb-4">
+      <a href="{{ route('member.personalized-plan.download') }}"
+         class="flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-sm font-semibold transition-colors">
+        <i class="fa-solid fa-file-arrow-down text-[15px]"></i>
+        Download plan (PDF)
+      </a>
+    </div>
 
     {{-- Header: 3 summary cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -159,10 +191,12 @@
                                 </p>
                               @endif
                             </a>
+                            <a href="{{ $progressForumUrl }}" x-show="isCompleted('{{ $lessonKey }}')" x-cloak
+                               class="text-xs font-semibold text-[#1447A6] hover:underline whitespace-nowrap flex-shrink-0">Share progress</a>
                             <input type="checkbox"
                                    class="w-5 h-5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
                                    :checked="isCompleted('{{ $lessonKey }}')"
-                                   @change="toggleLesson('{{ $lessonKey }}', $event.target.checked)">
+                                   @change="toggleLesson('{{ $lessonKey }}', $event.target.checked, {{ \Illuminate\Support\Js::from($lesson['name'] ?: 'this lesson') }})">
                           </div>
                         @endforeach
                       </div>
@@ -194,10 +228,12 @@
                               @if(!empty($lesson['duration'])) &middot; {{ $lesson['duration'] }} min @endif
                             </p>
                           </a>
+                          <a href="{{ $progressForumUrl }}" x-show="isCompleted('{{ $lessonKey }}')" x-cloak
+                             class="text-xs font-semibold text-[#1447A6] hover:underline whitespace-nowrap flex-shrink-0">Share progress</a>
                           <input type="checkbox"
                                  class="w-5 h-5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
                                  :checked="isCompleted('{{ $lessonKey }}')"
-                                 @change="toggleLesson('{{ $lessonKey }}', $event.target.checked)">
+                                 @change="toggleLesson('{{ $lessonKey }}', $event.target.checked, {{ \Illuminate\Support\Js::from($lesson['name'] ?: 'this lesson') }})">
                         </div>
                       @endforeach
                     </div>
@@ -394,12 +430,25 @@
         return {
             progress: initial.progress,
             completed: initial.completed || [],
+            shareNudge: null,
+            shareNudgeShown: false,
+            shareNudgeTimer: null,
+
+            // Invite the student to post their progress, once per visit to
+            // this page (reloading the page, or coming back later, resets it).
+            maybeShowShareNudge(lessonName) {
+                if (this.shareNudgeShown) return;
+                this.shareNudgeShown = true;
+                this.shareNudge = lessonName;
+                clearTimeout(this.shareNudgeTimer);
+                this.shareNudgeTimer = setTimeout(() => { this.shareNudge = null; }, 12000);
+            },
 
             isCompleted(key) {
                 return this.completed.includes(key);
             },
 
-            async toggleLesson(key, checked) {
+            async toggleLesson(key, checked, lessonName) {
                 if (checked) {
                     if (!this.completed.includes(key)) this.completed.push(key);
                 } else {
@@ -422,6 +471,7 @@
                     if (typeof data.progress === 'number') {
                         this.progress = data.progress;
                     }
+                    if (checked) this.maybeShowShareNudge(lessonName);
                 } catch (error) {
                     console.error('Could not save lesson completion:', error);
                     if (checked) {

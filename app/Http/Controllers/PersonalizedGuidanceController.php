@@ -8,9 +8,11 @@ use App\Models\Liveshow;
 use App\Models\PersonalizedGuidanceRequest;
 use App\Models\PersonalizedPlan;
 use App\Models\UserDailyLogin;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class PersonalizedGuidanceController extends Controller
 {
@@ -113,6 +115,27 @@ class PersonalizedGuidanceController extends Controller
         ];
 
         return view('memberpages.personalized-plan', compact('plan', 'liveshow', 'dayStatuses', 'streak', 'stats'));
+    }
+
+    public function downloadPlan()
+    {
+        if ($response = $this->denyUnlessPremium()) {
+            return $response;
+        }
+
+        $plan = PersonalizedPlan::where('user_id', auth()->id())->first();
+
+        if (! $plan) {
+            return redirect()->route('member.personalized-plan');
+        }
+
+        $user = auth()->user();
+        $studentName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->name ?? 'Student');
+
+        return Pdf::loadView('memberpages.personalized-plan-pdf', compact('plan', 'studentName'))
+            ->setPaper('a4')
+            ->setOption(['enable_font_subsetting' => true])
+            ->download('personalized-plan-' . Str::slug($studentName) . '.pdf');
     }
 
     public function toggleLesson(Request $request)

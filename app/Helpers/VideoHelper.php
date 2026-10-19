@@ -38,10 +38,12 @@ class VideoHelper
             return "https://player.vimeo.com/video/{$m[1]}";
         }
 
-        // Wistia — matches fast.wistia.net/embed/iframe/{id}, wistia.com/medias/{id},
-        // home.wistia.com/medias/{id}, and *.wistia.com/embed/iframe/{id}
-        if (preg_match('/wistia\.(?:com|net)\/(?:embed\/iframe|medias)\/([a-zA-Z0-9]+)/', $url, $m)) {
-            return "https://fast.wistia.net/embed/iframe/{$m[1]}";
+        // Wistia — share links, iframe embed code, and Wistia's other embed
+        // code styles (see extractWistiaId for every form accepted)
+        $wistiaId = self::extractWistiaId($url);
+
+        if ($wistiaId) {
+            return "https://fast.wistia.net/embed/iframe/{$wistiaId}";
         }
 
         // Dailymotion
@@ -111,6 +113,7 @@ class VideoHelper
     {
         if (
             self::extractGoogleDriveFileId($url) ||
+            self::extractWistiaId($url) ||
             preg_match('/youtu\.be\/|youtube\.com|vimeo\.com|wistia\.(com|net)|dailymotion\.com|tiktok\.com|vm\.tiktok\.com|vt\.tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos|instagram\.com\/(p|reel|tv)\//', $url)
         ) {
             return 'embed'; // use <iframe>
@@ -149,14 +152,41 @@ class VideoHelper
         }
     }
 
-    private static function extractGoogleDriveFileId(string $url): ?string
+    /**
+     * Pulls the Wistia media id out of whatever the admin pasted: a share link
+     * (home.wistia.com/medias/ID, *.wistia.com/medias/ID), an iframe embed or
+     * its src (fast.wistia.net/embed/iframe/ID, fast.wistia.com/embed/medias/ID),
+     * or one of Wistia's other embed-code styles — the <wistia-player media-id="ID">
+     * web component, the script embed (.../embed/ID.js), or the legacy
+     * wistia_async_ID div.
+     */
+    private static function extractWistiaId(string $url): ?string
     {
-        if (!str_contains($url, 'drive.google.com')) {
-            return null;
+        $patterns = [
+            '/wistia\.(?:com|net)\/(?:embed\/iframe|embed\/medias|medias)\/([a-zA-Z0-9]+)/',
+            '/wistia\.(?:com|net)\/embed\/([a-zA-Z0-9]{10})\.(?:js|jsonp)/',
+            '/<wistia-player[^>]*?\smedia-id=["\']([a-zA-Z0-9]+)["\']/i',
+            '/wistia_async_([a-zA-Z0-9]+)/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $url, $m)) {
+                return $m[1];
+            }
         }
 
-        if (preg_match('/drive\.google\.com\/(?:u\/\d+\/)?file\/d\/([^\/\?\&]+)/', $url, $matches)) {
+        return null;
+    }
+
+    private static function extractGoogleDriveFileId(string $url): ?string
+    {
+        // Older Drive file links use docs.google.com/file/d/ID/... — same file id.
+        if (preg_match('/(?:drive|docs)\.google\.com\/(?:u\/\d+\/)?file\/d\/([^\/\?\&"\']+)/', $url, $matches)) {
             return $matches[1];
+        }
+
+        if (!str_contains($url, 'drive.google.com')) {
+            return null;
         }
 
         $query = parse_url($url, PHP_URL_QUERY);

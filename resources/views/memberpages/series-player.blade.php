@@ -151,11 +151,11 @@
                     @endif
 
                     {{-- Lessons in this course (mobile & tablet only) --}}
-                    <div class="order-2 lg:order-none lg:hidden mb-10">
+                    <div class="order-1 lg:order-none lg:hidden mb-10">
                         @include($level ? 'memberpages.partials.lesson-playlist-grouped' : 'memberpages.partials.lesson-playlist')
                     </div>
 
-                    <div class="order-1 lg:order-none mt-10 pt-6 border-t border-gray-200" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
+                    <div class="order-2 lg:order-none mt-10 pt-6 border-t border-gray-200" id="discussion-section" data-course-id="{{ $activeVideo->id }}" data-comment-category="piano exercise">
                         <h2 class="text-[15px] font-semibold text-gray-900 mb-4">Discussion</h2>
                         <form id="comment-form" class="mb-6">
                             <textarea name="comment" placeholder="What did you learn from this lesson?"

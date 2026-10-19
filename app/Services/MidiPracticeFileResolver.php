@@ -52,33 +52,8 @@ class MidiPracticeFileResolver
             }
         }
 
-        $lessonTokens = $this->tokens($titles->implode(' '));
-
-        if ($lessonTokens->isEmpty()) {
-            return null;
-        }
-
-        return MidiFile::whereNotNull('midi_file_path')
-            ->get()
-            ->map(function (MidiFile $midiFile) use ($lessonTokens) {
-                $midiTokens = $this->tokens($midiFile->name);
-                $matches = $lessonTokens->intersect($midiTokens)->count();
-
-                $midiFile->match_score = $matches / max($lessonTokens->count(), 1);
-
-                return $midiFile;
-            })
-            ->filter(fn (MidiFile $midiFile) => $midiFile->match_score >= 0.5)
-            ->sortByDesc('match_score')
-            ->first();
-    }
-
-    private function tokens(string $value): \Illuminate\Support\Collection
-    {
-        return collect(preg_split('/[^a-z0-9]+/', strtolower($value)))
-            ->filter(fn ($token) => strlen($token) >= 3)
-            ->reject(fn ($token) => in_array($token, ['the', 'and', 'for', 'with', 'lesson', 'part'], true))
-            ->unique()
-            ->values();
+        // No exact or "contains" match: show no MIDI rather than guessing from
+        // shared words, which could attach another piece's MIDI to the lesson.
+        return null;
     }
 }
