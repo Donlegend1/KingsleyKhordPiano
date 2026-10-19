@@ -549,6 +549,14 @@ class AudioQuizAdminController extends Controller
             'correct_option' => $correctOption,
         ]);
 
+        $this->mirrorToFindTheKeyTwo($quiz, function ($siblingQuiz) use ($audioName, $correctOption) {
+            QuizQuestion::create([
+                'quiz_id' => $siblingQuiz->id,
+                'audio_path' => "/uploads/audio/$audioName",
+                'correct_option' => $correctOption,
+            ]);
+        });
+
         return redirect()
             ->route('admin.audio-quiz', ['category' => $quiz->category, 'quiz' => $quiz->id])
             ->with('success', 'Question added successfully.');
@@ -557,7 +565,14 @@ class AudioQuizAdminController extends Controller
     public function destroyQuestion(QuizQuestion $question)
     {
         $quiz = $question->quiz;
+        $audioPath = $question->audio_path;
         $question->delete();
+
+        $this->mirrorToFindTheKeyTwo($quiz, function ($siblingQuiz) use ($audioPath) {
+            QuizQuestion::where('quiz_id', $siblingQuiz->id)
+                ->where('audio_path', $audioPath)
+                ->delete();
+        });
 
         return redirect()
             ->route('admin.audio-quiz', ['category' => $quiz->category, 'quiz' => $quiz->id])
@@ -573,9 +588,38 @@ class AudioQuizAdminController extends Controller
             'correct_option' => $correctOption,
         ]);
 
+        $this->mirrorToFindTheKeyTwo($quiz, function ($siblingQuiz) use ($question, $correctOption) {
+            QuizQuestion::where('quiz_id', $siblingQuiz->id)
+                ->where('audio_path', $question->audio_path)
+                ->update(['correct_option' => $correctOption]);
+        });
+
         return redirect()
             ->route('admin.audio-quiz', ['category' => $quiz->category, 'quiz' => $quiz->id])
             ->with('success', 'Correct answer updated.');
+    }
+
+    /**
+     * "Find the Key" and "Find the key #2" are near-identical lessons, so
+     * adding/editing/removing a question on "Find the Key" mirrors the same
+     * change onto "Find the key #2" — saves the admin from managing both by
+     * hand. One-directional only: changes on "Find the key #2" don't mirror
+     * back. Matching between the two lessons' questions is by audio_path,
+     * since mirrored questions always share the exact same uploaded file.
+     */
+    protected function mirrorToFindTheKeyTwo(Quiz $quiz, callable $callback): void
+    {
+        if ($quiz->title !== 'Find the Key') {
+            return;
+        }
+
+        $siblingQuiz = Quiz::where('category', $quiz->category)
+            ->where('title', 'Find the key #2')
+            ->first();
+
+        if ($siblingQuiz) {
+            $callback($siblingQuiz);
+        }
     }
 
     // A plain abort(422) renders Laravel's blank JSON/error page instead of

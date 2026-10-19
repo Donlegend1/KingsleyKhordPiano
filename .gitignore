@@ -3,6 +3,8 @@
 /node_modules/*
 /public/build
 /public/hot
+/public/uploads
+/public/midi-files
 /public/storage
 /storage/*.key
 /storage/app/google

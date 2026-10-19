@@ -6,6 +6,8 @@ use App\Models\Upload;
 use App\Http\Requests\StoreUploadRequest;
 use App\Http\Requests\UpdateUploadRequest;
 use App\Models\User;
+use App\Models\LearnSong;
+
 use App\Notifications\NewUploadCreated;
 use App\Enums\Roles\UserRoles;
 use Illuminate\Http\Request;
@@ -31,7 +33,7 @@ class UploadController extends Controller
     public function learnSongs()
     {
         return view('admin.uploads.learn-songs', [
-            'uploads' => Upload::where('category', 'learn songs')->orderByRaw('position IS NULL, position ASC')->orderBy('id', 'desc')->get(),
+            'uploads' => LearnSong::latest()->get(),
         ]);
     }
     public function etudes()

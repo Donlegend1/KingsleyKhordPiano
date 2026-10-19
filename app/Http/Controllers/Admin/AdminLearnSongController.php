@@ -29,12 +29,27 @@ class AdminLearnSongController extends Controller
             // Show every song in the category. Filtering again by song.level
             // hid uploads whose stored level did not exactly match the category.
             $categories->load(['songs' => function ($q) {
-                $q->orderBy('position');
+                $q->orderBy('position')->orderBy('id');
             }]);
 
             $data = [];
+            $seen = [];
             foreach ($categories as $cat) {
                 $data[$cat->category] = $cat->songs->values();
+                foreach ($cat->songs as $song) {
+                    $seen[$song->id] = true;
+                }
+            }
+
+            $uncategorized = LearnSong::query()
+                ->whereRaw('LOWER(level) = ?', [$level])
+                ->when($seen !== [], fn ($q) => $q->whereNotIn('id', array_keys($seen)))
+                ->orderBy('position')
+                ->orderBy('id')
+                ->get();
+
+            if ($uncategorized->isNotEmpty()) {
+                $data['Uncategorized'] = $uncategorized->values();
             }
 
             return [

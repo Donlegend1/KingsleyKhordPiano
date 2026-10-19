@@ -26,16 +26,30 @@ class AdminExtraCourseController extends Controller
                 ->orderBy('position')
                 ->get(['id', 'category', 'position', 'thumbnail']);
 
-            $categories->load(['courses' => function ($q) use ($level) {
-                $q->where('level', $level)
-                  ->orderBy('position');
+            $categories->load(['courses' => function ($q) {
+                $q->orderBy('position')->orderBy('id');
             }]);
 
             $data = [];
             $categoryThumbnails = [];
+            $seen = [];
             foreach ($categories as $cat) {
                 $data[$cat->category] = $cat->courses->values();
                 $categoryThumbnails[$cat->category] = $cat->thumbnail_url;
+                foreach ($cat->courses as $course) {
+                    $seen[$course->id] = true;
+                }
+            }
+
+            $uncategorized = ExtraCourse::query()
+                ->whereRaw('LOWER(level) = ?', [$level])
+                ->when($seen !== [], fn ($q) => $q->whereNotIn('id', array_keys($seen)))
+                ->orderBy('position')
+                ->orderBy('id')
+                ->get();
+
+            if ($uncategorized->isNotEmpty()) {
+                $data['Uncategorized'] = $uncategorized->values();
             }
 
             return [

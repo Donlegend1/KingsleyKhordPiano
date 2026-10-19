@@ -25,17 +25,33 @@ class AdminPianoExerciseController extends Controller
                 ->orderBy('position')
                 ->get(['id', 'category', 'position', 'thumbnail']);
 
-            $categories->load(['lessons' => function ($q) use ($level) {
+            $categories->load(['lessons' => function ($q) {
                 $q->where('category', 'piano exercise')
-                    ->where('level', $level)
-                    ->orderBy('position');
+                    ->orderBy('position')
+                    ->orderBy('id');
             }]);
 
             $data = [];
             $categoryThumbnails = [];
+            $seen = [];
             foreach ($categories as $cat) {
                 $data[$cat->category] = $cat->lessons->values();
                 $categoryThumbnails[$cat->category] = $cat->thumbnail_url;
+                foreach ($cat->lessons as $lesson) {
+                    $seen[$lesson->id] = true;
+                }
+            }
+
+            $uncategorized = Upload::query()
+                ->where('category', 'piano exercise')
+                ->whereRaw('LOWER(level) = ?', [$level])
+                ->when($seen !== [], fn ($q) => $q->whereNotIn('id', array_keys($seen)))
+                ->orderBy('position')
+                ->orderBy('id')
+                ->get();
+
+            if ($uncategorized->isNotEmpty()) {
+                $data['Uncategorized'] = $uncategorized->values();
             }
 
             $payload[$level] = [

@@ -580,7 +580,7 @@ const ExtraCoursesAdmin = () => {
                                                                             </div>
 
                                                                             {/* Category Courses List */}
-                                                                            <div className={`mt-4 overflow-hidden transition-all duration-300 ${isCollapsed ? "max-h-0 opacity-0" : "max-h-[3000px] opacity-100"}`}>
+                                                                            <div className={`mt-4 transition-all duration-300 ${isCollapsed ? "max-h-0 opacity-0 overflow-hidden" : "overflow-visible opacity-100"}`}>
                                                                                 {courses.length === 0 ? (
                                                                                     <p className="text-gray-500 text-xs text-center py-4">No courses in this category yet.</p>
                                                                                 ) : (

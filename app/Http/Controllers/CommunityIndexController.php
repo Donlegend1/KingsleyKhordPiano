@@ -91,7 +91,7 @@ class CommunityIndexController extends Controller
             $resumeLesson = $lastBookmark->bookmarkable;
             $resumeType = $lastBookmark->bookmarkable_type;
             $resumeUrl = ($resumeType === 'App\Models\Course') 
-                ? '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id 
+                ? '/member/course/' . $resumeLesson->level . '/' . $resumeLesson->id 
                 : '/member/lesson/' . $resumeLesson->id;
         } else {
             $resumeLesson = LearnSong::where('status', 'active')->first() 
@@ -100,7 +100,7 @@ class CommunityIndexController extends Controller
             if ($resumeLesson) {
                 $resumeType = get_class($resumeLesson);
                 $resumeUrl = ($resumeType === 'App\Models\Course') 
-                    ? '/member/course/' . $resumeLesson->level . '?selected_course=' . $resumeLesson->id 
+                    ? '/member/course/' . $resumeLesson->level . '/' . $resumeLesson->id 
                     : '/member/lesson/' . $resumeLesson->id;
             }
         }

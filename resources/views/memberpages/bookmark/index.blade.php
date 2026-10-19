@@ -33,8 +33,7 @@
 
                 $url = match ($bookmark->bookmarkable_type) {
                     'App\Models\Course' =>
-                        '/member/course/' . $item?->level
-                        . '?selected_course=' . $item?->id,
+                        '/member/course/' . $item?->level . '/' . $item?->id,
 
                     'App\Models\Upload' =>
                         '/member/lesson/' . $item?->id . '?type=upload',

@@ -50,6 +50,10 @@
             'extra_matches' => ['member/community/tutorials/*'],
         ],
         [
+            'key' => 'application', 'label' => 'Application', 'url' => '/member/application',
+            'submenu' => [],
+        ],
+        [
             'key' => 'member-area', 'label' => 'Member Area', 'url' => '/home',
             'submenu' => [
                 ['label' => 'Dashboard', 'url' => '/home'],

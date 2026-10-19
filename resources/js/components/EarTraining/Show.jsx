@@ -2242,7 +2242,7 @@ const ShowEartraining = () => {
                                 </p>
                             </div>
 
-                            {(quiz.title === "Find the Key" || quiz.title === "Find the key #2") && (
+                            {quiz.title === "Find the key #2" && (
                                 <div className="mb-8">
                                     {question.reference_note && (
                                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 text-center">
@@ -2251,6 +2251,15 @@ const ShowEartraining = () => {
                                     )}
                                     <PianoKeyboard
                                         highlightNote={REFERENCE_NOTE_TO_KEY[question.reference_note] ?? null}
+                                        includeOctaveC={false}
+                                    />
+                                </div>
+                            )}
+
+                            {quiz.title === "Find the Key" && (
+                                <div className="mb-8">
+                                    <PianoKeyboard
+                                        highlightNote={null}
                                         includeOctaveC={false}
                                     />
                                 </div>
