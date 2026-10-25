@@ -28,13 +28,12 @@ class RegisterController extends Controller
     {
 
         if ($request->expectsJson()) {
-            $validator = Validator::make($request->all(), [
-                'first_name' => ['required', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', 'string', 'min:4', 'confirmed'],
-                'g-recaptcha-response' => ['required', 'captcha'],
-            ]);
+            // Reuse the same rules and messages as the traditional form
+            $validator = Validator::make(
+                $request->all(),
+                $this->rules(),
+                $this->messages()
+            );
 
             if ($validator->fails()) {
                 return response()->json([
@@ -50,6 +49,7 @@ class RegisterController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => UserRoles::MEMBER->value,
                 'payment_status' => 'pending',
+                'terms_accepted_at' => now(),
             ]);
 
             // 🔥 This sends the verification email
@@ -71,11 +71,9 @@ class RegisterController extends Controller
 
         // Fallback (non-AJAX)
         $this->validator($request->all())->validate();
-        $user = $this->create($request->all());
 
-        // 🔥 Again, ensure the event is triggered here too
-        event(new Registered($user));
-        
+        // create() already fires the Registered event, so it is not fired again here
+        $user = $this->create($request->all());
 
         $this->guard()->login($user);
 
@@ -87,18 +85,37 @@ class RegisterController extends Controller
     }
 
     /**
-     * For traditional form validation.
+     * Validation rules shared by the AJAX and traditional flows.
      */
-    protected function validator(array $data)
+    protected function rules(): array
     {
-        return Validator::make($data, [
+        return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:4', 'confirmed'],
+            'terms' => ['accepted'],
             'g-recaptcha-response' => ['required', 'captcha'],
             // 'plan' => ['required', 'string'],
-        ]);
+        ];
+    }
+
+    /**
+     * Custom validation messages.
+     */
+    protected function messages(): array
+    {
+        return [
+            'terms.accepted' => 'You must agree to the Terms of Service and Privacy Policy.',
+        ];
+    }
+
+    /**
+     * For traditional form validation.
+     */
+    protected function validator(array $data)
+    {
+        return Validator::make($data, $this->rules(), $this->messages());
     }
 
     /**
@@ -111,10 +128,11 @@ class RegisterController extends Controller
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'terms_accepted_at' => now(),
             'payment_status' => 'pending',
         ]);
 
-        event(new Registered($user)); 
+        event(new Registered($user));
 
         return $user;
     }

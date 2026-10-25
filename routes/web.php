@@ -116,11 +116,11 @@ Route::get('/contact', function () {
 
 Route::get('/privacy-policy', function () {
     return view('privacy', ['pageTitle' => 'Privacy Policy']);
-});
+})->name('privacy');
 
 Route::get('/terms-of-service', function () {
     return view('/terms-of-service', ['pageTitle' => 'Terms of Service']);
-});
+})->name('terms');
 
 Route::get('/clear', function () {
     Artisan::call('optimize');

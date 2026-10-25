@@ -115,6 +115,28 @@
           <i :class="show ? 'fa fa-eye-slash' : 'fa fa-eye'" class="text-sm"></i>
         </button>
       </div>
+            <!-- Terms & Privacy -->
+      <div class="pt-1">
+        <label for="terms" class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            name="terms"
+            id="terms"
+            value="1"
+            {{ old('terms') ? 'checked' : '' }}
+            class="mt-0.5 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-2 focus:ring-gray-900 cursor-pointer @error('terms') border-red-500 @enderror"
+          />
+          <span class="text-sm text-gray-600 leading-snug">
+            {{ __('I agree to the') }}
+            <a href="{{ route('terms') }}" target="_blank" rel="noopener" class="text-red-700 font-medium hover:underline">{{ __('Terms of Service') }}</a>
+            {{ __('and') }}
+            <a href="{{ route('privacy') }}" target="_blank" rel="noopener" class="text-red-700 font-medium hover:underline">{{ __('Privacy Policy') }}</a>.
+          </span>
+        </label>
+        @error('terms')
+          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+        @enderror
+      </div>
 
       <!-- reCAPTCHA -->
       <div class="pt-1">
