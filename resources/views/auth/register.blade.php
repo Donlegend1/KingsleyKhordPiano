@@ -124,7 +124,7 @@
             id="terms"
             value="1"
             {{ old('terms') ? 'checked' : '' }}
-            class="mt-0.5 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-2 focus:ring-gray-900 cursor-pointer @error('terms') border-red-500 @enderror"
+            class="mt-0.5 h-4 w-4 rounded border border-gray-400 bg-white text-gray-900 focus:ring-2 focus:ring-gray-900 cursor-pointer @error('terms') border-red-500 @enderror"
           />
           <span class="text-sm text-gray-600 leading-snug">
             {{ __('I agree to the') }}
