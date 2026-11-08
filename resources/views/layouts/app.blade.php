@@ -40,12 +40,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-3 items-center lg:flex lg:justify-between">
             <!-- Mobile: Cart Icon (left) -->
             <div class="lg:hidden justify-self-start">
+                {{-- Cart hidden for now
                 <a href="/cart" class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-neutral-800 hover:bg-neutral-700 transition duration-200" aria-label="View cart">
                     <i class="fa-solid fa-cart-shopping text-white text-base"></i>
                     <span id="cart-badge-mobile" class="cart-badge absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[#FFD736] text-black text-[10px] font-bold">
                         {{ $cartCount ?? 0 }}
                     </span>
                 </a>
+                --}}
             </div>
 
             <!-- Left: Logo -->
@@ -112,10 +114,12 @@
                     class="text-base font-semibold transition duration-200 {{ Request::is('about') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     About
                 </a>
+                {{-- Shop hidden for now
                 <a href="/shop"
                     class="text-base font-semibold transition duration-200 {{ Request::is('shop') ? 'text-[#FFD736] border-b-2 border-[#FFD736] pb-0.5' : 'text-gray-400 hover:text-[#FFD736]' }}">
                     Shop
                 </a>
+                --}}
                 <a href="https://discord.gg/TKKtTSYVvx"
                     target="_blank" rel="noopener noreferrer"
                     class="text-base font-semibold transition duration-200 text-gray-400 hover:text-[#FFD736]">
@@ -136,6 +140,7 @@
                 class="text-lg font-semibold px-4 py-2 rounded-lg bg-[#FFD736] text-black hover:bg-[#e6c22e] shadow transition duration-200">
                 Login
             </a>
+            {{-- Cart hidden for now
             <div class="relative ml-14" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                 <a href="/cart" class="relative flex items-center justify-center w-11 h-11 rounded-xl bg-neutral-800 hover:bg-neutral-700 transition duration-200" aria-label="View cart">
                     <i class="fa-solid fa-cart-shopping text-white text-lg"></i>
@@ -199,6 +204,7 @@
                     @endif
                 </div>
             </div>
+            --}}
         </div>
 
 
@@ -229,10 +235,12 @@
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('contact') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Contact
                     </a>
+                    {{-- Shop hidden for now
                     <a href="/shop"
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 {{ Request::is('shop') ? 'text-white' : 'text-gray-400 hover:text-[#FFD736]' }}">
                         Shop
                     </a>
+                    --}}
                     <a href="https://discord.gg/TKKtTSYVvx"
                         target="_blank" rel="noopener noreferrer"
                         class="block text-sm font-semibold transition duration-200 py-3 px-2 text-gray-400 ">
