@@ -142,6 +142,10 @@
                                             <span class="text-gray-500 flex-shrink-0 ml-1.5">min</span>
                                         </div>
                                     </div>
+                                    <p x-show="!Number.isInteger(Number(lesson.week)) || Number(lesson.week) < 1"
+                                       class="mt-2 text-xs font-medium text-amber-800">
+                                        No week assigned. This lesson will appear after the scheduled weeks.
+                                    </p>
                                 </div>
                             </template>
 

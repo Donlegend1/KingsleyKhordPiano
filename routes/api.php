@@ -187,10 +187,13 @@ use App\Http\Controllers\LiveShowNotificationController;
         Route::post('course/{course}/exercise/submit', [CourseController::class, 'submitExercise']);
         Route::post('course/{course}/video-comment', [CourseVideoCommentsController::class, 'store']);
         Route::get('comments/course', [CourseVideoCommentsController::class, 'index']);
+        Route::post('comments/course', [CourseVideoCommentsController::class, 'store']);
         Route::put('comment/{CourseVideoComment}', [CourseVideoCommentsController::class, 'update']);
         Route::delete('comment/{CourseVideoComment}', [CourseVideoCommentsController::class, 'destroy']);
 
         Route::post('comment/{comment}/reply', [CourseVideoCommentRepliesController::class, 'store']);
+        Route::put('comment-replies/{reply}', [CourseVideoCommentRepliesController::class, 'update']);
+        Route::delete('comment-replies/{reply}', [CourseVideoCommentRepliesController::class, 'destroy']);
          
         Route::post('/post', [PostController::class, 'store'])->name('post.store');
         Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.delete');

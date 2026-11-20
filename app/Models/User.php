@@ -10,11 +10,22 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Cashier\Billable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
-// use NotificationChannels\WebPush\HasPushSubscriptions;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, Billable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, Billable, SoftDeletes, HasPushSubscriptions;
+
+    public function notificationsForArea(bool $community)
+    {
+        $section = \App\Enums\Notification\NotificationSectionEnum::COMMUNITY->value;
+        $column = 'data->data->section';
+        $query = $this->notifications();
+
+        return $community
+            ? $query->where($column, $section)
+            : $query->where(fn ($query) => $query->whereNull($column)->orWhere($column, '!=', $section));
+    }
 
     /**
      * The attributes that are mass assignable.

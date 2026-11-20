@@ -76,6 +76,54 @@ class PersonalizedPlan extends Model
         return $keys;
     }
 
+    public function lessonsByWeek(int $monthIndex): array
+    {
+        $weeks = [];
+        $unscheduled = [];
+
+        foreach ($this->months[$monthIndex]['lessons'] ?? [] as $category => $lessons) {
+            foreach ($lessons as $lesson) {
+                if (empty($lesson['id'])) {
+                    continue;
+                }
+
+                $lesson['lesson_key'] = "{$monthIndex}.{$category}.{$lesson['id']}";
+                $lesson['category_key'] = $category;
+                $week = filter_var($lesson['week'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+                if ($week === false) {
+                    $unscheduled[] = $lesson;
+                } else {
+                    $weeks[$week][] = $lesson;
+                }
+            }
+        }
+
+        ksort($weeks, SORT_NUMERIC);
+        if ($unscheduled) {
+            $weeks['unscheduled'] = $unscheduled;
+        }
+
+        return $weeks;
+    }
+
+    public function nextUnfinishedLesson(): ?array
+    {
+        $completed = array_fill_keys($this->completed_lessons ?? [], true);
+
+        foreach (array_keys($this->months ?? []) as $monthIndex) {
+            foreach ($this->lessonsByWeek($monthIndex) as $lessons) {
+                foreach ($lessons as $lesson) {
+                    if (!isset($completed[$lesson['lesson_key']])) {
+                        return $lesson;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function progressPercent(): int
     {
         $totalLessons = count($this->allLessonKeys());

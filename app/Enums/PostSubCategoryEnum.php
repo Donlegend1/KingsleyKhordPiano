@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum PostSubCategoryEnum: string
 {
+    case GENERAL = 'general';
     case SAYHELLO = 'say_hello';
     case ASKQUESTION = 'ask_question';
     case POSTPROGRESS = 'post_progress';

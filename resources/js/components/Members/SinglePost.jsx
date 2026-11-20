@@ -30,6 +30,17 @@ const SinglePost = () => {
 
     const [showSkeleton, setShowSkeleton] = useState(false);
     const [mediaFiles, setMediaFiles] = useState([]);
+    const openedComment = useRef(false);
+
+    useEffect(() => {
+        if (!posts.length || openedComment.current || !/^#comment-[1-9][0-9]*$/.test(window.location.hash)) return;
+
+        const comment = document.getElementById(window.location.hash.slice(1));
+        if (comment) {
+            openedComment.current = true;
+            comment.scrollIntoView({ block: "start" });
+        }
+    }, [posts]);
 
     const lastSegment = (() => {
         const segment = window.location.pathname

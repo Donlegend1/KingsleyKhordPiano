@@ -67,6 +67,19 @@ Route::post(
 Route::post('/webhooks/paystack', [PaymentController::class, 'handlePaystackWebhook']);
 
 Route::get('/', [IndexController::class, 'index']);
+Route::get('/guides', [\App\Http\Controllers\PianoGuideController::class, 'index'])->name('guides.index');
+Route::get('/guides/{slug}', [\App\Http\Controllers\PianoGuideController::class, 'show'])->name('guides.show');
+Route::middleware('auth')->prefix('/guides/{slug}/discussion')->group(function () {
+    Route::get('/join', [\App\Http\Controllers\PianoGuideDiscussionController::class, 'join'])->name('guides.discussion.join');
+    Route::post('/', [\App\Http\Controllers\PianoGuideDiscussionController::class, 'store'])
+        ->middleware('throttle:12,1')->name('guides.discussion.store');
+    Route::delete('/{comment}', [\App\Http\Controllers\PianoGuideDiscussionController::class, 'destroy'])
+        ->whereNumber('comment')->name('guides.discussion.destroy');
+});
+Route::post('/guides/{slug}/pdf', [\App\Http\Controllers\PianoGuideController::class, 'requestPdf'])
+    ->middleware('throttle:10,1')->name('guides.pdf.request');
+Route::get('/guides/{slug}/pdf', [\App\Http\Controllers\PianoGuideController::class, 'pdf'])->name('guides.pdf');
+Route::get('/guides/{slug}/check-your-email', [\App\Http\Controllers\PianoGuideController::class, 'confirmation'])->name('guides.confirmation');
 Route::get('/about', function () {
     return view('about', ['pageTitle' => 'About Us']);
 });
@@ -279,6 +292,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');
     Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
     ->name('notifications.markAllAsRead');
+    Route::post('/community/notifications/{id}/open', [App\Http\Controllers\NotificationController::class, 'openCommunityNotification'])
+        ->name('community.notifications.open');
     Route::post('/notifications/preference', [App\Http\Controllers\NotificationController::class, 'updatePreference'])
     ->name('notifications.updatePreference');
     Route::post('/webpush/subscribe', [App\Http\Controllers\PushSubscriptionController::class, 'store'])

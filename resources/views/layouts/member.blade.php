@@ -120,15 +120,9 @@
 
                 {{-- Notifications (excluding community-section notifications) --}}
                 @php
-                    $communitySection = \App\Enums\Notification\NotificationSectionEnum::COMMUNITY->value;
-                    $recentNotifications = auth()->user()?->notifications()
-                        ->latest()
-                        ->get()
-                        ->filter(function ($n) use ($communitySection) {
-                            $section = $n->data['data']['section'] ?? null;
-                            return $section !== $communitySection;
-                        }) ?? collect();
-                    $unreadNotifications = $recentNotifications->whereNull('read_at')->count();
+                    $notificationQuery = auth()->user()?->notificationsForArea(false);
+                    $unreadNotifications = $notificationQuery ? (clone $notificationQuery)->whereNull('read_at')->count() : 0;
+                    $recentNotifications = $notificationQuery?->latest()->limit(12)->get() ?? collect();
                 @endphp
 
                 <div x-data="{ openNotif: false }" class="relative">
@@ -265,7 +259,7 @@
                         ['url' => 'member/piano-exercise/guided-practice', 'label' => 'Guided Practice', 'icon' => 'guided-practice.svg', 'new' => $hasNewHarmonicDrills],
                         ['url' => 'member/ear-training',    'label' => 'Ear Training',  'icon' => 'eartraning.svg'],
                         ['url' => 'member/extra-courses',   'label' => 'Extra Courses', 'icon' => 'extracourse.svg', 'new' => $hasNewExtraCourses],
-                        ['url' => 'member/learn-songs',     'label' => 'Learn Songs',   'icon' => 'music-note.svg', 'new' => $hasNewLearnSongs],
+                        ['url' => 'member/learn-songs',     'label' => 'MIDI & Songs',   'icon' => 'music-note.svg', 'new' => $hasNewLearnSongs],
                         ['url' => 'member/live-session',    'label' => 'Events',  'icon' => 'livesession.svg'],
                     ];
                     if (app()->environment('local')) {

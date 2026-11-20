@@ -55,7 +55,7 @@
                 </a>
             </div>
 
-            <!-- Card 2: Musical Application -->
+            <!-- Card 2: Etudes & Pieces -->
             <div class="relative bg-gradient-to-br from-white to-amber-50 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 overflow-hidden">
 
                 <!-- Decorative waves -->
@@ -73,14 +73,14 @@
                 </div>
 
                 <!-- Content -->
-                <h2 class="text-3xl font-extrabold text-[#1E293B] leading-tight mb-1">Harmonic<br><span class="text-amber-500">Drills</span></h2>
+                <h2 class="text-3xl font-extrabold text-[#1E293B] leading-tight mb-1">Etudes &amp;<br><span class="text-amber-500">Pieces</span></h2>
                 <div class="w-10 h-1 rounded-full bg-amber-400 mb-5"></div>
                 <p class="text-[#64748B] text-[15px] leading-relaxed mb-8 max-w-[260px] relative z-10">
-                    Sharpen your technique with focused drills designed to improve speed, accuracy, and control.
+                    Practice classic etudes and jazz studies, such as Czerny Op. 139, Oscar Peterson&rsquo;s Jazz Exercises and Jazz Hanon, to build speed, accuracy and control.
                 </p>
 
                 <!-- Button -->
-                <a href="{{ route('piano.exercise.musical') }}"
+                <a href="{{ route('piano.exercise.finger', ['tab' => 'etudes']) }}"
                    class="relative z-10 inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#1E293B] px-7 py-3 rounded-full font-semibold transition-all duration-300 shadow-md shadow-amber-400/20 hover:shadow-lg hover:shadow-amber-400/30 hover:-translate-y-0.5 text-[14px]">
                     Explore <i class="fa-solid fa-arrow-right"></i>
                 </a>

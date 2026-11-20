@@ -13,9 +13,12 @@ use Laravel\Cashier\Subscription;
 use App\Models\Plan;
 use App\Models\Subscription as BillingSubscription;
 use App\Models\Course;
+use App\Models\Liveshow;
+use App\Models\LiveCoachingBooking;
+use App\Models\PersonalizedGuidanceRequest;
+use App\Models\PersonalizedPlan;
 use Illuminate\Support\Facades\Log;
 use App\Models\Upload;
-use App\Models\UserAssessment;
 use App\Models\UserDailyLogin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -43,38 +46,15 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::user()->role == UserRoles::MEMBER->value) {
-            $userId = Auth::id();
+            $user = Auth::user();
+            $userId = $user->id;
 
             // Mark the user as active today (covers persisted/"remember me" sessions
             // as well as fresh logins, since this dashboard is where today's
             // activity is recorded for the practice-streak grid).
-            UserDailyLogin::recordToday($userId, Auth::user()->timezone);
+            UserDailyLogin::recordToday($userId, $user->timezone);
 
-            // Check assessment
-            $assessment = UserAssessment::where('user_id', $userId)->latest()->first();
-
-            // Define levels
-            $levels = ['Beginner', 'Intermediate', 'Advanced'];
-
-            $progress = collect($levels)->mapWithKeys(function ($level) use ($userId) {
-                $total = DB::table('courses')
-                    ->where('level', $level)
-                    ->count();
-
-                $completed = DB::table('course_progress')
-                    ->join('courses', 'course_progress.course_id', '=', 'courses.id')
-                    ->where('course_progress.user_id', $userId)
-                    ->where('courses.level', $level)
-                    ->distinct('course_progress.course_id')
-                    ->count('course_progress.course_id');
-
-                return [$level => [
-                    'total' => $total,
-                    'completed' => $completed,
-                ]];
-            });
-
-        $latestCourses = [];
+            $latestCourses = [];
 
             $latestPianoExercise = Upload::where('category', 'piano exercise')
                 ->orderBy('created_at', 'desc')
@@ -106,8 +86,20 @@ class HomeController extends Controller
             }
 
             $resumeLesson = $this->buildResumeLesson($userId);
+            $personalizedPlan = $user->premium ? PersonalizedPlan::where('user_id', $userId)->first() : null;
+            $nextPractice = $personalizedPlan?->nextUnfinishedLesson();
+            $planPending = $user->premium && !$personalizedPlan
+                && (PersonalizedGuidanceRequest::where('user_id', $userId)->exists()
+                    || LiveCoachingBooking::where('user_id', $userId)->exists());
 
-            return view('home', compact('progress', 'levels', 'latestCourses', 'assessment', 'resumeLesson'));
+            $dashboardLiveshow = Liveshow::whereIn('access_type', $user->premium ? ['all', 'premium'] : ['all'])
+                ->where('category', 'event')->where('start_time', '>=', now())
+                ->orderBy('start_time')->first();
+
+            return view('home', compact(
+                'latestCourses', 'resumeLesson', 'personalizedPlan', 'nextPractice',
+                'planPending', 'dashboardLiveshow'
+            ));
         }
     }
 
@@ -130,7 +122,7 @@ class HomeController extends Controller
                 continue;
             }
 
-            $resolved = $this->resolveResumeLesson($view->viewable);
+            $resolved = $this->resolveResumeLesson($view->viewable, $userId);
             if ($resolved) {
                 return $resolved;
             }
@@ -139,19 +131,32 @@ class HomeController extends Controller
         return null;
     }
 
-    private function resolveResumeLesson($lesson): ?array
+    private function resolveResumeLesson($lesson, int $userId): ?array
     {
-        return match (get_class($lesson)) {
-            \App\Models\Course::class => [
+        if ($lesson instanceof Course) {
+            $level = strtolower($lesson->level);
+            $roadmap = Course::where('level', $level)->where('status', 'active');
+            $total = (clone $roadmap)->count();
+            $completed = (clone $roadmap)->whereIn('id', DB::table('course_progress')
+                ->select('course_id')->where('user_id', $userId))->count();
+
+            return [
                 'title' => $lesson->title,
-                'url' => url("/member/course/{$lesson->level}?selected_course={$lesson->id}"),
-            ],
+                'url' => url("/member/course/{$level}/{$lesson->id}"),
+                'context' => ucfirst($level) . ' roadmap',
+                'progress' => $total ? ['completed' => $completed, 'total' => $total] : null,
+            ];
+        }
+
+        return match (get_class($lesson)) {
             Upload::class => [
                 'title' => $lesson->title,
+                'context' => 'Piano Exercise',
                 'url' => route('piano.exercise.player', ['level' => $lesson->level, 'video_id' => $lesson->id]),
             ],
             \App\Models\MusicalApplication::class => [
                 'title' => $lesson->title,
+                'context' => 'Guided Practice',
                 'url' => route('piano.exercise.player', [
                     'series' => $lesson->series,
                     'skill_level' => strtolower($lesson->skill_level),
@@ -160,14 +165,17 @@ class HomeController extends Controller
             ],
             \App\Models\ExtraCourse::class => [
                 'title' => $lesson->title,
+                'context' => 'Extra Courses',
                 'url' => url("/member/lesson/{$lesson->id}?type=extra_course"),
             ],
             \App\Models\LearnSong::class => [
                 'title' => $lesson->title,
+                'context' => 'Learn Songs',
                 'url' => url("/member/lesson/{$lesson->id}?type=learn_song"),
             ],
             \App\Models\Etude::class => [
                 'title' => $lesson->title,
+                'context' => 'Etudes & Pieces',
                 'url' => url("/member/lesson/{$lesson->id}?type=etudes"),
             ],
             default => null,
@@ -421,7 +429,6 @@ class HomeController extends Controller
     $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
-        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
         'new_password_input' => 'nullable|string|min:8|confirmed',
         'passport' => 'nullable|image|mimes:jpeg,png,jpg',
         'country' => 'nullable|string|max:500',
@@ -433,7 +440,6 @@ class HomeController extends Controller
 
     $user->first_name = $request->first_name;
     $user->last_name = $request->last_name;
-    $user->email = $request->email;
     $user->country = $request->country;
     $user->biography = $request->biography;
 

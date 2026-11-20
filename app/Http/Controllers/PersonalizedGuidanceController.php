@@ -10,6 +10,7 @@ use App\Models\PersonalizedPlan;
 use App\Models\UserDailyLogin;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -149,21 +150,25 @@ class PersonalizedGuidanceController extends Controller
             'completed' => ['required', 'boolean'],
         ]);
 
-        $plan = PersonalizedPlan::where('user_id', auth()->id())->firstOrFail();
+        $plan = DB::transaction(function () use ($validated) {
+            $plan = PersonalizedPlan::where('user_id', auth()->id())->lockForUpdate()->firstOrFail();
 
-        if (! in_array($validated['lesson_key'], $plan->allLessonKeys(), true)) {
-            abort(404);
-        }
+            abort_unless(in_array($validated['lesson_key'], $plan->allLessonKeys(), true), 404);
 
-        $completed = collect($plan->completed_lessons ?? []);
+            $completed = collect($plan->completed_lessons ?? []);
+            $completed = $validated['completed']
+                ? $completed->push($validated['lesson_key'])->unique()
+                : $completed->reject(fn ($key) => $key === $validated['lesson_key']);
 
-        $completed = $validated['completed']
-            ? $completed->push($validated['lesson_key'])->unique()
-            : $completed->reject(fn ($key) => $key === $validated['lesson_key']);
+            $plan->update(['completed_lessons' => $completed->values()->all()]);
 
-        $plan->update(['completed_lessons' => $completed->values()->all()]);
+            return $plan;
+        });
 
-        return response()->json(['progress' => $plan->progressPercent()]);
+        return response()->json([
+            'progress' => $plan->progressPercent(),
+            'completed' => $plan->completed_lessons,
+        ]);
     }
 
     public function store(Request $request)

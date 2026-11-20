@@ -17,16 +17,16 @@
                     : "/member/lesson/{$latestCourse->id}?type={$lessonType}";
             @endphp
             <div class="group flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-                {{-- Thumbnail --}}
-                <a href="{{ $lessonUrl }}" class="block relative aspect-video overflow-hidden bg-gray-50">
+                <a href="{{ $lessonUrl }}" aria-label="Watch {{ $latestCourse->title }}"
+                   class="relative block aspect-video overflow-hidden bg-blue-50">
+                    <div class="flex h-full flex-col items-center justify-center gap-2 px-4 text-center text-[#1447A6]" aria-hidden="true">
+                        <i class="fas fa-circle-play text-2xl"></i>
+                        <span class="text-xs font-semibold">{{ ucwords($category) }}</span>
+                    </div>
                     @if ($latestCourse->thumbnail_url)
-                        <img src="{{ $latestCourse->thumbnail_url }}"
-                             alt="{{ $latestCourse->title }}"
-                             class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
-                    @else
-                        <div class="w-full h-full flex items-center justify-center">
-                            <i class="fas fa-play text-gray-300 text-xl"></i>
-                        </div>
+                        <img src="{{ $latestCourse->thumbnail_url }}" alt=""
+                             onerror="this.hidden = true"
+                             class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105">
                     @endif
                 </a>
 

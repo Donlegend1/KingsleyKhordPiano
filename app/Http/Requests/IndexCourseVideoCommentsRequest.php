@@ -14,8 +14,10 @@ class IndexCourseVideoCommentsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => 'nullable|string|in:course,quiz,others',
-            'course_id' => 'nullable|integer',
+            'category' => 'nullable|string|in:course,quiz,others,checkpoint',
+            'course_id' => $this->input('category') === 'checkpoint'
+                ? 'required|integer|exists:course_checkpoints,id'
+                : 'nullable|integer',
         ];
     }
 }

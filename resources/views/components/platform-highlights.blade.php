@@ -12,8 +12,10 @@
 
     <!-- Row 1: Roadmap -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-roadmap-illustration.png" alt="Learning roadmap with Beginner, Intermediate, and Advanced levels" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/membership-learning-roadmap.webp" alt="Learning roadmap showing the Beginner, Intermediate, and Advanced paths"
+             width="1200" height="752" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div>
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -47,8 +49,10 @@
 
     <!-- Row 2: Customized Roadmap -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="md:order-2 rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-90day-roadmap.png" alt="90-day customized roadmap dashboard" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="md:order-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/feature-90day-roadmap.png" alt="90-day customized roadmap dashboard"
+             width="574" height="447" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div class="md:order-1">
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -82,8 +86,10 @@
 
     <!-- Row 3: Music Theory -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-music-theory.png" alt="Music theory fundamentals: scales, chords, intervals, harmony, chord progressions" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/membership-music-theory.webp" alt="Music Theory lessons in the Beginner Piano Roadmap with the C major scale open"
+             width="940" height="620" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div>
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -114,8 +120,10 @@
 
     <!-- Row 4: Finger Exercises -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="md:order-2 rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-piano-exercise-illustration.png" alt="Finger exercise categories: Hand Independence, Hand Flexibility, Hand Dexterity, Finger Strength, Finger Technique" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="md:order-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/membership-finger-exercises.webp" alt="Piano Exercise page with Finger Exercise and Etudes &amp; Pieces tabs and five technique categories"
+             width="1100" height="1039" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div class="md:order-1">
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -149,8 +157,10 @@
 
     <!-- Row 5: MIDI Keyboard -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-midi-keyboard.png" alt="Browser-based MIDI keyboard" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/feature-midi-keyboard.png" alt="Browser-based MIDI keyboard"
+             width="574" height="447" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div>
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -184,8 +194,10 @@
 
     <!-- Row 6: Audio Quiz -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="md:order-2 rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-audio-quiz.png" alt="Audio quiz ear training interface" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="md:order-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/feature-audio-quiz.png" alt="Audio quiz ear training interface"
+             width="574" height="447" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div class="md:order-1">
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -219,8 +231,10 @@
 
     <!-- Row 7: Assessment Quiz -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-assessment-quiz.png" alt="Gospel Musician Skills Assessment results" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/feature-assessment-quiz.png" alt="Gospel Musician Skills Assessment results"
+             width="574" height="447" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div>
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -251,8 +265,10 @@
 
     <!-- Row 8: Zoom Live Sessions -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="md:order-2 rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-live-sessions.png" alt="Live Zoom session with real-time piano instruction" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="md:order-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/membership-live-sessions.webp" alt="Upcoming Events page with a Book a Slot button for live piano coaching"
+             width="920" height="502" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div class="md:order-1">
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -283,8 +299,27 @@
 
     <!-- Row 9: Community -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-community.png" alt="Member community forums" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <figure class="relative overflow-hidden rounded-lg shadow-sm [container-type:inline-size]">
+          <img src="/images/feature-community.png" alt="Member community forums"
+               width="2870" height="1890" loading="lazy" decoding="async"
+               class="w-full h-auto">
+          <img src="/images/feature-community.png" alt="" aria-hidden="true" loading="lazy" decoding="async"
+               width="2870" height="1890" class="absolute top-[3.5%] left-0 h-auto w-full"
+               style="clip-path: inset(45.3% 6.8% 0 65%);">
+          <figcaption class="absolute left-[65.5%] top-[40.9%] flex h-[8%] w-[27.3%] items-center bg-white leading-tight"
+                      style="font-size: 1.08cqw; gap: 1cqw; padding-inline: 1.35cqw;">
+            <span class="sr-only">Sample upcoming event</span>
+            <span aria-hidden="true" class="shrink-0 overflow-hidden rounded-sm bg-gray-50 text-center font-bold text-gray-800 shadow-sm" style="width: 3.7cqw;">
+              <span class="block bg-blue-600 text-white" style="font-size: 0.8cqw; padding-block: 0.13cqw;">NOV</span>
+              <span class="block" style="padding-block: 0.15cqw;">28</span>
+            </span>
+            <span class="min-w-0">
+              <span class="block truncate font-semibold text-gray-800">Live Gospel Piano Q&amp;A</span>
+              <time datetime="2026-11-28T16:00:00+01:00" class="block whitespace-nowrap text-gray-500" style="font-size: 0.9cqw; margin-top: 0.22cqw;">Nov 28, 2026 4:00 PM</time>
+            </span>
+          </figcaption>
+        </figure>
       </div>
       <div>
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -318,8 +353,10 @@
 
     <!-- Row 10: Student Challenges -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="md:order-2 rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-student-challenges.png" alt="Student Challenges: Piano Exercise Challenge, Learn Song Challenge, All Keys Challenge, Piano Trick Challenge" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="md:order-2 rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/membership-student-challenges.webp" alt="Student Challenges forum with piano exercise, song, all keys, and piano trick topics"
+             width="850" height="524" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div class="md:order-1">
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">
@@ -350,8 +387,10 @@
 
     <!-- Row 11: Downloadable Resources -->
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="rounded-2xl overflow-hidden bg-[#FDF6EC] p-8">
-        <img src="/images/feature-downloadable-resources.png" alt="Downloadable plugin, MIDI, audio, and PDF resources" class="w-full h-auto rounded-xl shadow-xl">
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-2 sm:p-3">
+        <img src="/images/membership-downloads.webp" alt="Member audio downloads library with a searchable list of recordings"
+             width="1200" height="752" loading="lazy" decoding="async"
+             class="w-full h-auto rounded-lg shadow-sm">
       </div>
       <div>
         <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-4">

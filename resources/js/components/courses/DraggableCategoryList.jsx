@@ -9,6 +9,62 @@ import {
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
 
+const CheckpointMediaFields = ({ checkpoint, setCheckpoint }) => {
+    const isThumbnail = checkpoint.mediaMode === "thumbnail";
+
+    return (
+        <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+                Checkpoint media
+                <select
+                    className="mt-1 w-full px-3 py-2 border rounded-lg"
+                    value={checkpoint.mediaMode}
+                    onChange={(e) => setCheckpoint({ ...checkpoint, mediaMode: e.target.value })}
+                >
+                    <option value="embed">Video embed</option>
+                    <option value="thumbnail">Upload thumbnail image</option>
+                </select>
+            </label>
+            {isThumbnail ? (
+                <>
+                    <label className="block text-sm font-medium text-gray-700">
+                        {checkpoint.thumbnail_url ? "Replace thumbnail image (optional)" : "Thumbnail image"}
+                        <input
+                            key={checkpoint.thumbnail_url || "new-thumbnail"}
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={(e) => setCheckpoint({ ...checkpoint, thumbnailFile: e.target.files[0] })}
+                            className="mt-1 block w-full px-3 py-2 border rounded-lg"
+                        />
+                    </label>
+                    {checkpoint.thumbnail_url && (
+                        <img src={checkpoint.thumbnail_url} alt="Current checkpoint thumbnail" className="w-40 aspect-video rounded object-cover" />
+                    )}
+                    <p className="text-xs text-gray-500">
+                        JPG, PNG, or WebP up to 10 MB. Use a 16:9 image, such as 1280 × 720. Set a redirect link below for the Start Course button.
+                    </p>
+                </>
+            ) : (
+                <>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Video link or embed code (optional)
+                        <input
+                            type="text"
+                            value={checkpoint.video_url || ""}
+                            onChange={(e) => setCheckpoint({ ...checkpoint, video_url: e.target.value })}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="mt-1 w-full px-3 py-2 border rounded-lg"
+                        />
+                    </label>
+                    <p className="text-xs text-gray-500">
+                        Paste a link or embed code from YouTube, Vimeo, Wistia or Google Drive. Share Google Drive files as "Anyone with the link".
+                    </p>
+                </>
+            )}
+        </div>
+    );
+};
+
 const DraggableCategoryList = ({
     level,
     courses,
@@ -31,6 +87,7 @@ const DraggableCategoryList = ({
         course_category_id: null,
         title: "",
         video_url: "",
+        mediaMode: "embed",
         overview: "",
         redirect_url: "",
         downloads: [],
@@ -197,6 +254,7 @@ const DraggableCategoryList = ({
             course_category_id: categoryId,
             title: "",
             video_url: "",
+            mediaMode: "embed",
             overview: "",
             redirect_url: "",
             downloads: [],
@@ -210,12 +268,20 @@ const DraggableCategoryList = ({
 
     const handleCreateCheckpoint = async () => {
         if (!newCheckpoint.course_category_id || !newCheckpoint.title.trim()) return;
+        if (newCheckpoint.mediaMode === "thumbnail" && !newCheckpoint.thumbnailFile) {
+            showMessage("Choose an image file to upload", "error");
+            return;
+        }
         setLoading(true);
         try {
             const formData = new FormData();
             formData.append("course_category_id", newCheckpoint.course_category_id);
             formData.append("title", newCheckpoint.title || "");
             formData.append("video_url", newCheckpoint.video_url || "");
+            formData.append("media_mode", newCheckpoint.mediaMode);
+            if (newCheckpoint.mediaMode === "thumbnail" && newCheckpoint.thumbnailFile) {
+                formData.append("thumbnail", newCheckpoint.thumbnailFile);
+            }
             formData.append("overview", newCheckpoint.overview || "");
             formData.append("redirect_url", newCheckpoint.redirect_url || "");
             newCheckpoint.downloads.forEach((download, index) => {
@@ -265,6 +331,7 @@ const DraggableCategoryList = ({
     const openEditCheckpointModal = (checkpoint) => {
         setEditingCheckpoint({
             ...checkpoint,
+            mediaMode: checkpoint.thumbnail_url ? "thumbnail" : "embed",
             downloads: checkpoint.downloads || [],
         });
         setNewDownloadTitle("");
@@ -279,26 +346,35 @@ const DraggableCategoryList = ({
 
     const handleUpdateCheckpoint = async () => {
         if (!editingCheckpoint) return;
+        if (editingCheckpoint.mediaMode === "thumbnail" && !editingCheckpoint.thumbnailFile && !editingCheckpoint.thumbnail_url) {
+            showMessage("Choose an image file to upload", "error");
+            return;
+        }
         setLoading(true);
         try {
+            const formData = new FormData();
+            formData.append("title", editingCheckpoint.title || "");
+            formData.append("description", editingCheckpoint.description || "");
+            formData.append("video_url", editingCheckpoint.video_url || "");
+            formData.append("media_mode", editingCheckpoint.mediaMode);
+            formData.append("redirect_url", editingCheckpoint.redirect_url || "");
+            formData.append("overview", editingCheckpoint.overview || "");
+            if (editingCheckpoint.mediaMode === "thumbnail" && editingCheckpoint.thumbnailFile) {
+                formData.append("thumbnail", editingCheckpoint.thumbnailFile);
+            }
             const response = await axios.post(
                 `/api/admin/checkpoints/${editingCheckpoint.id}/update`,
-                {
-                    title: editingCheckpoint.title || "",
-                    description: editingCheckpoint.description || "",
-                    video_url: editingCheckpoint.video_url || "",
-                    overview: editingCheckpoint.overview || "",
-                },
+                formData,
                 {
                     headers: { "X-CSRF-TOKEN": csrfToken },
                     withCredentials: true,
                 }
             );
             showMessage("Checkpoint Updated", "success");
-            setEditingCheckpoint(response.data);
+            setEditingCheckpoint({ ...response.data, mediaMode: editingCheckpoint.mediaMode });
             fetchCourses();
         } catch (error) {
-            showMessage("Error updating checkpoint", "error");
+            showMessage(error.response?.data?.message || "Error updating checkpoint", "error");
         } finally {
             setLoading(false);
         }
@@ -1463,21 +1539,7 @@ const DraggableCategoryList = ({
                 </div>
 
                 <div className="mt-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Embedded Video (Optional)
-                    </label>
-                    <input
-                        type="text"
-                        value={newCheckpoint.video_url}
-                        onChange={(e) =>
-                            setNewCheckpoint({ ...newCheckpoint, video_url: e.target.value })
-                        }
-                        placeholder="e.g. https://www.youtube.com/watch?v=..."
-                        className="w-full px-3 py-2 border rounded-lg"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                        Shown at the top of the checkpoint page. Paste a link or the embed/iframe code from YouTube, Vimeo, Wistia or Google Drive. Google Drive files must be shared as "Anyone with the link" to play.
-                    </p>
+                    <CheckpointMediaFields checkpoint={newCheckpoint} setCheckpoint={setNewCheckpoint} />
                 </div>
 
                 <div className="mt-3">
@@ -1572,7 +1634,7 @@ const DraggableCategoryList = ({
                         className="w-full px-3 py-2 border rounded-lg"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                        Shows a "Watch Lesson" button on the checkpoint page linking here.
+                        Shows a "Start Course" button on the checkpoint page linking here.
                     </p>
                 </div>
 
@@ -1628,21 +1690,18 @@ const DraggableCategoryList = ({
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Video URL (Optional)</label>
+                            <CheckpointMediaFields checkpoint={editingCheckpoint} setCheckpoint={setEditingCheckpoint} />
+
+                            <label className="block text-sm font-medium text-gray-700">
+                                Custom Redirect Link (Optional)
                                 <input
                                     type="text"
-                                    value={editingCheckpoint.video_url || ""}
-                                    onChange={(e) =>
-                                        setEditingCheckpoint({ ...editingCheckpoint, video_url: e.target.value })
-                                    }
-                                    placeholder="e.g. https://www.youtube.com/watch?v=..."
-                                    className="w-full px-3 py-2 border rounded-lg"
+                                    value={editingCheckpoint.redirect_url || ""}
+                                    onChange={(e) => setEditingCheckpoint({ ...editingCheckpoint, redirect_url: e.target.value })}
+                                    placeholder="e.g. /member/course/beginner or https://..."
+                                    className="mt-1 w-full px-3 py-2 border rounded-lg"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Shown as an embedded video above the checkpoint content. Paste a link or the embed/iframe code from YouTube, Vimeo, Wistia or Google Drive. Google Drive files must be shared as "Anyone with the link" to play.
-                                </p>
-                            </div>
+                            </label>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Course Overview (Optional)</label>

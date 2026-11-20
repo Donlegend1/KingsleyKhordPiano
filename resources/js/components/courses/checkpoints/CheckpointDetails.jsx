@@ -1,5 +1,6 @@
 import React from "react";
 import { Target, Download } from "lucide-react";
+import LessonDiscussion from "../LessonDiscussion";
 
 export const checkpointHasCta = (checkpoint) =>
     Boolean(checkpoint?.redirect_url || checkpoint?.linked_course);
@@ -15,7 +16,7 @@ export const CheckpointCta = ({ checkpoint, onSelectCourse }) => {
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
             </svg>
-            Watch Lesson
+            Start Course
         </>
     );
 
@@ -42,6 +43,8 @@ export const CheckpointCta = ({ checkpoint, onSelectCourse }) => {
 };
 
 const CheckpointDetails = ({ checkpoint }) => {
+    const isGoogleDriveVideo = /\/\/drive\.google\.com\//i.test(checkpoint.video_embed_url || "");
+
     return (
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 w-full max-w-7xl mx-auto">
             <div className="flex items-start gap-4 mb-6">
@@ -60,8 +63,15 @@ const CheckpointDetails = ({ checkpoint }) => {
 
             <hr className="border-gray-100 dark:border-gray-700 mb-6" />
 
-            {checkpoint.video_embed_url && (
-                <div className="mb-8 rounded-xl overflow-hidden bg-black aspect-video">
+            {checkpoint.thumbnail_url ? (
+                <img
+                    src={checkpoint.thumbnail_url}
+                    alt={`${checkpoint.title} video thumbnail`}
+                    referrerPolicy="no-referrer"
+                    className="mb-8 w-full aspect-video rounded-xl bg-black object-cover"
+                />
+            ) : checkpoint.video_embed_url && (
+                <div className={`mb-8 rounded-xl overflow-hidden bg-black aspect-video ${isGoogleDriveVideo ? "-mx-9 md:mx-0" : ""}`}>
                     <iframe
                         className="w-full h-full"
                         src={checkpoint.video_embed_url}
@@ -127,11 +137,12 @@ const CheckpointDetails = ({ checkpoint }) => {
                 </div>
             )}
 
-            {!checkpoint.video_embed_url && !checkpoint.overview && (!checkpoint.downloads || checkpoint.downloads.length === 0) && (
+            {!checkpoint.thumbnail_url && !checkpoint.video_embed_url && !checkpoint.overview && (!checkpoint.downloads || checkpoint.downloads.length === 0) && (
                 <p className="text-gray-500 dark:text-gray-400 italic">
                     Content for this checkpoint is coming soon.
                 </p>
             )}
+            <LessonDiscussion key={checkpoint.id} topicId={checkpoint.id} category="checkpoint" />
         </div>
     );
 };

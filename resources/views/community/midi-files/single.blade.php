@@ -14,7 +14,7 @@
 <div class="w-full flex justify-center py-10 px-6">
 
     <div class="w-full max-w-4xl">
-    <div class="w-full rounded-md overflow-hidden shadow-lg">
+    <div class="rounded-md overflow-hidden shadow-lg {{ $MidiFile->video_type === 'google' ? '-mx-6 sm:mx-0' : 'w-full' }}">
 
         @if ($MidiFile->video_type === 'youtube')
             {{-- YOUTUBE --}}
@@ -30,12 +30,12 @@
 
         @elseif ($MidiFile->video_type === 'google')
             {{-- GOOGLE DRIVE VIDEO --}}
-            <div class="relative w-full" style="height: 400px;">
+            <div class="relative aspect-video w-full bg-black md:aspect-auto md:h-[400px]">
                 <iframe
                     src="https://drive.google.com/file/d/{{ $MidiFile->video_path }}/preview"
-                    width="100%"
-                    height="400"
+                    class="block w-full h-full border-0"
                     allow="autoplay"
+                    allowfullscreen
                 ></iframe>
                 {{-- Blocks Google Drive's built-in "open in new window" icon, which can't be removed from the cross-origin preview UI --}}
                 <div class="absolute top-0 right-0 w-16 h-16"></div>
@@ -112,12 +112,11 @@
             ✕
         </button>
 
-        <div class="relative w-full" style="height: 450px;">
+        <div class="relative aspect-video w-full bg-black md:aspect-auto md:h-[450px]">
             <iframe
                 id="learnVideo"
                 src="https://drive.google.com/file/d/19kLzKfc3HB0v2dYJHcUzBrnFqOE4YPm4/preview"
-                width="100%"
-                height="450"
+                class="block w-full h-full border-0"
                 allow="autoplay"
                 allowfullscreen
             ></iframe>

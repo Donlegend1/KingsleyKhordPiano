@@ -2,16 +2,31 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Roles\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseCheckpoint;
 use App\Models\CourseCheckpointDownload;
 use App\Helpers\VideoHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class CourseCheckpointController extends Controller
 {
+    private const THUMBNAIL_RULES = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
+
+    public function __construct()
+    {
+        $this->middleware(['web', 'auth']);
+        $this->middleware(function (Request $request, $next) {
+            abort_unless(in_array($request->user()->role, [UserRoles::ADMIN->value, UserRoles::SUPERADMIN->value], true), 403);
+
+            return $next($request);
+        });
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -19,6 +34,8 @@ class CourseCheckpointController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'video_url' => 'nullable|string|max:2048',
+            'media_mode' => 'sometimes|in:embed,thumbnail',
+            'thumbnail' => self::THUMBNAIL_RULES,
             'overview' => 'nullable|string',
             'linked_course_id' => 'nullable|exists:courses,id',
             'redirect_url' => 'nullable|string|max:2048',
@@ -32,11 +49,14 @@ class CourseCheckpointController extends Controller
             (int) CourseCheckpoint::where('course_category_id', $validated['course_category_id'])->max('position')
         ) + 1;
 
-        $checkpoint = CourseCheckpoint::create([
+        $checkpoint = new CourseCheckpoint();
+        $this->saveCheckpoint($checkpoint, [
             'course_category_id' => $validated['course_category_id'],
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'video_url' => $this->cleanVideoInput($validated['video_url'] ?? null),
+            'media_mode' => $validated['media_mode'] ?? null,
+            'thumbnail' => $validated['thumbnail'] ?? null,
             'overview' => $validated['overview'] ?? null,
             'linked_course_id' => $validated['linked_course_id'] ?? null,
             'redirect_url' => $validated['redirect_url'] ?? null,
@@ -59,6 +79,8 @@ class CourseCheckpointController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'video_url' => 'nullable|string|max:2048',
+            'media_mode' => 'sometimes|in:embed,thumbnail',
+            'thumbnail' => self::THUMBNAIL_RULES,
             'overview' => 'nullable|string',
             'linked_course_id' => 'nullable|exists:courses,id',
             'redirect_url' => 'nullable|string|max:2048',
@@ -68,7 +90,7 @@ class CourseCheckpointController extends Controller
             $validated['video_url'] = $this->cleanVideoInput($validated['video_url']);
         }
 
-        $checkpoint->update($validated);
+        $this->saveCheckpoint($checkpoint, $validated);
 
         return response()->json($checkpoint->fresh(['linkedCourse', 'downloads']));
     }
@@ -114,6 +136,55 @@ class CourseCheckpointController extends Controller
         return $input;
     }
 
+    private function saveCheckpoint(CourseCheckpoint $checkpoint, array $attributes): void
+    {
+        $mode = $attributes['media_mode'] ?? null;
+        $file = $attributes['thumbnail'] ?? null;
+        unset($attributes['media_mode'], $attributes['thumbnail']);
+
+        $disk = Storage::disk('public');
+        $newPath = null;
+
+        if ($mode === 'thumbnail' && $file) {
+            $newPath = $file->store('checkpoint-thumbnails', 'public');
+            if (!$newPath) {
+                throw ValidationException::withMessages(['thumbnail' => 'The thumbnail could not be saved. Please try again.']);
+            }
+        }
+
+        try {
+            $oldPath = DB::transaction(function () use ($checkpoint, $attributes, $mode, $newPath) {
+                $record = $checkpoint->exists
+                    ? CourseCheckpoint::query()->lockForUpdate()->findOrFail($checkpoint->getKey())
+                    : $checkpoint;
+
+                if ($mode === 'thumbnail' && !$newPath && !$record->thumbnail_url) {
+                    throw ValidationException::withMessages(['thumbnail' => 'Choose an image file to upload.']);
+                }
+
+                $oldPath = $record->thumbnail_path;
+                if ($newPath || $mode === 'embed') {
+                    $attributes['thumbnail_path'] = $newPath;
+                    $attributes['thumbnail_youtube_id'] = null;
+                }
+
+                $record->fill($attributes)->save();
+
+                return $record->thumbnail_path !== $oldPath ? $oldPath : null;
+            });
+        } catch (\Throwable $error) {
+            if ($newPath) {
+                $disk->delete($newPath);
+            }
+
+            throw $error;
+        }
+
+        if ($oldPath) {
+            $disk->delete($oldPath);
+        }
+    }
+
     public function destroy(CourseCheckpoint $checkpoint)
     {
         foreach ($checkpoint->downloads as $download) {
@@ -125,7 +196,17 @@ class CourseCheckpointController extends Controller
             }
         }
 
-        $checkpoint->delete();
+        $thumbnailPath = DB::transaction(function () use ($checkpoint) {
+            $record = CourseCheckpoint::query()->lockForUpdate()->findOrFail($checkpoint->getKey());
+            $path = $record->thumbnail_path;
+            $record->delete();
+
+            return $path;
+        });
+
+        if ($thumbnailPath) {
+            Storage::disk('public')->delete($thumbnailPath);
+        }
 
         return response()->json(['message' => 'Checkpoint deleted successfully']);
     }

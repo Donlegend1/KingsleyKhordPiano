@@ -5,6 +5,14 @@ import { useEffect, useRef, useState } from "react";
 // clickable link instead of trying to iframe the whole site.
 const EMBEDDABLE_LINK_PATTERN = /youtu\.be\/|youtube\.com|vimeo\.com|dailymotion\.com|drive\.google\.com\/file|tiktok\.com|twitch\.tv|facebook\.com\/.*\/videos|instagram\.com\/(p|reel|tv)\//i;
 const isEmbeddableLink = (url) => Boolean(url) && EMBEDDABLE_LINK_PATTERN.test(url);
+const isGoogleDriveVideo = (url) => /^https?:\/\/drive\.google\.com\/file\/d\//i.test(url);
+const googleDrivePreview = (url) => {
+    const match = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([\w-]+)(?:[/?#]|$)/i);
+    if (!match) return url;
+    const preview = new URL(url);
+    preview.pathname = `/file/d/${match[1]}/preview`;
+    return preview.href;
+};
 
 const PDFJS_VERSION = "4.5.136";
 let pdfjsLoadPromise = null;
@@ -114,6 +122,7 @@ function PreviewModal({ preview, onClose }) {
     if (!preview) return null;
     const { url, title } = preview;
     const isOwnFile = url.startsWith("/storage/");
+    const isDrive = isGoogleDriveVideo(url);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={onClose}>
@@ -123,9 +132,8 @@ function PreviewModal({ preview, onClose }) {
                     <button onClick={onClose} className="ml-4 text-gray-400 hover:text-gray-700 dark:hover:text-white text-xl font-bold">✕</button>
                 </div>
                 <iframe
-                    src={url}
-                    className="w-full"
-                    style={{ height: "70vh" }}
+                    src={isDrive ? googleDrivePreview(url) : url}
+                    className={isDrive ? "block w-full aspect-video bg-black md:aspect-auto md:h-[70vh]" : "w-full h-[70vh]"}
                     allowFullScreen
                     {...(isOwnFile ? {} : { sandbox: "allow-scripts allow-same-origin allow-forms allow-popups" })}
                 />
@@ -242,13 +250,15 @@ function FileCard({ block, onPreview }) {
 }
 
 function EmbedPlayer({ src, isVertical }) {
+    const isDrive = isGoogleDriveVideo(src);
+
     return (
         <div
-            className={`relative rounded-lg overflow-hidden ${isVertical ? "aspect-[9/16] max-w-sm mx-auto" : "aspect-video"}`}
+            className={`relative rounded-lg overflow-hidden ${isVertical ? "aspect-[9/16] max-w-sm mx-auto" : "aspect-video"} ${isDrive ? "-mx-5 bg-black md:mx-0" : ""}`}
         >
             <iframe
-                src={src}
-                className="w-full h-full"
+                src={isDrive ? googleDrivePreview(src) : src}
+                className="block w-full h-full"
                 frameBorder="0"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen

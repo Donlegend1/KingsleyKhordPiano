@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Http\Requests\StorePostLikeRequest;
 use App\Http\Requests\UpdatePostLikeRequest;
 use App\Notifications\NewLikeNotification;
+use Illuminate\Support\Facades\DB;
 
 class PostLikeController extends Controller
 {
@@ -34,6 +35,21 @@ class PostLikeController extends Controller
     {
         $post = Post::findOrFail($request->post_id);
         $user_id = auth()->id();
+        if ($request->has('liked')) {
+            $liked = $request->boolean('liked');
+
+            if ($liked) {
+                $like = $post->likes()->firstOrCreate(['user_id' => $user_id], ['type' => 'like']);
+                if ($like->wasRecentlyCreated) {
+                    $this->notifyFirstLike($post, $like);
+                }
+            } else {
+                $post->likes()->where('user_id', $user_id)->delete();
+            }
+
+            return response()->json(['liked' => $liked, 'likes_count' => $post->likes()->count()]);
+        }
+
         $type = $request->input('type', 'like');
 
         // Check if like already exists
@@ -56,8 +72,8 @@ class PostLikeController extends Controller
             ]);
         }
 
-        if ($like && $post->user_id !== $user_id) {
-            $post->user->notify(new NewLikeNotification($like));
+        if ($like?->wasRecentlyCreated) {
+            $this->notifyFirstLike($post, $like);
         }
 
         return response()->json([
@@ -65,6 +81,25 @@ class PostLikeController extends Controller
         ]);
     }
 
+    private function notifyFirstLike(Post $post, PostLike $like): void
+    {
+        if ((int) $post->user_id === (int) $like->user_id) {
+            return;
+        }
+
+        try {
+            $claimed = DB::table('post_like_notification_receipts')->insertOrIgnore([
+                'post_id' => $post->id,
+                'user_id' => $like->user_id,
+            ]);
+
+            if ($claimed) {
+                $post->user?->notify(new NewLikeNotification($like));
+            }
+        } catch (\Throwable $error) {
+            report($error);
+        }
+    }
 
     /**
      * Display the specified resource.

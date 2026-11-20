@@ -5,7 +5,8 @@ import {
     useFlashMessage,
     FlashMessageProvider,
 } from "../Alert/FlashMessageContext";
-import { Bookmark, BookmarkMinus, Check, Target } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bookmark, BookmarkMinus, Check, Target } from "lucide-react";
+import LessonDiscussion from "./LessonDiscussion";
 import CheckpointDetails, {
     CheckpointCta,
     checkpointHasCta,
@@ -25,9 +26,6 @@ const CourseDetails = ({
     hasNextLesson,
 }) => {
     const [loading, setLoading] = useState(false);
-    const [comment, setComment] = useState("");
-    const [comments, setComments] = useState([]);
-    const [commentSubmitting, setCommentSubmitting] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(
         course.isBookmarked || false
     );
@@ -36,32 +34,33 @@ const CourseDetails = ({
         .getAttribute("content");
     const { showMessage } = useFlashMessage();
 
-    const [activeMenuId, setActiveMenuId] = useState(null);
-    const [editingCommentId, setEditingCommentId] = useState(null);
-    const [editedComment, setEditedComment] = useState("");
-    const [replyText, setReplyText] = useState({});
-    const [activeReplyId, setActiveReplyId] = useState(null);
     const iframeWrapperRef = useRef(null);
-
+    const [portraitSource, setPortraitSource] = useState(null);
+    const isPortrait = Boolean(course.video_url && portraitSource === course.video_url);
+    const mediaAspect = isPortrait ? "aspect-[9/16] max-w-xs mx-auto" : "aspect-video";
+    const isGoogleDriveVideo = Boolean(course.video_url && (
+        course.video_type === "google" ||
+        (course.video_type === "iframe" && /\/\/drive\.google\.com\//i.test(course.video_url))
+    ));
     // The injected iframe embed (e.g. VdoCipher) ships with fixed inline
     // width/height — override it so it fills the responsive aspect-ratio box.
     useEffect(() => {
-        if (course.video_type === "iframe" && iframeWrapperRef.current) {
-            const iframe = iframeWrapperRef.current.querySelector("iframe");
-            if (iframe) {
-                iframe.style.position = "absolute";
-                iframe.style.top = "0";
-                iframe.style.left = "0";
-                iframe.style.width = "100%";
-                iframe.style.height = "100%";
-                iframe.style.border = "0";
-            }
-        }
-    }, [course.video_type, course.video_url]);
+        const iframe = iframeWrapperRef.current?.querySelector("iframe");
+        if (!iframe) return;
 
-    const handleMenuToggle = (commentId) => {
-        setActiveMenuId(activeMenuId === commentId ? null : commentId);
-    };
+        const width = Number(iframe.getAttribute("width")) ||
+            (iframe.style.width.endsWith("px") ? parseFloat(iframe.style.width) : 0);
+        const height = Number(iframe.getAttribute("height")) ||
+            (iframe.style.height.endsWith("px") ? parseFloat(iframe.style.height) : 0);
+        setPortraitSource(width > 0 && height > width ? course.video_url : null);
+        Object.assign(iframe.style, {
+            position: "absolute",
+            inset: "0",
+            width: "100%",
+            height: "100%",
+            border: "0",
+        });
+    }, [course.video_type, course.video_url]);
 
     const toggleBookmark = async () => {
         try {
@@ -88,21 +87,6 @@ const CourseDetails = ({
             showMessage("Error toggling bookmark", "error");
         }
     };
-
-    const handleReplyChange = (commentId, text) => {
-        setReplyText((prev) => ({
-            ...prev,
-            [commentId]: text,
-        }));
-    };
-
-    const toggleReplyInput = (commentId) => {
-        setActiveReplyId((prev) => (prev === commentId ? null : commentId));
-    };
-
-    useEffect(() => {
-        fetchComments();
-    }, [course.id]);
 
     // Records this course as the member's most recently viewed lesson so the
     // dashboard's "Resume Lesson" card points at whatever was opened last,
@@ -158,23 +142,6 @@ const CourseDetails = ({
         });
     }, [course?.video_url]);
 
-    const fetchComments = async () => {
-        try {
-            const response = await axios.get(
-                `/api/member/comments/course?course_id=${course.id}&category=course`,
-                {
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
-                    withCredentials: true,
-                }
-            );
-            setComments(response.data?.data || []);
-        } catch (error) {
-            console.error("Failed to fetch comments", error.response);
-        }
-    };
-
     const handleMarkAsCompleted = async () => {
         setLoading(true);
         try {
@@ -196,106 +163,10 @@ const CourseDetails = ({
         }
     };
 
-    const handleSubmitComment = async (e) => {
-        e.preventDefault();
-        if (!comment.trim()) return;
-
-        setCommentSubmitting(true);
-        try {
-            const response = await axios.post(
-                `/api/member/course/${course.id}/video-comment`,
-                {
-                    comment: comment,
-                    category: "course",
-                    course_id: course.id,
-                    url: window.location.href,
-                },
-                {
-                    headers: { "X-CSRF-TOKEN": csrfToken },
-                    withCredentials: true,
-                }
-            );
-
-            setComment("");
-            fetchComments();
-            showMessage("Comment added!", "success");
-        } catch (error) {
-            console.error("Error submitting comment", error);
-            showMessage("Failed to submit comment.", "error");
-        } finally {
-            setCommentSubmitting(false);
-        }
-    };
-
-    const handleEdit = (comment) => {
-        setEditingCommentId(comment.id);
-        setEditedComment(comment.comment);
-        setActiveMenuId(null); // Close menu
-    };
-
-    const handleUpdateComment = async (id) => {
-        try {
-            await axios.put(`/api/member/comment/${id}`, {
-                comment: editedComment,
-            });
-            setEditingCommentId(null);
-            showMessage("Comment updated!", "success");
-            fetchComments();
-        } catch (err) {
-            console.error("Failed to update comment:", err);
-            showMessage("Error updating comment!", "error");
-        }
-    };
-
-    const handleDelete = async (commentId) => {
-        try {
-            await axios.delete(`/api/member/comment/${commentId}`);
-            setEditingCommentId(null);
-            showMessage("Comment deleted!", "success");
-            fetchComments();
-        } catch (err) {
-            console.error("Failed to update comment:", err);
-            showMessage("Error deleting comment!", "error");
-        }
-    };
-
-    const submitReply = async (commentId) => {
-        if (!replyText[commentId]) return;
-
-        try {
-            const res = await axios.post(
-                `/api/member/comment/${commentId}/reply`,
-                {
-                    comment: replyText[commentId],
-                }
-            );
-
-            // Optional: Update UI
-            const updated = comments.map((c) => {
-                if (c.id === commentId) {
-                    return {
-                        ...c,
-                        replies: [...(c.replies || []), res.data],
-                    };
-                }
-                return c;
-            });
-
-            setComments(updated);
-            setReplyText((prev) => ({ ...prev, [commentId]: "" }));
-            setActiveReplyId(null);
-            showMessage("Reply submitted!", "success");
-            fetchComments();
-        } catch (error) {
-            showMessage("Failed to submit reply.", "error");
-            console.error("Reply failed", error);
-        }
-    };
-
     const renderVideoPlayer = () => {
         if (!course.video_type || !course.video_url) {
             return course.thumbnail_url || course.thumbnail ? (
-                <div className="mb-4 w-full h-[400px] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <div className="aspect-video w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 md:aspect-auto md:h-[400px]">
                     <img
                         src={course.thumbnail_url || course.thumbnail}
                         alt={course.title}
@@ -307,10 +178,12 @@ const CourseDetails = ({
             );
         }
 
+        const playerClass = `block w-full rounded bg-black ${mediaAspect} ${isPortrait ? "" : "md:aspect-auto md:h-[400px]"}`;
+
         switch (course.video_type) {
             case "iframe":
                 return (
-                    <div className="relative w-full aspect-video rounded overflow-hidden shadow-lg bg-gray-100 mb-4">
+                    <div className={`relative w-full overflow-hidden rounded bg-gray-100 md:shadow-lg ${mediaAspect}`}>
                         <div
                             ref={iframeWrapperRef}
                             className="absolute inset-0"
@@ -322,36 +195,35 @@ const CourseDetails = ({
             case "google":
                 return (
                     <iframe
-                        width="100%"
-                        height="400"
                         src={`https://drive.google.com/file/d/${course.video_url}/preview`}
+                        title={course.title}
                         allow="autoplay"
                         allowFullScreen
-                        className="rounded"
+                        className={playerClass}
                     />
                 );
 
             case "youtube":
                 return (
                     <iframe
-                        width="100%"
-                        height="400"
                         src={`https://www.youtube.com/embed/${course.video_url}`}
-                        title="YouTube video"
+                        title={course.title}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
-                        className="rounded"
+                        className={playerClass}
                     />
                 );
 
             case "local":
                 return (
                     <video
+                        key={course.video_url}
                         controls
-                        width="100%"
-                        height="400"
-                        className="rounded"
+                        className={playerClass}
+                        onLoadedMetadata={({ currentTarget }) => {
+                            setPortraitSource(currentTarget.videoHeight > currentTarget.videoWidth ? course.video_url : null);
+                        }}
                         poster={course.thumbnail_url || course.thumbnail}
                     >
                         <source
@@ -371,29 +243,29 @@ const CourseDetails = ({
         }
     };    
 
-    // console.log(lastSegment, 'lastSegment')
+    const lessonDescription = course.description && (
+        <div className="my-4 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+            {course.description}
+        </div>
+    );
 
     return (
-        <div className="p-6 bg-white dark:bg-black rounded shadow-lg">
-            <div className="mb-6">
+        <div className="rounded bg-white px-1 pb-4 pt-2 dark:bg-black md:p-6 md:shadow-lg">
+            <div className="mb-3 md:mb-6">
                 {/* Course Title */}
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-bold leading-tight text-gray-900 dark:text-white md:text-2xl">
                     {course.title}
                 </h2>
             </div>
 
-            <div className="mb-4">{renderVideoPlayer()}</div>
+            <div className={`mb-3 md:mb-4 ${isGoogleDriveVideo ? "-mx-4 md:mx-0" : ""}`}>
+                {renderVideoPlayer()}
+            </div>
 
-            {course.description && (
-                <div className="mt-4 mb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                    {course.description}
-                </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 mt-6">
+            <div className="grid grid-cols-2 gap-2 md:mt-6 md:flex md:items-center md:justify-center md:gap-3">
                 <button
                     onClick={toggleBookmark}
-                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 border transition duration-200 whitespace-nowrap ${
+                    className={`px-2 py-2.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 border transition duration-200 whitespace-nowrap ${
                         isBookmarked
                             ? "border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
                             : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
@@ -410,7 +282,7 @@ const CourseDetails = ({
                 <button
                     onClick={handleMarkAsCompleted}
                     disabled={loading || course.progress?.course_id}
-                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 whitespace-nowrap ${
+                    className={`px-2 py-2.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 whitespace-nowrap ${
                         course.progress?.course_id
                             ? "bg-green-500 text-white cursor-not-allowed"
                             : "bg-gray-900 text-white hover:bg-gray-800"
@@ -422,6 +294,8 @@ const CourseDetails = ({
                         : "Mark as Completed"}
                 </button>
             </div>
+
+            {lessonDescription}
 
             {course.image_urls && course.image_urls.length > 0 && (
                 <div className="mt-6 mb-6">
@@ -501,190 +375,28 @@ const CourseDetails = ({
                 </div>
             )}
 
-            {/* Lesson Navigation */}
-            <div className="flex items-center justify-between mt-8 border-t pt-6 dark:border-gray-700">
+            <nav aria-label="Lesson navigation" className="mt-6 grid grid-cols-2 gap-3 border-t border-gray-200 pt-4 dark:border-gray-700 md:flex md:justify-between">
                 <button
+                    type="button"
                     onClick={onPrevLesson}
                     disabled={!hasPrevLesson}
-                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 bg-yellow-400 text-black hover:bg-yellow-500 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-[#1447A6] disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 md:min-w-32"
                 >
-                    <i className="fa fa-chevron-left"></i>
-                    Prev
+                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                    Previous
                 </button>
                 <button
+                    type="button"
                     onClick={onNextLesson}
                     disabled={!hasNextLesson}
-                    className="px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 bg-gray-900 text-white hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#1447A6] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#0F3A8A] focus-visible:ring-2 focus-visible:ring-[#1447A6] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 md:min-w-32"
                 >
                     Next
-                    <i className="fa fa-chevron-right"></i>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </button>
-            </div>
+            </nav>
 
-            {/* Comment Section */}
-            <div className="mt-10 pt-6 border-t border-gray-100 dark:border-white/10 bg-white dark:bg-gray-800 rounded-2xl p-6">
-                <div className="flex items-center gap-2.5 mb-5">
-                    <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400">
-                        <i className="fa-regular fa-comments text-sm"></i>
-                    </span>
-                    <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                        Comments{" "}
-                        <span className="text-gray-400 font-medium">
-                            ({comments.length})
-                        </span>
-                    </h3>
-                </div>
-
-                <form onSubmit={handleSubmitComment} className="mb-8">
-                    <textarea
-                        className="w-full border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-[#1447A6] focus:border-[#1447A6] outline-none transition resize-none"
-                        rows="3"
-                        placeholder="Write a comment..."
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        required
-                    ></textarea>
-                    <div className="flex justify-end mt-3">
-                        <button
-                            type="submit"
-                            disabled={commentSubmitting}
-                            className="flex items-center gap-2 bg-[#1447A6] hover:bg-[#0F3A8A] disabled:opacity-60 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
-                        >
-                            <i className="fa-solid fa-paper-plane text-[11px]"></i>
-                            {commentSubmitting ? "Posting..." : "Post"}
-                        </button>
-                    </div>
-                </form>
-
-                {comments.length === 0 ? (
-                    <div className="py-8 text-center">
-                        <p className="text-sm text-gray-400">
-                            No comments yet. Be the first to share your thoughts.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="divide-y divide-gray-100 dark:divide-white/10">
-                        {comments.map((c) => (
-                            <div key={c.id} className="flex gap-3 py-4 first:pt-0">
-                                <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-300 font-semibold text-xs flex-shrink-0 overflow-hidden">
-                                    {c.user?.passport ? (
-                                        <img
-                                            src={c.user.passport}
-                                            alt="Avatar"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        (c.user?.first_name || "U").charAt(0)
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2">
-                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                            {c.user?.first_name} {c.user?.last_name}
-                                        </p>
-                                        <span className="text-xs text-gray-400">
-                                            {new Date(c.created_at).toLocaleString()}
-                                        </span>
-                                        {c.user_id === window.authUser?.id && (
-                                            <div className="flex items-center gap-3 ml-auto">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleEdit(c)}
-                                                    className="text-xs font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleDelete(c.id)}
-                                                    className="text-xs font-medium text-red-500 hover:underline"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {editingCommentId === c.id ? (
-                                        <div className="mt-2">
-                                            <textarea
-                                                className="w-full border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg p-2 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#1447A6] focus:border-[#1447A6] outline-none transition resize-none"
-                                                rows="2"
-                                                value={editedComment}
-                                                onChange={(e) => setEditedComment(e.target.value)}
-                                            />
-                                            <div className="flex items-center gap-3 mt-1.5">
-                                                <button
-                                                    onClick={() => handleUpdateComment(c.id)}
-                                                    className="bg-[#1447A6] hover:bg-[#0F3A8A] text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors"
-                                                >
-                                                    Save
-                                                </button>
-                                                <button
-                                                    onClick={() => setEditingCommentId(null)}
-                                                    className="text-xs font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
-                                            {c.comment}
-                                        </p>
-                                    )}
-
-                                    {c.replies && c.replies.length > 0 && (
-                                        <div className="mt-3 space-y-2 pl-4 border-l-2 border-gray-100 dark:border-white/10">
-                                            {c.replies.map((reply) => (
-                                                <p
-                                                    key={reply.id}
-                                                    className="text-sm text-gray-600 dark:text-gray-300"
-                                                >
-                                                    <span className="font-semibold text-gray-800 dark:text-white">
-                                                        {reply.user?.first_name}:
-                                                    </span>{" "}
-                                                    {reply.reply}
-                                                </p>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <div className="mt-2">
-                                        <button
-                                            type="button"
-                                            className="text-xs font-semibold text-[#1447A6] hover:underline"
-                                            onClick={() => toggleReplyInput(c.id)}
-                                        >
-                                            {activeReplyId === c.id ? "Cancel" : "Reply"}
-                                        </button>
-
-                                        {activeReplyId === c.id && (
-                                            <div className="mt-2 flex items-center gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={replyText[c.id] || ""}
-                                                    onChange={(e) =>
-                                                        handleReplyChange(c.id, e.target.value)
-                                                    }
-                                                    placeholder="Write a reply..."
-                                                    className="flex-1 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-full px-3.5 py-1.5 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-[#1447A6] focus:border-[#1447A6] outline-none transition"
-                                                />
-                                                <button
-                                                    onClick={() => submitReply(c.id)}
-                                                    className="bg-[#1447A6] hover:bg-[#0F3A8A] text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors flex-shrink-0"
-                                                >
-                                                    Send
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+            <LessonDiscussion key={course.id} topicId={course.id} category="course" />
         </div>
     );
 };
@@ -710,7 +422,6 @@ const CoursesPage = () => {
     const [expandedCategories, setExpandedCategories] = useState({});
     const [showCourseModal, setShowCourseModal] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const contentScrollRef = useRef(null);
 
     useEffect(() => {
@@ -721,9 +432,6 @@ const CoursesPage = () => {
         }
     }, []);
 
-    const handleSidebarToggle = () => {
-        setSidebarCollapsed((prev) => !prev);
-    };
     useEffect(() => {
         const onPopState = () => {
             const next = parseCoursePath();
@@ -1114,81 +822,13 @@ const CoursesPage = () => {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row">
+            <div className="flex h-[100dvh] flex-col md:h-[calc(100dvh-3rem)] md:flex-row">
                 <div
-                    className={`hidden md:block ${
-                        sidebarCollapsed ? "w-20" : "w-1/3"
-                    } transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800`}
-                    style={{ height: "calc(100vh - 90px)", overflowY: "auto" }}
+                    className={`hidden md:block w-1/3 transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800`}
+                    style={{ overflowY: "auto" }}
                 >
-                    <div className={`relative ${sidebarCollapsed ? "px-4 py-5" : "px-4 py-5 bg-[#1447A6]"}`}>
-                        <button
-                            onClick={handleSidebarToggle}
-                            className={
-                                sidebarCollapsed
-                                    ? "flex items-center justify-center w-11 h-11 mx-auto rounded-2xl text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
-                                    : "absolute top-4 right-4 flex items-center justify-center w-7 h-7 rounded-full border border-white/80 text-white/80 hover:text-white hover:bg-white/10 transition focus:outline-none"
-                            }
-                            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                        >
-                            {sidebarCollapsed ? (
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            ) : (
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M18 6 6 18M6 6l12 12" />
-                                </svg>
-                            )}
-                        </button>
-
-                        {!sidebarCollapsed && (
-                            <>
-                                <span className="block font-bold text-lg text-white truncate pr-8">
-                                    {level.charAt(0).toUpperCase() +
-                                        level.slice(1)}{" "}
-                                    Piano Roadmap
-                                </span>
-                                <a
-                                    href="/member/roadmap"
-                                    className="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-white/80 hover:text-white transition"
-                                >
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M15 18l-6-6 6-6" />
-                                    </svg>
-                                    Back
-                                </a>
-                            </>
-                        )}
-                    </div>
-                    {!sidebarCollapsed && <CourseList />}
-                </div>
-
-                {/* Mobile Course List */}
-                <div className="md:hidden w-full mb-4">
                     <div className="relative px-4 py-5 bg-[#1447A6]">
-                        <button
-                            onClick={() =>
-                                setExpandedCategories((prev) => ({
-                                    ...prev,
-                                    __mobile: !prev.__mobile,
-                                }))
-                            }
-                            className="absolute top-4 right-4 flex items-center justify-center w-7 h-7 rounded-full border border-white/80 text-white/80 hover:text-white hover:bg-white/10 transition focus:outline-none"
-                            aria-label={expandedCategories.__mobile ? "Collapse list" : "Expand list"}
-                        >
-                            {expandedCategories.__mobile ? (
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M18 6 6 18M6 6l12 12" />
-                                </svg>
-                            ) : (
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M6 9l6 6 6-6" />
-                                </svg>
-                            )}
-                        </button>
-
-                        <span className="block font-bold text-lg text-white truncate pr-8">
+                        <span className="block font-bold text-lg text-white truncate">
                             {level.charAt(0).toUpperCase() +
                                 level.slice(1)}{" "}
                             Piano Roadmap
@@ -1200,24 +840,58 @@ const CoursesPage = () => {
                             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M15 18l-6-6 6-6" />
                             </svg>
-                            Back
+                            Back to Roadmap
                         </a>
                     </div>
-                    {expandedCategories.__mobile && <CourseList />}
+                    <CourseList />
+                </div>
+
+                <div className={`w-full md:hidden ${expandedCategories.__mobile ? "flex min-h-0 flex-1 flex-col" : "shrink-0"}`}>
+                    <div className="bg-[#1447A6] px-4 pb-3 pt-2.5 text-white">
+                        <a href="/member/roadmap" className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-white/90 hover:underline">
+                            <span aria-hidden="true">‹</span> Back to Roadmap
+                        </a>
+                        <div className="flex items-center justify-between gap-3">
+                            <h1 className="text-base font-bold leading-tight">
+                                {level.charAt(0).toUpperCase() + level.slice(1)} Piano Roadmap
+                            </h1>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setExpandedCategories((prev) => ({ ...prev, __mobile: !prev.__mobile }))
+                                }
+                                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-white/50 px-2.5 text-xs font-semibold hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white"
+                                aria-expanded={Boolean(expandedCategories.__mobile)}
+                                aria-controls="mobile-roadmap-lessons"
+                            >
+                                Lessons
+                                <svg className={`h-4 w-4 transition-transform ${expandedCategories.__mobile ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="mt-1 flex items-center gap-3">
+                            <div role="progressbar" aria-label="Roadmap progress" aria-valuenow={generalProgress} aria-valuemin={0} aria-valuemax={100}
+                                 className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/25">
+                                <div className="h-full rounded-full bg-white" style={{ width: `${generalProgress}%` }} />
+                            </div>
+                            <span className="shrink-0 text-xs font-medium">{generalProgress}% complete</span>
+                        </div>
+                    </div>
+                    <div id="mobile-roadmap-lessons" hidden={!expandedCategories.__mobile} className="min-h-0 flex-1 overflow-y-auto">
+                        {expandedCategories.__mobile && <CourseList />}
+                    </div>
                 </div>
 
                 {/* Course Details */}
                 <div
-                    className={`flex flex-col transition-all duration-300 ${
-                        sidebarCollapsed ? "md:w-full" : "md:w-2/3"
-                    }`}
-                    style={{ height: "calc(100dvh - 90px)" }}
+                    className={`${expandedCategories.__mobile ? "hidden md:flex" : "flex"} min-h-0 min-w-0 flex-1 flex-col transition-all duration-300 md:w-2/3 md:flex-none`}
                 >
                     <div
                         ref={contentScrollRef}
-                        className="flex-1 overflow-y-auto px-4 pb-4 pt-1"
+                        className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-3 md:px-4 md:pt-1"
                     >
-                        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-5 w-full max-w-7xl mx-auto mb-2">
+                        <div className="mx-auto mb-2 hidden w-full max-w-7xl rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-900 md:block">
                             <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                                 {calculateGeneralProgress()}% Completed
                             </span>
