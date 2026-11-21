@@ -24,6 +24,7 @@
             ['Live Show', '/admin/live-shows', 'fa-tv', ['admin/live-show*']],
             ['Community Tutorials', route('admin.tutorials.index'), 'fa-video', ['admin/tutorials*']],
             ['Student Challenges', route('admin.student-challenges.index'), 'fa-trophy', ['admin/student-challenges*']],
+            ['Comments', route('admin.comments.index'), 'fa-comments', ['admin/comments*']],
         ]],
         ['key' => 'shop', 'label' => 'Shop & Downloads', 'items' => [
             ['Shop', route('admin.shop.index', ['type' => 'midi']), 'fa-store', ['admin/shop', 'admin/shop/*']],

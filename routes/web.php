@@ -363,6 +363,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::put('payment-settings', [\App\Http\Controllers\Admin\PaymentSettingsController::class, 'update'])->name('admin.payment-settings.update');
     Route::put('payment-settings/plans', [\App\Http\Controllers\Admin\PaymentSettingsController::class, 'updatePlans'])->name('admin.payment-settings.plans');
 
+    // Comment moderation
+    Route::get('comments', [\App\Http\Controllers\Admin\CommentModerationController::class, 'index'])->name('admin.comments.index');
+    Route::delete('comments/{source}/{id}', [\App\Http\Controllers\Admin\CommentModerationController::class, 'destroy'])->whereNumber('id')->name('admin.comments.destroy');
+
     // Guest Bookings
     Route::prefix('guest-bookings')->name('admin.guest-bookings.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\GuestBookingController::class, 'index'])->name('index');
