@@ -94,19 +94,6 @@
         </a>
       </div>
 
-      <div class="flex flex-col items-center text-center p-5 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-        <div class="w-12 h-12 flex items-center justify-center bg-emerald-50 rounded-full flex-shrink-0 mb-3">
-          <i class="fa fa-ear-listen text-emerald-600 text-lg"></i>
-        </div>
-        <h4 class="font-semibold text-[#435065] text-[16px] font-sf">Ear Training</h4>
-        <p class="text-sm text-[#5E6779] mt-1 font-sf">Sharpen your ear with guided drills</p>
-        <a href="{{ route('ear.training') }}"
-           class="mt-4 inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-blue-200 bg-white text-blue-600 text-sm font-semibold font-sf hover:bg-blue-50 transition-colors">
-          Start Training
-          <i class="fa fa-angle-right text-xs"></i>
-        </a>
-      </div>
-
     </div>
 
   </div>

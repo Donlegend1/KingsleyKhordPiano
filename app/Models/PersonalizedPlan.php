@@ -160,4 +160,41 @@ class PersonalizedPlan extends Model
 
         return (int) round((count($completed) / count($keys)) * 100);
     }
+
+    /**
+     * Admin-facing snapshot of how a member is doing against their plan:
+     * lessons done, overall %, per-month %, and pace vs the 90-day schedule.
+     */
+    public function progressSummary(): array
+    {
+        $keys = $this->allLessonKeys();
+        $total = count($keys);
+        $done = count(array_intersect($this->completed_lessons ?? [], $keys));
+        $percent = $total > 0 ? (int) round(($done / $total) * 100) : 0;
+
+        $started = $this->start_date && ! $this->start_date->isFuture();
+        $elapsedDays = $started ? min(self::PROGRAM_LENGTH_DAYS, (int) $this->start_date->diffInDays(now())) : 0;
+        $expected = (int) round(($elapsedDays / self::PROGRAM_LENGTH_DAYS) * 100);
+
+        $pace = match (true) {
+            $total === 0 => 'No lessons',
+            $percent >= 100 => 'Completed',
+            ! $started => 'Not started',
+            $percent >= $expected + 10 => 'Ahead',
+            $percent >= $expected - 10 => 'On track',
+            default => 'Behind',
+        };
+
+        return [
+            'done' => $done,
+            'total' => $total,
+            'percent' => $percent,
+            'expected' => $expected,
+            'day' => $elapsedDays,
+            'started' => $started,
+            'pace' => $pace,
+            'months' => collect(array_keys($this->months ?? []))->map(fn ($m) => $this->monthProgressPercent((int) $m))->all(),
+            'next' => $this->nextUnfinishedLesson()['name'] ?? null,
+        ];
+    }
 }

@@ -6,6 +6,7 @@
     $authUser = auth()->user();
     $initials = strtoupper(substr($authUser->first_name ?? $authUser->name ?? 'U', 0, 1) . substr($authUser->last_name ?? '', 0, 1));
     $progress = $plan->progressPercent();
+    $paceInfo = $plan->progressSummary();
     $categoryLabels = [
         'finger_exercise' => ['label' => 'Finger Exercise', 'icon' => 'fa-hand-fist'],
         'theory_and_application' => ['label' => 'Theory and Application', 'icon' => 'fa-book'],
@@ -32,7 +33,7 @@
 </section>
 
 <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6"
-     x-data="personalizedPlanPage({{ \Illuminate\Support\Js::from(['progress' => $progress, 'completed' => $plan->completed_lessons ?? [], 'weeks' => $weekGroups]) }})">
+     x-data="personalizedPlanPage({{ \Illuminate\Support\Js::from(['progress' => $progress, 'expected' => $paceInfo['expected'], 'started' => $paceInfo['started'], 'day' => $paceInfo['day'], 'completed' => $plan->completed_lessons ?? [], 'weeks' => $weekGroups]) }})">
 
   {{-- Shown right after a lesson is ticked: invites the student to post their progress --}}
   <div x-show="shareNudge" x-cloak x-transition.opacity
@@ -92,13 +93,19 @@
             <i class="fa-solid fa-chart-pie text-lg"></i>
           </div>
           <div class="flex-1 flex items-center justify-between min-w-0">
-            <p class="text-[15px] font-semibold text-gray-900">Overall Progress</p>
+            <div class="min-w-0">
+              <p class="text-[15px] font-semibold text-gray-900">Overall Progress</p>
+              <span class="mt-0.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold" :class="pace.badge">
+                <i :class="pace.icon" class="text-[10px]"></i><span x-text="pace.label"></span>
+              </span>
+            </div>
             <p class="text-[15px] font-extrabold text-gray-900" x-text="progress + '%'"></p>
           </div>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2.5">
-          <div class="bg-[#1447A6] h-2.5 rounded-full transition-all duration-500" :style="'width: ' + progress + '%'"></div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5 relative" role="progressbar" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+          <div class="h-2.5 rounded-full transition-all duration-500" :class="pace.bar" :style="'width: ' + progress + '%'"></div>
         </div>
+        <p class="mt-2 text-xs text-gray-500" x-text="pace.message"></p>
       </div>
 
     </div>
@@ -389,6 +396,18 @@
     function personalizedPlanPage(initial) {
         return {
             progress: initial.progress,
+            expected: initial.expected,
+            started: initial.started,
+            day: initial.day,
+            get pace() {
+                const p = this.progress, e = this.expected;
+                if (p >= 100) return { label: 'Completed', icon: 'fa-solid fa-trophy', badge: 'bg-emerald-50 text-emerald-700', bar: 'bg-emerald-500', message: 'You finished your whole plan. Amazing work!' };
+                if (!this.started) return { label: 'Not started yet', icon: 'fa-regular fa-clock', badge: 'bg-gray-100 text-gray-600', bar: 'bg-[#1447A6]', message: 'Your plan hasn\'t begun yet. Get ready to start.' };
+                const day = 'Day ' + this.day + ' of 90 · you\'d be around ' + e + '% by now.';
+                if (p >= e + 10) return { label: 'Ahead of schedule', icon: 'fa-solid fa-rocket', badge: 'bg-violet-50 text-violet-700', bar: 'bg-violet-500', message: 'You\'re doing wonderfully, ahead of plan. ' + day };
+                if (p >= e - 10) return { label: 'On track', icon: 'fa-solid fa-circle-check', badge: 'bg-blue-50 text-blue-700', bar: 'bg-[#1447A6]', message: 'Right where you should be. Keep it up! ' + day };
+                return { label: 'Behind schedule', icon: 'fa-solid fa-hourglass-half', badge: 'bg-amber-50 text-amber-700', bar: 'bg-amber-500', message: 'A little behind, but a short session today gets you back on pace. ' + day };
+            },
             completed: initial.completed || [],
             weeks: initial.weeks,
             activeMonth: 0,

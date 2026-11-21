@@ -18,7 +18,6 @@ use App\Http\Controllers\PostReplyController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\EarTrainingController;
 use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\CourseCategoryController;
 use App\Http\Controllers\ChatMessageController;
@@ -64,9 +63,11 @@ use App\Http\Controllers\LiveShowNotificationController;
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminController::class, 'usersList']);
         Route::get('all-courses', [CourseController::class, 'allCourses']);
-        Route::put('users/{user}', [AdminController::class, 'editUser']);
-        Route::put('users/{user}/subscription', [AdminController::class, 'updateSubscriptionAccess']);
-        Route::delete('user/{user}', [AdminController::class, 'destroy']);
+        Route::middleware(['web', 'auth'])->group(function () {
+            Route::put('users/{user}', [AdminController::class, 'editUser']);
+            Route::put('users/{user}/subscription', [AdminController::class, 'updateSubscriptionAccess']);
+            Route::delete('user/{user}', [AdminController::class, 'destroy']);
+        });
         Route::get('courses', [CourseController::class, 'coursesList']);
         Route::patch('courses/{course}', [CourseController::class, 'update']);
         Route::post('upload/{upload}', [UploadController::class, 'update']);
@@ -230,8 +231,6 @@ use App\Http\Controllers\LiveShowNotificationController;
 
     Route::get('exercise/{exercise}', [ExerciseController::class, 'show']);
     Route::post('exercise/{exercise}/submit', [ExerciseController::class, 'submit']);
-    Route::get('ear-training', [EarTrainingController::class, 'index']);
-    Route::get('ear-training/{level}', [EarTrainingController::class, 'show']);
     Route::get('live-sessions', [LiveSessionController::class, 'index']);
     Route::get('live-sessions/{session}', [LiveSessionController::class, 'show']);
     Route::get('course/{level}', [CourseController::class, 'membershow']);
