@@ -61,6 +61,15 @@ use App\Http\Controllers\LiveShowNotificationController;
 
     Route::get('/plans', [PlanController::class, 'index']);
 
+    // Khord Quiz (server-to-server): verify a subscribed member so Khord Quiz
+    // can create their account + subscription on its side.
+    Route::prefix('khord-quiz')->middleware(['khord.quiz', 'throttle:60,1'])->group(function () {
+        Route::get('members', [\App\Http\Controllers\Api\KhordQuizMemberController::class, 'index']);
+        Route::post('members/verify', [\App\Http\Controllers\Api\KhordQuizMemberController::class, 'verify']);
+        Route::get('members/{email}', [\App\Http\Controllers\Api\KhordQuizMemberController::class, 'show'])
+            ->where('email', '[^/]+');
+    });
+
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminController::class, 'usersList']);
         Route::get('all-courses', [CourseController::class, 'allCourses']);

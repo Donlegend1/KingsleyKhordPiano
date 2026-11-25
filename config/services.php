@@ -81,4 +81,9 @@ return [
     // end-to-end without real money. Must never be true in production.
     'fake_guest_payments' => env('FAKE_GUEST_PAYMENTS', false),
 
+    // Shared secret Khord Quiz sends (X-Api-Key header) to look up subscribed members.
+    'khord_quiz' => [
+        'api_key' => env('KHORD_QUIZ_API_KEY'),
+    ],
+
 ];
