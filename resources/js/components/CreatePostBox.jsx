@@ -34,10 +34,14 @@ const EMOJI_LIST = [
 
 const TOPIC_OPTIONS = [
     { label: "Select Topic", value: "" },
+    { label: "General", value: "general" },
     { label: "Say Hello", value: "say_hello" },
     { label: "Discussions", value: "ask_question" },
     { label: "Announcements", value: "announcement" },
     { label: "Suggestions", value: "suggestions" },
+    { label: "Progress Reports", value: "progress_report" },
+    { label: "Public Pledges", value: "public_pledges" },
+    { label: "Workspace Showcase", value: "workspace_showcase" },
 ];
 
 const CreatePostBox = ({

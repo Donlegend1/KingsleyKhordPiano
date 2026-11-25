@@ -14,14 +14,6 @@ import { Trash2, Bookmark, ThumbsUp, MessageCircle, PinIcon } from "lucide-react
 import AuthorNameWithVerification from "./User/AuthorNameWithVerification";
 import PostBlocks from "./PostBlocks";
 
-const REACTIONS = [
-    { type: "like", emoji: "👍", label: "Like", color: "text-blue-600 dark:text-blue-400" },
-    { type: "love", emoji: "❤️", label: "Love", color: "text-red-600 dark:text-red-400" },
-    { type: "haha", emoji: "😂", label: "Haha", color: "text-yellow-500" },
-    { type: "sad", emoji: "😢", label: "Sad", color: "text-yellow-600" },
-    { type: "wow", emoji: "😮", label: "Wow", color: "text-yellow-500" },
-];
-
 const getInitials = (firstName, lastName) => {
     return `${firstName?.charAt(0) || ""}${
         lastName?.charAt(0) || ""
@@ -80,12 +72,11 @@ const PostWithComments = ({
     const toggleReplies = (commentId) => {
         setExpandedReplies((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
     };
-    const [likes, setLikes] = useState(post.likes || []);
-    const [liked, setLiked] = useState(post.liked_by_user || false);
-    const [heartPulse, setHeartPulse] = useState(false);
-    const [showReactionPicker, setShowReactionPicker] = useState(false);
-    const reactionCloseTimer = useRef(null);
-    const longPressTimer = useRef(null);
+    const [likeCount, setLikeCount] = useState(post.likes_count ?? post.likes?.length ?? 0);
+    const [liked, setLiked] = useState(Boolean(post.liked_by_user ??
+        post.likes?.some((like) => (like.user_id ?? like.user?.id) === window.authUser?.id)));
+    const [savingLike, setSavingLike] = useState(false);
+    const likeRequest = useRef(false);
     const [isBookmarked, setIsBookmarked] = useState(post.is_bookmarked || false);
     const [replySectionFor, setReplySectionFor] = useState(null);
     const [editingCommentId, setEditingCommentId] = useState(null);
@@ -104,66 +95,33 @@ const PostWithComments = ({
     const author = post.user || {};
     const initials = getInitials(author.first_name, author.last_name);
 
-    const myLike = likes.find((like) => like.user?.id === window.authUser?.id);
-    const myReaction = REACTIONS.find((r) => r.type === myLike?.type);
+    const toggleLike = async () => {
+        if (likeRequest.current) return;
 
-    const openReactionPicker = () => {
-        clearTimeout(reactionCloseTimer.current);
-        setShowReactionPicker(true);
-    };
-
-    const scheduleCloseReactionPicker = () => {
-        reactionCloseTimer.current = setTimeout(
-            () => setShowReactionPicker(false),
-            350,
-        );
-    };
-
-    const handleLikeTouchStart = () => {
-        longPressTimer.current = setTimeout(() => {
-            openReactionPicker();
-            longPressTimer.current = null;
-        }, 350);
-    };
-
-    const handleLikeTouchEnd = () => {
-        if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-            longPressTimer.current = null;
-        }
-    };
-
-    const selectReaction = (type) => {
-        setShowReactionPicker(false);
-        toggleLike(type);
-    };
-
-    const toggleLike = async (type = "like") => {
-        setHeartPulse(true);
-        setTimeout(() => setHeartPulse(false), 400);
+        const nextLiked = !liked;
+        likeRequest.current = true;
+        setSavingLike(true);
+        setLiked(nextLiked);
+        setLikeCount(Math.max(0, likeCount + (nextLiked ? 1 : -1)));
 
         try {
-            const response = await axios.post("/api/member/like", {
+            const { data } = await axios.post("/api/member/like", {
                 post_id: post.id,
-                type,
+                liked: nextLiked,
             });
-            const updatedLikes =
-                response.data?.likes || response.data?.data || [];
-
-            setLikes(updatedLikes);
-            const nowLiked = updatedLikes.some(
-                (like) => like.user?.id === window.authUser?.id,
-            );
-            setLiked(nowLiked);
-
-            if (typeof onUpdatePost === "function") {
-                onUpdatePost(post.id, {
-                    likes: updatedLikes,
-                    liked_by_user: nowLiked,
-                });
-            }
-        } catch (error) {
-            console.error("Error toggling like:", error);
+            setLiked(data.liked);
+            setLikeCount(data.likes_count);
+            onUpdatePost?.(post.id, {
+                liked_by_user: data.liked,
+                likes_count: data.likes_count,
+            });
+        } catch {
+            setLiked(liked);
+            setLikeCount(likeCount);
+            showMessage("Couldn’t update your like. Please try again.", "error");
+        } finally {
+            likeRequest.current = false;
+            setSavingLike(false);
         }
     };
 
@@ -569,43 +527,15 @@ const PostWithComments = ({
             </div>
 
             {/* Engagement Summary */}
-            {(likes.length > 0 || totalCommentCount > 0) && (
-                <div className="flex items-center justify-between text-sm text-gray-400 dark:text-gray-500 pb-2">
-                    <span className="flex items-center gap-1.5">
-                        {likes.length > 0 && (
+            {(likeCount > 0 || totalCommentCount > 0) && (
+                <div className="flex items-center justify-between pb-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="flex items-center gap-1.5" aria-live="polite">
+                        {likeCount > 0 && (
                             <>
-                                {(() => {
-                                    const firstReaction = REACTIONS.find(
-                                        (r) => r.type === likes[0]?.type,
-                                    );
-
-                                    if (!firstReaction || firstReaction.type === "like") {
-                                        return (
-                                            <span className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                                                <ThumbsUp className="w-2.5 h-2.5 fill-white text-white" />
-                                            </span>
-                                        );
-                                    }
-
-                                    return (
-                                        <span className="text-sm leading-none">
-                                            {firstReaction.emoji}
-                                        </span>
-                                    );
-                                })()}
-                                {(() => {
-                                    const names = likes.map(
-                                        (l) =>
-                                            l.user?.first_name ||
-                                            l.user?.display_name ||
-                                            "Someone",
-                                    );
-
-                                    if (names.length === 1) return names[0];
-                                    if (names.length === 2)
-                                        return `${names[0]} and ${names[1]}`;
-                                    return `${names[0]} and ${names.length - 1} others`;
-                                })()}
+                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
+                                    <ThumbsUp className="h-3 w-3" aria-hidden="true" />
+                                </span>
+                                {likeCount} {likeCount === 1 ? "like" : "likes"}
                             </>
                         )}
                     </span>
@@ -620,67 +550,21 @@ const PostWithComments = ({
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
                 <div className="flex items-center">
-                    {/* Like */}
-                    <div
-                        className="relative flex-1"
-                        onMouseEnter={openReactionPicker}
-                        onMouseLeave={scheduleCloseReactionPicker}
+                    <button
+                        type="button"
+                        onClick={toggleLike}
+                        aria-label="Like post"
+                        aria-pressed={liked}
+                        aria-disabled={savingLike}
+                        className={`flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+                            liked
+                                ? "bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        }`}
                     >
-                        {showReactionPicker && (
-                            <div
-                                className="absolute bottom-full left-0 mb-1 flex items-center gap-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg px-1.5 py-1 z-10"
-                                onMouseEnter={openReactionPicker}
-                                onMouseLeave={scheduleCloseReactionPicker}
-                            >
-                                {REACTIONS.map((reaction) => (
-                                    <button
-                                        key={reaction.type}
-                                        type="button"
-                                        title={reaction.label}
-                                        onClick={() => selectReaction(reaction.type)}
-                                        className="w-9 h-9 flex items-center justify-center text-2xl rounded-full hover:scale-125 hover:-translate-y-1 transition-transform duration-150"
-                                    >
-                                        {reaction.emoji}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-
-                        <button
-                            onClick={() => {
-                                // A plain click only removes an existing reaction.
-                                // Choosing "Like" (or any other reaction) requires
-                                // hovering/pressing to open the picker above.
-                                if (liked) toggleLike(myReaction?.type || "like");
-                            }}
-                            onTouchStart={handleLikeTouchStart}
-                            onTouchEnd={handleLikeTouchEnd}
-                            className={`w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-md transition-colors duration-150 active:scale-95 ${
-                                liked
-                                    ? myReaction?.color || "text-blue-600 dark:text-blue-400"
-                                    : "text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                            }`}
-                        >
-                            {liked && myReaction && myReaction.type !== "like" ? (
-                                <span
-                                    className={`text-base transition-transform ease-out ${
-                                        heartPulse ? "scale-125 duration-200" : "scale-100 duration-300"
-                                    }`}
-                                >
-                                    {myReaction.emoji}
-                                </span>
-                            ) : (
-                                <ThumbsUp
-                                    className={`w-4 h-4 transition-transform ease-out ${
-                                        heartPulse
-                                            ? "scale-125 duration-200"
-                                            : "scale-100 duration-300"
-                                    } ${liked ? "fill-blue-600 text-blue-600 dark:fill-blue-400 dark:text-blue-400" : ""}`}
-                                />
-                            )}
-                            <span>{liked ? myReaction?.label || "Liked" : "Like"}</span>
-                        </button>
-                    </div>
+                        <ThumbsUp className={`h-4 w-4 ${liked ? "fill-current" : ""}`} aria-hidden="true" />
+                        <span>{liked ? "Liked" : "Like"}</span>
+                    </button>
 
                     {/* Comment */}
                     <button
@@ -705,7 +589,7 @@ const PostWithComments = ({
                             const replyCount = comment.replies?.length || 0;
 
                             return (
-                                <div key={comment.id} className="flex items-start gap-2.5">
+                                <div key={comment.id} id={`comment-${comment.id}`} className="flex scroll-mt-24 items-start gap-2.5">
                                     <img
                                         src={comment.user?.passport || "/avatar1.jpg"}
                                         alt={comment.user?.first_name}

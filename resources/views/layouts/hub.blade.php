@@ -119,11 +119,9 @@
                 <div class="hidden lg:flex items-center gap-6">
                 {{-- Notifications --}}
                 @php
-                    $notifications = auth()->user()->notifications()
-                        ->where('data->data->section', \App\Enums\Notification\NotificationSectionEnum::COMMUNITY->value)
-                        ->latest()
-                        ->get();
-                    $unreadCount = $notifications->whereNull('read_at')->count();
+                    $notificationQuery = auth()->user()->notificationsForArea(true);
+                    $unreadCount = (clone $notificationQuery)->whereNull('read_at')->count();
+                    $notifications = $notificationQuery->latest()->limit(12)->get();
                 @endphp
 
                 <div class="relative group" x-data="{
@@ -132,8 +130,9 @@
                         notifPref: '{{ auth()->user()->notification_preference ?? 'email' }}',
                         saving: false,
                         pushError: '',
+                        savedPref: '{{ auth()->user()->notification_preference ?? 'email' }}',
                         async savePreference(value) {
-                            const previous = this.notifPref;
+                            const previous = this.savedPref;
                             this.notifPref = value;
                             try {
                                 const res = await fetch('{{ route('notifications.updatePreference') }}', {
@@ -145,9 +144,11 @@
                                     },
                                     body: JSON.stringify({ notification_preference: value }),
                                 });
-                                if (!res.ok) { this.notifPref = previous; }
+                                if (!res.ok) throw new Error('Preferences could not be saved.');
+                                this.savedPref = value;
                             } catch (e) {
                                 this.notifPref = previous;
+                                this.pushError = 'Could not save notification settings. Please try again.';
                             }
                         },
                         async setPref(value) {
@@ -162,7 +163,7 @@
 
                             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
                                 this.pushError = 'Push notifications are not supported in this browser.';
-                                this.notifPref = '{{ auth()->user()->notification_preference ?? 'email' }}';
+                                this.notifPref = this.savedPref;
                                 return;
                             }
 
@@ -171,7 +172,7 @@
                                 const permission = await Notification.requestPermission();
                                 if (permission !== 'granted') {
                                     this.pushError = 'Notification permission was denied.';
-                                    this.notifPref = '{{ auth()->user()->notification_preference ?? 'email' }}';
+                                    this.notifPref = this.savedPref;
                                     return;
                                 }
 
@@ -193,7 +194,7 @@
                                     });
                                 }
 
-                                await fetch('{{ route('webpush.subscribe') }}', {
+                                const subscriptionResponse = await fetch('{{ route('webpush.subscribe') }}', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -203,10 +204,11 @@
                                     body: JSON.stringify(subscription.toJSON()),
                                 });
 
+                                if (!subscriptionResponse.ok) throw new Error('Push registration failed.');
                                 await this.savePreference('push');
                             } catch (e) {
                                 this.pushError = 'Could not enable push notifications.';
-                                this.notifPref = '{{ auth()->user()->notification_preference ?? 'email' }}';
+                                this.notifPref = this.savedPref;
                             } finally {
                                 this.saving = false;
                             }
@@ -254,7 +256,7 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 @if($unreadCount > 0)
-                                    <form method="POST" action="{{ route('notifications.markAllAsRead') }}">
+                                    <form method="POST" action="{{ route('notifications.markAllAsRead', ['area' => 'community']) }}">
                                         @csrf
                                         <button type="submit" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
                                             Mark all read
@@ -301,44 +303,46 @@
                                 $avatar    = $data['data']['by_user_avatar'] ?? null;
                                 $isUnread  = is_null($notification->read_at);
                                 $initials2 = strtoupper(substr($firstName, 0, 1));
-                                $notifUrl  = $data['data']['url'] ?? null;
                             @endphp
 
-                                <a href="{{ $notifUrl }}"
-                                   class="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/60 {{ $isUnread ? 'bg-blue-50 dark:bg-blue-900/20' : '' }}">
+                                <form method="POST" action="{{ route('community.notifications.open', $notification->id) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="flex w-full text-left items-start gap-3 px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/60 {{ $isUnread ? 'bg-blue-50 dark:bg-blue-900/20' : '' }}">
 
-                                    <!-- Avatar -->
-                                    <div class="flex-shrink-0 mt-0.5">
-                                        @if(!empty($avatar))
-                                            <img src="{{ $avatar }}" alt="{{ $firstName }}"
-                                                 class="w-9 h-9 rounded-full object-cover ring-2 ring-white dark:ring-gray-800">
-                                        @else
-                                            <div class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400 ring-2 ring-white dark:ring-gray-800">
-                                                {{ $initials2 }}
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    <!-- Text -->
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug">
-                                            <span class="font-semibold">{{ $firstName }}</span>
-                                            @if($type === 'comment') commented on your post
-                                            @elseif($type === 'reply') replied to your comment
-                                            @elseif($type === 'like') liked your post
-                                            @else interacted with your post
+                                        <!-- Avatar -->
+                                        <span class="flex-shrink-0 mt-0.5">
+                                            @if(!empty($avatar))
+                                                <img src="{{ $avatar }}" alt="{{ $firstName }}"
+                                                     class="w-9 h-9 rounded-full object-cover ring-2 ring-white dark:ring-gray-800">
+                                            @else
+                                                <span class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400 ring-2 ring-white dark:ring-gray-800">
+                                                    {{ $initials2 }}
+                                                </span>
                                             @endif
-                                        </p>
-                                        <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 block">
-                                            {{ $notification->created_at->diffForHumans() }}
                                         </span>
-                                    </div>
 
-                                    <!-- Unread dot -->
-                                    @if($isUnread)
-                                        <span class="flex-shrink-0 mt-2 w-2 h-2 rounded-full bg-blue-500"></span>
-                                    @endif
-                                </a>
+                                        <!-- Text -->
+                                        <span class="flex-1 min-w-0">
+                                            <span class="block text-sm text-gray-800 dark:text-gray-200 leading-snug">
+                                                <span class="font-semibold">{{ $firstName }}</span>
+                                                @if($type === 'comment') commented on your post
+                                                @elseif($type === 'reply') replied to your comment
+                                                @elseif($type === 'like') liked your post
+                                                @else interacted with your post
+                                                @endif
+                                            </span>
+                                            <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 block">
+                                                {{ $notification->created_at->diffForHumans() }}
+                                            </span>
+                                        </span>
+
+                                        <!-- Unread dot -->
+                                        @if($isUnread)
+                                            <span class="flex-shrink-0 mt-2 w-2 h-2 rounded-full bg-blue-500"></span>
+                                        @endif
+                                    </button>
+                                </form>
                             @empty
                                 <div class="flex flex-col items-center justify-center py-10 px-4 text-center">
                                     <svg class="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

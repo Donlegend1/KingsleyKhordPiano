@@ -1,0 +1,44 @@
+.recording-timeline {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    cursor: pointer;
+    opacity: 1;
+    --played: 0%;
+    --track: linear-gradient(to right, #ffd736 0 var(--played), #697485 var(--played) 100%);
+}
+
+.recording-timeline:disabled {
+    cursor: default;
+}
+
+.recording-timeline::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--track);
+}
+
+.recording-timeline::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--track);
+}
+
+.recording-timeline::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border: 0;
+    border-radius: 50%;
+    background: #ffd736;
+}
+
+.recording-timeline::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 50%;
+    background: #ffd736;
+}

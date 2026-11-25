@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles\UserRoles;
+use App\Models\MemberSignInDay;
 use App\Models\UserDailyLogin;
 
 class LoginController extends Controller
@@ -25,6 +26,7 @@ class LoginController extends Controller
             'last_login_at' => now()
         ]);
 
+        MemberSignInDay::record($user);
         UserDailyLogin::recordToday($user->id, $user->timezone);
 
         if ($request->has('plan_id')) {

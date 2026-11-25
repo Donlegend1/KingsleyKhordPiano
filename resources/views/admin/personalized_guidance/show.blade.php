@@ -42,6 +42,40 @@
         @endif
     </div>
 
+    <!-- Plan progress -->
+    @if($planSummary)
+        @php
+            $paceStyles = ['Completed' => 'bg-emerald-50 text-emerald-700', 'Ahead' => 'bg-violet-50 text-violet-700', 'On track' => 'bg-blue-50 text-blue-700', 'Behind' => 'bg-red-50 text-red-700'];
+            $barStyle = ['Completed' => 'bg-emerald-500', 'Ahead' => 'bg-violet-500', 'On track' => 'bg-blue-600', 'Behind' => 'bg-red-500'][$planSummary['pace']] ?? 'bg-gray-400';
+        @endphp
+        <div class="bg-white rounded-xl shadow p-5 mb-6">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-sm font-bold text-gray-900">Plan progress</p>
+                <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $paceStyles[$planSummary['pace']] ?? 'bg-gray-100 text-gray-600' }}">{{ $planSummary['pace'] }}</span>
+            </div>
+            <div class="mt-3 flex items-center gap-3">
+                <div class="h-2 flex-1 overflow-hidden rounded-full bg-gray-200" role="progressbar" aria-valuenow="{{ $planSummary['percent'] }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="h-full rounded-full {{ $barStyle }}" style="width: {{ $planSummary['percent'] }}%"></div>
+                </div>
+                <span class="text-sm font-bold text-gray-900">{{ $planSummary['percent'] }}%</span>
+            </div>
+            <p class="mt-1 text-xs text-gray-500">{{ $planSummary['done'] }} of {{ $planSummary['total'] }} lessons completed · Day {{ $planSummary['day'] }} of 90 (expected {{ $planSummary['expected'] }}% by now)</p>
+            @if(count($planSummary['months']))
+                <div class="mt-4 grid grid-cols-3 gap-3">
+                    @foreach($planSummary['months'] as $i => $monthPercent)
+                        <div>
+                            <div class="flex justify-between text-xs text-gray-500"><span>Month {{ $i + 1 }}</span><span class="font-semibold text-gray-800">{{ $monthPercent }}%</span></div>
+                            <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-gray-200"><div class="h-full rounded-full bg-blue-600" style="width: {{ $monthPercent }}%"></div></div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+            @if($planSummary['next'])
+                <p class="mt-4 border-t border-gray-100 pt-3 text-xs text-gray-500">Next lesson: <span class="font-semibold text-gray-800">{{ $planSummary['next'] }}</span></p>
+            @endif
+        </div>
+    @endif
+
     <!-- Guidance form submission -->
     @if($request)
         @php

@@ -34,14 +34,20 @@
         Start wherever you are — we'll guide you one note at a time, until playing feels like second nature.
       </p>
 
-      <a href="/plans#pricing"
-         class="flex items-center justify-center gap-2 text-black text-sm font-semibold px-7 py-4 rounded-full w-full transition shadow-[0_10px_30px_-8px_rgba(255,215,54,0.55)]"
-         style="background: linear-gradient(100deg, #FFE07A 0%, #FFD736 45%, #F2A93C 100%);">
-        Start Your Journey
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
-      </a>
+      <div class="flex flex-wrap gap-3">
+        <a href="/plans#pricing"
+           class="flex flex-1 items-center justify-center gap-2 whitespace-nowrap text-black text-sm font-semibold px-4 py-4 rounded-full transition shadow-[0_10px_30px_-8px_rgba(255,215,54,0.55)]"
+           style="background: linear-gradient(100deg, #FFE07A 0%, #FFD736 45%, #F2A93C 100%);">
+          Start Your Journey
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+        <a href="{{ route('guides.index') }}"
+           class="flex flex-1 items-center justify-center whitespace-nowrap rounded-full border border-white/40 px-4 py-4 text-sm font-semibold text-white transition hover:border-[#FFD736] hover:text-[#FFD736]">
+          Free Piano Guides
+        </a>
+      </div>
 
     </div>
 
@@ -94,14 +100,20 @@
           Start wherever you are — we'll guide you one note at a time, until playing feels like second nature.
         </p>
 
-        <a href="/plans#pricing"
-           class="inline-flex items-center gap-2 text-black text-sm font-semibold px-8 py-4 rounded-full transition hover:brightness-105 hover:-translate-y-0.5 duration-200 shadow-[0_10px_30px_-8px_rgba(255,215,54,0.55)]"
-           style="background: linear-gradient(100deg, #FFE07A 0%, #FFD736 45%, #F2A93C 100%);">
-          Start Your Journey
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </a>
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="/plans#pricing"
+             class="inline-flex items-center gap-2 text-black text-sm font-semibold px-8 py-4 rounded-full transition hover:brightness-105 hover:-translate-y-0.5 duration-200 shadow-[0_10px_30px_-8px_rgba(255,215,54,0.55)]"
+             style="background: linear-gradient(100deg, #FFE07A 0%, #FFD736 45%, #F2A93C 100%);">
+            Start Your Journey
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+          <a href="{{ route('guides.index') }}"
+             class="inline-flex items-center justify-center rounded-full border border-white/40 px-6 py-4 text-sm font-semibold text-white transition hover:border-[#FFD736] hover:text-[#FFD736]">
+            Free Piano Guides
+          </a>
+        </div>
 
       </div>
     </div>

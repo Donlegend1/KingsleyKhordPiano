@@ -7,206 +7,92 @@
 @endsection
 
 @section('content')
-@php
-    $displayName = static function ($member) {
-        $name = trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? ''));
-        if ($name !== '') {
-            return $name;
-        }
-        return $member->user_name ? ltrim($member->user_name, '@') : 'Community member';
-    };
-@endphp
-<div
-    x-data="{ activeTab: 'leaderboard' }"
-    class="min-h-full max-w-full overflow-x-hidden bg-gray-50 px-4 py-6 dark:bg-black sm:px-6 lg:px-8"
->
-    <div class="mx-auto max-w-6xl w-full min-w-0 space-y-6">
-
-        <!-- Header -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+<div class="min-h-full bg-gray-50 px-4 py-6 dark:bg-black sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-6xl space-y-6">
+        <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-slate-500">Community Rankings</p>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-xl">
-                    Leaderboard shows the highest point earners this month, Top Members ranks all-time totals.
-                </p>
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">Community Leaderboard</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Member rankings based on lesson completions and community activity.</p>
             </div>
+            <nav aria-label="Leaderboard period" class="inline-flex shrink-0 self-start rounded-xl border border-gray-200 bg-white p-1 dark:border-white/10 dark:bg-gray-900 sm:self-auto">
+                <a href="{{ route('community.leaderboard') }}" @if(!$allTime) aria-current="page" @endif
+                   class="rounded-lg px-4 py-2 text-sm font-semibold {{ !$allTime ? 'bg-[#1447A6] text-white' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10' }}">
+                    This Month
+                </a>
+                <a href="{{ route('community.leaderboard', ['period' => 'all']) }}" @if($allTime) aria-current="page" @endif
+                   class="rounded-lg px-4 py-2 text-sm font-semibold {{ $allTime ? 'bg-[#1447A6] text-white' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10' }}">
+                    All Time
+                </a>
+            </nav>
+        </header>
 
-            <div class="w-full rounded-xl bg-gray-100 p-1 dark:bg-[#161617] sm:w-auto">
-                <div class="grid grid-cols-2 gap-1">
-                    <button
-                        type="button"
-                        @click="activeTab = 'leaderboard'"
-                        :class="activeTab === 'leaderboard' ? 'bg-white text-gray-900 shadow-sm dark:bg-[#1f2021] dark:text-white' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'"
-                        class="rounded-lg px-4 py-2 text-sm font-semibold transition"
-                    >
-                        Leaderboard
-                    </button>
-                    <button
-                        type="button"
-                        @click="activeTab = 'top-members'"
-                        :class="activeTab === 'top-members' ? 'bg-white text-gray-900 shadow-sm dark:bg-[#1f2021] dark:text-white' : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'"
-                        class="rounded-lg px-4 py-2 text-sm font-semibold transition"
-                    >
-                        Top Members
-                    </button>
-                </div>
+        <section aria-labelledby="ranking-heading" class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
+            <div class="border-b border-gray-200 px-4 py-4 dark:border-white/10 sm:px-6">
+                <h2 id="ranking-heading" class="text-base font-bold text-gray-900 dark:text-white">{{ $allTime ? 'All-Time Rankings' : $month->format('F Y') }}</h2>
             </div>
-        </div>
-
-        <div class="min-w-0">
-            <section
-                x-show="activeTab === 'leaderboard'"
-                x-transition.opacity.duration.200ms
-                x-cloak
-            >
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Leaderboard</h2>
-                    <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Highest point totals for {{ now()->format('F Y') }}.</p>
-                </div>
-
-                @if ($monthlyLeaders->currentPage() === 1 && $monthlyLeaders->count() > 0)
-                    <div class="mt-4">
-                        @include('community.partials.leaderboard-podium', [
-                            'members' => $monthlyLeaders->take(3),
-                            'displayName' => $displayName,
-                            'stats' => [
-                                ['key' => 'total_points', 'label' => 'Points'],
-                                ['key' => 'posts_count', 'label' => 'Posts'],
-                            ],
-                        ])
-                    </div>
-                @endif
-
-                <div class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#161617] {{ $monthlyLeaders->currentPage() === 1 && $monthlyLeaders->total() <= 3 ? 'hidden' : '' }}">
-                    @php $skipTop3 = $monthlyLeaders->currentPage() === 1; @endphp
-                    @forelse ($monthlyLeaders as $index => $member)
-                        @php $rank = $monthlyLeaders->firstItem() + $index - 1; @endphp
-                        @continue($skipTop3 && $rank < 3)
-                        <div class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5 transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.03] {{ $loop->last ? '' : 'border-b border-gray-100 dark:border-white/10' }}">
-                            <div class="flex min-w-0 flex-1 items-center gap-3">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold bg-gray-100 text-gray-500 dark:bg-[#1f2021] dark:text-gray-400">
-                                    {{ $rank + 1 }}
-                                </div>
-                                <img
-                                    src="{{ $member->passport ? asset($member->passport) : '/avatar1.jpg' }}"
-                                    alt="{{ $displayName($member) }}"
-                                    class="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm"
-                                    onerror="this.onerror=null;this.src='/avatar1.jpg';"
-                                >
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex min-w-0 items-center gap-2">
-                                        <p class="min-w-0 truncate text-sm font-semibold text-gray-900 dark:text-white sm:text-base">{{ $displayName($member) }}</p>
-                                        @if ((int) $member->verified_status === 1)
-                                            <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[9px] font-bold text-sky-600 dark:bg-sky-500/10 dark:text-sky-300">✓</span>
-                                        @endif
+            @if($leaders->isNotEmpty())
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-xs font-semibold text-gray-600 dark:bg-white/5 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="w-14 px-3 py-3 text-center sm:w-20 sm:px-5">Rank</th>
+                            <th scope="col" class="py-3 pr-2">Member</th>
+                            <th scope="col" class="hidden px-3 py-3 text-right sm:table-cell">Lessons Completed</th>
+                            <th scope="col" class="hidden px-3 py-3 text-right md:table-cell">Posts</th>
+                            <th scope="col" class="px-3 py-3 text-right sm:px-6">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-white/10">
+                        @foreach($leaders as $member)
+                            @php
+                                $rank = $leaders->firstItem() + $loop->index;
+                                $name = trim($member->display_name ?? '') ?: (ltrim($member->user_name ?? '', '@') ?: 'Community member');
+                                $isCurrentMember = (int) $member->id === (int) auth()->id();
+                            @endphp
+                            <tr @class(['bg-blue-50 dark:bg-blue-500/10' => $isCurrentMember])>
+                                <td class="px-3 py-3 text-center sm:px-5">
+                                    <span class="inline-flex min-w-8 items-center justify-center rounded-full px-2 py-1 text-xs font-bold tabular-nums {{ $rank <= 3 ? 'bg-blue-100 text-blue-900 dark:bg-blue-500/20 dark:text-blue-200' : 'text-gray-500 dark:text-gray-400' }}">
+                                        {{ $rank }}
+                                    </span>
+                                </td>
+                                <th scope="row" class="min-w-0 py-3 pr-2 text-left font-semibold text-gray-900 dark:text-white">
+                                    <div class="flex items-center gap-2 sm:gap-3">
+                                        <img src="{{ $member->passport ? asset($member->passport) : asset('avatar1.jpg') }}"
+                                             alt="" width="36" height="36" loading="lazy"
+                                             class="h-9 w-9 shrink-0 rounded-full bg-gray-100 object-cover"
+                                             onerror="this.onerror=null;this.src='{{ asset('avatar1.jpg') }}';">
+                                        <div class="min-w-0 break-words [overflow-wrap:anywhere]">
+                                            {{ $name }}
+                                            @if((int) $member->verified_status === 1)
+                                                <span class="text-blue-700 dark:text-blue-300" aria-label="Verified member" title="Verified member">✓</span>
+                                            @endif
+                                            @if($isCurrentMember)
+                                                <span class="ml-1 text-xs text-[#1447A6] dark:text-blue-300">You</span>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="flex shrink-0 items-center gap-4 text-center">
-                                <div>
-                                    <p class="text-base font-bold text-gray-900 dark:text-white">{{ number_format($member->total_points) }}</p>
-                                    <p class="text-[10px] uppercase tracking-wide text-gray-400 dark:text-slate-500">Points</p>
-                                </div>
-                                <div class="hidden sm:block">
-                                    <p class="text-base font-bold text-gray-900 dark:text-white">{{ number_format($member->posts_count) }}</p>
-                                    <p class="text-[10px] uppercase tracking-wide text-gray-400 dark:text-slate-500">Posts</p>
-                                </div>
-                                <div class="hidden sm:block">
-                                    <p class="text-base font-bold text-gray-900 dark:text-white">{{ number_format($member->replies_count) }}</p>
-                                    <p class="text-[10px] uppercase tracking-wide text-gray-400 dark:text-slate-500">Replies</p>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-                            No monthly community activity yet.
-                        </div>
-                    @endforelse
+                                </th>
+                                <td class="hidden px-3 py-3 text-right tabular-nums text-gray-600 dark:text-gray-300 sm:table-cell">{{ number_format($member->completed_count) }}</td>
+                                <td class="hidden px-3 py-3 text-right tabular-nums text-gray-600 dark:text-gray-300 md:table-cell">{{ number_format($member->posts_count) }}</td>
+                                <td class="whitespace-nowrap px-3 py-3 text-right text-base font-bold tabular-nums text-[#1447A6] dark:text-blue-300 sm:px-6">{{ number_format($member->total_points) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="px-6 py-12 text-center">
+                    <i class="fa-solid fa-ranking-star text-2xl text-[#1447A6] dark:text-blue-300" aria-hidden="true"></i>
+                    <p class="mt-3 text-base font-bold text-gray-900 dark:text-white">{{ $allTime ? 'No rankings yet' : 'No rankings this month yet' }}</p>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Members appear here once they earn points.</p>
                 </div>
+            @endif
+        </section>
 
-                <div class="mt-4">
-                    {{ $monthlyLeaders->links('pagination.community') }}
-                </div>
-            </section>
+        {{ $leaders->links('pagination.community') }}
 
-            <section
-                x-show="activeTab === 'top-members'"
-                x-transition.opacity.duration.200ms
-                x-cloak
-            >
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Top Members</h2>
-                    <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Highest point totals across all-time community activity.</p>
-                </div>
-
-                @if ($topMembers->currentPage() === 1 && $topMembers->count() > 0)
-                    <div class="mt-4">
-                        @include('community.partials.leaderboard-podium', [
-                            'members' => $topMembers->take(3),
-                            'displayName' => $displayName,
-                            'palette' => 'top-members',
-                            'stats' => [
-                                ['key' => 'total_points', 'label' => 'Points'],
-                                ['key' => 'comments_count', 'label' => 'Comments'],
-                            ],
-                        ])
-                    </div>
-                @endif
-
-                <div class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#161617] {{ $topMembers->currentPage() === 1 && $topMembers->total() <= 3 ? 'hidden' : '' }}">
-                    @php $skipTop3Members = $topMembers->currentPage() === 1; @endphp
-                    @forelse ($topMembers as $index => $member)
-                        @php $rank = $topMembers->firstItem() + $index - 1; @endphp
-                        @continue($skipTop3Members && $rank < 3)
-                        <div class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5 transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.03] {{ $loop->last ? '' : 'border-b border-gray-100 dark:border-white/10' }}">
-                            <div class="flex min-w-0 flex-1 items-center gap-3">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold bg-gray-100 text-gray-500 dark:bg-[#1f2021] dark:text-gray-400">
-                                    {{ $rank + 1 }}
-                                </div>
-                                <img
-                                    src="{{ $member->passport ? asset($member->passport) : '/avatar1.jpg' }}"
-                                    alt="{{ $displayName($member) }}"
-                                    class="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm"
-                                    onerror="this.onerror=null;this.src='/avatar1.jpg';"
-                                >
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex min-w-0 items-center gap-2">
-                                        <p class="min-w-0 truncate text-sm font-semibold text-gray-900 dark:text-white sm:text-base">{{ $displayName($member) }}</p>
-                                        @if ((int) $member->verified_status === 1)
-                                            <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[9px] font-bold text-sky-600 dark:bg-sky-500/10 dark:text-sky-300">✓</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex shrink-0 items-center gap-4 text-center">
-                                <div>
-                                    <p class="text-base font-bold text-gray-900 dark:text-white">{{ number_format($member->total_points) }}</p>
-                                    <p class="text-[10px] uppercase tracking-wide text-gray-400 dark:text-slate-500">Points</p>
-                                </div>
-                                <div class="hidden sm:block">
-                                    <p class="text-base font-bold text-gray-900 dark:text-white">{{ number_format($member->comments_count) }}</p>
-                                    <p class="text-[10px] uppercase tracking-wide text-gray-400 dark:text-slate-500">Comments</p>
-                                </div>
-                                <div class="hidden sm:block">
-                                    <p class="text-base font-bold text-gray-900 dark:text-white">{{ number_format($member->likes_count) }}</p>
-                                    <p class="text-[10px] uppercase tracking-wide text-gray-400 dark:text-slate-500">Likes</p>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-                            No overall community activity yet.
-                        </div>
-                    @endforelse
-                </div>
-
-                <div class="mt-4">
-                    {{ $topMembers->links('pagination.community') }}
-                </div>
-            </section>
-        </div>
+        <details class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 dark:border-white/10 dark:bg-gray-900 dark:text-gray-300">
+            <summary class="cursor-pointer font-semibold text-gray-900 dark:text-white">How points are earned</summary>
+            <p class="mt-2 leading-relaxed">Earn 10 points per roadmap lesson completed, 5 per post, 3 per comment, 2 per reply, and 1 per post like you give. Roadmap milestones award 20 bonus points each.</p>
+        </details>
     </div>
 </div>
 @endsection

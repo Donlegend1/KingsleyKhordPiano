@@ -74,13 +74,11 @@ class GetstartedController extends Controller
     public function library() 
     {
         $pianoExerciseCount = \App\Models\Upload::where('category', 'piano exercise')->where('status', 'active')->count();
-        $earTrainingCount = \App\Models\Quiz::count();
         $extraCoursesCount = \App\Models\ExtraCourse::where('status', 'active')->count();
         $learnSongsCount = \App\Models\LearnSong::where('status', 'active')->count();
 
         return view('memberpages.library', [
             'pianoExerciseCount' => $pianoExerciseCount,
-            'earTrainingCount' => $earTrainingCount,
             'extraCoursesCount' => $extraCoursesCount,
             'learnSongsCount' => $learnSongsCount,
         ]);

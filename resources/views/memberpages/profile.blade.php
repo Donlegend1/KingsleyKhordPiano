@@ -113,11 +113,8 @@
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                        <input id="email" name="email" type="email" value="{{ old('email', Auth::user()->email) }}" required
-                            class="block w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                        @error('email')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <input id="email" type="email" value="{{ Auth::user()->email }}" disabled
+                            class="block w-full cursor-not-allowed rounded-md border border-gray-300 bg-gray-100 px-4 py-2 text-gray-600 opacity-100 sm:text-sm" />
                     </div>
 
                     <!-- Country -->

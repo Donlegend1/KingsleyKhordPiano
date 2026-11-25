@@ -5,18 +5,6 @@
     {{-- Live Session / Community / Ear Training --}}
     <hr class="border-t border-gray-100">
     <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-widest font-sf">Explore</h3>
-    @php
-      $dashboardLiveshow = \App\Models\Liveshow::where('category', 'event')
-          ->where('start_time', '>=', now())
-          ->where(function ($query) {
-              $query->where('access_type', 'all');
-              if (Auth::user()->premium) {
-                  $query->orWhere('access_type', 'premium');
-              }
-          })
-          ->orderBy('start_time')
-          ->first();
-    @endphp
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
       @if($dashboardLiveshow)
@@ -95,26 +83,13 @@
 
       <div class="flex flex-col items-center text-center p-5 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
         <div class="w-12 h-12 flex items-center justify-center bg-indigo-50 rounded-full flex-shrink-0 mb-3">
-          <img src="/images/community.svg" class="w-6 h-6 object-contain" />
+          <i class="fa-solid fa-users text-lg text-[#1447A6]" aria-hidden="true"></i>
         </div>
         <h4 class="font-semibold text-[#435065] text-[16px] font-sf">Community</h4>
         <p class="text-sm text-[#5E6779] mt-1 font-sf">View the latest community activities</p>
         <a href="/member/community/activity-feed"
            class="mt-4 inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-blue-200 bg-white text-blue-600 text-sm font-semibold font-sf hover:bg-blue-50 transition-colors">
           Join Community
-          <i class="fa fa-angle-right text-xs"></i>
-        </a>
-      </div>
-
-      <div class="flex flex-col items-center text-center p-5 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-        <div class="w-12 h-12 flex items-center justify-center bg-emerald-50 rounded-full flex-shrink-0 mb-3">
-          <i class="fa fa-ear-listen text-emerald-600 text-lg"></i>
-        </div>
-        <h4 class="font-semibold text-[#435065] text-[16px] font-sf">Ear Training</h4>
-        <p class="text-sm text-[#5E6779] mt-1 font-sf">Sharpen your ear with guided drills</p>
-        <a href="{{ route('ear.training') }}"
-           class="mt-4 inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-blue-200 bg-white text-blue-600 text-sm font-semibold font-sf hover:bg-blue-50 transition-colors">
-          Start Training
           <i class="fa fa-angle-right text-xs"></i>
         </a>
       </div>

@@ -23,6 +23,7 @@ class StorePostLikeRequest extends FormRequest
     {
         return [
             'post_id' => 'required|exists:posts,id',
+            'liked' => 'sometimes|required|boolean',
             'type' => 'nullable|in:like,love,haha,wow,sad',
         ];
     }

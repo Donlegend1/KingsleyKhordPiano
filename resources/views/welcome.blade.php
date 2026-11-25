@@ -3,6 +3,7 @@
 @section("content")
 @include("components.banner")
 @include("components.roadmap")
+@include("components.free-piano-guides")
 @include("components.joinplatform")
 @include("components.latest-lessons-public")
 @include("components.coaches")

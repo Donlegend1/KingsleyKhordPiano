@@ -14,7 +14,7 @@
       <!-- Content -->
       <div class="relative z-10 flex flex-col items-center justify-center text-center text-white max-w-4xl mx-auto">
         <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-6">
-          Join 800+ students already building real piano skills with a proven, hands-on method.
+          Join 900+ students already building real piano skills with a proven, hands-on method.
         </h1>
 
         <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto">
