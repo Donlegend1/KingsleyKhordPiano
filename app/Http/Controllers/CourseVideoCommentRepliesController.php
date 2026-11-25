@@ -63,16 +63,22 @@ class CourseVideoCommentRepliesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCourseVideoCommentReplyRequest $request, CourseVideoCommentReply $CourseVideoCommentReply)
+    public function update(UpdateCourseVideoCommentReplyRequest $request, CourseVideoCommentReply $reply)
     {
-        //
+        $reply->update(['reply' => $request->validated('comment')]);
+
+        return response()->json(['data' => $reply]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CourseVideoCommentReply $CourseVideoCommentReply)
+    public function destroy(CourseVideoCommentReply $reply)
     {
-        //
+        abort_unless($reply->user_id === auth()->id(), 403);
+
+        $reply->delete();
+
+        return response()->noContent();
     }
 }

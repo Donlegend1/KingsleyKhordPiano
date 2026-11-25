@@ -26,9 +26,6 @@ import './components/uploads/CategorizedLessonsAdmin';
 import './components/uploads/EtudesAdmin';
 import './components/uploads/Create';
 import './components/uploads/Single.jsx';
-import './components/EarTraining/Index';
-import './components/EarTraining/Create'
-import './components/EarTraining/Show'
 import './components/LiveShow/LiveShowCard'
 import './components/LiveShow/List'
 import './components/LiveShow/Create'

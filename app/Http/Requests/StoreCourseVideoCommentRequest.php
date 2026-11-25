@@ -22,8 +22,10 @@ class StoreCourseVideoCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => 'required|string|in:course,quiz,others',
-            'course_id' => 'required|integer',
+            'category' => 'required|string|in:course,quiz,others,checkpoint',
+            'course_id' => $this->input('category') === 'checkpoint'
+                ? 'required|integer|exists:course_checkpoints,id'
+                : 'required|integer',
             'comment' => 'required|string',
             'url' => 'nullable|string'
         ];

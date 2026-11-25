@@ -6,22 +6,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles\UserRoles;
 use App\Models\User;
-use App\Models\Payment;
 use Stripe\Stripe;
 use Stripe\Price;
-use Laravel\Cashier\Subscription;
 use App\Models\Plan;
 use App\Models\Subscription as BillingSubscription;
 use App\Models\Course;
+use App\Models\Liveshow;
+use App\Models\LiveCoachingBooking;
+use App\Models\PersonalizedGuidanceRequest;
+use App\Models\PersonalizedPlan;
 use Illuminate\Support\Facades\Log;
 use App\Models\Upload;
-use App\Models\UserAssessment;
 use App\Models\UserDailyLogin;
+use App\Models\UserAssessment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Validator;
 
 class HomeController extends Controller
 {
@@ -43,38 +46,15 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::user()->role == UserRoles::MEMBER->value) {
-            $userId = Auth::id();
+            $user = Auth::user();
+            $userId = $user->id;
 
             // Mark the user as active today (covers persisted/"remember me" sessions
             // as well as fresh logins, since this dashboard is where today's
             // activity is recorded for the practice-streak grid).
-            UserDailyLogin::recordToday($userId, Auth::user()->timezone);
+            UserDailyLogin::recordToday($userId, $user->timezone);
 
-            // Check assessment
-            $assessment = UserAssessment::where('user_id', $userId)->latest()->first();
-
-            // Define levels
-            $levels = ['Beginner', 'Intermediate', 'Advanced'];
-
-            $progress = collect($levels)->mapWithKeys(function ($level) use ($userId) {
-                $total = DB::table('courses')
-                    ->where('level', $level)
-                    ->count();
-
-                $completed = DB::table('course_progress')
-                    ->join('courses', 'course_progress.course_id', '=', 'courses.id')
-                    ->where('course_progress.user_id', $userId)
-                    ->where('courses.level', $level)
-                    ->distinct('course_progress.course_id')
-                    ->count('course_progress.course_id');
-
-                return [$level => [
-                    'total' => $total,
-                    'completed' => $completed,
-                ]];
-            });
-
-        $latestCourses = [];
+            $latestCourses = [];
 
             $latestPianoExercise = Upload::where('category', 'piano exercise')
                 ->orderBy('created_at', 'desc')
@@ -106,8 +86,20 @@ class HomeController extends Controller
             }
 
             $resumeLesson = $this->buildResumeLesson($userId);
+            $personalizedPlan = $user->premium ? PersonalizedPlan::where('user_id', $userId)->first() : null;
+            $nextPractice = $personalizedPlan?->nextUnfinishedLesson();
+            $planPending = $user->premium && !$personalizedPlan
+                && (PersonalizedGuidanceRequest::where('user_id', $userId)->exists()
+                    || LiveCoachingBooking::where('user_id', $userId)->exists());
 
-            return view('home', compact('progress', 'levels', 'latestCourses', 'assessment', 'resumeLesson'));
+            $dashboardLiveshow = Liveshow::whereIn('access_type', $user->premium ? ['all', 'premium'] : ['all'])
+                ->where('category', 'event')->where('start_time', '>=', now())
+                ->orderBy('start_time')->first();
+
+            return view('home', compact(
+                'latestCourses', 'resumeLesson', 'personalizedPlan', 'nextPractice',
+                'planPending', 'dashboardLiveshow'
+            ));
         }
     }
 
@@ -130,7 +122,7 @@ class HomeController extends Controller
                 continue;
             }
 
-            $resolved = $this->resolveResumeLesson($view->viewable);
+            $resolved = $this->resolveResumeLesson($view->viewable, $userId);
             if ($resolved) {
                 return $resolved;
             }
@@ -139,19 +131,32 @@ class HomeController extends Controller
         return null;
     }
 
-    private function resolveResumeLesson($lesson): ?array
+    private function resolveResumeLesson($lesson, int $userId): ?array
     {
-        return match (get_class($lesson)) {
-            \App\Models\Course::class => [
+        if ($lesson instanceof Course) {
+            $level = strtolower($lesson->level);
+            $roadmap = Course::where('level', $level)->where('status', 'active');
+            $total = (clone $roadmap)->count();
+            $completed = (clone $roadmap)->whereIn('id', DB::table('course_progress')
+                ->select('course_id')->where('user_id', $userId))->count();
+
+            return [
                 'title' => $lesson->title,
-                'url' => url("/member/course/{$lesson->level}?selected_course={$lesson->id}"),
-            ],
+                'url' => url("/member/course/{$level}/{$lesson->id}"),
+                'context' => ucfirst($level) . ' roadmap',
+                'progress' => $total ? ['completed' => $completed, 'total' => $total] : null,
+            ];
+        }
+
+        return match (get_class($lesson)) {
             Upload::class => [
                 'title' => $lesson->title,
+                'context' => 'Piano Exercise',
                 'url' => route('piano.exercise.player', ['level' => $lesson->level, 'video_id' => $lesson->id]),
             ],
             \App\Models\MusicalApplication::class => [
                 'title' => $lesson->title,
+                'context' => 'Guided Practice',
                 'url' => route('piano.exercise.player', [
                     'series' => $lesson->series,
                     'skill_level' => strtolower($lesson->skill_level),
@@ -160,147 +165,128 @@ class HomeController extends Controller
             ],
             \App\Models\ExtraCourse::class => [
                 'title' => $lesson->title,
+                'context' => 'Extra Courses',
                 'url' => url("/member/lesson/{$lesson->id}?type=extra_course"),
             ],
             \App\Models\LearnSong::class => [
                 'title' => $lesson->title,
+                'context' => 'Learn Songs',
                 'url' => url("/member/lesson/{$lesson->id}?type=learn_song"),
             ],
             \App\Models\Etude::class => [
                 'title' => $lesson->title,
+                'context' => 'Etudes & Pieces',
                 'url' => url("/member/lesson/{$lesson->id}?type=etudes"),
             ],
             default => null,
         };
     }
 
-    public function admin()
+    public function admin(Request $request)
     {
-        if (Auth::user()->role == UserRoles::ADMIN->value) {
-            // Set Stripe API key
-            Stripe::setApiKey(config('cashier.secret'));
+        abort_unless($request->user()->role === UserRoles::ADMIN->value, 403);
 
-            // Get users from last 2 weeks for table
-            $users = User::where('created_at', '>=', Carbon::now()->subWeeks(2))->paginate(20);
-            
-            // Get total users (excluding admin)
-            $totalUsers = User::where('role', '!=', UserRoles::ADMIN->value)->count();
-            
-            // Get active users (logged in within the week)
-            $activeUsers = User::where('role', '!=', UserRoles::ADMIN->value)
-                ->where('last_login_at', '>=', Carbon::now()->subWeek())
-                ->count();
-                
-            // Calculate user growth percentage
-            $lastMonthUsers = User::where('role', '!=', UserRoles::ADMIN->value)
-                ->where('created_at', '>=', Carbon::now()->subMonth())
-                ->count();
-            $previousMonthUsers = User::where('role', '!=', UserRoles::ADMIN->value)
-                ->whereBetween('created_at', [
-                    Carbon::now()->subMonths(2),
-                    Carbon::now()->subMonth()
-                ])->count();
-            $userGrowth = $previousMonthUsers > 0 
-                ? round((($lastMonthUsers - $previousMonthUsers) / $previousMonthUsers) * 100, 1)
-                : 0;
-
-            $nairaRevenue = Payment::where('payment_method', 'Paystack')
-                ->where('status', 'successful')
-                ->sum('amount');
-
-            // Calculate subscription revenue using Cashier
-            $currentMonthRevenue = Subscription::where('stripe_status', 'active')
-                ->where('created_at', '>=', Carbon::now()->startOfMonth())
-                ->with('items')
-                ->get()
-                ->sum(function ($subscription) {
-                    $item = $subscription->items->first();
-                    if (!$item || !$item->stripe_price) return 0;
-                    
-                    try {
-                        $price = Price::retrieve($item->stripe_price);
-                        return $price->unit_amount / 100;
-                    } catch (\Exception $e) {
-                        return 0;
-                    }
-                });
-
-            $lastMonthRevenue = Subscription::where('stripe_status', 'active')
-                ->whereBetween('created_at', [
-                    Carbon::now()->subMonth()->startOfMonth(),
-                    Carbon::now()->subMonth()->endOfMonth()
-                ])
-                ->with('items')
-                ->get()
-                ->sum(function ($subscription) {
-                    $item = $subscription->items->first();
-                    if (!$item || !$item->stripe_price) return 0;
-                    
-                    try {
-                        $price = Price::retrieve($item->stripe_price);
-                        return $price->unit_amount / 100;
-                    } catch (\Exception $e) {
-                        return 0;
-                    }
-                });
-
-            $revenueGrowth = $lastMonthRevenue > 0 
-                ? round((($currentMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1)
-                : 0;
-
-            // Get revenue by currency using Cashier
-            $subscriptions = Subscription::where('stripe_status', 'active')
-                ->with('items')
-                ->get();
-
-            $usdRevenue = $subscriptions->sum(function ($subscription) {
-                $item = $subscription->items->first();
-                if (!$item || !$item->stripe_price) return 0;
-                
-                try {
-                    $price = Price::retrieve($item->stripe_price);
-                    return $price->currency === 'usd' ? $price->unit_amount / 100 : 0;
-                } catch (\Exception $e) {
-                    return 0;
-                }
-            });
-
-            $eurRevenue = $subscriptions->sum(function ($subscription) {
-                $item = $subscription->items->first();
-                if (!$item || !$item->stripe_price) return 0;
-                
-                try {
-                    $price = Price::retrieve($item->stripe_price);
-                    return $price->currency === 'eur' ? $price->unit_amount / 100 : 0;
-                } catch (\Exception $e) {
-                    return 0;
-                }
-            });
-            
-            // Get courses count and growth
-            $courses = Course::count();
-            $lastMonthCourses = Course::where('created_at', '>=', Carbon::now()->subMonth())->count();
-            $previousMonthCourses = Course::whereBetween('created_at', [
-                Carbon::now()->subMonths(2),
-                Carbon::now()->subMonth()
-            ])->count();
-            $courseGrowth = $previousMonthCourses > 0 
-                ? round((($lastMonthCourses - $previousMonthCourses) / $previousMonthCourses) * 100, 1)
-                : 0;
-
-            return view('admin.home', compact(
-                'users', 
-                'totalUsers',
-                'nairaRevenue',
-                'activeUsers',
-                'userGrowth',
-                'usdRevenue', 
-                'eurRevenue',
-                'revenueGrowth',
-                'courses',
-                'courseGrowth'
-            ));
+        $tabs = [
+            'overview' => 'Overview',
+            'acquisition' => 'Audience',
+            'student-engagement' => 'Students',
+            'subscriptions' => 'Subscription Activity',
+        ];
+        $requestedTab = $request->query('tab');
+        if ($requestedTab === 'students-resources') {
+            $requestedTab = 'student-engagement';
         }
+        $activeTab = is_string($requestedTab) && isset($tabs[$requestedTab]) ? $requestedTab : 'overview';
+
+        $today = CarbonImmutable::today();
+        $dates = Validator::make($request->only('from', 'to'), [
+            'from' => ['required_with:to', 'date_format:Y-m-d', 'before_or_equal:to'],
+            'to' => ['required_with:from', 'date_format:Y-m-d', 'before_or_equal:' . $today->toDateString()],
+        ]);
+
+        $from = $today->subDays(29);
+        $to = $today;
+        $rangeError = null;
+        if ($request->hasAny(['from', 'to'])) {
+            if ($dates->fails() || !$request->filled(['from', 'to'])) {
+                $rangeError = 'Choose a valid start and end date up to today.';
+            } elseif (CarbonImmutable::parse($request->input('from'))->diffInDays($request->input('to')) > 365) {
+                $rangeError = 'Choose a range of up to 366 days.';
+            } else {
+                $from = CarbonImmutable::parse($request->input('from'));
+                $to = CarbonImmutable::parse($request->input('to'));
+            }
+        }
+
+        $window = [$from, $to->endOfDay()];
+        $dayWindow = [$from->toDateString(), $to->toDateString()];
+        $members = User::query()->where('role', UserRoles::MEMBER->value);
+        $signups = (clone $members)->whereBetween('created_at', $window);
+        $activity = UserDailyLogin::query()
+            ->whereBetween('date', $dayWindow)
+            ->whereIn('user_id', (clone $members)->select('id'));
+        $guideLeads = DB::table('piano_guide_leads')->whereBetween('created_at', $window);
+        $roadmapEmails = DB::table('visitors')->where('source', 'visitor_page')
+            ->whereBetween('created_at', $window)->selectRaw('LOWER(TRIM(email)) as email');
+        $pdfEmails = (clone $guideLeads)->selectRaw('LOWER(TRIM(email)) as email')->union($roadmapEmails);
+        $pdfRequesters = DB::query()->fromSub($pdfEmails, 'pdf_emails')->count();
+        $periodDays = (int) $from->diffInDays($to) + 1;
+        $demoTraffic = [];
+        foreach ([
+            'Google Search' => [37, 72, 19],
+            'YouTube' => [30, 65, 24],
+            'Instagram' => [21, 38, 9],
+            'TikTok' => [12, 19, 4],
+            'Direct link' => [10, 24, 7],
+            'WhatsApp' => [7, 19, 8],
+            'Email' => [4, 14, 6],
+            'Facebook' => [3, 5, 1],
+        ] as $source => [$dailyVisitors, $monthlyAccounts, $monthlyPaidPlans]) {
+            $demoTraffic[$source] = [
+                'visitors' => $dailyVisitors * $periodDays,
+                'accounts' => (int) round($monthlyAccounts * $periodDays / 30),
+                'paidPlans' => (int) round($monthlyPaidPlans * $periodDays / 30),
+            ];
+        }
+        $demoVisitors = array_sum(array_column($demoTraffic, 'visitors'));
+
+        $stats = [
+            'New sign-ups' => ['users', (clone $signups)->count(), 'Member accounts created'],
+            'Active members' => ['sign-in-alt', (clone $activity)->distinct()->count('user_id'), 'Members with a recorded active day'],
+            'PDF requesters' => ['file-alt', $pdfRequesters, 'Unique emails from free guide and roadmap requests'],
+            'Visitors' => ['globe', $demoVisitors, 'Estimated unique visitors for this period'],
+        ];
+
+        $signupDays = (clone $signups)->selectRaw('DATE(created_at) as day, COUNT(*) as total')->groupByRaw('DATE(created_at)')->pluck('total', 'day');
+        $signInDays = DB::table('member_sign_in_days');
+        $firstRecordedSignIn = (clone $signInDays)->min('date');
+        $signInsByDate = $signInDays->whereBetween('date', $dayWindow)
+            ->selectRaw('date, COUNT(*) as total')->groupBy('date')->pluck('total', 'date');
+        $dailyCounts = [];
+        for ($day = $to; $day->gte($from); $day = $day->subDay()) {
+            $date = $day->toDateString();
+            $dailyCounts[] = [
+                'date' => $day->format('D, M j, Y'),
+                'signups' => $signupDays[$date] ?? 0,
+                'signIns' => $firstRecordedSignIn && $date >= $firstRecordedSignIn ? ($signInsByDate[$date] ?? 0) : null,
+            ];
+        }
+        $guides = $guideLeads->selectRaw('guide_slug, COUNT(*) as total')->groupBy('guide_slug')->orderByDesc('total')->orderBy('guide_slug')->limit(6)->get();
+        $latestAssessments = UserAssessment::query()
+            ->whereIn('user_id', (clone $members)->select('id'))
+            ->selectRaw('MAX(id)')->groupBy('user_id');
+        $assessmentCounts = UserAssessment::query()->whereIn('id', $latestAssessments)
+            ->selectRaw('LOWER(skill_level) as level, COUNT(*) as total')->groupByRaw('LOWER(skill_level)')
+            ->pluck('total', 'level');
+        $skillLevels = [];
+        foreach (['Beginner', 'Intermediate', 'Advanced'] as $level) {
+            $skillLevels[$level] = (int) ($assessmentCounts[strtolower($level)] ?? 0);
+        }
+
+        return view('admin.home', compact(
+            'tabs', 'activeTab',
+            'from', 'to', 'today', 'rangeError', 'stats', 'dailyCounts', 'guides', 'skillLevels', 'demoTraffic', 'demoVisitors'
+        ));
     }
 
     public function profile()
@@ -421,7 +407,6 @@ class HomeController extends Controller
     $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
-        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
         'new_password_input' => 'nullable|string|min:8|confirmed',
         'passport' => 'nullable|image|mimes:jpeg,png,jpg',
         'country' => 'nullable|string|max:500',
@@ -433,7 +418,6 @@ class HomeController extends Controller
 
     $user->first_name = $request->first_name;
     $user->last_name = $request->last_name;
-    $user->email = $request->email;
     $user->country = $request->country;
     $user->biography = $request->biography;
 

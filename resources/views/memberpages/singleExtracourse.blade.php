@@ -83,7 +83,7 @@
                 <a href="/home" class="hover:text-gray-700">Dashboard</a>
                 <span>/</span>
                 @if ($lessonType === 'learn_songs')
-                    <a href="{{ route('learn.songs') }}" class="hover:text-gray-700">Learn Songs</a>
+                    <a href="{{ route('learn.songs') }}" class="hover:text-gray-700">MIDI &amp; Songs</a>
                 @elseif ($lessonType === 'etudes')
                     <a href="{{ route('piano.exercise.finger', ['tab' => 'etudes']) }}" class="hover:text-gray-700">Etudes &amp; Pieces</a>
                 @else

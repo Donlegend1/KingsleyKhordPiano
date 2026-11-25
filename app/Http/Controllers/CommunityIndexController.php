@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Roles\UserRoles;
 use App\Models\User;
 use App\Models\Post;
 use App\Models\MidiFile;
@@ -478,7 +479,7 @@ class CommunityIndexController extends Controller
          ->get(['id', 'first_name', 'last_name', 'display_name', 'passport', 'created_at']);
 
       $contributors = [
-         'month' => $this->leaderboardQuery(now()->subMonth())->take(3)->get(),
+         'month' => $this->leaderboardQuery(now()->startOfMonth())->take(3)->get(),
          'all' => $this->leaderboardQuery()->take(3)->get(),
       ];
 
@@ -641,24 +642,11 @@ class CommunityIndexController extends Controller
 
    public function notifications()
    {
-      $communitySection = \App\Enums\Notification\NotificationSectionEnum::COMMUNITY->value;
+      $query = auth()->user()->notificationsForArea(true);
+      $unreadCount = (clone $query)->whereNull('read_at')->count();
+      $notifications = $query->latest()->paginate(20)->withQueryString();
 
-      $notifications = auth()->user()->notifications()
-         ->where('data->data->section', $communitySection)
-         ->latest()
-         ->get();
-
-      $page = request()->get('page', 1);
-      $perPage = 20;
-      $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-         $notifications->forPage($page, $perPage),
-         $notifications->count(),
-         $perPage,
-         $page,
-         ['path' => request()->url(), 'query' => request()->query()]
-      );
-
-      return view('community.notifications', ['notifications' => $paginated]);
+      return view('community.notifications', compact('notifications', 'unreadCount'));
    }
 
    public function profile()
@@ -762,22 +750,15 @@ class CommunityIndexController extends Controller
       ));
    }
 
-   public function leaderboard()
+   public function leaderboard(Request $request)
    {
-      // The champion/standout summary card always reflects the true #1,
-      // independent of which page of the (now paginated) list is showing.
-      $monthlyChampion = $this->leaderboardQuery(now()->startOfMonth())->first();
-      $allTimeChampion = $this->leaderboardQuery()->first();
+      $allTime = $request->query('period') === 'all';
+      $month = now()->startOfMonth();
+      $leaders = $this->leaderboardQuery($allTime ? null : $month)
+         ->paginate(10)
+         ->appends($allTime ? ['period' => 'all'] : []);
 
-      $monthlyLeaders = $this->leaderboardQuery(now()->startOfMonth())
-         ->paginate(10, ['*'], 'leaderboard_page')
-         ->withQueryString();
-
-      $topMembers = $this->leaderboardQuery()
-         ->paginate(10, ['*'], 'members_page')
-         ->withQueryString();
-
-      return view('community.leaderboard', compact('monthlyLeaders', 'topMembers', 'monthlyChampion', 'allTimeChampion'));
+      return view('community.leaderboard', compact('leaders', 'allTime', 'month'));
    }
 
     public function single()
@@ -979,6 +960,10 @@ class CommunityIndexController extends Controller
          ->when($from, fn ($query) => $query->where('created_at', '>=', $from))
          ->groupBy('user_id');
 
+      $communityProfiles = DB::table('communities')
+         ->selectRaw('user_id, MAX(id) as profile_id')
+         ->groupBy('user_id');
+
       return User::query()
          ->select([
             'users.id',
@@ -990,7 +975,9 @@ class CommunityIndexController extends Controller
             'communities.user_name',
             'communities.verified_status',
          ])
-         ->join('communities', 'communities.user_id', '=', 'users.id')
+         ->leftJoinSub($communityProfiles, 'community_profiles', fn ($join) => $join->on('community_profiles.user_id', '=', 'users.id'))
+         ->leftJoin('communities', 'communities.id', '=', 'community_profiles.profile_id')
+         ->where('users.role', UserRoles::MEMBER->value)
          ->leftJoinSub($postsSubquery, 'post_totals', fn ($join) => $join->on('post_totals.user_id', '=', 'users.id'))
          ->leftJoinSub($commentsSubquery, 'comment_totals', fn ($join) => $join->on('comment_totals.user_id', '=', 'users.id'))
          ->leftJoinSub($repliesSubquery, 'reply_totals', fn ($join) => $join->on('reply_totals.user_id', '=', 'users.id'))
@@ -999,6 +986,13 @@ class CommunityIndexController extends Controller
          ->where(function ($query) {
             $query->whereNull('communities.status')
                ->orWhere('communities.status', '!=', 'blocked');
+         })
+         ->where(function ($query) {
+            $query->whereNotNull('post_totals.user_id')
+               ->orWhereNotNull('comment_totals.user_id')
+               ->orWhereNotNull('reply_totals.user_id')
+               ->orWhereNotNull('like_totals.user_id')
+               ->orWhereNotNull('progress_totals.user_id');
          })
          ->selectRaw('COALESCE(post_totals.posts_count, 0) as posts_count')
          ->selectRaw('COALESCE(comment_totals.comments_count, 0) as comments_count')
@@ -1030,6 +1024,7 @@ class CommunityIndexController extends Controller
          ->orderByDesc('total_points')
          ->orderByDesc('posts_count')
          ->orderByDesc('comments_count')
-         ->orderBy('users.first_name');
+         ->orderBy('users.first_name')
+         ->orderBy('users.id');
    }
 }

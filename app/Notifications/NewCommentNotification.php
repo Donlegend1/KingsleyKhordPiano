@@ -46,6 +46,8 @@ class NewCommentNotification extends Notification implements ShouldQueue
                 'user' => $this->comment->user->full_name,
                 'type' => 'comment',
                 'section' => NotificationSectionEnum::COMMUNITY->value,
+                'post_id' => $this->comment->post_id,
+                'comment_id' => $this->comment->id,
                 'url' => route('singlePost', $this->comment->post_id) . '#comment-' . $this->comment->id,
                 'by_user_avatar' => $this->comment->user->passport ? asset($this->comment->user->passport) : null,
             ],

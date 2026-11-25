@@ -30,11 +30,20 @@ class AdminController extends Controller
 
     public function usersList(Request $request)
     {
-        $query = User::with([
+        $query = User::query()->fromSub($this->usersWithSubscriptionFilters(), 'users')->with([
             'plan',
             'community',
             'subscriptions' => fn ($q) => $q->latest(),
         ]);
+
+        $status = $request->string('status')->toString();
+        $planFilter = $request->string('plan')->toString();
+        if (in_array($status, ['Active', 'Inactive', 'Canceled'], true)) {
+            $query->where('display_subscription_status', $status);
+        }
+        if (in_array($planFilter, ['standard-monthly', 'standard-quarterly', 'standard-yearly', 'premium-monthly', 'premium-quarterly', 'premium-yearly', 'manual', 'none'], true)) {
+            $query->where('display_plan', $planFilter);
+        }
 
         // ==== SORTING ====
         if ($request->filled('search')) {
@@ -47,23 +56,26 @@ class AdminController extends Controller
         } else {
             // Default sorting: admins first, then by created_at desc
             $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
-                ->orderBy('created_at', 'desc');
+                ->orderBy('created_at', 'desc')->orderByDesc('id');
         }
 
         $perPage = $request->get('perPage', $request->get('per_page', 10));
         $users = $query->paginate($perPage);
+        $countryNames = DB::table('countries')->pluck('country_name', 'country_code');
 
-        $users->getCollection()->transform(function (User $user) {
+        $users->getCollection()->transform(function (User $user) use ($countryNames) {
             $latestSubscription = $user->subscriptions->first();
             $metadata = is_array($user->metadata) ? $user->metadata : [];
+            $plan = $user->getRelation('plan');
 
             $duration = $metadata['duration']
                 ?? $latestSubscription?->duration
                 ?? $user->subscription_type
-                ?? null;
+                ?? $plan?->type;
 
             $tier = $metadata['tier']
-                ?? ($user->premium ? 'premium' : null);
+                ?? $plan?->tier
+                ?? ($user->premium ? 'premium' : ($duration ? 'standard' : null));
 
             $paymentMethod = $user->payment_method
                 ?? $latestSubscription?->payment_method
@@ -71,18 +83,20 @@ class AdminController extends Controller
 
             $endsAt = $user->subscription_expires_at
                 ?? $latestSubscription?->ends_at;
+            $status = strtolower((string) ($user->subscription_status ?? $latestSubscription?->stripe_status));
+            $country = trim((string) ($metadata['signup_country'] ?? $user->country ?? ''));
 
             $user->setAttribute('subscription_details', [
                 'type' => $duration,
                 'tier' => $tier,
                 'payment_method' => $paymentMethod,
-                'status' => $user->subscription_status
-                    ?? $latestSubscription?->stripe_status
-                    ?? null,
+                'status' => $status ?: null,
+                'display_status' => $user->display_subscription_status,
                 'started_at' => $user->subscription_started_at
                     ?? $latestSubscription?->created_at,
                 'ends_at' => $endsAt,
             ]);
+            $user->setAttribute('country_name', $countryNames[strtoupper($country)] ?? ($country ?: null));
 
             return $user;
         });
@@ -90,8 +104,58 @@ class AdminController extends Controller
         return response()->json($users);
     }
 
+    private function usersWithSubscriptionFilters()
+    {
+        $latest = Subscription::query()->whereColumn('subscriptions.user_id', 'users.id')
+            ->orderByDesc('subscriptions.created_at')->orderByDesc('subscriptions.id')->limit(1);
+        $source = User::query()->leftJoin('plans', 'plans.id', '=', 'users.plan')->select('users.*');
+        $grammar = $source->getQuery()->getGrammar();
+        $durationMeta = $grammar->wrap('users.metadata->duration');
+        $tierMeta = $grammar->wrap('users.metadata->tier');
+        $status = (clone $latest)->select('stripe_status');
+        $duration = (clone $latest)->select('duration');
+        $method = (clone $latest)->select('payment_method');
+
+        $source->selectRaw("LOWER(COALESCE(users.subscription_status, ({$status->toSql()}), '')) as effective_status")
+            ->selectRaw("LOWER(COALESCE({$durationMeta}, ({$duration->toSql()}), users.subscription_type, plans.type, '')) as plan_interval")
+            ->selectRaw("LOWER(COALESCE({$tierMeta}, plans.tier, CASE WHEN users.premium THEN 'premium' ELSE 'standard' END)) as plan_tier")
+            ->selectRaw("LOWER(COALESCE(users.payment_method, ({$method->toSql()}), '')) as plan_method");
+        $now = now();
+
+        return DB::query()->fromSub($source, 'accounts')->select('accounts.*')->selectRaw("
+            CASE
+                WHEN effective_status IN ('canceled', 'cancelled') THEN 'Canceled'
+                WHEN effective_status = 'paused' OR subscription_started_at > ? THEN 'Inactive'
+                WHEN EXISTS (
+                    SELECT 1 FROM subscriptions WHERE subscriptions.user_id = accounts.id AND (
+                        (stripe_status IN ('active', 'trialing') AND (ends_at IS NULL OR ends_at > ?))
+                        OR (stripe_status IN ('canceled', 'cancelled') AND ends_at > ?)
+                    )
+                ) OR (
+                    subscription_expires_at > ?
+                    AND effective_status NOT IN ('past_due', 'expired', 'failed', 'incomplete', 'pending')
+                    AND (effective_status IN ('active', 'trialing') OR payment_status = 'successful')
+                ) OR EXISTS (
+                    SELECT 1 FROM payments WHERE payments.user_id = CAST(accounts.id AS CHAR)
+                    AND payments.status = 'successful' AND payments.ends_at > ?
+                ) THEN 'Active'
+                ELSE 'Inactive'
+            END as display_subscription_status
+        ", [$now, $now, $now, $now, $now])->selectRaw("
+            CASE
+                WHEN plan_interval IN ('month', 'monthly') THEN CASE WHEN plan_tier LIKE '%premium%' THEN 'premium-monthly' ELSE 'standard-monthly' END
+                WHEN plan_interval IN ('quarter', 'quarterly') THEN CASE WHEN plan_tier LIKE '%premium%' THEN 'premium-quarterly' ELSE 'standard-quarterly' END
+                WHEN plan_interval IN ('year', 'yearly', 'annual') THEN CASE WHEN plan_tier LIKE '%premium%' THEN 'premium-yearly' ELSE 'standard-yearly' END
+                WHEN plan_interval = 'manual' OR plan_method = 'manual' THEN 'manual'
+                ELSE 'none'
+            END as display_plan
+        ");
+    }
+
     public function editUser(Request $request, User $user)
     {
+        $this->authorizeUserManagement($request);
+
         $validated = $request->validate([
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
@@ -112,6 +176,8 @@ class AdminController extends Controller
 
     public function destroy(Request $request, User $user)
     {
+        $this->authorizeUserManagement($request);
+        abort_if($request->user()->is($user), 403);
         $user->delete();
 
         return response()->json(['message' => "Record deleted"]);
@@ -119,6 +185,8 @@ class AdminController extends Controller
 
     public function updateSubscriptionAccess(Request $request, User $user)
     {
+        $this->authorizeUserManagement($request);
+
         $validated = $request->validate([
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date'],
@@ -184,6 +252,11 @@ class AdminController extends Controller
             'subscription_started_at' => $startsAt,
             'subscription_expires_at' => $endsAt,
         ]);
+    }
+
+    private function authorizeUserManagement(Request $request): void
+    {
+        abort_unless(in_array($request->user()?->role, [UserRoles::ADMIN->value, UserRoles::SUPERADMIN->value], true), 403);
     }
 
     public function updateUserStatus(Request $request, User $user)

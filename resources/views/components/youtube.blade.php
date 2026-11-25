@@ -38,22 +38,22 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-white/20">
 
       <div class="px-6 py-4">
-        <p class="text-3xl md:text-4xl font-extrabold text-white">56K+</p>
+        <p class="text-3xl md:text-4xl font-extrabold text-white">59K+</p>
         <p class="text-gray-400 text-sm mt-1">YouTube Subscribers</p>
       </div>
 
       <div class="px-6 py-4">
-        <p class="text-3xl md:text-4xl font-extrabold text-white">29K+</p>
+        <p class="text-3xl md:text-4xl font-extrabold text-white">33K+</p>
         <p class="text-gray-400 text-sm mt-1">Instagram Followers</p>
       </div>
 
       <div class="px-6 py-4">
-        <p class="text-3xl md:text-4xl font-extrabold text-white">170K+</p>
+        <p class="text-3xl md:text-4xl font-extrabold text-white">200K+</p>
         <p class="text-gray-400 text-sm mt-1">Lessons Viewed</p>
       </div>
 
       <div class="px-6 py-4">
-        <p class="text-3xl md:text-4xl font-extrabold text-white">800+</p>
+        <p class="text-3xl md:text-4xl font-extrabold text-white">900+</p>
         <p class="text-gray-400 text-sm mt-1">Students Enrolled</p>
       </div>
 

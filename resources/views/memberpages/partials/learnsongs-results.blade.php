@@ -56,12 +56,16 @@
           <p class="text-xs text-indigo-500 font-medium -mt-2">by {{ $song->author }}</p>
         @endif
 
-        <!-- Level Badge -->
-        <div>
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="inline-flex items-center gap-1.5 {{ $levelStyle }} text-xs font-semibold px-2.5 py-1 rounded-full">
             <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
             {{ $levelLabel }}
           </span>
+          @if(!empty($song->midi_resource))
+            <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+              MIDI
+            </span>
+          @endif
         </div>
 
         <!-- Watch Now Button -->

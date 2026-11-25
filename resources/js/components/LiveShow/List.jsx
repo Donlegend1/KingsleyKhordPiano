@@ -18,7 +18,10 @@ const LiveShow = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
      const { showMessage } = useFlashMessage();
     // const [liveShow, setliveShow] = useState(null);
-    const perPage = 10;
+    const perPage = 8;
+    const [search, setSearch] = useState("");
+    const [timeFilter, setTimeFilter] = useState("all");
+    const [categoryFilter, setCategoryFilter] = useState("all");
     const [liveShow, setLiveShow] = useState({
         title: "",
         recording_url: "",
@@ -39,9 +42,10 @@ const LiveShow = () => {
                 },
                 withCredentials: true,
             });
-            setCourses(response.data);
-            setCurrentPage(response.data.current_page);
-            setTotalPages(response.data.last_page);
+            const rows = Array.isArray(response.data)
+                ? response.data
+                : response.data?.data || [];
+            setCourses(rows);
         } catch (error) {
             console.error("Error fetching users:", error);
         } finally {
@@ -82,7 +86,51 @@ const LiveShow = () => {
     }, []);
 
     const handlePageChange = (page) => {
-        fetchCourses(page);
+        setCurrentPage(page);
+    };
+
+    const now = Date.now();
+    const filtered = (courses || [])
+        .filter((show) => {
+            const startsAt = new Date(show.start_time).getTime();
+            if (timeFilter === "upcoming" && !(startsAt >= now)) return false;
+            if (timeFilter === "past" && !(startsAt < now)) return false;
+            if (
+                categoryFilter !== "all" &&
+                (show.category || "event") !== categoryFilter
+            )
+                return false;
+            if (
+                search.trim() &&
+                !String(show.title || "")
+                    .toLowerCase()
+                    .includes(search.trim().toLowerCase())
+            )
+                return false;
+            return true;
+        })
+        .sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+    const totalPagesCalc = Math.max(1, Math.ceil(filtered.length / perPage));
+    const page = Math.min(currentPage, totalPagesCalc);
+    const pageRows = filtered.slice((page - 1) * perPage, page * perPage);
+
+    const formatWhen = (iso) => {
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return { date: "—", time: "" };
+        return {
+            date: d.toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                timeZone: "Africa/Lagos",
+            }),
+            time:
+                d.toLocaleTimeString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    timeZone: "Africa/Lagos",
+                }) + " WAT",
+        };
     };
 
     const openEditModal = (course) => {
@@ -130,112 +178,163 @@ const LiveShow = () => {
         }
     };
 
+    const filterSelect = (label, value, setter, options) => (
+        <select
+            aria-label={label}
+            value={value}
+            onChange={(e) => {
+                setter(e.target.value);
+                setCurrentPage(1);
+            }}
+            className="rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+        >
+            {options.map(([v, l]) => (
+                <option key={v} value={v}>
+                    {l}
+                </option>
+            ))}
+        </select>
+    );
+
     return (
-        <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Live Show List</h2>
-            <div className="flex justify-end items-center mb-4 ">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
+                <div>
+                    <h2 className="text-base font-bold text-gray-900">
+                        Live Shows
+                    </h2>
+                    <p className="text-xs text-gray-500">
+                        {filtered.length} of {courses.length}{" "}
+                        {courses.length === 1 ? "show" : "shows"}
+                    </p>
+                </div>
                 <a
-                    className="px-4 py-2 bg-black text-white rounded-full"
+                    className="inline-flex items-center gap-2 rounded-lg bg-black px-3.5 py-2 text-xs font-semibold text-white hover:bg-gray-800"
                     href="/admin/live-show/create"
                 >
-                    <span className="fa fa-plus"></span>
+                    <span className="fa fa-plus"></span> New live show
                 </a>
             </div>
+
+            <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+                <div className="relative w-full sm:w-64">
+                    <span className="fa fa-search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"></span>
+                    <input
+                        type="search"
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        placeholder="Search by title"
+                        className="w-full rounded-lg border border-gray-300 py-2 pl-8 pr-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                </div>
+                {filterSelect("When", timeFilter, setTimeFilter, [
+                    ["all", "All dates"],
+                    ["upcoming", "Upcoming"],
+                    ["past", "Past"],
+                ])}
+                {filterSelect("Type", categoryFilter, setCategoryFilter, [
+                    ["all", "All types"],
+                    ["event", "Events"],
+                    ["session", "Sessions"],
+                ])}
+            </div>
+
             {loading ? (
-                <p>Loading...</p>
+                <p className="px-4 pb-6 text-sm text-gray-500">Loading...</p>
             ) : (
                 <>
-                    <table className="min-w-full bg-white mb-4">
-                        <thead className="bg-gray-800 text-white">
-                            <tr>
-                                <th className="py-2 px-4 text-left">S/N</th>
-                                <th className="py-2 px-4 text-left">Title</th>
-                                <th className="py-2 px-4 text-left">Date</th>
-                                <th className="py-2 px-4 text-left">
-                                    Access Level
-                                </th>
-                                <th className="py-2 px-4 text-left">
-                                    Category
-                                </th>
-                                <th className="py-2 px-4 text-left">
-                                    Status
-                                </th>
-                                <th className="py-2 px-4 text-left">
-                                    Video Url
-                                </th>
-
-                                <th className="py-2 px-4 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {courses && courses.length > 0 ? (
-                                courses.map((user, index) => (
-                                    <tr key={user.id} className="border-b">
-                                        <td className="py-2 px-4">
-                                            {index + 1}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.title}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.start_time}
-                                        </td>
-                                        <td className="py-2 px-4 text-sm font-semibold capitalize">
-                                            {user.access_type}
-                                        </td>
-                                        <td className="py-2 px-4 text-xs uppercase font-bold text-blue-600">
-                                            {user.category || 'event'}
-                                        </td>
-                                        <td className="py-2 px-4 text-xs uppercase font-bold">
-                                            {user.status === 'coming_soon' ? (
-                                                <span className="text-amber-600">Coming Soon</span>
-                                            ) : (
-                                                <span className="text-emerald-600">Open</span>
-                                            )}
-                                        </td>
-                                        <td className="py-2 px-4">
-                                            {user.recording_url}
-                                        </td>
-                                        <td className="py-2 px-4 flex">
-                                            <button
-                                                onClick={() =>
-                                                    openEditModal(user)
-                                                }
-                                                className="bg-blue-500 text-white px-2 py-1 rounded"
-                                            >
-                                                <span className="fa fa-edit"></span>
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    openDeleteModal(user)
-                                                }
-                                                className="bg-red-500 text-white px-2 py-1 rounded ml-2"
-                                            >
-                                                <span className="fa fa-trash"></span>
-                                            </button>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead className="border-y border-gray-100 bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                                <tr>
+                                    <th className="px-4 py-2.5 font-semibold">Title</th>
+                                    <th className="px-4 py-2.5 font-semibold">Date</th>
+                                    <th className="px-4 py-2.5 font-semibold">Type</th>
+                                    <th className="px-4 py-2.5 font-semibold">Access</th>
+                                    <th className="px-4 py-2.5 font-semibold">Status</th>
+                                    <th className="px-4 py-2.5 text-right font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {pageRows.length > 0 ? (
+                                    pageRows.map((show) => {
+                                        const when = formatWhen(show.start_time);
+                                        const isSession = show.category === "session";
+                                        const upcoming =
+                                            new Date(show.start_time).getTime() >= now;
+                                        return (
+                                            <tr key={show.id} className="hover:bg-gray-50">
+                                                <td className="max-w-[16rem] px-4 py-2.5">
+                                                    <p className="truncate font-semibold text-gray-900" title={show.title}>
+                                                        {show.title}
+                                                    </p>
+                                                </td>
+                                                <td className="whitespace-nowrap px-4 py-2.5">
+                                                    <p className="text-gray-900">{when.date}</p>
+                                                    <p className="text-xs text-gray-500">{when.time}</p>
+                                                </td>
+                                                <td className="px-4 py-2.5">
+                                                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${isSession ? "bg-violet-50 text-violet-700" : "bg-blue-50 text-blue-700"}`}>
+                                                        {isSession ? "Session" : "Event"}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-2.5">
+                                                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold capitalize ${show.access_type === "premium" ? "bg-amber-50 text-amber-700" : "bg-gray-100 text-gray-700"}`}>
+                                                        {show.access_type === "premium" ? "Premium" : "All users"}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-2.5 text-xs font-semibold">
+                                                    {show.status === "coming_soon" ? (
+                                                        <span className="text-amber-600">Coming soon</span>
+                                                    ) : (
+                                                        <span className="text-emerald-600">Open</span>
+                                                    )}
+                                                    <span className="ml-1.5 font-normal text-gray-400">
+                                                        {upcoming ? "· upcoming" : "· past"}
+                                                    </span>
+                                                </td>
+                                                <td className="whitespace-nowrap px-4 py-2.5 text-right">
+                                                    <button
+                                                        onClick={() => openEditModal(show)}
+                                                        aria-label={`Edit ${show.title}`}
+                                                        className="rounded-md bg-blue-50 px-2.5 py-1.5 text-blue-600 hover:bg-blue-100"
+                                                    >
+                                                        <span className="fa fa-edit"></span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openDeleteModal(show)}
+                                                        aria-label={`Delete ${show.title}`}
+                                                        className="ml-1.5 rounded-md bg-red-50 px-2.5 py-1.5 text-red-600 hover:bg-red-100"
+                                                    >
+                                                        <span className="fa fa-trash"></span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan="6" className="px-4 py-10 text-center text-sm text-gray-500">
+                                            No live shows match.
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td
-                                        colSpan="7"
-                                        className="py-2 px-4 text-center"
-                                    >
-                                        No Live Show found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-
-                    <div className="flex items-center justify-center gap-6 mt-6">
-                        <CustomPagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
+                                )}
+                            </tbody>
+                        </table>
                     </div>
+
+                    {totalPagesCalc > 1 && (
+                        <div className="flex items-center justify-center gap-6 border-t border-gray-100 py-4">
+                            <CustomPagination
+                                currentPage={page}
+                                totalPages={totalPagesCalc}
+                                onPageChange={handlePageChange}
+                            />
+                        </div>
+                    )}
                 </>
             )}
 

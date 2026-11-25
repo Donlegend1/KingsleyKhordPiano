@@ -42,6 +42,7 @@ class NewPostNotification extends Notification
                 'title' => "New post added by {$this->post->user->name}",
                 'user' => $this->post->user->name,
                 'section' => NotificationSectionEnum::COMMUNITY->value,
+                'post_id' => $this->post->getKey(),
                 'url' => route('singlePost', $this->post),
             ],
         ];

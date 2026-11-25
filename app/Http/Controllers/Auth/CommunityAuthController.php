@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\MemberSignInDay;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -33,6 +34,7 @@ class CommunityAuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
+            MemberSignInDay::record(Auth::user());
             $request->session()->regenerate();
             return redirect()->intended(route('community.index'))->with('success', 'Welcome back, musician! Enjoy your premium content.');
         }

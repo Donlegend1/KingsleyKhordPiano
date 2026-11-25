@@ -15,14 +15,15 @@ use Illuminate\Support\Facades\Mail;
 
 class PersonalizedGuidanceController extends Controller
 {
-    public function index()
+    public function index(Request $httpRequest)
     {
         $requests = PersonalizedGuidanceRequest::with('user')->get()->keyBy('user_id');
         $bookings = LiveCoachingBooking::with('user')->orderByDesc('date')->orderByDesc('time')->get()->groupBy('user_id');
 
         $userIds = $requests->keys()->merge($bookings->keys())->unique();
+        $plans = PersonalizedPlan::whereIn('user_id', $userIds)->get()->keyBy('user_id');
 
-        $entries = $userIds->map(function ($userId) use ($requests, $bookings) {
+        $entries = $userIds->map(function ($userId) use ($requests, $bookings, $plans) {
             $request = $requests->get($userId);
             $userBookings = $bookings->get($userId, collect());
 
@@ -30,12 +31,41 @@ class PersonalizedGuidanceController extends Controller
                 'user' => optional($request)->user ?? optional($userBookings->first())->user,
                 'request' => $request,
                 'bookings' => $userBookings,
+                'plan' => $plans->get($userId)?->progressSummary(),
                 'latestAt' => collect([
                     optional($request)->created_at,
                     optional($userBookings->first())->created_at,
                 ])->filter()->max(),
             ];
         })->filter(fn ($entry) => $entry->user)->sortByDesc('latestAt')->values();
+
+        $counts = [
+            'all' => $entries->count(),
+            'pending' => $entries->filter(fn ($e) => $e->request && $e->request->status !== 'reviewed')->count(),
+            'reviewed' => $entries->filter(fn ($e) => $e->request?->status === 'reviewed')->count(),
+            'no_plan' => $entries->whereNull('plan')->count(),
+            'ahead' => $entries->filter(fn ($e) => ($e->plan['pace'] ?? null) === 'Ahead')->count(),
+            'behind' => $entries->filter(fn ($e) => ($e->plan['pace'] ?? null) === 'Behind')->count(),
+            'completed' => $entries->filter(fn ($e) => ($e->plan['pace'] ?? null) === 'Completed')->count(),
+        ];
+
+        $search = trim((string) $httpRequest->query('q'));
+        $filter = (string) $httpRequest->query('filter', 'all');
+        $entries = $entries->filter(function ($e) use ($search, $filter) {
+            if ($search !== '' && ! str_contains(strtolower(($e->user->full_name ?? '') . ' ' . $e->user->email), strtolower($search))) {
+                return false;
+            }
+
+            return match ($filter) {
+                'pending' => $e->request && $e->request->status !== 'reviewed',
+                'reviewed' => $e->request?->status === 'reviewed',
+                'no_plan' => $e->plan === null,
+                'ahead' => ($e->plan['pace'] ?? null) === 'Ahead',
+                'behind' => ($e->plan['pace'] ?? null) === 'Behind',
+                'completed' => ($e->plan['pace'] ?? null) === 'Completed',
+                default => true,
+            };
+        })->values();
 
         $perPage = 15;
         $page = LengthAwarePaginator::resolveCurrentPage();
@@ -47,7 +77,7 @@ class PersonalizedGuidanceController extends Controller
             ['path' => request()->url(), 'query' => request()->query()]
         );
 
-        return view('admin.personalized_guidance.index', ['entries' => $paginated]);
+        return view('admin.personalized_guidance.index', ['entries' => $paginated, 'counts' => $counts, 'search' => $search, 'filter' => $filter]);
     }
 
     public function show(User $user)
@@ -62,6 +92,7 @@ class PersonalizedGuidanceController extends Controller
             'user' => $user,
             'request' => $guidanceRequest,
             'bookings' => $bookings,
+            'planSummary' => PersonalizedPlan::where('user_id', $user->id)->first()?->progressSummary(),
         ]);
     }
 

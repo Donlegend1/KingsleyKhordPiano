@@ -57,6 +57,7 @@ class NewLikeNotification extends Notification implements ShouldQueue
                 'user' => $this->like->user->full_name,
                 'type' => 'like',
                 'section' => NotificationSectionEnum::COMMUNITY->value,
+                'post_id' => $this->like->post_id,
                 'url' => route('singlePost', $this->like->post_id),
                 'by_user_avatar' => $this->like->user->passport ? asset($this->like->user->passport) : null,
             ],

@@ -6,6 +6,21 @@
     $authUser = auth()->user();
     $initials = strtoupper(substr($authUser->first_name ?? $authUser->name ?? 'U', 0, 1) . substr($authUser->last_name ?? '', 0, 1));
     $progress = $plan->progressPercent();
+    $paceInfo = $plan->progressSummary();
+    $categoryLabels = [
+        'finger_exercise' => ['label' => 'Finger Exercise', 'icon' => 'fa-hand-fist'],
+        'theory_and_application' => ['label' => 'Theory and Application', 'icon' => 'fa-book'],
+        'guided_practice' => ['label' => 'Guided Practice', 'icon' => 'fa-bullseye'],
+        'repertoire' => ['label' => 'Repertoire', 'icon' => 'fa-music'],
+    ];
+    $weeksByMonth = [];
+    $weekGroups = [];
+    foreach (array_keys($plan->months ?? []) as $index) {
+        $weeksByMonth[$index] = $plan->lessonsByWeek($index);
+        foreach ($weeksByMonth[$index] as $week => $lessons) {
+            $weekGroups[] = ['id' => "{$index}.{$week}", 'month' => $index, 'keys' => array_column($lessons, 'lesson_key')];
+        }
+    }
     $progressForumUrl = route('community.forum.category', 'progress_report');
 @endphp
 
@@ -18,7 +33,7 @@
 </section>
 
 <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6"
-     x-data="personalizedPlanPage({{ \Illuminate\Support\Js::from(['progress' => $progress, 'completed' => $plan->completed_lessons ?? []]) }})">
+     x-data="personalizedPlanPage({{ \Illuminate\Support\Js::from(['progress' => $progress, 'expected' => $paceInfo['expected'], 'started' => $paceInfo['started'], 'day' => $paceInfo['day'], 'completed' => $plan->completed_lessons ?? [], 'weeks' => $weekGroups]) }})">
 
   {{-- Shown right after a lesson is ticked: invites the student to post their progress --}}
   <div x-show="shareNudge" x-cloak x-transition.opacity
@@ -42,16 +57,7 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto" x-data="{ activeMonth: 0 }">
-
-    {{-- Download the plan as a PDF --}}
-    <div class="flex justify-end mb-4">
-      <a href="{{ route('member.personalized-plan.download') }}"
-         class="flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-sm font-semibold transition-colors">
-        <i class="fa-solid fa-file-arrow-down text-[15px]"></i>
-        Download plan (PDF)
-      </a>
-    </div>
+  <div class="max-w-7xl mx-auto">
 
     {{-- Header: 3 summary cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -64,7 +70,7 @@
         <div class="min-w-0">
           <p class="text-[15px] font-bold text-gray-900 break-words">{{ trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: $authUser->name }}</p>
           @if($plan->skill_level)
-            <p class="text-[13px] text-gray-500">{{ $plan->skill_level }}</p>
+            <p class="text-[13px] text-gray-500">Plan Level: {{ $plan->skill_level }}</p>
           @endif
         </div>
       </div>
@@ -87,13 +93,19 @@
             <i class="fa-solid fa-chart-pie text-lg"></i>
           </div>
           <div class="flex-1 flex items-center justify-between min-w-0">
-            <p class="text-[15px] font-semibold text-gray-900">Overall Progress</p>
+            <div class="min-w-0">
+              <p class="text-[15px] font-semibold text-gray-900">Overall Progress</p>
+              <span class="mt-0.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold" :class="pace.badge">
+                <i :class="pace.icon" class="text-[10px]"></i><span x-text="pace.label"></span>
+              </span>
+            </div>
             <p class="text-[15px] font-extrabold text-gray-900" x-text="progress + '%'"></p>
           </div>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2.5">
-          <div class="bg-[#1447A6] h-2.5 rounded-full transition-all duration-500" :style="'width: ' + progress + '%'"></div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5 relative" role="progressbar" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+          <div class="h-2.5 rounded-full transition-all duration-500" :class="pace.bar" :style="'width: ' + progress + '%'"></div>
         </div>
+        <p class="mt-2 text-xs text-gray-500" x-text="pace.message"></p>
       </div>
 
     </div>
@@ -114,7 +126,7 @@
                 @if($tabDateRange)
                   {{ $tabDateRange[0]->format('M j') }} - {{ $tabDateRange[1]->format('M j') }} &middot;
                 @endif
-                {{ $plan->monthProgressPercent($index) }}%
+                <span x-text="monthProgress({{ $index }}) + '%'">{{ $plan->monthProgressPercent($index) }}%</span>
               </p>
             </button>
           @endforeach
@@ -123,124 +135,79 @@
         @foreach ($plan->months ?? [] as $index => $month)
           <div x-show="activeMonth === {{ $index }}" x-cloak>
 
-            @php
-              $categoryLabels = [
-                  'finger_exercise' => ['label' => 'Finger Exercise', 'icon' => 'fa-hand-fist'],
-                  'theory_and_application' => ['label' => 'Theory and Application', 'icon' => 'fa-book'],
-                  'guided_practice' => ['label' => 'Guided Practice', 'icon' => 'fa-bullseye'],
-                  'repertoire' => ['label' => 'Repertoire', 'icon' => 'fa-music'],
-              ];
-
-              // Same lessons re-grouped by week (across all 4 categories) for the
-              // alternate "by week" view — falls back into a "No Week Set" bucket
-              // when a lesson has no week number assigned.
-              $lessonsByWeek = [];
-              foreach ($categoryLabels as $key => $meta) {
-                  foreach ($month['lessons'][$key] ?? [] as $lesson) {
-                      $weekNumber = is_numeric($lesson['week'] ?? null) ? (int) $lesson['week'] : null;
-                      $lessonsByWeek[$weekNumber][] = $lesson + ['category_key' => $key, 'category_label' => $meta['label'], 'category_icon' => $meta['icon']];
-                  }
-              }
-              ksort($lessonsByWeek);
-            @endphp
-
-            <div class="bg-white border border-gray-200 rounded-xl p-4" x-data="{ viewMode: 'category' }">
-              <div class="flex items-center justify-between mb-4">
-                <p class="text-sm font-bold text-gray-900">Lessons</p>
-                <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                  <button type="button" @click="viewMode = 'category'"
-                          :class="viewMode === 'category' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'"
-                          class="w-7 h-7 flex items-center justify-center rounded-md transition-colors"
-                          title="Group by practice menu">
-                    <i class="fa-solid fa-list text-xs"></i>
-                  </button>
-                  <button type="button" @click="viewMode = 'week'"
-                          :class="viewMode === 'week' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'"
-                          class="w-7 h-7 flex items-center justify-center rounded-md transition-colors"
-                          title="Group by week">
-                    <i class="fa-solid fa-calendar-week text-xs"></i>
-                  </button>
+            <div class="rounded-xl border border-gray-200 bg-white p-4">
+              <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h2 class="text-sm font-bold text-gray-900">Lessons</h2>
+                <div class="flex items-center gap-1 rounded-lg bg-gray-100 p-1" role="group" aria-label="Group lessons">
+                  <button type="button" @click="viewMode = 'week'" :aria-pressed="viewMode === 'week'"
+                          :class="viewMode === 'week' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
+                          class="rounded-md px-3 py-1.5 text-xs font-semibold">By Week</button>
+                  <button type="button" @click="viewMode = 'category'" :aria-pressed="viewMode === 'category'"
+                          :class="viewMode === 'category' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
+                          class="rounded-md px-3 py-1.5 text-xs font-semibold">By Category</button>
                 </div>
               </div>
 
-              {{-- View 1: grouped by practice menu (category) --}}
-              <div x-show="viewMode === 'category'">
-                @foreach ($categoryLabels as $key => $meta)
-                  @php $lessons = $month['lessons'][$key] ?? []; @endphp
-                  @if(!empty($lessons))
-                    <div class="mb-5 last:mb-0">
-                      <p class="flex items-center gap-2 text-xs font-bold text-gray-900 uppercase tracking-wide mb-2">
-                        <i class="fa-solid {{ $meta['icon'] }} text-blue-500"></i>
-                        {{ $meta['label'] }}
-                      </p>
-                      <div class="space-y-2">
-                        @foreach ($lessons as $lesson)
-                          @php $lessonKey = "{$index}.{$key}.{$lesson['id']}"; @endphp
-                          <div class="flex items-start gap-3 px-3 sm:px-4 py-3 rounded-lg border transition-colors"
-                               :class="isCompleted('{{ $lessonKey }}') ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-transparent'">
-                            <a href="{{ $lesson['url'] ?: '#' }}"
-                               target="{{ $lesson['url'] ? '_blank' : '_self' }}" rel="noopener noreferrer"
-                               class="flex-1 min-w-0 hover:text-[#1447A6] transition-colors">
-                              <p class="text-sm font-medium text-gray-800 whitespace-normal break-words"
-                                 :class="isCompleted('{{ $lessonKey }}') ? 'line-through text-gray-400' : ''">{{ $lesson['name'] ?: 'Untitled lesson' }}</p>
-                              @if(!empty($lesson['week']) || !empty($lesson['duration']))
-                                <p class="text-xs text-gray-400 mt-0.5">
-                                  @if(!empty($lesson['week'])) Week {{ $lesson['week'] }} @endif
-                                  @if(!empty($lesson['week']) && !empty($lesson['duration'])) &middot; @endif
-                                  @if(!empty($lesson['duration'])) {{ $lesson['duration'] }} min @endif
-                                </p>
-                              @endif
-                            </a>
-                            <a href="{{ $progressForumUrl }}" x-show="isCompleted('{{ $lessonKey }}')" x-cloak
-                               class="text-xs font-semibold text-[#1447A6] hover:underline whitespace-nowrap flex-shrink-0">Share progress</a>
-                            <input type="checkbox"
-                                   class="w-5 h-5 mt-0.5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
-                                   :checked="isCompleted('{{ $lessonKey }}')"
-                                   @change="toggleLesson('{{ $lessonKey }}', $event.target.checked, {{ \Illuminate\Support\Js::from($lesson['name'] ?: 'this lesson') }})">
-                          </div>
-                        @endforeach
-                      </div>
-                    </div>
-                  @endif
-                @endforeach
-              </div>
+              <p x-show="saveError" x-cloak role="alert" class="mb-4 text-sm text-red-700">
+                Progress could not be saved. Please try again.
+              </p>
 
-              {{-- View 2: grouped by week (across all practice menus) --}}
-              <div x-show="viewMode === 'week'" x-cloak>
-                @forelse ($lessonsByWeek as $weekNumber => $lessons)
-                  <div class="mb-5 last:mb-0">
-                    <p class="text-xs font-bold text-gray-900 uppercase tracking-wide mb-2">
-                      {{ $weekNumber !== null ? 'Week ' . $weekNumber : 'No Week Set' }}
-                    </p>
-                    <div class="space-y-2">
+              <div x-show="viewMode === 'week'" class="space-y-3">
+                @forelse ($weeksByMonth[$index] as $weekNumber => $lessons)
+                  @php
+                    $weekId = "{$index}.{$weekNumber}";
+                    $weekPanel = "plan-week-{$index}-{$weekNumber}";
+                  @endphp
+                  <div class="rounded-xl border"
+                       :class="nextWeek?.id === '{{ $weekId }}' ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-white'">
+                    <h3>
+                      <button type="button" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left focus-visible:ring-2 focus-visible:ring-[#1447A6]"
+                              @click="toggleWeek('{{ $weekId }}')" :aria-expanded="isWeekOpen('{{ $weekId }}')" aria-controls="{{ $weekPanel }}">
+                        <span class="text-sm font-bold text-gray-900">{{ $weekNumber === 'unscheduled' ? 'No Week Set' : 'Week ' . $weekNumber }}</span>
+                        <span x-cloak x-show="nextWeek?.id === '{{ $weekId }}'" class="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-[#1447A6]">Next up</span>
+                        <span class="ml-auto text-right text-xs text-gray-600"><span x-text="weekCompleted('{{ $weekId }}')"></span> of {{ count($lessons) }} complete</span>
+                        <i class="fa-solid fa-chevron-down shrink-0 text-xs text-gray-500 transition-transform" :class="{ 'rotate-180': isWeekOpen('{{ $weekId }}') }" aria-hidden="true"></i>
+                      </button>
+                    </h3>
+                    <div id="{{ $weekPanel }}" x-show="isWeekOpen('{{ $weekId }}')" x-cloak class="space-y-2 px-3 pb-3">
                       @foreach ($lessons as $lesson)
-                        @php $lessonKey = "{$index}.{$lesson['category_key']}.{$lesson['id']}"; @endphp
-                        <div class="flex items-start gap-3 px-3 sm:px-4 py-3 rounded-lg border transition-colors"
-                             :class="isCompleted('{{ $lessonKey }}') ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-transparent'">
-                          <a href="{{ $lesson['url'] ?: '#' }}"
-                             target="{{ $lesson['url'] ? '_blank' : '_self' }}" rel="noopener noreferrer"
-                             class="flex-1 min-w-0 hover:text-[#1447A6] transition-colors">
-                            <p class="text-sm font-medium text-gray-800 whitespace-normal break-words"
-                               :class="isCompleted('{{ $lessonKey }}') ? 'line-through text-gray-400' : ''">{{ $lesson['name'] ?: 'Untitled lesson' }}</p>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                              <i class="fa-solid {{ $lesson['category_icon'] }} text-gray-300"></i>
-                              {{ $lesson['category_label'] }}
-                              @if(!empty($lesson['duration'])) &middot; {{ $lesson['duration'] }} min @endif
-                            </p>
-                          </a>
-                          <a href="{{ $progressForumUrl }}" x-show="isCompleted('{{ $lessonKey }}')" x-cloak
-                             class="text-xs font-semibold text-[#1447A6] hover:underline whitespace-nowrap flex-shrink-0">Share progress</a>
-                          <input type="checkbox"
-                                 class="w-5 h-5 mt-0.5 rounded border-2 border-gray-400 bg-white text-green-600 focus:ring-green-500 flex-shrink-0"
-                                 :checked="isCompleted('{{ $lessonKey }}')"
-                                 @change="toggleLesson('{{ $lessonKey }}', $event.target.checked, {{ \Illuminate\Support\Js::from($lesson['name'] ?: 'this lesson') }})">
-                        </div>
+                        @include('memberpages.partials.personalized-plan-lesson', [
+                            'lessonKey' => $lesson['lesson_key'],
+                            'lessonContext' => $categoryLabels[$lesson['category_key']]['label'] ?? null,
+                        ])
                       @endforeach
                     </div>
                   </div>
                 @empty
-                  <p class="text-sm text-gray-400 italic">No lessons yet.</p>
+                  <p class="text-sm text-gray-600">No lessons yet.</p>
                 @endforelse
+              </div>
+
+              <div x-show="viewMode === 'category'" x-cloak>
+                @if(empty($weeksByMonth[$index]))
+                  <p class="text-sm text-gray-600">No lessons yet.</p>
+                @endif
+                @foreach ($categoryLabels as $key => $meta)
+                  @php $lessons = $month['lessons'][$key] ?? []; @endphp
+                  @if(!empty($lessons))
+                    <section class="mb-5 last:mb-0">
+                      <h3 class="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-900">
+                        <i class="fa-solid {{ $meta['icon'] }} text-blue-500" aria-hidden="true"></i>
+                        {{ $meta['label'] }}
+                      </h3>
+                      <div class="space-y-2">
+                        @foreach ($lessons as $lesson)
+                          @if(!empty($lesson['id']))
+                            @include('memberpages.partials.personalized-plan-lesson', [
+                                'lessonKey' => "{$index}.{$key}.{$lesson['id']}",
+                                'lessonContext' => !empty($lesson['week']) ? 'Week ' . $lesson['week'] : null,
+                            ])
+                          @endif
+                        @endforeach
+                      </div>
+                    </section>
+                  @endif
+                @endforeach
               </div>
             </div>
 
@@ -353,9 +320,9 @@
           </div>
         @endif
 
-        {{-- Daily Practice Tracker --}}
+        {{-- Weekly Activity --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-          <p class="text-sm font-bold text-gray-900">Daily Practice Tracker</p>
+          <p class="text-sm font-bold text-gray-900">Weekly Activity</p>
           <p class="text-xs text-gray-400 mb-4">This week's login activity</p>
 
           <div class="flex justify-between items-center gap-1 mb-4">
@@ -402,10 +369,10 @@
           <div class="space-y-2.5">
             <div class="flex items-start justify-between gap-3 text-sm">
               <span class="text-gray-500">Lessons Completed</span>
-              <span class="font-bold text-gray-900 text-right">{{ $stats['lessons_completed'] }}/{{ $stats['lessons_total'] }}</span>
+              <span class="font-bold text-gray-900 text-right"><span x-text="completedLessonCount">{{ $stats['lessons_completed'] }}</span>/{{ $stats['lessons_total'] }}</span>
             </div>
             <div class="flex items-start justify-between gap-3 text-sm">
-              <span class="text-gray-500">Current Streak</span>
+              <span class="text-gray-500">Login Streak</span>
               <span class="font-bold text-gray-900 text-right">{{ $stats['current_streak'] }} days</span>
             </div>
             <div class="flex items-start justify-between gap-3 text-sm pt-2.5 border-t border-gray-100">
@@ -413,8 +380,8 @@
               <span class="font-bold text-gray-900 text-right break-words">{{ $stats['milestone_name'] }} ({{ $stats['milestone_count'] }})</span>
             </div>
             <div class="flex items-start justify-between gap-3 text-sm">
-              <span class="text-gray-500 shrink-0">Current Level</span>
-              <span class="font-bold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-md text-[10px] text-right break-words">{{ $stats['current_level'] }}</span>
+              <span class="text-gray-500 shrink-0">Assessment Level</span>
+              <span class="font-bold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-md text-[10px] text-right break-words">{{ $stats['current_level'] === 'Nil' ? 'Not assessed' : $stats['current_level'] }}</span>
             </div>
           </div>
         </div>
@@ -429,10 +396,62 @@
     function personalizedPlanPage(initial) {
         return {
             progress: initial.progress,
+            expected: initial.expected,
+            started: initial.started,
+            day: initial.day,
+            get pace() {
+                const p = this.progress, e = this.expected;
+                if (p >= 100) return { label: 'Completed', icon: 'fa-solid fa-trophy', badge: 'bg-emerald-50 text-emerald-700', bar: 'bg-emerald-500', message: 'You finished your whole plan. Amazing work!' };
+                if (!this.started) return { label: 'Not started yet', icon: 'fa-regular fa-clock', badge: 'bg-gray-100 text-gray-600', bar: 'bg-[#1447A6]', message: 'Your plan hasn\'t begun yet. Get ready to start.' };
+                const day = 'Day ' + this.day + ' of 90 · you\'d be around ' + e + '% by now.';
+                if (p >= e + 10) return { label: 'Ahead of schedule', icon: 'fa-solid fa-rocket', badge: 'bg-violet-50 text-violet-700', bar: 'bg-violet-500', message: 'You\'re doing wonderfully, ahead of plan. ' + day };
+                if (p >= e - 10) return { label: 'On track', icon: 'fa-solid fa-circle-check', badge: 'bg-blue-50 text-blue-700', bar: 'bg-[#1447A6]', message: 'Right where you should be. Keep it up! ' + day };
+                return { label: 'Behind schedule', icon: 'fa-solid fa-hourglass-half', badge: 'bg-amber-50 text-amber-700', bar: 'bg-amber-500', message: 'A little behind, but a short session today gets you back on pace. ' + day };
+            },
             completed: initial.completed || [],
+            weeks: initial.weeks,
+            activeMonth: 0,
+            viewMode: 'week',
+            expandedWeeks: {},
+            saving: false,
+            saveError: false,
             shareNudge: null,
             shareNudgeShown: false,
             shareNudgeTimer: null,
+
+            init() {
+                this.activeMonth = this.nextWeek?.month ?? this.weeks[0]?.month ?? 0;
+                if (!this.nextWeek && this.weeks[0]) this.expandedWeeks[this.weeks[0].id] = true;
+            },
+
+            get nextWeek() {
+                return this.weeks.find((week) => week.keys.some((key) => !this.isCompleted(key)));
+            },
+
+            get completedLessonCount() {
+                return this.weeks.reduce((count, week) => count + this.completedCount(week.keys), 0);
+            },
+
+            completedCount(keys) {
+                return keys.filter((key) => this.isCompleted(key)).length;
+            },
+
+            weekCompleted(id) {
+                return this.completedCount(this.weeks.find((week) => week.id === id).keys);
+            },
+
+            monthProgress(month) {
+                const keys = this.weeks.filter((week) => week.month === month).flatMap((week) => week.keys);
+                return keys.length ? Math.round(this.completedCount(keys) / keys.length * 100) : 0;
+            },
+
+            isWeekOpen(id) {
+                return this.expandedWeeks[id] ?? (this.nextWeek?.id === id);
+            },
+
+            toggleWeek(id) {
+                this.expandedWeeks[id] = !this.isWeekOpen(id);
+            },
 
             // Invite the student to post their progress, once per visit to
             // this page (reloading the page, or coming back later, resets it).
@@ -448,12 +467,13 @@
                 return this.completed.includes(key);
             },
 
-            async toggleLesson(key, checked, lessonName) {
-                if (checked) {
-                    if (!this.completed.includes(key)) this.completed.push(key);
-                } else {
-                    this.completed = this.completed.filter((k) => k !== key);
-                }
+            async toggleLesson(key, input, lessonName) {
+                const checked = input.checked;
+                input.checked = this.isCompleted(key);
+                if (this.saving) return;
+                const previousWeek = this.nextWeek;
+                this.saving = true;
+                this.saveError = false;
 
                 try {
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -471,14 +491,18 @@
                     if (typeof data.progress === 'number') {
                         this.progress = data.progress;
                     }
-                    if (checked) this.maybeShowShareNudge(lessonName);
-                } catch (error) {
-                    console.error('Could not save lesson completion:', error);
+                    this.completed = data.completed;
                     if (checked) {
-                        this.completed = this.completed.filter((k) => k !== key);
-                    } else if (!this.completed.includes(key)) {
-                        this.completed.push(key);
+                        const upcomingWeek = this.nextWeek;
+                        if (previousWeek?.keys.includes(key) && this.activeMonth === previousWeek.month && upcomingWeek) {
+                            this.activeMonth = upcomingWeek.month;
+                        }
+                        this.maybeShowShareNudge(lessonName);
                     }
+                } catch (error) {
+                    this.saveError = true;
+                } finally {
+                    this.saving = false;
                 }
             },
         };

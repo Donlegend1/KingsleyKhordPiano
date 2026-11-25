@@ -76,6 +76,54 @@ class PersonalizedPlan extends Model
         return $keys;
     }
 
+    public function lessonsByWeek(int $monthIndex): array
+    {
+        $weeks = [];
+        $unscheduled = [];
+
+        foreach ($this->months[$monthIndex]['lessons'] ?? [] as $category => $lessons) {
+            foreach ($lessons as $lesson) {
+                if (empty($lesson['id'])) {
+                    continue;
+                }
+
+                $lesson['lesson_key'] = "{$monthIndex}.{$category}.{$lesson['id']}";
+                $lesson['category_key'] = $category;
+                $week = filter_var($lesson['week'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+                if ($week === false) {
+                    $unscheduled[] = $lesson;
+                } else {
+                    $weeks[$week][] = $lesson;
+                }
+            }
+        }
+
+        ksort($weeks, SORT_NUMERIC);
+        if ($unscheduled) {
+            $weeks['unscheduled'] = $unscheduled;
+        }
+
+        return $weeks;
+    }
+
+    public function nextUnfinishedLesson(): ?array
+    {
+        $completed = array_fill_keys($this->completed_lessons ?? [], true);
+
+        foreach (array_keys($this->months ?? []) as $monthIndex) {
+            foreach ($this->lessonsByWeek($monthIndex) as $lessons) {
+                foreach ($lessons as $lesson) {
+                    if (!isset($completed[$lesson['lesson_key']])) {
+                        return $lesson;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function progressPercent(): int
     {
         $totalLessons = count($this->allLessonKeys());
@@ -111,5 +159,42 @@ class PersonalizedPlan extends Model
         $completed = array_intersect($this->completed_lessons ?? [], $keys);
 
         return (int) round((count($completed) / count($keys)) * 100);
+    }
+
+    /**
+     * Admin-facing snapshot of how a member is doing against their plan:
+     * lessons done, overall %, per-month %, and pace vs the 90-day schedule.
+     */
+    public function progressSummary(): array
+    {
+        $keys = $this->allLessonKeys();
+        $total = count($keys);
+        $done = count(array_intersect($this->completed_lessons ?? [], $keys));
+        $percent = $total > 0 ? (int) round(($done / $total) * 100) : 0;
+
+        $started = $this->start_date && ! $this->start_date->isFuture();
+        $elapsedDays = $started ? min(self::PROGRAM_LENGTH_DAYS, (int) $this->start_date->diffInDays(now())) : 0;
+        $expected = (int) round(($elapsedDays / self::PROGRAM_LENGTH_DAYS) * 100);
+
+        $pace = match (true) {
+            $total === 0 => 'No lessons',
+            $percent >= 100 => 'Completed',
+            ! $started => 'Not started',
+            $percent >= $expected + 10 => 'Ahead',
+            $percent >= $expected - 10 => 'On track',
+            default => 'Behind',
+        };
+
+        return [
+            'done' => $done,
+            'total' => $total,
+            'percent' => $percent,
+            'expected' => $expected,
+            'day' => $elapsedDays,
+            'started' => $started,
+            'pace' => $pace,
+            'months' => collect(array_keys($this->months ?? []))->map(fn ($m) => $this->monthProgressPercent((int) $m))->all(),
+            'next' => $this->nextUnfinishedLesson()['name'] ?? null,
+        ];
     }
 }

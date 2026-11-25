@@ -14,7 +14,7 @@
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
 
     {{-- Video --}}
-    <div class="relative aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-sm">
+    <div class="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-sm {{ $tutorial->video_type === 'google' ? '-mx-4 sm:mx-0' : 'w-full' }}">
         @if($tutorial->video_type === 'vimeo')
             <iframe
                 src="https://player.vimeo.com/video/{{ $tutorial->video_url }}?autoplay=0"
@@ -32,7 +32,7 @@
         @elseif($tutorial->video_type === 'google')
             <iframe
                 src="https://drive.google.com/file/d/{{ $tutorial->video_url }}/preview"
-                class="w-full h-full border-0"
+                class="block w-full h-full border-0"
                 allow="autoplay"
                 allowfullscreen
             ></iframe>

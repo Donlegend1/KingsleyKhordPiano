@@ -11,7 +11,6 @@ use App\Http\Controllers\PersonalizedGuidanceController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\LessonController;
-use App\Http\Controllers\EarTrainingController;
 use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
@@ -28,7 +27,6 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShopCheckoutController;
 use App\Support\ShopCatalog;
 use App\Http\Controllers\QuizController;
-use App\Http\Controllers\AudioQuizController;
 use App\Http\Controllers\CommunityIndexController;
 // use App\Http\Controllers\StripeWebhookController;
 use Laravel\Cashier\Http\Controllers\WebhookController;
@@ -67,6 +65,19 @@ Route::post(
 Route::post('/webhooks/paystack', [PaymentController::class, 'handlePaystackWebhook']);
 
 Route::get('/', [IndexController::class, 'index']);
+Route::get('/guides', [\App\Http\Controllers\PianoGuideController::class, 'index'])->name('guides.index');
+Route::get('/guides/{slug}', [\App\Http\Controllers\PianoGuideController::class, 'show'])->name('guides.show');
+Route::middleware('auth')->prefix('/guides/{slug}/discussion')->group(function () {
+    Route::get('/join', [\App\Http\Controllers\PianoGuideDiscussionController::class, 'join'])->name('guides.discussion.join');
+    Route::post('/', [\App\Http\Controllers\PianoGuideDiscussionController::class, 'store'])
+        ->middleware('throttle:12,1')->name('guides.discussion.store');
+    Route::delete('/{comment}', [\App\Http\Controllers\PianoGuideDiscussionController::class, 'destroy'])
+        ->whereNumber('comment')->name('guides.discussion.destroy');
+});
+Route::post('/guides/{slug}/pdf', [\App\Http\Controllers\PianoGuideController::class, 'requestPdf'])
+    ->middleware('throttle:10,1')->name('guides.pdf.request');
+Route::get('/guides/{slug}/pdf', [\App\Http\Controllers\PianoGuideController::class, 'pdf'])->name('guides.pdf');
+Route::get('/guides/{slug}/check-your-email', [\App\Http\Controllers\PianoGuideController::class, 'confirmation'])->name('guides.confirmation');
 Route::get('/about', function () {
     return view('about', ['pageTitle' => 'About Us']);
 });
@@ -153,6 +164,8 @@ Route::post('/logout/community', [CommunityAuthController::class, 'logout'])->na
 
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(['check.payment', 'verified']);
 Route::get('/admin/dashboard', [HomeController::class, 'admin'])->name('admin')->middleware(['check.payment', 'verified']);
+Route::get('/admin/lesson-analytics', [\App\Http\Controllers\Admin\LessonAnalyticsController::class, 'index'])
+    ->middleware(['auth', 'check.payment', 'verified'])->name('admin.lesson-analytics');
 
 Route::get('/payment/direct-checkout', [PaymentController::class, 'directCheckout'])->middleware(['auth'])->name('payment.direct-checkout');
 Route::post('/paystack', [PaymentController::class, 'initialize'])->name('paystack.redirect');
@@ -210,9 +223,6 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('piano-exercise', [ExerciseController::class, 'pianoExercise'])->name('piano.exercise');
     Route::get('extra-courses', [CoursesController::class, 'extraCourses'])->name('extra.courses');
     Route::get('lesson/{id}', [CoursesController::class, 'singleCourse']);
-    Route::get('ear-training', [EarTrainingController::class, 'earTraining'])->name('ear.training');
-    Route::get('ear-training/{id}', [EarTrainingController::class, 'showmember']);
-    Route::get('ear-training/{id}/siblings', [EarTrainingController::class, 'siblings']);
     Route::get('learn-songs', [LessonController::class, 'learnSongs'])->name('learn.songs');
     Route::get('live-session', [LiveSessionController::class, 'liveSession']);
     Route::get('live-session/{liveshow}/confirm', [LiveSessionController::class, 'confirmBooking'])->name('member.live-session.confirm');
@@ -220,9 +230,6 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('live-show/{liveshow}/recording', [LiveShowController::class, 'showRecording'])->name('member.live-show.recording');
     Route::get('notifications/live-shows/status', [LiveShowNotificationController::class, 'index']);
     Route::post('notifications/subscribe-live-shows', [LiveShowNotificationController::class, 'store']);
-    if (app()->environment('local')) {
-        Route::get('audio-quiz', [AudioQuizController::class, 'index'])->name('member.audio-quiz');
-    }
     Route::get('course/{level}', [CourseController::class, 'membershow']);
     Route::get('course/{level}/{course}', [CourseController::class, 'membershow'])
         ->where(['level' => 'beginner|intermediate|advanced', 'course' => '[0-9]+']);
@@ -279,6 +286,8 @@ Route::prefix('member')->middleware(['auth', 'check.payment', 'verified'])->grou
     Route::get('/community/single/{single}', [CommunityIndexController::class, 'single'])->name('community.single');
     Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
     ->name('notifications.markAllAsRead');
+    Route::post('/community/notifications/{id}/open', [App\Http\Controllers\NotificationController::class, 'openCommunityNotification'])
+        ->name('community.notifications.open');
     Route::post('/notifications/preference', [App\Http\Controllers\NotificationController::class, 'updatePreference'])
     ->name('notifications.updatePreference');
     Route::post('/webpush/subscribe', [App\Http\Controllers\PushSubscriptionController::class, 'store'])
@@ -300,28 +309,11 @@ Route::get('support', [HomeController::class, 'support']);
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('users', [AdminController::class, 'users']);
+    Route::get('users/{user}', [\App\Http\Controllers\Admin\ManageUserController::class, 'show'])->name('admin.users.manage');
+    Route::put('users/{user}', [\App\Http\Controllers\Admin\ManageUserController::class, 'update'])->name('admin.users.manage.update');
+    Route::put('users/{user}/access', [\App\Http\Controllers\Admin\ManageUserController::class, 'updateAccess'])->name('admin.users.manage.access');
+    Route::delete('users/{user}', [\App\Http\Controllers\Admin\ManageUserController::class, 'destroy'])->name('admin.users.manage.destroy');
     Route::get('courses', [CourseController::class, 'index']);
-    Route::get('ear-training', [EarTrainingController::class, 'index']);
-    Route::get('ear-training/list', [EarTrainingController::class, 'list']);
-    Route::get('ear-training/create', [EarTrainingController::class, 'create']);
-    Route::get('ear-training/{id}', [EarTrainingController::class, 'show']);
-    Route::post('/ear-training', [EarTrainingController::class, 'store']);
-    Route::get('ear-training/show', [EarTrainingController::class, 'showadmin']);
-    if (app()->environment('local')) {
-        Route::get('audio-quiz', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'index'])->name('admin.audio-quiz');
-        Route::post('audio-quiz/category/rename', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'renameCategory'])->name('admin.audio-quiz.category.rename');
-        Route::post('audio-quiz/{quiz}/update', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'updateLesson'])->name('admin.audio-quiz.lesson.update');
-        Route::post('audio-quiz/{quiz}/rename', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'renameLesson'])->name('admin.audio-quiz.lesson.rename');
-        Route::post('audio-quiz/{quiz}/questions', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'storeQuestion'])->name('admin.audio-quiz.questions.store');
-        Route::delete('audio-quiz/questions/{question}', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'destroyQuestion'])->name('admin.audio-quiz.questions.destroy');
-        Route::post('audio-quiz/questions/{question}/update', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'updateQuestion'])->name('admin.audio-quiz.questions.update');
-        Route::post('audio-quiz/{quiz}/reference-audio', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'storeReferenceAudio'])->name('admin.audio-quiz.reference-audio.store');
-        Route::delete('audio-quiz/reference-audio/{referenceAudio}', [\App\Http\Controllers\Admin\AudioQuizAdminController::class, 'destroyReferenceAudio'])->name('admin.audio-quiz.reference-audio.destroy');
-    }
-    Route::post('ear-training/update/{quiz}', [EarTrainingController::class, 'update']);
-    Route::delete('ear-training/delete/{quiz}', [EarTrainingController::class, 'destroy']);
-    Route::delete('ear-training/question/{question}', [EarTrainingController::class, 'deleteQuestion']);
-    Route::post('/ear-training/{quiz}/questions', [EarTrainingController::class, 'storeQuestions']);
     Route::get('course/create', [CourseController::class, 'create']);
     Route::post('course', [CourseController::class, 'store']);
     Route::get('uploads/piano-exercise', [UploadController::class, 'pianoExercise']);

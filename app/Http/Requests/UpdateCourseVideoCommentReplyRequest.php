@@ -11,7 +11,7 @@ class UpdateCourseVideoCommentReplyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()?->id === $this->route('reply')->user_id;
     }
 
     /**
@@ -22,7 +22,7 @@ class UpdateCourseVideoCommentReplyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'comment' => 'required|string',
         ];
     }
 }
