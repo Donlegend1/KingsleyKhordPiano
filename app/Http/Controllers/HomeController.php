@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Upload;
 use App\Models\UserDailyLogin;
 use App\Models\UserAssessment;
+use App\Services\Admin\DashboardMetrics;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -230,31 +231,13 @@ class HomeController extends Controller
             ->whereBetween('created_at', $window)->selectRaw('LOWER(TRIM(email)) as email');
         $pdfEmails = (clone $guideLeads)->selectRaw('LOWER(TRIM(email)) as email')->union($roadmapEmails);
         $pdfRequesters = DB::query()->fromSub($pdfEmails, 'pdf_emails')->count();
-        $periodDays = (int) $from->diffInDays($to) + 1;
-        $demoTraffic = [];
-        foreach ([
-            'Google Search' => [37, 72, 19],
-            'YouTube' => [30, 65, 24],
-            'Instagram' => [21, 38, 9],
-            'TikTok' => [12, 19, 4],
-            'Direct link' => [10, 24, 7],
-            'WhatsApp' => [7, 19, 8],
-            'Email' => [4, 14, 6],
-            'Facebook' => [3, 5, 1],
-        ] as $source => [$dailyVisitors, $monthlyAccounts, $monthlyPaidPlans]) {
-            $demoTraffic[$source] = [
-                'visitors' => $dailyVisitors * $periodDays,
-                'accounts' => (int) round($monthlyAccounts * $periodDays / 30),
-                'paidPlans' => (int) round($monthlyPaidPlans * $periodDays / 30),
-            ];
-        }
-        $demoVisitors = array_sum(array_column($demoTraffic, 'visitors'));
+        $metrics = new DashboardMetrics($from, $to);
 
         $stats = [
             'New sign-ups' => ['users', (clone $signups)->count(), 'Member accounts created'],
             'Active members' => ['sign-in-alt', (clone $activity)->distinct()->count('user_id'), 'Members with a recorded active day'],
+            'Active subscribers' => ['credit-card', $metrics->activeSubscribers(), 'Members with plan access today'],
             'PDF requesters' => ['file-alt', $pdfRequesters, 'Unique emails from free guide and roadmap requests'],
-            'Visitors' => ['globe', $demoVisitors, 'Estimated unique visitors for this period'],
         ];
 
         $signupDays = (clone $signups)->selectRaw('DATE(created_at) as day, COUNT(*) as total')->groupByRaw('DATE(created_at)')->pluck('total', 'day');
@@ -283,10 +266,25 @@ class HomeController extends Controller
             $skillLevels[$level] = (int) ($assessmentCounts[strtolower($level)] ?? 0);
         }
 
+        // Each tab only loads the reports it shows.
+        $report = match ($activeTab) {
+            'overview' => ['latestSignups' => $metrics->latestSignups()],
+            'acquisition' => [
+                'countriesAllTime' => $metrics->membersByCountry(),
+                'countriesPeriod' => $metrics->membersByCountry(periodOnly: true),
+            ],
+            'student-engagement' => [
+                'firstWeek' => $metrics->firstWeek(),
+                'returnToLearning' => $metrics->returnToLearning(),
+                'topLessons' => $metrics->topLessons(),
+            ],
+            'subscriptions' => ['subscriptionActivity' => $metrics->subscriptionActivity()],
+        };
+
         return view('admin.home', compact(
             'tabs', 'activeTab',
-            'from', 'to', 'today', 'rangeError', 'stats', 'dailyCounts', 'guides', 'skillLevels', 'demoTraffic', 'demoVisitors'
-        ));
+            'from', 'to', 'today', 'rangeError', 'stats', 'dailyCounts', 'guides', 'skillLevels'
+        ) + $report);
     }
 
     public function profile()

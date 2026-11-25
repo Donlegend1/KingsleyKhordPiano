@@ -164,6 +164,28 @@ class CommunityIndexController extends Controller
        return view('community.members');
    }
 
+   /**
+    * Community member directory. Returns only profile fields shown in the
+    * directory, never emails or billing details.
+    */
+   public function membersList(\Illuminate\Http\Request $request)
+   {
+       $query = \App\Models\User::query()
+           ->select(['id', 'first_name', 'last_name', 'display_name', 'passport', 'role', 'created_at', 'last_login_at'])
+           ->with('community:id,user_id,user_name,social,verified_status,status');
+
+       match ($request->string('sort')->toString()) {
+           'display_name' => $query->orderBy('first_name')->orderBy('last_name'),
+           'latest_activity' => $query->orderByRaw('last_login_at IS NULL')->orderByDesc('last_login_at'),
+           default => $query->orderByDesc('created_at'),
+       };
+
+       $members = $query->orderByDesc('id')->paginate(10);
+       $members->getCollection()->each->setAppends([]);
+
+       return response()->json($members);
+   }
+
    public function activityFeed()
    {
       return view('community.activity-feed', $this->communitySidebarData());

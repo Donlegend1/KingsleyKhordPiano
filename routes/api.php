@@ -70,9 +70,9 @@ use App\Http\Controllers\LiveShowNotificationController;
     });
 
     Route::prefix('admin')->group(function () {
-        Route::get('users', [AdminController::class, 'usersList']);
         Route::get('all-courses', [CourseController::class, 'allCourses']);
         Route::middleware(['web', 'auth'])->group(function () {
+            Route::get('users', [AdminController::class, 'usersList']);
             Route::put('users/{user}', [AdminController::class, 'editUser']);
             Route::put('users/{user}/subscription', [AdminController::class, 'updateSubscriptionAccess']);
             Route::delete('user/{user}', [AdminController::class, 'destroy']);
@@ -187,6 +187,7 @@ use App\Http\Controllers\LiveShowNotificationController;
     Route::prefix('member')->middleware(['web', 'auth'])->group(function () {
         Route::get('courses', [CourseController::class, 'index']);
         Route::get('user/{community}', [UserController::class, 'getSingleUser']);
+        Route::get('community/members', [\App\Http\Controllers\CommunityIndexController::class, 'membersList']);
         Route::post('user/{community}/update', [UserController::class, 'updateUserCommunity']);
         Route::post('passport', [UserController::class, 'updateUserPassport']);
         Route::get('courses/{level}', [CourseController::class, 'membershowAPI']);  

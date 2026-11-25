@@ -48,8 +48,8 @@
                     <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
                         <i class="fas fa-{{ $icon }}" aria-hidden="true"></i>
                     </span>
-                    @if($label === 'Visitors')
-                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">Demo data</span>
+                    @if($label === 'Active subscribers')
+                        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">Today</span>
                     @endif
                 </div>
                 <dt class="text-sm font-semibold text-slate-700">{{ $label }}</dt>
@@ -71,16 +71,7 @@
 
     @if($activeTab === 'overview')
         <section class="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-            @php
-                $showDemoSignIns = collect($dailyCounts)->every(fn ($row) => $row['signIns'] === null);
-                $demoSignIns = [34, 26, 31, 19, 24, 16, 22, 29, 18, 27, 15];
-            @endphp
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="text-lg font-bold text-slate-900">Daily member sign-ins</h2>
-                @if($showDemoSignIns)
-                    <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">Demo sign-ins</span>
-                @endif
-            </div>
+            <h2 class="text-lg font-bold text-slate-900">Daily member sign-ins</h2>
             <p class="mt-1 text-sm text-slate-600">Each member counts once per day when they log in. Dates use {{ config('app.timezone') }}.</p>
             <div class="mt-4 max-h-72 overflow-auto rounded-lg border border-slate-200" tabindex="0" role="region" aria-label="Daily sign-in counts for the selected period">
                 <table class="w-full text-left text-sm">
@@ -96,9 +87,7 @@
                             <tr>
                                 <th scope="row" class="px-3 py-2.5 font-medium text-slate-800">{{ $row['date'] }}</th>
                                 <td class="px-3 py-2.5 text-right font-bold tabular-nums text-blue-800">
-                                    @if($showDemoSignIns)
-                                        {{ $demoSignIns[$loop->index % count($demoSignIns)] }}
-                                    @elseif($row['signIns'] === null)
+                                    @if($row['signIns'] === null)
                                         <span aria-label="Unavailable" class="font-normal text-slate-500">—</span>
                                     @else
                                         {{ number_format($row['signIns']) }}
@@ -110,128 +99,74 @@
                     </tbody>
                 </table>
             </div>
-            <p class="mt-3 text-xs leading-5 text-slate-600">
-                @if($showDemoSignIns)
-                    The Signed in column shows sample counts for this period. New sign-ups come from registration records.
-                @else
-                    A dash means sign-in history is unavailable for that day. The separate Active members card includes visits from remembered sessions.
-                @endif
-            </p>
+            <p class="mt-3 text-xs leading-5 text-slate-600">A dash means sign-in history wasn't being recorded yet on that day. The Active members card also counts visits from remembered sessions.</p>
         </section>
 
-        <section class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-            @php
-                $demoSignups = [
-                    ['Amara Okafor', 'amara.okafor@example.test', 0, 'Nigeria', 'Standard Monthly'],
-                    ['Daniel Mensah', 'daniel.mensah@example.test', 0, 'Ghana', null],
-                    ['Sofia Bennett', 'sofia.bennett@example.test', 1, 'United Kingdom', 'Standard Yearly'],
-                    ['Ethan Brooks', 'ethan.brooks@example.test', 1, 'United States', null],
-                    ['Maya Chen', 'maya.chen@example.test', 2, 'Canada', 'Premium Quarterly'],
-                    ['Chidi Nwosu', 'chidi.nwosu@example.test', 2, 'Nigeria', null],
-                    ['Isabel Santos', 'isabel.santos@example.test', 3, 'Philippines', 'Standard Monthly'],
-                    ['Noah Wilson', 'noah.wilson@example.test', 4, 'Australia', null],
-                    ['Leila Mbeki', 'leila.mbeki@example.test', 4, 'South Africa', 'Premium Yearly'],
-                    ['Ava Thompson', 'ava.thompson@example.test', 5, 'United States', null],
-                ];
-            @endphp
-            <div class="flex items-center justify-between gap-2">
-                <h2 class="text-lg font-bold text-slate-900">Latest 10 sign-ups</h2>
-                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">Demo data</span>
+        <section class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="latest-signups-heading">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 id="latest-signups-heading" class="text-lg font-bold text-slate-900">Latest 10 sign-ups</h2>
+                <a href="{{ url('/admin/users') }}" class="text-sm font-semibold text-blue-800 hover:underline">All users <span aria-hidden="true">→</span></a>
             </div>
-            <div class="mt-3 overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-slate-600">
-                        <tr><th scope="col" class="px-3 py-2">Name</th><th scope="col" class="px-3 py-2">Email</th><th scope="col" class="px-3 py-2">Joined</th><th scope="col" class="px-3 py-2">Sign-up country</th><th scope="col" class="px-3 py-2">Sign-up type</th><th scope="col" class="px-3 py-2">Plan</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @foreach($demoSignups as [$name, $email, $daysAgo, $country, $plan])
+            <p class="mt-1 text-sm text-slate-600">Newest member accounts, with the plan and access they have today.</p>
+            @if($latestSignups->isEmpty())
+                <p class="mt-4 rounded-lg bg-slate-50 px-3 py-6 text-center text-sm text-slate-600">No members have signed up yet.</p>
+            @else
+                <div class="mt-3 overflow-x-auto">
+                    <table class="w-full min-w-[40rem] text-left text-sm">
+                        <thead class="bg-slate-50 text-xs font-semibold text-slate-700">
                             <tr>
-                                <td class="px-3 py-3 font-semibold">{{ $name }}</td>
-                                <td class="px-3 py-3">{{ $email }}</td>
-                                <td class="whitespace-nowrap px-3 py-3">{{ $today->subDays($daysAgo)->format('M j, Y') }}</td>
-                                <td class="px-3 py-3">{{ $country }}</td>
-                                <td class="whitespace-nowrap px-3 py-3">
-                                    <span class="rounded-full px-2 py-1 text-xs font-semibold {{ $plan ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-700' }}">
-                                        {{ $plan ? 'Paid at sign-up' : 'Sign-up only' }}
-                                    </span>
-                                </td>
-                                <td class="whitespace-nowrap px-3 py-3">{{ $plan ?? '—' }}</td>
+                                <th scope="col" class="px-3 py-2">Name</th>
+                                <th scope="col" class="px-3 py-2">Email</th>
+                                <th scope="col" class="px-3 py-2">Joined</th>
+                                <th scope="col" class="px-3 py-2">Country</th>
+                                <th scope="col" class="px-3 py-2">Plan</th>
+                                <th scope="col" class="px-3 py-2">Status</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach($latestSignups as $signup)
+                                <tr>
+                                    <td class="px-3 py-3 font-semibold">
+                                        <a href="{{ route('admin.users.manage', $signup->id) }}" class="text-slate-900 hover:text-blue-800 hover:underline">{{ $signup->name }}</a>
+                                    </td>
+                                    <td class="break-all px-3 py-3 text-slate-700">{{ $signup->email }}</td>
+                                    <td class="whitespace-nowrap px-3 py-3 text-slate-700">
+                                        <time datetime="{{ $signup->joined->toIso8601String() }}">{{ $signup->joined->format('M j, Y') }}</time>
+                                    </td>
+                                    <td class="px-3 py-3 text-slate-700">{{ $signup->country ?? '—' }}</td>
+                                    <td class="whitespace-nowrap px-3 py-3 text-slate-700">{{ $signup->plan }}</td>
+                                    <td class="whitespace-nowrap px-3 py-3">
+                                        <span class="rounded-full px-2 py-1 text-xs font-semibold {{ match ($signup->status) { 'Active' => 'bg-emerald-50 text-emerald-800', 'Canceled' => 'bg-amber-50 text-amber-800', default => 'bg-slate-100 text-slate-700' } }}">{{ $signup->status }}</span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </section>
     @elseif($activeTab === 'acquisition')
-        <section class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="traffic-sources-heading">
-            <div class="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                    <h2 id="traffic-sources-heading" class="text-lg font-bold text-slate-900">Traffic sources and conversions</h2>
-                    <p class="mt-1 text-xs text-slate-600">Sample counts for the selected period. Paid plans are included in accounts created.</p>
-                </div>
-                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">Demo data</span>
-            </div>
-            <div class="mt-3 overflow-x-auto">
-                <table class="w-full min-w-[18rem] text-left text-sm">
-                    <thead class="bg-slate-50 text-xs text-slate-700">
-                        <tr>
-                            <th scope="col" class="px-2 py-2 sm:px-3">Source</th>
-                            <th scope="col" class="px-2 py-2 text-right sm:px-3">Visitors</th>
-                            <th scope="col" class="px-2 py-2 text-right sm:px-3">Accounts created</th>
-                            <th scope="col" class="px-2 py-2 text-right sm:px-3">Paid plans</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @foreach($demoTraffic as $source => $counts)
-                            <tr>
-                                <th scope="row" class="px-2 py-2 font-medium text-slate-800 sm:px-3">
-                                    {{ $source }}
-                                    <div class="mt-1 h-1.5 rounded-full bg-slate-100" aria-hidden="true">
-                                        <div class="h-full rounded-full bg-blue-600" style="width: {{ 100 * $counts['visitors'] / $demoVisitors }}%"></div>
-                                    </div>
-                                </th>
-                                <td class="px-2 py-2 text-right font-semibold tabular-nums text-slate-900 sm:px-3">{{ number_format($counts['visitors']) }}</td>
-                                <td class="px-2 py-2 text-right tabular-nums text-slate-700 sm:px-3">{{ number_format($counts['accounts']) }}</td>
-                                <td class="px-2 py-2 text-right tabular-nums text-slate-700 sm:px-3">{{ number_format($counts['paidPlans']) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot class="border-t border-slate-200 bg-slate-50 font-bold tabular-nums text-slate-900">
-                        <tr>
-                            <th scope="row" class="px-2 py-2 sm:px-3">Total</th>
-                            <td class="px-2 py-2 text-right sm:px-3">{{ number_format($demoVisitors) }}</td>
-                            <td class="px-2 py-2 text-right sm:px-3">{{ number_format(array_sum(array_column($demoTraffic, 'accounts'))) }}</td>
-                            <td class="px-2 py-2 text-right sm:px-3">{{ number_format(array_sum(array_column($demoTraffic, 'paidPlans'))) }}</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </section>
-        <section class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-            <div class="flex items-center justify-between gap-3">
-                <h2 class="text-lg font-bold text-slate-900">Members by country</h2>
-                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">Demo data</span>
-            </div>
-            <p class="mt-1 text-xs text-slate-600">All registered members, including paid and unpaid accounts, across all dates.</p>
-            <div class="mt-4 flex justify-between border-b border-slate-200 pb-2 text-xs font-semibold text-slate-600">
-                <span>Country</span>
-                <span>Members</span>
-            </div>
-            <ul class="mt-3 space-y-3">
-                @foreach(['Nigeria' => 48, 'United States' => 27, 'United Kingdom' => 16, 'Ghana' => 11, 'Canada' => 8] as $country => $count)
-                    <li>
-                        <div class="mb-1 flex justify-between gap-2 text-sm text-slate-800">
-                            <span>{{ $country }}</span>
-                            <strong class="tabular-nums">{{ $count }}</strong>
-                        </div>
-                        <div class="h-1.5 rounded-full bg-slate-100" aria-hidden="true">
-                            <div class="h-full rounded-full bg-blue-600" style="width: {{ $count / 48 * 100 }}%"></div>
-                        </div>
-                    </li>
-                @endforeach
-            </ul>
-        </section>
+        <div class="grid gap-4 xl:grid-cols-2">
+            @include('admin.partials.country-breakdown', [
+                'headingId' => 'period-countries-heading',
+                'heading' => 'Sign-ups by country',
+                'intro' => 'Member accounts created between ' . $from->format('M j') . ' and ' . $to->format('M j, Y') . '.',
+                'breakdown' => $countriesPeriod,
+                'empty' => 'No sign-ups in this period.',
+            ])
+            @include('admin.partials.country-breakdown', [
+                'headingId' => 'all-countries-heading',
+                'heading' => 'All members by country',
+                'intro' => 'Every registered member, paid or not, across all dates.',
+                'breakdown' => $countriesAllTime,
+                'empty' => 'No members yet.',
+            ])
+        </div>
 
+        <section class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 sm:p-5" aria-labelledby="traffic-sources-heading">
+            <h2 id="traffic-sources-heading" class="text-lg font-bold text-slate-900">Traffic sources</h2>
+            <p class="mt-1 text-sm leading-6 text-slate-600">Not tracked yet. The site doesn't record where visitors come from or how many visit, so this report can't be shown. Recording the referrer and UTM tags when someone signs up would make it possible.</p>
+        </section>
     @elseif($activeTab === 'student-engagement')
         @include('admin.partials.student-engagement')
 

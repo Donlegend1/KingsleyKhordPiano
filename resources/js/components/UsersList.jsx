@@ -20,6 +20,7 @@ const UsersList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [total, setTotal] = useState(0);
     const [search, setSearch] = useState("");
     const [planFilter, setPlanFilter] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
@@ -36,18 +37,23 @@ const UsersList = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get(
-                "/api/admin/users",
-                {
-                    headers: { "X-CSRF-TOKEN": csrfToken },
-                    withCredentials: true,
-                }
-            );
+            const response = await axios.get("/api/admin/users", {
+                params: {
+                    page,
+                    per_page: perPage,
+                    search: search.trim() || undefined,
+                    plan: planFilter || undefined,
+                    status: statusFilter || undefined,
+                },
+                headers: { "X-CSRF-TOKEN": csrfToken },
+                withCredentials: true,
+            });
 
             if (id !== requestId.current) return;
             setUserList(response.data.data);
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
+            setTotal(response.data.total);
         } catch (error) {
             if (id !== requestId.current) return;
             console.error("Error fetching users:", error);
@@ -98,8 +104,10 @@ const UsersList = () => {
                         <h2 className="text-xl font-semibold text-gray-900">
                             Users
                         </h2>
-                        <p className="mt-1 text-sm text-gray-500">
-                            Manage and monitor user accounts
+                        <p className="mt-1 text-sm text-gray-500" aria-live="polite">
+                            {loading
+                                ? "Loading users…"
+                                : `${total.toLocaleString()} ${total === 1 ? "user" : "users"}${search || planFilter || statusFilter ? " match these filters" : ""}`}
                         </p>
                     </div>
 
@@ -138,7 +146,7 @@ const UsersList = () => {
             </div>
 
             <div className="flex-1">
-                {userList.length === 0 ? (
+                {userList.length === 0 && !loading ? (
                     <div className="px-6 py-12 text-center">
                         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                             <i className="fas fa-users text-2xl text-gray-400"></i>

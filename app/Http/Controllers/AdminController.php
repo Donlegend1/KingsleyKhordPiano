@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Community;
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Queries\UserSubscriptionSummary;
 use App\Enums\Roles\UserRoles;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -22,15 +23,18 @@ class AdminController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function users() 
+    public function users(Request $request)
     {
-        $users = User::with('community')->paginate(10);
-        return view('admin.users', compact('users'));
+        $this->authorizeUserManagement($request);
+
+        return view('admin.users');
     }
 
     public function usersList(Request $request)
     {
-        $query = User::query()->fromSub($this->usersWithSubscriptionFilters(), 'users')->with([
+        $this->authorizeUserManagement($request);
+
+        $query = User::query()->fromSub(UserSubscriptionSummary::query(), 'users')->with([
             'plan',
             'community',
             'subscriptions' => fn ($q) => $q->latest(),
@@ -45,21 +49,21 @@ class AdminController extends Controller
             $query->where('display_plan', $planFilter);
         }
 
-        // ==== SORTING ====
         if ($request->filled('search')) {
-            $search = $request->input('search');
+            $search = trim((string) $request->input('search'));
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT_WS(' ', first_name, last_name) LIKE ?", ["%{$search}%"]);
             });
-        } else {
-            // Default sorting: admins first, then by created_at desc
-            $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
-                ->orderBy('created_at', 'desc')->orderByDesc('id');
         }
 
-        $perPage = $request->get('perPage', $request->get('per_page', 10));
+        // Admins first, then newest accounts. Always ordered so pages don't overlap.
+        $query->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
+            ->orderBy('created_at', 'desc')->orderByDesc('id');
+
+        $perPage = min(max((int) $request->get('perPage', $request->get('per_page', 10)), 1), 100);
         $users = $query->paginate($perPage);
         $countryNames = DB::table('countries')->pluck('country_name', 'country_code');
 
@@ -102,54 +106,6 @@ class AdminController extends Controller
         });
 
         return response()->json($users);
-    }
-
-    private function usersWithSubscriptionFilters()
-    {
-        $latest = Subscription::query()->whereColumn('subscriptions.user_id', 'users.id')
-            ->orderByDesc('subscriptions.created_at')->orderByDesc('subscriptions.id')->limit(1);
-        $source = User::query()->leftJoin('plans', 'plans.id', '=', 'users.plan')->select('users.*');
-        $grammar = $source->getQuery()->getGrammar();
-        $durationMeta = $grammar->wrap('users.metadata->duration');
-        $tierMeta = $grammar->wrap('users.metadata->tier');
-        $status = (clone $latest)->select('stripe_status');
-        $duration = (clone $latest)->select('duration');
-        $method = (clone $latest)->select('payment_method');
-
-        $source->selectRaw("LOWER(COALESCE(users.subscription_status, ({$status->toSql()}), '')) as effective_status")
-            ->selectRaw("LOWER(COALESCE({$durationMeta}, ({$duration->toSql()}), users.subscription_type, plans.type, '')) as plan_interval")
-            ->selectRaw("LOWER(COALESCE({$tierMeta}, plans.tier, CASE WHEN users.premium THEN 'premium' ELSE 'standard' END)) as plan_tier")
-            ->selectRaw("LOWER(COALESCE(users.payment_method, ({$method->toSql()}), '')) as plan_method");
-        $now = now();
-
-        return DB::query()->fromSub($source, 'accounts')->select('accounts.*')->selectRaw("
-            CASE
-                WHEN effective_status IN ('canceled', 'cancelled') THEN 'Canceled'
-                WHEN effective_status = 'paused' OR subscription_started_at > ? THEN 'Inactive'
-                WHEN EXISTS (
-                    SELECT 1 FROM subscriptions WHERE subscriptions.user_id = accounts.id AND (
-                        (stripe_status IN ('active', 'trialing') AND (ends_at IS NULL OR ends_at > ?))
-                        OR (stripe_status IN ('canceled', 'cancelled') AND ends_at > ?)
-                    )
-                ) OR (
-                    subscription_expires_at > ?
-                    AND effective_status NOT IN ('past_due', 'expired', 'failed', 'incomplete', 'pending')
-                    AND (effective_status IN ('active', 'trialing') OR payment_status = 'successful')
-                ) OR EXISTS (
-                    SELECT 1 FROM payments WHERE payments.user_id = CAST(accounts.id AS CHAR)
-                    AND payments.status = 'successful' AND payments.ends_at > ?
-                ) THEN 'Active'
-                ELSE 'Inactive'
-            END as display_subscription_status
-        ", [$now, $now, $now, $now, $now])->selectRaw("
-            CASE
-                WHEN plan_interval IN ('month', 'monthly') THEN CASE WHEN plan_tier LIKE '%premium%' THEN 'premium-monthly' ELSE 'standard-monthly' END
-                WHEN plan_interval IN ('quarter', 'quarterly') THEN CASE WHEN plan_tier LIKE '%premium%' THEN 'premium-quarterly' ELSE 'standard-quarterly' END
-                WHEN plan_interval IN ('year', 'yearly', 'annual') THEN CASE WHEN plan_tier LIKE '%premium%' THEN 'premium-yearly' ELSE 'standard-yearly' END
-                WHEN plan_interval = 'manual' OR plan_method = 'manual' THEN 'manual'
-                ELSE 'none'
-            END as display_plan
-        ");
     }
 
     public function editUser(Request $request, User $user)

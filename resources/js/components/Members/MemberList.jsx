@@ -49,7 +49,7 @@ const MemberList = () => {
     const fetchUsers = async (page = 1) => {
         try {
             const response = await axios.get(
-                `/api/admin/users?page=${page}&sort=${sortBy}`
+                `/api/member/community/members?page=${page}&sort=${sortBy.trim()}`
             );
             setMembers(response?.data?.data || []);
             setTotalPages(response?.data?.last_page || 1);
